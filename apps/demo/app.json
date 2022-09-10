@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "context-irl",
+    "slug": "context-irl",
+    "scheme": "bacontext",
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

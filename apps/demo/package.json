@@ -1,0 +1,41 @@
+{
+  "name": "metro-context-modules-demo",
+  "version": "1.0.0",
+  "main": "./index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@bacons/expo-metro-runtime": "^1.2.0",
+    "@expo/html-elements": "^0.2.0",
+    "@radix-ui/react-slot": "^1.0.0",
+    "@react-navigation/bottom-tabs": "^6.3.3",
+    "@react-navigation/drawer": "^6.4.4",
+    "@react-navigation/material-top-tabs": "^6.2.3",
+    "@react-navigation/native": "^6.0.12",
+    "@react-navigation/native-stack": "^6.8.0",
+    "@react-navigation/stack": "^6.2.3",
+    "@types/react": "~18.0.0",
+    "@types/react-native": "~0.69.1",
+    "expo": "~46.0.7",
+    "expo-router": "0.0.0",
+    "react": "18.0.0",
+    "react-dom": "18.0.0",
+    "react-native": "0.69.4",
+    "react-native-gesture-handler": "~2.5.0",
+    "react-native-pager-view": "5.4.24",
+    "react-native-reanimated": "~2.9.1",
+    "react-native-safe-area-context": "4.3.1",
+    "react-native-screens": "~3.15.0",
+    "react-native-tab-view": "^3.1.1",
+    "react-native-web": "~0.18.7",
+    "typescript": "^4.6.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.9"
+  },
+  "private": true
+}
