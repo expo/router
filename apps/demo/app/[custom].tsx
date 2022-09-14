@@ -1,8 +1,10 @@
+import { Link } from '@react-navigation/native';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { Text, View } from 'react-native';
 
 export const getNavOptions = (): NativeStackNavigationOptions => ({
-    title: 'Not Found'
+    title: 'Not Found',
+    headerShown: true,
 });
 
 export default function App({ navigation }) {
@@ -17,14 +19,13 @@ export default function App({ navigation }) {
                 alignItems: "stretch",
             }}
         >
-            <Text
+            <Link
                 style={{ position: "absolute", top: 8, left: 8 }}
-                onPress={() => {
-                    navigation.goBack();
-                }}
+
+                to="/"
             >
                 {__filename}
-            </Text>
+            </Link>
         </View>
     );
 }

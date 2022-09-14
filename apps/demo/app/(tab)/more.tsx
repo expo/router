@@ -20,7 +20,7 @@ export default function App({ navigation }) {
             <Text
                 style={{ position: "absolute", top: 8, left: 8 }}
                 onPress={() => {
-                    navigation.goBack();
+                    navigation.push('modal');
                 }}
             >
                 {__filename}

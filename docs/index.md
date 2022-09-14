@@ -20,6 +20,7 @@ Unlike the web, native apps have some constraints that make this more difficult:
 - **Universal:** The router should be able to be used with `react-native-web` to enable web navigation.
 - **Offline:** The router should be able to be used without a server. This means that the router must be able to run on the client in native environments. This is critical for app review.
 - **Universal links:** The router should be able to automatically parse incoming URLs and navigate to the correct page. This router should also be able to share URLs across platforms, enabling **perfect hand-off** between platforms. This means App Clips, Universal Links, and Deep Links should all work out of the box.
+- Missing routes are handled automatically. A default 404-type component is rendered when a route is not found. This can be fully replaced by adding a `app/[...missing].tsx` route.
 
 ## Follow up work
 

@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { RoutesContext } from './context';
 import { ContextNavigationContainer } from './ContextNavigationContainer';
 import { getRoutes } from './getRoutes';
-import { StackNavigator } from './navigation';
+import { NativeStackNavigator } from './navigation';
 import { CurrentRoute } from './routes';
 
 // @ts-expect-error: welp
@@ -65,7 +65,7 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
             <CurrentRoute filename={"./"}>
                 <ContextNavigationContainer>
                     {/* Using a switch navigator at the root to host all pages. */}
-                    <StackNavigator screenOptions={{ animationEnabled: false, headerShown: false }} />
+                    <NativeStackNavigator screenOptions={{ animation: 'none', headerShown: false }} />
                 </ContextNavigationContainer>
             </CurrentRoute>
         </RoutesContextProvider>

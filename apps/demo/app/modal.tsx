@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 
 export const getNavOptions = (): NativeStackNavigationOptions => ({
     presentation: "modal",
+    animation: 'default'
 });
 
 export default function App({ navigation }) {
