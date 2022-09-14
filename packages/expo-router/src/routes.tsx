@@ -1,28 +1,101 @@
-import NavigationScreen from '@react-navigation/core/src/Screen';
-import React, { createContext, forwardRef, ReactNode, useContext } from 'react';
+import NavigationScreen from "@react-navigation/core/src/Screen";
+import { useURL } from "expo-linking";
+import React, { createContext, forwardRef, ReactNode, useContext } from "react";
 
-import { AutoErrorBoundary } from './ErrorBoundary'
+import { AutoErrorBoundary } from "./ErrorBoundary";
+
+const dev = process.env.NODE_ENV === "development";
+
+type RouteNode = {
+    /** nested routes */
+    children: RouteNode[];
+    /** React component */
+    component: React.ComponentType<any>;
+    /** Is the route a dynamic path */
+    dynamic: boolean;
+    /** All static exports from the file. */
+    extras: Record<string, any>;
+    /** `index`, `error-boundary`, etc. */
+    route: string;
+};
+
+export const CurrentRouteContext = React.createContext<{
+    filename: string | null;
+    routes: RouteNode[];
+}>({
+    filename: null,
+    routes: [],
+});
+
+if (dev) {
+    CurrentRouteContext.displayName = "Route";
+}
+
+export function useModuleRoute() {
+    const { filename } = useContext(CurrentRouteContext);
+    if (dev && !filename) {
+        throw new Error("No filename found. This is likely a bug in expo-router.");
+    }
+    return filename;
+}
+
+/** Return all the routes for the current boundary. */
+export function useRoutes() {
+    const { filename, routes } = useContext(CurrentRouteContext);
+    if (dev && !filename) {
+        throw new Error("No filename found. This is likely a bug in expo-router.");
+    }
+    return routes;
+}
+
+/** Return the route that matches the current URL. */
+export function useSelectedRoute() {
+    const url = useURL();
+    const routes = useRoutes();
+
+    const [route, setRoute] = React.useState<RouteNode | null>(null);
+
+    React.useEffect(() => {
+        if (!url) return;
+        const route = routes.find((route) => {
+            if (route.dynamic) {
+                return url.startsWith(route.route);
+            }
+            return url === route.route;
+        });
+        setRoute(route ?? null);
+    }, [url, routes]);
+
+    return route;
+}
+
+export function CurrentRoute({
+    filename,
+    children,
+}: {
+    filename: string;
+    children: ReactNode;
+}) {
+    const routes = getRoutesAtPath(filename);
+
+    return (
+        <CurrentRouteContext.Provider value={{ filename, routes }}>
+            {children}
+        </CurrentRouteContext.Provider>
+    );
+}
+
 // Routes context
 export const RoutesContext = createContext<
     { route: string; children: any[] }[]
 >([]);
 
-const ROOT_FOLDER = "app";
+export const FileNameContext = createContext<
+    { route: string; children: any[] }[]
+>([]);
 
 export function matchDynamicName(name: string): string | undefined {
     return name.match(/^\[([^/]+)\]$/)?.[1];
-}
-
-export function matchSlot(name: string): string | undefined {
-    return name.match(/^@([^/]+)/)?.[1];
-}
-
-// Given `(..)foobar` return [`(..)`, `foobar`]
-// Given `(..)(...)foobar` return [`(..)(...)`, `foobar`]
-export function matchIntercepted(name: string): undefined | [string, string] {
-    const match = name.match(/^((?:\(\.\.\.?\))+)([^/]+)/);
-    if (!match?.[1]) return undefined;
-    return [match[1], match[2]];
 }
 
 // `[page]` -> `:page`
@@ -39,8 +112,9 @@ export function convertDynamicRouteToReactNavigation(name: string) {
 function expandFilePath(filePath: string) {
     // `./app/page.tsx` => `app/page`
     const normalized = getNameFromFilePath(filePath);
+    console.warn("expandFilePath", filePath, normalized);
     // `app/page` => `page`
-    const id = normalized.replace(new RegExp(`^${ROOT_FOLDER}/`, "g"), "");
+    const id = normalized;
     // const id = normalized.replace(/^app\//g, "");
     // `app/[page]` => `page`
     // `app/page` => `undefined`
@@ -48,32 +122,18 @@ function expandFilePath(filePath: string) {
     const last = id.split("/").pop();
 
     const dynamicName = matchDynamicName(last);
-    const slot = matchSlot(last);
-    if (!slot && last.startsWith("@")) {
-        console.error(
-            `Invalid slot name "${last}" at path "${filePath}". Slots must start with @ and contain only letters, numbers, and underscores.`
-        );
-    }
-
-    const intercepted = matchIntercepted(last);
-    if (intercepted && !intercepted[1]) {
-        console.error(
-            `Invalid intercepted route name "${last}" at path "${filePath}". Intercepted routes must start with '(..)' or '(...)' and contain only letters, numbers, and underscores.`
-        );
-    }
 
     return {
         normalized,
         id,
-        slot,
-        intercepted,
         lastPathName: dynamicName ?? last,
         dynamic: !!dynamicName,
     };
 }
 
-export function useRoutesAtPath(filename): { component: any, route: string, extras: Record<string, any> }[] {
+function getRoutesAtPath(filename: string): RouteNode[] {
     const info = expandFilePath(filename);
+
     // const name = getNameFromFilePath(filename).replace(/^app\//g, "");
     const routes = useContext(RoutesContext);
     // split and search
@@ -87,35 +147,40 @@ export function useRoutesAtPath(filename): { component: any, route: string, extr
     const filtered = current.filter(({ component }) => component);
 
     return filtered.map(({ component: Component, ...value }) => {
-        const { ErrorBoundary } = value.extras
+        const { ErrorBoundary } = value.extras;
         return {
             component: React.forwardRef((props, ref) => {
                 const children = <Component ref={ref} {...props} />;
                 if (ErrorBoundary) {
-                    return (<AutoErrorBoundary component={ErrorBoundary}>{children}</AutoErrorBoundary>)
+                    return (
+                        <AutoErrorBoundary component={ErrorBoundary}>
+                            {children}
+                        </AutoErrorBoundary>
+                    );
                 }
-                return children;
+                console.log("render with:", value.route);
+                return <CurrentRoute filename={value.route}>{children}</CurrentRoute>;
             }),
             ...value,
-        }
+        };
     });
 }
 
 /** Get the children React nodes as an array. */
-export function useChildren(filename?: string): React.ReactNode[] {
-    const children = useRoutesAtPath(filename);
+export function useChildren(): React.ReactNode[] {
+    const children = useRoutes();
     return children.map((value) => <value.component key={value.route} />);
 }
 
 // TODO: Make this return only the selected component.
-export function useChild(filename?: string) {
-    const children = useRoutesAtPath(filename);
+export function useChild() {
+    const children = useRoutes();
     return children?.map((value) => <value.component key={value.route} />)[0];
 }
 
 /** Wrap a navigator and export with the children for a given. */
-export function useNavigator(Nav, filename?: string) {
-    const children = useNavigationChildren(filename);
+export function useNavigator(Nav) {
+    const children = useNavigationChildren();
     if (!children?.length) return function EmptyNavigator() { };
 
     const Navigator = forwardRef((props, ref) => {
@@ -125,36 +190,30 @@ export function useNavigator(Nav, filename?: string) {
     return Navigator;
 }
 
-export function useNavigationChildren(filename?: string) {
-    if (!filename) throw new Error("filename is required");
-    const children = useRoutesAtPath(filename);
-    return children
-        .map((value) => (
+export function useNavigationChildren() {
+    const children = useRoutes();
+    return children.map((value) => (
+        <NavigationScreen
+            options={value.extras?.getNavOptions}
+            name={convertDynamicRouteToReactNavigation(value.route)}
+            key={value.route}
+            component={value.component}
+        />
+    ));
+}
+
+export function useNamedNavigationChildren(): Record<string, ReactNode> {
+    const children = useRoutes();
+    return Object.fromEntries(
+        children.map((value) => [
+            value.route,
             <NavigationScreen
                 options={value.extras?.getNavOptions}
                 name={convertDynamicRouteToReactNavigation(value.route)}
                 key={value.route}
                 component={value.component}
-            />
-        ));
-}
-
-export function useNamedNavigationChildren(
-    filename?: string
-): Record<string, ReactNode> {
-    if (!filename) throw new Error("filename is required");
-    const children = useRoutesAtPath(filename);
-    return Object.fromEntries(
-        children
-            .map((value) => [
-                value.route,
-                <NavigationScreen
-                    options={value.extras?.getNavOptions}
-                    name={convertDynamicRouteToReactNavigation(value.route)}
-                    key={value.route}
-                    component={value.component}
-                />,
-            ])
+            />,
+        ])
     );
 }
 

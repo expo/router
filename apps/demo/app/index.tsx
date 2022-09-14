@@ -28,7 +28,6 @@ export default function App() {
 
   return (
     <Navigator
-      ctx={__filename}
       initialRouteName="card"
       screenOptions={{
         headerShown: false,

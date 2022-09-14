@@ -13,8 +13,8 @@ const DrawerNavigatorUpstream = createDrawerNavigator().Navigator;
 import React from 'react';
 
 function createWrappedNavigator<T extends React.ComponentType<any>>(Nav: T): T {
-    const Navigator = React.forwardRef(({ ...props, ctx }, ref) => {
-        const children = useNavigationChildren(ctx);
+    const Navigator = React.forwardRef((props, ref) => {
+        const children = useNavigationChildren();
         // Prevent throwing an error when there are no screens.
         if (!children.length) return null;
         return <Nav {...props} ref={ref} children={children} />;

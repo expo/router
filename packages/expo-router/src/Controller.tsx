@@ -6,14 +6,14 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import React, { useMemo } from "react";
 
-import { RoutesContext } from "./routes";
+import { CurrentRoute, RoutesContext } from "./routes";
 
 import { getRoutes, getLinkingConfig } from "./getRoutes";
 
 // @ts-expect-error: welp
 type RequireContext = ReturnType<typeof require.context>;
 
-export function AutoNav({ context }: { context: RequireContext}) {
+export function AutoNav({ context }: { context: RequireContext }) {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
@@ -41,9 +41,11 @@ export function Controller({ context, children }: { context: RequireContext; chi
 
     return (
         <RoutesContext.Provider value={routes}>
-            <NavigationContainer linking={linking}>
-                {children ?? <Initial />}
-            </NavigationContainer>
+            <CurrentRoute filename="./index">
+                <NavigationContainer linking={linking}>
+                    {children ?? <Initial />}
+                </NavigationContainer>
+            </CurrentRoute>
         </RoutesContext.Provider>
     );
 }

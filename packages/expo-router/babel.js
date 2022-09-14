@@ -1,38 +1,38 @@
-// A babel plugin that adds `__filename` as the last argument of `useNavigationChildren` calls.
-// Input: `useNavigationChildren(Nav)`
-// Output: `useNavigationChildren(Nav, __filename)`
-const { relative } = require("path");
+// A babel plugin that adds `export const __filename = '...'` to every file in the app directory.
+
+const { relative, join } = require("path");
 
 module.exports = function (api) {
   const { types: t } = api;
   const getRelPath = (state) =>
     "./" + relative(state.file.opts.root, state.filename);
+  const isInAppDirectory = (state) => {
+    const { filename } = state;
+    const appDir = join(state.file.opts.root, "app");
+
+    return join(filename).startsWith(appDir);
+  };
+  const isContextModule = (state) => {
+    const { filename } = state;
+    return filename.match(/\?ctx=/);
+  };
 
   return {
     visitor: {
-      // Add support for Node.js __filename
-      Identifier(path, state) {
-        if (path.node.name === "__filename") {
-          path.replaceWith(t.stringLiteral(getRelPath(state)));
-        }
-      },
-
-      CallExpression(path, state) {
-        if (["useNavigator"].includes(path.node.callee.name)) {
-          if (path.node.arguments.length === 1) {
-            path.node.arguments.push(t.stringLiteral(getRelPath(state)));
-          }
-        } else if (
-          [
-            "useNamedNavigationChildren",
-            "useNavigationChildren",
-            "useChildren",
-            "useChild",
-          ].includes(path.node.callee.name)
-        ) {
-          if (path.node.arguments.length === 0) {
-            path.node.arguments.push(t.stringLiteral(getRelPath(state)));
-          }
+      Program(path, state) {
+        if (isInAppDirectory(state) && !isContextModule(state)) {
+          const relativePath = getRelPath(state);
+          path.unshiftContainer(
+            "body",
+            t.exportNamedDeclaration(
+              t.variableDeclaration("const", [
+                t.variableDeclarator(
+                  t.identifier("__filename"),
+                  t.stringLiteral(relativePath)
+                ),
+              ])
+            )
+          );
         }
       },
     },

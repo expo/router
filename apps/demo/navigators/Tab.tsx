@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { convertDynamicRouteToReactNavigation, Screen, useNavigationChildren, useRoutesAtPath } from 'expo-router';
+import { convertDynamicRouteToReactNavigation, Screen, useNavigationChildren, useRoutes } from 'expo-router';
 
 
 const UpstreamNavigator = createBottomTabNavigator();
@@ -56,7 +56,7 @@ export function Navigator({ ctx, children, ...props }) {
     });
     console.log('props:', tabBarItems)
 
-    const routesAtPath = useRoutesAtPath(ctx);
+    const routesAtPath = useRoutes();
     const screens = routesAtPath
         .map((value) => {
             const componentApi = tabBarItems.find((item) => item.to === value.route);
