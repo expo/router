@@ -97,6 +97,12 @@ export function matchDynamicName(name: string): string | undefined {
     return name.match(/^\[([^/]+)\]$/)?.[1];
 }
 
+
+// Match `(page)` -> `page`
+export function matchGroupName(name: string): string | undefined {
+    return name.match(/^\(([^/]+)\)$/)?.[1];
+}
+
 // `[page]` -> `:page`
 // `page` -> `page`
 export function convertDynamicRouteToReactNavigation(name: string) {
@@ -120,10 +126,12 @@ function expandFilePath(filePath: string) {
     const last = id.split("/").pop();
 
     const dynamicName = matchDynamicName(last);
+    const group = matchGroupName(last);
 
     return {
         normalized,
         id,
+        group,
         lastPathName: dynamicName ?? last,
         dynamic: !!dynamicName,
     };

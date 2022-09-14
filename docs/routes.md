@@ -53,19 +53,10 @@ The format and naming is similar to Next.js layouts, but the implementation and 
 
 ## Index Routes
 
-If a file or directory is named `index`, it will not add a new path segment to the route.
-
-This currently has an issue where multiple levels of index folders cannot have multiple dynamic routes:
-
-```
-- app/
-  - index.js
-  - index/
-    - index.js
-    - [catch].js -- This should match `localhost:19000/any` but it is intercepted, making this route unreachable.
-    - index/
-      - [catch2].js -- This will match `localhost:19000/any`
-```
+- If is named `index`, it will not add a new path segment to the route.
+- Directories cannot be named `index`.
+- `/index.js` is reserved for leaf routes.
+- An `index` route cannot be next to a route group as they'd both match `/`.
 
 ## Nested Routes
 

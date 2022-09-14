@@ -5,6 +5,7 @@ import {
   convertDynamicRouteToReactNavigation,
   getNameFromFilePath,
   matchDynamicName,
+  matchGroupName,
 } from "./routes";
 import { getAllWebRedirects } from "./aasa";
 
@@ -38,7 +39,8 @@ function treeToReactNavigationLinkingRoutes(nodes: Node[], depth = 0) {
       return routingInfo;
     })
     .reduce((acc, cur) => {
-      const path = cur.path === "index" ? "" : cur.path;
+      const path =
+        cur.path === "index" || matchGroupName(cur.path) ? "" : cur.path;
       if (!cur.screens) {
         acc[cur.path] = path;
       } else {

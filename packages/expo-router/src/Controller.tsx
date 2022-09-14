@@ -24,23 +24,30 @@ export function AutoNav({ context }: { context: RequireContext }) {
 }
 
 export function Controller({ context, children }: { context: RequireContext; children?: React.ReactNode }) {
-    const { Initial, routes, linking } = useMemo(() => {
+    const { Initial, key, routes, linking } = useMemo(() => {
         const keys = context.keys();
-        const initialKey = keys.find((value) =>
-            value.match(/^\.\/index\.(js|ts)x?$/)
+        const initialKeys = keys.filter((value) =>
+            value.match(/^\.\/[^/]+\.(js|ts)x?$/)
         );
-        const Initial = interopDefault(context(initialKey));
+        if (!initialKeys.length) {
+            console.warn('No initial route found in the app directory.');
+
+        }
+        if (initialKeys.length > 1) {
+            console.warn('Multiple initial routes found in the app directory.');
+        }
+        const Initial = interopDefault(context(initialKeys[0]));
 
         const routes = getRoutes(context);
 
         const linking = getLinkingConfig(routes);
         // console.log('routes', routes);
-        return { Initial, routes, linking };
+        return { Initial, key: initialKeys[0], routes, linking };
     }, [context.keys()]);
 
     return (
         <RoutesContext.Provider value={routes}>
-            <CurrentRoute filename="./index">
+            <CurrentRoute filename={key}>
                 <NavigationContainer linking={linking}>
                     {children ?? <Initial />}
                 </NavigationContainer>
