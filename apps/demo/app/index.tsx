@@ -1,19 +1,14 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useNamedNavigationChildren } from 'expo-router';
+import { NativeStackNavigator } from 'expo-router';
 
 const Nav = createBottomTabNavigator();
 
 export default function App() {
-  const { "[card]": card, index, ...rest } = useNamedNavigationChildren();
 
-  return <Nav.Navigator initialRouteName="card" screenOptions={{
+  return <NativeStackNavigator initialRouteName="index" screenOptions={{
     headerShown: false
-  }}>
-    {index}
-    {card}
-    {Object.values(rest)}
-  </Nav.Navigator>;
+  }} />
 }
 
 // import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';

@@ -11,24 +11,13 @@ export default function App() {
     return (
         <View
             style={{
+                margin: 24,
+                borderRadius: 20,
                 flex: 1,
-                flexDirection: "row",
-                flexWrap: 'wrap'
-
-            }}>
-            <Link to={"/error-boundary"}>Go to</Link>
-            <Square />
-            <Square />
-            <Square />
-            <Square />
-            <Square />
-            <Square />
-            <Square />
-        </View>
+                backgroundColor: "darkcyan",
+                padding: 24,
+                alignItems: "stretch",
+            }}
+        />
     );
-}
-
-function Square() {
-    const size = 200;
-    return (<View style={{ width: size, height: size, margin: 16, backgroundColor: 'gray' }} />)
 }

@@ -18,6 +18,18 @@ Routes are defined as files in the `app/` directory. The file name is the route 
 
 If a file or directory is named `index`, it will not add a new path segment to the route.
 
+This currently has an issue where multiple levels of index folders cannot have multiple dynamic routes:
+
+```
+- app/
+  - index.js
+  - index/
+    - index.js
+    - [catch].js -- This should match `localhost:19000/any` but it is intercepted, making this route unreachable.
+    - index/
+      - [catch2].js -- This will match `localhost:19000/any`
+```
+
 ## Nested Routes
 
 To render shared navigation elements like a header, tab bar, or drawer, you can use a nested route. If a directory name matches a file name, then the matching routes can be nested.

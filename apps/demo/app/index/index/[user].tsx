@@ -9,12 +9,10 @@ import { View } from "react-native";
 
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 // import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useNavigationChildren } from "expo-router";
+import { useNavigationChildren, useNavigator } from "expo-router";
 
 const Nav = createMaterialTopTabNavigator();
 
-
-// import { useChild } from "expo-router";
 
 export const getNavOptions = () => {
     return {
@@ -24,16 +22,14 @@ export const getNavOptions = () => {
 
 
 export default function App() {
-    // const children = useChild();
-    const children = useNavigationChildren();
+    const Navigator = useNavigator(Nav.Navigator);
     return (
         <View
             style={{
                 margin: 24,
                 borderRadius: 20,
                 flex: 1,
-                backgroundColor: "orange",
-                padding: 24,
+                backgroundColor: "white",
                 alignItems: "stretch",
             }}
         >
@@ -42,7 +38,7 @@ export default function App() {
                     height: 256,
                 }}
             />
-            <Nav.Navigator children={children} />
+            <Navigator />
 
         </View>
     );
