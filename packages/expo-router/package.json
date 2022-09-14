@@ -20,17 +20,18 @@
     "expo"
   ],
   "jest": {
-    "preset": "expo-module-scripts"
+    "preset": "jest-expo"
   },
   "peerDependencies": {
-    "expo": "^46.0.2"
-  },
-  "devDependencies": {
-    "expo-module-scripts": "^2.0.0"
-  },
-  "dependencies": {
-    "expo-linking": "^3.2.2",
+    "expo": "^46.0.2",
     "react-native-gesture-handler": "^2.6.0",
     "react-native-safe-area-context": "^4.3.3"
+  },
+  "devDependencies": {
+    "expo-module-scripts": "^2.0.0",
+    "jest": "^26.6.3"
+  },
+  "dependencies": {
+    "expo-linking": "^3.2.2"
   }
 }

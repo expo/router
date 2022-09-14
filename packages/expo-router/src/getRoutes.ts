@@ -19,7 +19,7 @@ type Node = {
   contextKey: string;
 };
 
-function treeToReactNavigationLinkingRoutes(nodes: Node[], depth = 0) {
+export function treeToReactNavigationLinkingRoutes(nodes: Node[], depth = 0) {
   return nodes
     .map((node) => {
       let path = convertDynamicRouteToReactNavigation(node.route);

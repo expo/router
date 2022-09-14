@@ -4,7 +4,6 @@ import React, { createContext, forwardRef, ReactNode, useContext } from "react";
 
 import { AutoErrorBoundary } from "./ErrorBoundary";
 
-// @ts-expect-error: this is provided by Metro and Webpack
 const dev = process.env.NODE_ENV === "development";
 
 type RouteNode = {

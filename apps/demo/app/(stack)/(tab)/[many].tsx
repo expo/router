@@ -7,7 +7,7 @@ export default function App({ navigation }) {
                 margin: 24,
                 borderRadius: 20,
                 flex: 1,
-                backgroundColor: "blue",
+                backgroundColor: "dodgerblue",
                 padding: 24,
                 alignItems: "stretch",
             }}
