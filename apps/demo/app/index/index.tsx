@@ -1,6 +1,11 @@
 // import { createDrawerNavigator } from '@react-navigation/drawer';
 // import { useNavigator } from 'expo-router';
 // import { useWindowDimensions } from 'react-native';
+import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
+import { Text, View } from 'react-native';
+
+import { TabBarIcon } from '../../components/TabBarIcon';
+
 
 // const Nav = createDrawerNavigator();
 
@@ -16,7 +21,12 @@
 //     );
 // }
 
-import { Text, View } from 'react-native';
+export const getNavOptions = (): BottomTabNavigationOptions => ({
+    headerShown: true,
+    title: 'Home',
+    tabBarIcon: (props) => <TabBarIcon {...props} name="home-outline" />
+})
+
 
 export default function App({ navigation }) {
     return (

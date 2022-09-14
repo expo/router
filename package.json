@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "expo-yarn-workspaces check-workspace-dependencies",
+    "postinstall": "patch-package && expo-yarn-workspaces check-workspace-dependencies",
     "start": "lerna run build --parallel -- --watch",
     "prepare": "lerna run prepare --parallel"
   },
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "eslint": "^7.25.0",
+    "patch-package": "^6.4.7",
     "expo-yarn-workspaces": "^2.0.2",
     "lerna": "3.4.1",
     "prettier": "^2.2.1",

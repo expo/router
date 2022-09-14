@@ -4,3 +4,4 @@ export * from './Controller'
 export { ErrorBoundaryProps } from './ErrorBoundary'
 
 export * from './navigation';
+export * from './primitives';

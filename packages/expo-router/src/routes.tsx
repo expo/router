@@ -1,9 +1,10 @@
-import NavigationScreen from "@react-navigation/core/src/Screen";
+import { Screen } from './primitives'
 import { useURL } from "expo-linking";
 import React, { createContext, forwardRef, ReactNode, useContext } from "react";
 
 import { AutoErrorBoundary } from "./ErrorBoundary";
 
+// @ts-expect-error: this is provided by Metro and Webpack
 const dev = process.env.NODE_ENV === "development";
 
 type RouteNode = {
@@ -55,6 +56,7 @@ export function useSelectedRoute() {
 
     const [route, setRoute] = React.useState<RouteNode | null>(null);
 
+    // TODO: This logic makes no sense
     React.useEffect(() => {
         if (!url) return;
         const route = routes.find((route) => {
@@ -69,6 +71,7 @@ export function useSelectedRoute() {
     return route;
 }
 
+/** Provides the matching routes and filename to the children. */
 export function CurrentRoute({
     filename,
     children,
@@ -76,7 +79,7 @@ export function CurrentRoute({
     filename: string;
     children: ReactNode;
 }) {
-    const routes = getRoutesAtPath(filename);
+    const routes = useRoutesAtPath(filename);
 
     return (
         <CurrentRouteContext.Provider value={{ filename, routes }}>
@@ -87,10 +90,6 @@ export function CurrentRoute({
 
 // Routes context
 export const RoutesContext = createContext<
-    { route: string; children: any[] }[]
->([]);
-
-export const FileNameContext = createContext<
     { route: string; children: any[] }[]
 >([]);
 
@@ -112,7 +111,6 @@ export function convertDynamicRouteToReactNavigation(name: string) {
 function expandFilePath(filePath: string) {
     // `./app/page.tsx` => `app/page`
     const normalized = getNameFromFilePath(filePath);
-    console.warn("expandFilePath", filePath, normalized);
     // `app/page` => `page`
     const id = normalized;
     // const id = normalized.replace(/^app\//g, "");
@@ -131,39 +129,43 @@ function expandFilePath(filePath: string) {
     };
 }
 
-function getRoutesAtPath(filename: string): RouteNode[] {
-    const info = expandFilePath(filename);
+function useRoutesAtPath(filename: string): RouteNode[] {
+    const info = React.useMemo(() => expandFilePath(filename), [filename]);
 
     // const name = getNameFromFilePath(filename).replace(/^app\//g, "");
     const routes = useContext(RoutesContext);
-    // split and search
-    const parts = info.id.split("/");
-    let current: any = routes;
-    for (const part of parts) {
-        current = current.find(({ route }) => route === part)?.children;
-        if (!current) return [];
-    }
 
-    const filtered = current.filter(({ component }) => component);
+    const matchingRoutes = React.useMemo(() => {
+        // split and search
+        const parts = info.id.split("/");
+        let current: any = routes;
+        for (const part of parts) {
+            current = current.find(({ route }) => route === part)?.children;
+            if (!current) return [];
+        }
+        return current.filter(({ component }) => component);
+    }, [info, routes]);
 
-    return filtered.map(({ component: Component, ...value }) => {
-        const { ErrorBoundary } = value.extras;
-        return {
-            component: React.forwardRef((props, ref) => {
-                const children = <Component ref={ref} {...props} />;
-                if (ErrorBoundary) {
-                    return (
-                        <AutoErrorBoundary component={ErrorBoundary}>
-                            {children}
-                        </AutoErrorBoundary>
-                    );
-                }
-                console.log("render with:", value.route);
-                return <CurrentRoute filename={value.route}>{children}</CurrentRoute>;
-            }),
-            ...value,
-        };
-    });
+    return React.useMemo(() => {
+        return matchingRoutes.map(({ component: Component, ...value }) => {
+            const { ErrorBoundary } = value.extras;
+            return {
+                component: React.forwardRef((props, ref) => {
+                    const children = <Component ref={ref} {...props} />;
+                    if (ErrorBoundary) {
+                        return (
+                            <AutoErrorBoundary component={ErrorBoundary}>
+                                {children}
+                            </AutoErrorBoundary>
+                        );
+                    }
+                    console.log("render with:", value.route);
+                    return <CurrentRoute filename={value.route}>{children}</CurrentRoute>;
+                }),
+                ...value,
+            };
+        });
+    }, [matchingRoutes]);
 }
 
 /** Get the children React nodes as an array. */
@@ -193,7 +195,7 @@ export function useNavigator(Nav) {
 export function useNavigationChildren() {
     const children = useRoutes();
     return children.map((value) => (
-        <NavigationScreen
+        <Screen
             options={value.extras?.getNavOptions}
             name={convertDynamicRouteToReactNavigation(value.route)}
             key={value.route}
@@ -207,7 +209,7 @@ export function useNamedNavigationChildren(): Record<string, ReactNode> {
     return Object.fromEntries(
         children.map((value) => [
             value.route,
-            <NavigationScreen
+            <Screen
                 options={value.extras?.getNavOptions}
                 name={convertDynamicRouteToReactNavigation(value.route)}
                 key={value.route}
@@ -216,8 +218,6 @@ export function useNamedNavigationChildren(): Record<string, ReactNode> {
         ])
     );
 }
-
-// TODO: useChild -- current route or null
 
 export function getNameFromFilePath(name) {
     return name.replace(/(^.\/)|(\.[jt]sx?$)/g, "");

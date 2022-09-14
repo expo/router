@@ -1,0 +1,580 @@
+diff --git a/node_modules/expo-font/build/ExpoFontLoader.web.js b/node_modules/expo-font/build/ExpoFontLoader.web.js
+index 3784a6a..1abd394 100644
+--- a/node_modules/expo-font/build/ExpoFontLoader.web.js
++++ b/node_modules/expo-font/build/ExpoFontLoader.web.js
+@@ -1,116 +1,124 @@
+-import { CodedError, Platform } from 'expo-modules-core';
+-import FontObserver from 'fontfaceobserver';
+-import { FontDisplay } from './Font.types';
++import { CodedError, Platform } from "expo-modules-core";
++import FontObserver from "fontfaceobserver";
++import { FontDisplay } from "./Font.types";
+ function getFontFaceStyleSheet() {
+-    if (!Platform.isDOMAvailable) {
+-        return null;
+-    }
+-    const styleSheet = getStyleElement();
+-    return styleSheet.sheet ? styleSheet.sheet : null;
++  if (!Platform.isDOMAvailable) {
++    return null;
++  }
++  const styleSheet = getStyleElement();
++  return styleSheet.sheet ? styleSheet.sheet : null;
+ }
+ function getFontFaceRules() {
+-    const sheet = getFontFaceStyleSheet();
+-    if (sheet) {
+-        // @ts-ignore: rule iterator
+-        const rules = [...sheet.cssRules];
+-        const items = [];
+-        for (let i = 0; i < rules.length; i++) {
+-            const rule = rules[i];
+-            if (rule instanceof CSSFontFaceRule) {
+-                items.push({ rule, index: i });
+-            }
+-        }
+-        return items;
++  const sheet = getFontFaceStyleSheet();
++  if (sheet) {
++    // @ts-ignore: rule iterator
++    const rules = [...sheet.cssRules];
++    const items = [];
++    for (let i = 0; i < rules.length; i++) {
++      const rule = rules[i];
++      if (rule instanceof CSSFontFaceRule) {
++        items.push({ rule, index: i });
++      }
+     }
+-    return [];
++    return items;
++  }
++  return [];
+ }
+ function getFontFaceRulesMatchingResource(fontFamilyName, options) {
+-    const rules = getFontFaceRules();
+-    return rules.filter(({ rule }) => {
+-        return (rule.style.fontFamily === fontFamilyName &&
+-            (options && options.display ? options.display === rule.style.fontDisplay : true));
+-    });
++  const rules = getFontFaceRules();
++  return rules.filter(({ rule }) => {
++    return (
++      rule.style.fontFamily === fontFamilyName &&
++      (options && options.display
++        ? options.display === rule.style.fontDisplay
++        : true)
++    );
++  });
+ }
+ export default {
+-    get name() {
+-        return 'ExpoFontLoader';
+-    },
+-    async unloadAllAsync() {
+-        if (!Platform.isDOMAvailable)
+-            return;
+-        const element = document.getElementById(ID);
+-        if (element && element instanceof HTMLStyleElement) {
+-            document.removeChild(element);
+-        }
+-    },
+-    async unloadAsync(fontFamilyName, options) {
+-        const sheet = getFontFaceStyleSheet();
+-        if (!sheet)
+-            return;
+-        const items = getFontFaceRulesMatchingResource(fontFamilyName, options);
+-        for (const item of items) {
+-            sheet.deleteRule(item.index);
+-        }
+-    },
+-    async loadAsync(fontFamilyName, resource) {
+-        if (!Platform.isDOMAvailable) {
+-            return;
+-        }
+-        const canInjectStyle = document.head && typeof document.head.appendChild === 'function';
+-        if (!canInjectStyle) {
+-            throw new CodedError('ERR_WEB_ENVIRONMENT', `The browser's \`document.head\` element doesn't support injecting fonts.`);
+-        }
+-        const style = _createWebStyle(fontFamilyName, resource);
+-        document.head.appendChild(style);
+-        if (!isFontLoadingListenerSupported()) {
+-            return;
+-        }
+-        return new FontObserver(fontFamilyName, { display: resource.display }).load();
+-    },
+-};
+-const ID = 'expo-generated-fonts';
+-function getStyleElement() {
++  get name() {
++    return "ExpoFontLoader";
++  },
++  async unloadAllAsync() {
++    if (!Platform.isDOMAvailable) return;
+     const element = document.getElementById(ID);
+     if (element && element instanceof HTMLStyleElement) {
+-        return element;
++      document.removeChild(element);
++    }
++  },
++  async unloadAsync(fontFamilyName, options) {
++    const sheet = getFontFaceStyleSheet();
++    if (!sheet) return;
++    const items = getFontFaceRulesMatchingResource(fontFamilyName, options);
++    for (const item of items) {
++      sheet.deleteRule(item.index);
+     }
+-    const styleElement = document.createElement('style');
+-    styleElement.id = ID;
+-    styleElement.type = 'text/css';
+-    return styleElement;
++  },
++  async loadAsync(fontFamilyName, resource) {
++    console.log("ExpoFontLoader.loadAsync", fontFamilyName, resource);
++    if (!Platform.isDOMAvailable) {
++      return;
++    }
++    const canInjectStyle =
++      document.head && typeof document.head.appendChild === "function";
++    if (!canInjectStyle) {
++      throw new CodedError(
++        "ERR_WEB_ENVIRONMENT",
++        `The browser's \`document.head\` element doesn't support injecting fonts.`
++      );
++    }
++    const style = _createWebStyle(fontFamilyName, resource);
++    document.head.appendChild(style);
++    if (!isFontLoadingListenerSupported()) {
++      return;
++    }
++    return new FontObserver(fontFamilyName, {
++      display: resource.display,
++    }).load();
++  },
++};
++const ID = "expo-generated-fonts";
++function getStyleElement() {
++  const element = document.getElementById(ID);
++  if (element && element instanceof HTMLStyleElement) {
++    return element;
++  }
++  const styleElement = document.createElement("style");
++  styleElement.id = ID;
++  styleElement.type = "text/css";
++  return styleElement;
+ }
+ function _createWebStyle(fontFamily, resource) {
+-    const fontStyle = `@font-face {
++  const fontStyle = `@font-face {
+     font-family: ${fontFamily};
+     src: url(${resource.uri});
+     font-display: ${resource.display || FontDisplay.AUTO};
+   }`;
+-    const styleElement = getStyleElement();
+-    // @ts-ignore: TypeScript does not define HTMLStyleElement::styleSheet. This is just for IE and
+-    // possibly can be removed if it's unnecessary on IE 11.
+-    if (styleElement.styleSheet) {
+-        const styleElementIE = styleElement;
+-        styleElementIE.styleSheet.cssText = styleElementIE.styleSheet.cssText
+-            ? styleElementIE.styleSheet.cssText + fontStyle
+-            : fontStyle;
+-    }
+-    else {
+-        const textNode = document.createTextNode(fontStyle);
+-        styleElement.appendChild(textNode);
+-    }
+-    return styleElement;
++  const styleElement = getStyleElement();
++  // @ts-ignore: TypeScript does not define HTMLStyleElement::styleSheet. This is just for IE and
++  // possibly can be removed if it's unnecessary on IE 11.
++  if (styleElement.styleSheet) {
++    const styleElementIE = styleElement;
++    styleElementIE.styleSheet.cssText = styleElementIE.styleSheet.cssText
++      ? styleElementIE.styleSheet.cssText + fontStyle
++      : fontStyle;
++  } else {
++    const textNode = document.createTextNode(fontStyle);
++    styleElement.appendChild(textNode);
++  }
++  return styleElement;
+ }
+ function isFontLoadingListenerSupported() {
+-    const { userAgent } = window.navigator;
+-    // WebKit is broken https://github.com/bramstein/fontfaceobserver/issues/95
+-    const isIOS = !!userAgent.match(/iPad|iPhone/i);
+-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+-    // Edge is broken https://github.com/bramstein/fontfaceobserver/issues/109#issuecomment-333356795
+-    const isEdge = userAgent.includes('Edge');
+-    // Internet Explorer
+-    const isIE = userAgent.includes('Trident');
+-    // Firefox
+-    const isFirefox = userAgent.includes('Firefox');
+-    return !isSafari && !isIOS && !isEdge && !isIE && !isFirefox;
++  const { userAgent } = window.navigator;
++  // WebKit is broken https://github.com/bramstein/fontfaceobserver/issues/95
++  const isIOS = !!userAgent.match(/iPad|iPhone/i);
++  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
++  // Edge is broken https://github.com/bramstein/fontfaceobserver/issues/109#issuecomment-333356795
++  const isEdge = userAgent.includes("Edge");
++  // Internet Explorer
++  const isIE = userAgent.includes("Trident");
++  // Firefox
++  const isFirefox = userAgent.includes("Firefox");
++  return !isSafari && !isIOS && !isEdge && !isIE && !isFirefox;
+ }
+ //# sourceMappingURL=ExpoFontLoader.web.js.map
+\ No newline at end of file
+diff --git a/node_modules/expo-font/build/Font.js b/node_modules/expo-font/build/Font.js
+index ae61b7e..9047201 100644
+--- a/node_modules/expo-font/build/Font.js
++++ b/node_modules/expo-font/build/Font.js
+@@ -1,7 +1,12 @@
+-import { CodedError, UnavailabilityError } from 'expo-modules-core';
+-import ExpoFontLoader from './ExpoFontLoader';
+-import { FontDisplay } from './Font.types';
+-import { getAssetForSource, loadSingleFontAsync, fontFamilyNeedsScoping, getNativeFontName, } from './FontLoader';
++import { CodedError, UnavailabilityError } from "expo-modules-core";
++import ExpoFontLoader from "./ExpoFontLoader";
++import { FontDisplay } from "./Font.types";
++import {
++  getAssetForSource,
++  loadSingleFontAsync,
++  fontFamilyNeedsScoping,
++  getNativeFontName,
++} from "./FontLoader";
+ const loaded = {};
+ const loadPromises = {};
+ // @needsAudit
+@@ -15,23 +20,24 @@ const loadPromises = {};
+  * @returns Returns a name processed for use with the [current workflow](https://docs.expo.dev/introduction/managed-vs-bare/).
+  */
+ export function processFontFamily(fontFamily) {
+-    if (!fontFamily || !fontFamilyNeedsScoping(fontFamily)) {
+-        return fontFamily;
+-    }
+-    if (!isLoaded(fontFamily)) {
+-        if (__DEV__) {
+-            if (isLoading(fontFamily)) {
+-                console.error(`You started loading the font "${fontFamily}", but used it before it finished loading. You need to wait for Font.loadAsync to complete before using the font.`);
+-            }
+-            else {
+-                console.error(`fontFamily "${fontFamily}" is not a system font and has not been loaded through Font.loadAsync.\n
++  if (!fontFamily || !fontFamilyNeedsScoping(fontFamily)) {
++    return fontFamily;
++  }
++  if (!isLoaded(fontFamily)) {
++    if (__DEV__) {
++      if (isLoading(fontFamily)) {
++        console.error(
++          `You started loading the font "${fontFamily}", but used it before it finished loading. You need to wait for Font.loadAsync to complete before using the font.`
++        );
++      } else {
++        console.error(`fontFamily "${fontFamily}" is not a system font and has not been loaded through Font.loadAsync.\n
+ - If you intended to use a system font, make sure you typed the name correctly and that it is supported by your device operating system.\n
+ - If this is a custom font, be sure to load it with Font.loadAsync.`);
+-            }
+-        }
+-        return 'System';
++      }
+     }
+-    return `ExpoFont-${getNativeFontName(fontFamily)}`;
++    return "System";
++  }
++  return `ExpoFont-${getNativeFontName(fontFamily)}`;
+ }
+ // @needsAudit
+ /**
+@@ -41,7 +47,7 @@ export function processFontFamily(fontFamily) {
+  * @return Returns `true` if the font has fully loaded.
+  */
+ export function isLoaded(fontFamily) {
+-    return fontFamily in loaded;
++  return fontFamily in loaded;
+ }
+ // @needsAudit
+ /**
+@@ -51,7 +57,7 @@ export function isLoaded(fontFamily) {
+  * @returns Returns `true` if the font is still loading.
+  */
+ export function isLoading(fontFamily) {
+-    return fontFamily in loadPromises;
++  return fontFamily in loadPromises;
+ }
+ // @needsAudit
+ /**
+@@ -67,58 +73,70 @@ export function isLoading(fontFamily) {
+  * method in a `try/catch/finally` to ensure the app continues if the font fails to load.
+  */
+ export async function loadAsync(fontFamilyOrFontMap, source) {
+-    if (typeof fontFamilyOrFontMap === 'object') {
+-        if (source) {
+-            throw new CodedError(`ERR_FONT_API`, `No fontFamily can be used for the provided source: ${source}. The second argument of \`loadAsync()\` can only be used with a \`string\` value as the first argument.`);
+-        }
+-        const fontMap = fontFamilyOrFontMap;
+-        const names = Object.keys(fontMap);
+-        await Promise.all(names.map((name) => loadFontInNamespaceAsync(name, fontMap[name])));
+-        return;
++  if (typeof fontFamilyOrFontMap === "object") {
++    if (source) {
++      throw new CodedError(
++        `ERR_FONT_API`,
++        `No fontFamily can be used for the provided source: ${source}. The second argument of \`loadAsync()\` can only be used with a \`string\` value as the first argument.`
++      );
+     }
+-    return await loadFontInNamespaceAsync(fontFamilyOrFontMap, source);
++    const fontMap = fontFamilyOrFontMap;
++    const names = Object.keys(fontMap);
++    await Promise.all(
++      names.map((name) => loadFontInNamespaceAsync(name, fontMap[name]))
++    );
++    return;
++  }
++  return await loadFontInNamespaceAsync(fontFamilyOrFontMap, source);
+ }
+ async function loadFontInNamespaceAsync(fontFamily, source) {
+-    if (!source) {
+-        throw new CodedError(`ERR_FONT_SOURCE`, `Cannot load null or undefined font source: { "${fontFamily}": ${source} }. Expected asset of type \`FontSource\` for fontFamily of name: "${fontFamily}"`);
+-    }
+-    if (loaded[fontFamily]) {
+-        return;
+-    }
+-    if (loadPromises.hasOwnProperty(fontFamily)) {
+-        return loadPromises[fontFamily];
++  if (!source) {
++    throw new CodedError(
++      `ERR_FONT_SOURCE`,
++      `Cannot load null or undefined font source: { "${fontFamily}": ${source} }. Expected asset of type \`FontSource\` for fontFamily of name: "${fontFamily}"`
++    );
++  }
++  if (loaded[fontFamily]) {
++    return;
++  }
++  if (loadPromises.hasOwnProperty(fontFamily)) {
++    return loadPromises[fontFamily];
++  }
++  // Important: we want all callers that concurrently try to load the same font to await the same
++  // promise. If we're here, we haven't created the promise yet. To ensure we create only one
++  // promise in the program, we need to create the promise synchronously without yielding the event
++  // loop from this point.
++  const asset = getAssetForSource(source);
++  loadPromises[fontFamily] = (async () => {
++    try {
++      await loadSingleFontAsync(fontFamily, asset);
++      loaded[fontFamily] = true;
++    } finally {
++      delete loadPromises[fontFamily];
+     }
+-    // Important: we want all callers that concurrently try to load the same font to await the same
+-    // promise. If we're here, we haven't created the promise yet. To ensure we create only one
+-    // promise in the program, we need to create the promise synchronously without yielding the event
+-    // loop from this point.
+-    const asset = getAssetForSource(source);
+-    loadPromises[fontFamily] = (async () => {
+-        try {
+-            await loadSingleFontAsync(fontFamily, asset);
+-            loaded[fontFamily] = true;
+-        }
+-        finally {
+-            delete loadPromises[fontFamily];
+-        }
+-    })();
+-    await loadPromises[fontFamily];
++  })();
++  await loadPromises[fontFamily];
+ }
+ // @needsAudit
+ /**
+  * Unloads all the custom fonts. This is used for testing.
+  */
+ export async function unloadAllAsync() {
+-    if (!ExpoFontLoader.unloadAllAsync) {
+-        throw new UnavailabilityError('expo-font', 'unloadAllAsync');
+-    }
+-    if (Object.keys(loadPromises).length) {
+-        throw new CodedError(`ERR_UNLOAD`, `Cannot unload fonts while they're still loading: ${Object.keys(loadPromises).join(', ')}`);
+-    }
+-    for (const fontFamily of Object.keys(loaded)) {
+-        delete loaded[fontFamily];
+-    }
+-    await ExpoFontLoader.unloadAllAsync();
++  if (!ExpoFontLoader.unloadAllAsync) {
++    throw new UnavailabilityError("expo-font", "unloadAllAsync");
++  }
++  if (Object.keys(loadPromises).length) {
++    throw new CodedError(
++      `ERR_UNLOAD`,
++      `Cannot unload fonts while they're still loading: ${Object.keys(
++        loadPromises
++      ).join(", ")}`
++    );
++  }
++  for (const fontFamily of Object.keys(loaded)) {
++    delete loaded[fontFamily];
++  }
++  await ExpoFontLoader.unloadAllAsync();
+ }
+ // @needsAudit
+ /**
+@@ -130,36 +148,40 @@ export async function unloadAllAsync() {
+  * the custom font originally.
+  */
+ export async function unloadAsync(fontFamilyOrFontMap, options) {
+-    if (!ExpoFontLoader.unloadAsync) {
+-        throw new UnavailabilityError('expo-font', 'unloadAsync');
+-    }
+-    if (typeof fontFamilyOrFontMap === 'object') {
+-        if (options) {
+-            throw new CodedError(`ERR_FONT_API`, `No fontFamily can be used for the provided options: ${options}. The second argument of \`unloadAsync()\` can only be used with a \`string\` value as the first argument.`);
+-        }
+-        const fontMap = fontFamilyOrFontMap;
+-        const names = Object.keys(fontMap);
+-        await Promise.all(names.map((name) => unloadFontInNamespaceAsync(name, fontMap[name])));
+-        return;
++  if (!ExpoFontLoader.unloadAsync) {
++    throw new UnavailabilityError("expo-font", "unloadAsync");
++  }
++  if (typeof fontFamilyOrFontMap === "object") {
++    if (options) {
++      throw new CodedError(
++        `ERR_FONT_API`,
++        `No fontFamily can be used for the provided options: ${options}. The second argument of \`unloadAsync()\` can only be used with a \`string\` value as the first argument.`
++      );
+     }
+-    return await unloadFontInNamespaceAsync(fontFamilyOrFontMap, options);
++    const fontMap = fontFamilyOrFontMap;
++    const names = Object.keys(fontMap);
++    await Promise.all(
++      names.map((name) => unloadFontInNamespaceAsync(name, fontMap[name]))
++    );
++    return;
++  }
++  return await unloadFontInNamespaceAsync(fontFamilyOrFontMap, options);
+ }
+ async function unloadFontInNamespaceAsync(fontFamily, options) {
+-    if (!loaded[fontFamily]) {
+-        return;
+-    }
+-    else {
+-        delete loaded[fontFamily];
+-    }
+-    // Important: we want all callers that concurrently try to load the same font to await the same
+-    // promise. If we're here, we haven't created the promise yet. To ensure we create only one
+-    // promise in the program, we need to create the promise synchronously without yielding the event
+-    // loop from this point.
+-    const nativeFontName = getNativeFontName(fontFamily);
+-    if (!nativeFontName) {
+-        throw new CodedError(`ERR_FONT_FAMILY`, `Cannot unload an empty name`);
+-    }
+-    await ExpoFontLoader.unloadAsync(nativeFontName, options);
++  if (!loaded[fontFamily]) {
++    return;
++  } else {
++    delete loaded[fontFamily];
++  }
++  // Important: we want all callers that concurrently try to load the same font to await the same
++  // promise. If we're here, we haven't created the promise yet. To ensure we create only one
++  // promise in the program, we need to create the promise synchronously without yielding the event
++  // loop from this point.
++  const nativeFontName = getNativeFontName(fontFamily);
++  if (!nativeFontName) {
++    throw new CodedError(`ERR_FONT_FAMILY`, `Cannot unload an empty name`);
++  }
++  await ExpoFontLoader.unloadAsync(nativeFontName, options);
+ }
+ export { FontDisplay };
+ //# sourceMappingURL=Font.js.map
+\ No newline at end of file
+diff --git a/node_modules/expo-font/build/FontLoader.web.js b/node_modules/expo-font/build/FontLoader.web.js
+index d287341..ea22152 100644
+--- a/node_modules/expo-font/build/FontLoader.web.js
++++ b/node_modules/expo-font/build/FontLoader.web.js
+@@ -1,45 +1,59 @@
+-import { CodedError } from 'expo-modules-core';
+-import ExpoFontLoader from './ExpoFontLoader';
+-import { FontDisplay } from './Font';
++import { CodedError } from "expo-modules-core";
++import ExpoFontLoader from "./ExpoFontLoader";
++import { FontDisplay } from "./Font";
++import { Asset } from "expo-asset";
++
++import { getAssetByID } from "react-native-web/dist/modules/AssetRegistry";
++
+ function uriFromFontSource(asset) {
+-    if (typeof asset === 'string') {
+-        return asset || null;
+-    }
+-    else if (typeof asset === 'object') {
+-        return asset.uri || asset.localUri || null;
+-    }
+-    return null;
++  if (typeof asset === "string") {
++    return asset || null;
++  } else if (typeof asset === "object") {
++    return asset.uri || asset.localUri || null;
++  } else if (typeof asset === "number") {
++    // const parsed = getAssetByID(asset);
++    return uriFromFontSource(Asset.fromModule(asset));
++  }
++  return null;
+ }
+ function displayFromFontSource(asset) {
+-    return asset.display || FontDisplay.AUTO;
++  return asset.display || FontDisplay.AUTO;
+ }
+ export function fontFamilyNeedsScoping(name) {
+-    return false;
++  return false;
+ }
+ export function getAssetForSource(source) {
+-    const uri = uriFromFontSource(source);
+-    const display = displayFromFontSource(source);
+-    if (!uri || typeof uri !== 'string') {
+-        throwInvalidSourceError(uri);
+-    }
+-    return {
+-        uri: uri,
+-        display,
+-    };
++  const uri = uriFromFontSource(source);
++  console.log("getAssetForSource", { source }, getAssetByID(source), uri);
++  const display = displayFromFontSource(source);
++  if (!uri || typeof uri !== "string") {
++    throwInvalidSourceError(uri);
++  }
++  return {
++    uri: uri,
++    display,
++  };
+ }
+ function throwInvalidSourceError(source) {
+-    let type = typeof source;
+-    if (type === 'object')
+-        type = JSON.stringify(source, null, 2);
+-    throw new CodedError(`ERR_FONT_SOURCE`, `Expected font asset of type \`string | FontResource | Asset\` (number is not supported on web) instead got: ${type}`);
++  let type = typeof source;
++  if (type === "object") type = JSON.stringify(source, null, 2);
++  throw new CodedError(
++    `ERR_FONT_SOURCE`,
++    `Expected font asset of type \`string | FontResource | Asset\` (number is not supported on web) instead got: ${type}`
++  );
+ }
+ export async function loadSingleFontAsync(name, input) {
+-    if (typeof input !== 'object' || typeof input.uri !== 'string' || input.downloadAsync) {
+-        throwInvalidSourceError(input);
+-    }
+-    await ExpoFontLoader.loadAsync(name, input);
++  console.log("loadSingleFontAsync", { name, input });
++  if (
++    typeof input !== "object" ||
++    typeof input.uri !== "string" ||
++    input.downloadAsync
++  ) {
++    throwInvalidSourceError(input);
++  }
++  await ExpoFontLoader.loadAsync(name, input);
+ }
+ export function getNativeFontName(name) {
+-    return name;
++  return name;
+ }
+ //# sourceMappingURL=FontLoader.web.js.map
+\ No newline at end of file
