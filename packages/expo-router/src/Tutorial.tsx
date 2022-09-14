@@ -10,15 +10,19 @@ const URL = 'TODO';
 export function Tutorial() {
 
     return (
+        // @ts-ignore
         <View accessibilityRole='main' style={styles.container}>
             <Text
+                // @ts-ignore
                 accessibilityRole="heading" accessibilityLevel={1}
                 style={styles.title}
             >
                 Welcome to Expo
             </Text>
+            {/* @ts-expect-error */}
             <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>To get started, create a file in the `app/` folder which exports a React component.</Text>
             <Button />
+            {/* @ts-expect-error */}
             <Text href={URL} style={styles.link}>
                 Learn more about expo/router.
             </Text>

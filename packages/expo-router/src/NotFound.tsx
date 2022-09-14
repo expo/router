@@ -5,14 +5,18 @@ import { StyleSheet, Text, View } from 'react-native';
 export const NotFound = forwardRef((props, ref) => {
     const url = useURL();
     return (
+        // @ts-ignore
         <View ref={ref} accessibilityRole='main' style={styles.container}>
             <Text
+                // @ts-expect-error
                 accessibilityRole="heading" accessibilityLevel={1}
                 style={styles.title}
             >
                 Not Found
             </Text>
+            {/* @ts-expect-error */}
             <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>Incoming link could not be matched.</Text>
+            {/* @ts-expect-error */}
             <Text href={url} style={styles.link}>
                 {url}
             </Text>

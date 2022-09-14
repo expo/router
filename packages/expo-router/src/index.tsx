@@ -1,6 +1,6 @@
 
 export * from './routes'
-export * from './Controller'
+export * from './ContextNavigator'
 export { ErrorBoundaryProps } from './ErrorBoundary'
 
 export * from './navigation';

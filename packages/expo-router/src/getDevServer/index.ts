@@ -31,6 +31,7 @@ export const getDevServer = () => {
         qs.stringify({ ...query, platform: Platform.OS })
       );
     },
-    url: location.origin + location.pathname,
+
+    url: location.origin + "/",
   };
 };
