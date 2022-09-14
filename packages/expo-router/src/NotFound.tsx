@@ -1,10 +1,11 @@
+import React, { forwardRef } from 'react';
 import { useURL } from 'expo-linking';
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function NotFound() {
+export const NotFound = forwardRef((props, ref) => {
     const url = useURL();
     return (
-        <View accessibilityRole='main' style={styles.container}>
+        <View ref={ref} accessibilityRole='main' style={styles.container}>
             <Text
                 accessibilityRole="heading" accessibilityLevel={1}
                 style={styles.title}
@@ -17,7 +18,7 @@ export default function NotFound() {
             </Text>
         </View>
     );
-}
+})
 
 const styles = StyleSheet.create({
     container: {

@@ -1,15 +1,15 @@
 import * as Linking from "expo-linking";
 import { ReactNode } from "react";
 
+import { getAllWebRedirects } from "./aasa";
+import { matchDynamicName, matchGroupName } from "./matchers";
 import {
   convertDynamicRouteToReactNavigation,
   getNameFromFilePath,
-  matchDynamicName,
-  matchGroupName,
+  getReactNavigationScreenName,
 } from "./routes";
-import { getAllWebRedirects } from "./aasa";
 
-type Node = {
+export type Node = {
   route: string;
   extras: Record<string, any>;
   component: ReactNode;
@@ -20,31 +20,28 @@ type Node = {
 };
 
 export function treeToReactNavigationLinkingRoutes(nodes: Node[], depth = 0) {
+  // TODO: Intercept errors, strip invalid routes, and warn instead.
+  // Our warnings can be more helpful than upstream since we know the associated file name.
   return nodes
     .map((node) => {
       let path = convertDynamicRouteToReactNavigation(node.route);
-      const exact = path !== node.route;
-
       const routingInfo = {
         path,
+        screenName: getReactNavigationScreenName(node.route),
         screens: node.children.length
           ? treeToReactNavigationLinkingRoutes(node.children, depth + 1)
           : undefined,
       };
 
-      if (exact) {
-        routingInfo.exact = exact;
-      }
-
       return routingInfo;
     })
-    .reduce((acc, cur) => {
+    .reduce((acc, { screenName, ...cur }) => {
       const path =
         cur.path === "index" || matchGroupName(cur.path) ? "" : cur.path;
       if (!cur.screens) {
-        acc[cur.path] = path;
+        acc[screenName] = path;
       } else {
-        acc[cur.path] = {
+        acc[screenName] = {
           ...cur,
           path,
         };
@@ -54,28 +51,20 @@ export function treeToReactNavigationLinkingRoutes(nodes: Node[], depth = 0) {
 }
 
 export function getLinkingConfig(routes: Node[]) {
-  const prefix = Linking.createURL("/");
-
-  // This ensures that we can redirect correctly when the user comes from an associated domain
-  // i.e. iOS Safari banner.
-  const appSiteAssociations = getAllWebRedirects();
-
-  if (appSiteAssociations.length) {
-    console.log("App Site Associations:", appSiteAssociations);
-  }
-  const screens = treeToReactNavigationLinkingRoutes(
-    // Skip first route which doesn't have a navigator
-    routes[0].children
-  );
-
   return {
     prefixes: [
       /* your linking prefixes */
-      prefix,
-      ...appSiteAssociations,
+      Linking.createURL("/"),
+
+      // This ensures that we can redirect correctly when the user comes from an associated domain
+      // i.e. iOS Safari banner.
+      ...getAllWebRedirects(),
     ],
     config: {
-      screens,
+      screens: treeToReactNavigationLinkingRoutes(
+        // Skip first route which doesn't have a navigator
+        routes[0].children
+      ),
     },
   };
 }
@@ -128,7 +117,7 @@ function sortScreens(screens: Node[]) {
   );
 }
 
-export function getRoutes(pages) {
+export function getRoutes(pages): Node[] {
   const names = pages
     .keys()
     .map((key) => {

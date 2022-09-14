@@ -1,8 +1,10 @@
-import { Screen } from './primitives'
-import { useURL } from "expo-linking";
-import React, { createContext, forwardRef, ReactNode, useContext } from "react";
+import { useURL } from 'expo-linking';
+import React, { forwardRef, ReactNode, useContext } from 'react';
+import { RoutesContext } from './context';
 
-import { AutoErrorBoundary } from "./ErrorBoundary";
+import { AutoErrorBoundary } from './ErrorBoundary';
+import { matchCatchAllRouteName, matchDynamicName, matchGroupName, matchOptionalCatchAllRouteName } from './matchers';
+import { Screen } from './primitives';
 
 const dev = process.env.NODE_ENV === "development";
 
@@ -87,30 +89,25 @@ export function CurrentRoute({
     );
 }
 
-// Routes context
-export const RoutesContext = createContext<
-    { route: string; children: any[] }[]
->([]);
 
-export function matchDynamicName(name: string): string | undefined {
-    return name.match(/^\[([^/]+)\]$/)?.[1];
-}
-
-
-// Match `(page)` -> `page`
-export function matchGroupName(name: string): string | undefined {
-    return name.match(/^\(([^/]+)\)$/)?.[1];
-}
 
 // `[page]` -> `:page`
 // `page` -> `page`
 export function convertDynamicRouteToReactNavigation(name: string) {
+
+    if (matchCatchAllRouteName(name) || matchOptionalCatchAllRouteName(name)) {
+        return '*';
+    }
     const dynamicName = matchDynamicName(name);
 
     if (dynamicName) {
         return `:${dynamicName}`;
     }
     return name;
+}
+
+export function getReactNavigationScreenName(name: string) {
+    return matchOptionalCatchAllRouteName(name) || matchCatchAllRouteName(name) || matchDynamicName(name) || name;
 }
 
 function expandFilePath(filePath: string) {
@@ -202,7 +199,7 @@ export function useNavigationChildren() {
     return children.map((value) => (
         <Screen
             options={value.extras?.getNavOptions}
-            name={convertDynamicRouteToReactNavigation(value.route)}
+            name={getReactNavigationScreenName(value.route)}
             key={value.route}
             component={value.component}
         />
@@ -216,7 +213,7 @@ export function useNamedNavigationChildren(): Record<string, ReactNode> {
             value.route,
             <Screen
                 options={value.extras?.getNavOptions}
-                name={convertDynamicRouteToReactNavigation(value.route)}
+                name={getReactNavigationScreenName(value.route)}
                 key={value.route}
                 component={value.component}
             />,
