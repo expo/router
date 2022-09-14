@@ -34,10 +34,9 @@ export function Controller({ context, children }: { context: RequireContext; chi
         const routes = getRoutes(context);
 
         const linking = getLinkingConfig(routes);
+        // console.log('routes', routes);
         return { Initial, routes, linking };
-    }, context.keys());
-
-    console.log("linking:", linking);
+    }, [context.keys()]);
 
     return (
         <RoutesContext.Provider value={routes}>
