@@ -14,6 +14,8 @@ type Node = {
   component: ReactNode;
   children: Node[];
   dynamic?: boolean;
+  /** require.context key, used for matching children. */
+  contextKey: string;
 };
 
 function treeToReactNavigationLinkingRoutes(nodes: Node[], depth = 0) {
@@ -97,6 +99,7 @@ function convert(files: { route: string; node: any }[]) {
         route: key,
         extras: ___child?.extras,
         component: ___child?.node,
+        contextKey: ___child?.contextKey,
         children: toNodeArray(obj),
         dynamic: !!matchDynamicName(key),
       });
@@ -130,7 +133,12 @@ export function getRoutes(pages) {
       const _import = pages(key);
       if (!_import?.default) return null;
       const { default: mod, ...extras } = _import;
-      return { route: getNameFromFilePath(key), node: _import.default, extras };
+      return {
+        route: getNameFromFilePath(key),
+        node: _import.default,
+        contextKey: key,
+        extras,
+      };
     })
     .filter((node) => node);
   return convert(names);

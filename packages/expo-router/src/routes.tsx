@@ -131,7 +131,6 @@ function expandFilePath(filePath: string) {
 
 function useRoutesAtPath(filename: string): RouteNode[] {
     const info = React.useMemo(() => expandFilePath(filename), [filename]);
-
     // const name = getNameFromFilePath(filename).replace(/^app\//g, "");
     const routes = useContext(RoutesContext);
 
@@ -159,8 +158,7 @@ function useRoutesAtPath(filename: string): RouteNode[] {
                             </AutoErrorBoundary>
                         );
                     }
-                    console.log("render with:", value.route);
-                    return <CurrentRoute filename={value.route}>{children}</CurrentRoute>;
+                    return <CurrentRoute filename={value.contextKey}>{children}</CurrentRoute>;
                 }),
                 ...value,
             };
