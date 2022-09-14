@@ -1,14 +1,9 @@
-import React, { forwardRef } from 'react';
-import { useURL } from 'expo-linking';
+import React from 'react';
 import { StyleSheet, TouchableOpacity, Platform, Text, View } from 'react-native';
-import { createEntryFileAsync } from './onboard/createEntryFile';
-
-// Docs page for expo router
-const URL = 'TODO';
+import { DOCS_URL, createEntryFileAsync } from './createEntryFile';
 
 
 export function Tutorial() {
-
     return (
         // @ts-ignore
         <View accessibilityRole='main' style={styles.container}>
@@ -23,7 +18,7 @@ export function Tutorial() {
             <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>To get started, create a file in the `app/` folder which exports a React component.</Text>
             <Button />
             {/* @ts-expect-error */}
-            <Text href={URL} style={styles.link}>
+            <Text href={DOCS_URL} style={styles.link}>
                 Learn more about expo/router.
             </Text>
         </View>

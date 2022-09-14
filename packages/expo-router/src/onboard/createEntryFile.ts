@@ -1,5 +1,8 @@
 import { getDevServer } from "../getDevServer";
 
+// Docs page for expo router
+export const DOCS_URL = "TODO";
+
 /** Middleware for creating an entry file in the project. */
 export function createEntryFileAsync() {
   if (process.env.NODE_ENV === "production") {
@@ -20,7 +23,7 @@ export function createEntryFileAsync() {
 
 const TEMPLATE = `import { View, Text } from 'react-native';
 
-// Learn more: TODO
+// Learn more: ${DOCS_URL}
 export default function App() {
   return (
     <View

@@ -40,13 +40,15 @@ function useEntryModule(context: RequireContext) {
     }, [context]);
 
     const EntryComponent = useMemo(() => {
+        if (!entryRouteId) {
+            return null;
+        }
         const EntryComponent = interopDefault(context(entryRouteId)) ?? null;
 
-        // if (!EntryComponent) {
-        // TODO: Maybe dev only?
-        const { Tutorial } = require('./Tutorial')
-        return Tutorial;
-        // }
+        if (!EntryComponent && process.env.NODE_ENV === 'development') {
+            const { Tutorial } = require('./Tutorial')
+            return Tutorial;
+        }
 
         return EntryComponent;
     }, [entryRouteId]);
@@ -62,6 +64,9 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
 
     if (!id && Component) {
         return <Component />
+    }
+    if (!Component) {
+        throw new Error('No entry component found.');
     }
 
     return (
