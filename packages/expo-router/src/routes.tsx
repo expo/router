@@ -69,7 +69,8 @@ export function useSelectedRoute() {
         setRoute(route ?? null);
     }, [url, routes]);
 
-    return route;
+    const Component = routes[0].component;
+    return <Component />
 }
 
 /** Provides the matching routes and filename to the children. */

@@ -1,10 +1,8 @@
-import { Link } from '@react-navigation/native';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { Text, View } from 'react-native';
 
 export const getNavOptions = (): NativeStackNavigationOptions => ({
-    title: 'Not Found',
-    headerShown: true,
+    title: 'Post'
 });
 
 export default function App({ navigation }) {
@@ -19,13 +17,22 @@ export default function App({ navigation }) {
                 alignItems: "stretch",
             }}
         >
-            <Link
+            <Text
                 style={{ position: "absolute", top: 8, left: 8 }}
-
-                to="/"
+                onPress={() => {
+                    navigation.push('modal');
+                }}
             >
                 {__filename}
-            </Link>
+            </Text>
+            <Text
+                style={{ position: "absolute", top: 24, left: 8 }}
+                onPress={() => {
+                    navigation.push('comments');
+                }}
+            >
+                View comments
+            </Text>
         </View>
     );
 }

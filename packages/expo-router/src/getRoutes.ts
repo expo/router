@@ -151,11 +151,7 @@ export function getRoutes(pages): Node[] {
   const routes = convert(names);
 
   // Auto add not found route if it doesn't exist
-  const userDefinedNotFound = routes.find(
-    (route) =>
-      matchCatchAllRouteName(route.route) ||
-      matchOptionalCatchAllRouteName(route.route)
-  );
+  const userDefinedNotFound = getUserDefinedTopLevelCatch(routes);
   if (!userDefinedNotFound) {
     routes.push({
       component: require("./NotFound").NotFound,
@@ -168,4 +164,24 @@ export function getRoutes(pages): Node[] {
   }
 
   return routes;
+}
+
+function getUserDefinedTopLevelCatch(routes: Node[]) {
+  // Auto add not found route if it doesn't exist
+  for (const route of routes) {
+    const isCatchAll =
+      matchCatchAllRouteName(route.route) ||
+      matchOptionalCatchAllRouteName(route.route);
+    if (isCatchAll) {
+      return route;
+    }
+    // Recurse through pathless routes
+    if (matchGroupName(route.route)) {
+      const child = getUserDefinedTopLevelCatch(route.children);
+      if (child) {
+        return child;
+      }
+    }
+  }
+  return null;
 }

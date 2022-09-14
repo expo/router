@@ -15,11 +15,15 @@ export const NotFound = forwardRef((props, ref) => {
                 Not Found
             </Text>
             {/* @ts-expect-error */}
-            <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>Incoming link could not be matched.</Text>
+            <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>Page could not be found. {/* @ts-expect-error */}
+                <Text href={'/'} style={styles.link}>
+                    Go back.
+                </Text></Text>
             {/* @ts-expect-error */}
             <Text href={url} style={styles.link}>
                 {url}
             </Text>
+
         </View>
     );
 })
