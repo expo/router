@@ -14,6 +14,43 @@ Routes are defined as files in the `app/` directory. The file name is the route 
 - You can use extensions: `js`, `tsx`, `ts`, `tsx`.
 <!-- - Platform extensions like `.ios.js` or `.native.ts` are not supported in the `app/` directory. -->
 
+## Route Groups
+
+Folded routes add nested layout without appending any path segments.
+
+The format is currently `(name).js` and `/(name)`. The name serves no purpose other than to distinguish various folded routes.
+
+For example:
+
+```
+- app/
+  - App.js
+  - routes/
+    - profile.js -- Matches /profile with: profile.js
+    - (layout).js
+    - (layout)
+      - home.js -- Matches /home with: (layout).js > home.js
+    - (alternate).js
+    - (alternate)
+      - settings.js -- Matches /settings with: (alternate).js > settings.js
+```
+
+The issue with this feature is that it's a bit harder to reason about the routes at a glance. This feature also makes it possible to create conflicting routes like:
+
+```
+- app/
+  - App.js
+  - routes/
+    - profile.js -- Matches /profile
+    - (layout).js
+    - (layout)
+      - profile.js -- Matches /profile (conflict)
+```
+
+The format and naming is similar to Next.js layouts, but the implementation and usage is different.
+
+> This feature is known as "pathless layout routes" in Remix.
+
 ## Index Routes
 
 If a file or directory is named `index`, it will not add a new path segment to the route.
