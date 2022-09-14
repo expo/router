@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { LinkingOptions, NavigationContainer } from '@react-navigation/native';
 import React, { useMemo } from 'react';
 
 import { useRoutesContext } from './context';
@@ -7,7 +7,7 @@ import { getLinkingConfig } from './getRoutes';
 
 type NavigationContainerProps = React.ComponentProps<typeof NavigationContainer>;
 
-function useLinkingConfig() {
+function useLinkingConfig(): LinkingOptions<{}> {
     const routes = useRoutesContext()
     const linking = useMemo(() => getLinkingConfig(routes), [routes]);
     return linking;

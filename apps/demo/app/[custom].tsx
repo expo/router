@@ -2,7 +2,7 @@ import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { Text, View } from 'react-native';
 
 export const getNavOptions = (): NativeStackNavigationOptions => ({
-    title: 'Home'
+    title: 'Not Found'
 });
 
 export default function App({ navigation }) {

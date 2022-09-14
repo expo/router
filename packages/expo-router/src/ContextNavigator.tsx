@@ -1,8 +1,10 @@
+import { useURL } from 'expo-linking';
 import React, { useMemo } from 'react';
 
 import { RoutesContext } from './context';
 import { ContextNavigationContainer } from './ContextNavigationContainer';
 import { getRoutes } from './getRoutes';
+import { StackNavigator } from './navigation';
 import { CurrentRoute } from './routes';
 
 // @ts-expect-error: welp
@@ -13,7 +15,6 @@ function useContextModuleAsRoutes(context: RequireContext) {
 }
 
 function RoutesContextProvider({ context, children }: { context: RequireContext, children: React.ReactNode }) {
-
     const routes = useContextModuleAsRoutes(context);
 
     return (
@@ -25,6 +26,7 @@ function RoutesContextProvider({ context, children }: { context: RequireContext,
 
 /** Return the initial component in the `app/` folder and the associated module ID. If no module is defined, return a tutorial component. */
 function useEntryModule(context: RequireContext) {
+    const url = useURL();
     const entryRouteId = useMemo(() => {
         const initialKeys = context.keys().filter((value) =>
             value.match(/^\.\/[^/]+\.(js|ts)x?$/)
@@ -33,24 +35,15 @@ function useEntryModule(context: RequireContext) {
         if (!initialKeys.length) {
             console.warn('No initial route found in the app directory.');
         }
-        if (initialKeys.length > 1) {
-            console.warn('Multiple initial routes found in the app directory.');
-        }
         return first;
-    }, [context]);
+    }, [context, url]);
 
     const EntryComponent = useMemo(() => {
-        if (!entryRouteId) {
-            return null;
-        }
-        const EntryComponent = interopDefault(context(entryRouteId)) ?? null;
-
-        if (!EntryComponent && process.env.NODE_ENV === 'development') {
+        if ((!entryRouteId || !interopDefault(context(entryRouteId))) && process.env.NODE_ENV === 'development') {
             const { Tutorial } = require('./Tutorial')
             return Tutorial;
         }
-
-        return EntryComponent;
+        return null;
     }, [entryRouteId]);
 
     return {
@@ -60,20 +53,19 @@ function useEntryModule(context: RequireContext) {
 }
 
 export function ContextNavigator({ context }: { context: RequireContext }) {
-    const { id, Component } = useEntryModule(context);
+    const { Component } = useEntryModule(context);
 
-    if (!id && Component) {
+    if (Component) {
+        //  Tutorial
         return <Component />
-    }
-    if (!Component) {
-        throw new Error('No entry component found.');
     }
 
     return (
         <RoutesContextProvider context={context}>
-            <CurrentRoute filename={id}>
+            <CurrentRoute filename={"./"}>
                 <ContextNavigationContainer>
-                    <Component />
+                    {/* Using a switch navigator at the root to host all pages. */}
+                    <StackNavigator screenOptions={{ animationEnabled: false, headerShown: false }} />
                 </ContextNavigationContainer>
             </CurrentRoute>
         </RoutesContextProvider>

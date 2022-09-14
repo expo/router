@@ -139,12 +139,16 @@ function useRoutesAtPath(filename: string): RouteNode[] {
     const routes = useContext(RoutesContext);
 
     const matchingRoutes = React.useMemo(() => {
-        // split and search
-        const parts = info.id.split("/");
         let current: any = routes;
-        for (const part of parts) {
-            current = current.find(({ route }) => route === part)?.children;
-            if (!current) return [];
+
+        // Skip root directory
+        if (info.id) {
+            // split and search
+            const parts = info.id.split("/");
+            for (const part of parts) {
+                current = current.find(({ route }) => route === part)?.children;
+                if (!current) return [];
+            }
         }
         return current.filter(({ component }) => component);
     }, [info, routes]);

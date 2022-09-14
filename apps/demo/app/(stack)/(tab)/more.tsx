@@ -1,47 +1,30 @@
-import { useURL } from 'expo-linking';
-import { StyleSheet, Text, View } from 'react-native';
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { Text, View } from 'react-native';
 
-export default function NotFound() {
-    const url = useURL();
+export const getNavOptions = (): NativeStackNavigationOptions => ({
+    title: 'More'
+});
+
+export default function App({ navigation }) {
     return (
-        <View accessibilityRole='main' style={styles.container}>
+        <View
+            style={{
+                margin: 24,
+                borderRadius: 20,
+                flex: 1,
+                backgroundColor: "crimson",
+                padding: 24,
+                alignItems: "stretch",
+            }}
+        >
             <Text
-                accessibilityRole="heading" accessibilityLevel={1}
-                style={styles.title}
+                style={{ position: "absolute", top: 8, left: 8 }}
+                onPress={() => {
+                    navigation.goBack();
+                }}
             >
-                Not Found
-            </Text>
-            <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>Incoming link could not be matched.</Text>
-            <Text href={url} style={styles.link}>
-                {url}
+                {__filename}
             </Text>
         </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "black",
-        padding: 24,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    title: {
-        color: "white",
-        fontSize: 24,
-        paddingBottom: 12,
-        marginBottom: 12,
-        borderBottomColor: "rgba(255,255,255,0.4)",
-        borderBottomWidth: 1,
-        textAlign: "center",
-        fontWeight: "bold",
-    },
-    subtitle: {
-        color: "white",
-        fontSize: 14,
-        marginBottom: 12,
-        textAlign: "center",
-    },
-    link: { color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center" },
-});

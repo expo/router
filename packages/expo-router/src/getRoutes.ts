@@ -1,8 +1,14 @@
 import * as Linking from "expo-linking";
 import { ReactNode } from "react";
+import { LinkingOptions, PathConfigMap } from "@react-navigation/native";
 
 import { getAllWebRedirects } from "./aasa";
-import { matchDynamicName, matchGroupName } from "./matchers";
+import {
+  matchCatchAllRouteName,
+  matchDynamicName,
+  matchGroupName,
+  matchOptionalCatchAllRouteName,
+} from "./matchers";
 import {
   convertDynamicRouteToReactNavigation,
   getNameFromFilePath,
@@ -19,23 +25,24 @@ export type Node = {
   contextKey: string;
 };
 
-export function treeToReactNavigationLinkingRoutes(nodes: Node[], depth = 0) {
+export function treeToReactNavigationLinkingRoutes(
+  nodes: Node[],
+  depth = 0
+): PathConfigMap<{}> {
   // TODO: Intercept errors, strip invalid routes, and warn instead.
   // Our warnings can be more helpful than upstream since we know the associated file name.
-  return nodes
+  const firstPass = nodes
     .map((node) => {
       let path = convertDynamicRouteToReactNavigation(node.route);
-      const routingInfo = {
+      return {
         path,
         screenName: getReactNavigationScreenName(node.route),
         screens: node.children.length
           ? treeToReactNavigationLinkingRoutes(node.children, depth + 1)
           : undefined,
       };
-
-      return routingInfo;
     })
-    .reduce((acc, { screenName, ...cur }) => {
+    .reduce<PathConfigMap<{}>>((acc, { screenName, ...cur }) => {
       const path =
         cur.path === "index" || matchGroupName(cur.path) ? "" : cur.path;
       if (!cur.screens) {
@@ -48,9 +55,21 @@ export function treeToReactNavigationLinkingRoutes(nodes: Node[], depth = 0) {
       }
       return acc;
     }, {});
+
+  return addNotFoundRoutes(firstPass);
 }
 
-export function getLinkingConfig(routes: Node[]) {
+function addNotFoundRoutes(
+  pathConfigMap: PathConfigMap<{}>
+): PathConfigMap<{}> {
+  // TODO: Append this in cases where there is a required catch-all route with no `index` route, to ensure `index` cannot be matched.
+  return {
+    // NotFound: "*",
+    ...pathConfigMap,
+  };
+}
+
+export function getLinkingConfig(routes: Node[]): LinkingOptions<{}> {
   return {
     prefixes: [
       /* your linking prefixes */
@@ -61,10 +80,7 @@ export function getLinkingConfig(routes: Node[]) {
       ...getAllWebRedirects(),
     ],
     config: {
-      screens: treeToReactNavigationLinkingRoutes(
-        // Skip first route which doesn't have a navigator
-        routes[0].children
-      ),
+      screens: treeToReactNavigationLinkingRoutes(routes),
     },
   };
 }
@@ -132,5 +148,24 @@ export function getRoutes(pages): Node[] {
       };
     })
     .filter((node) => node);
-  return convert(names);
+  const routes = convert(names);
+
+  // Auto add not found route if it doesn't exist
+  const userDefinedNotFound = routes.find(
+    (route) =>
+      matchCatchAllRouteName(route.route) ||
+      matchOptionalCatchAllRouteName(route.route)
+  );
+  if (!userDefinedNotFound) {
+    routes.push({
+      component: require("./NotFound").NotFound,
+      children: [],
+      extras: {},
+      route: "[...generated]",
+      contextKey: "./[...generated].tsx",
+      dynamic: true,
+    });
+  }
+
+  return routes;
 }

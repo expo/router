@@ -61,7 +61,6 @@ export function Navigator({ ctx, children, ...props }) {
         .map((value) => {
             const componentApi = tabBarItems.find((item) => item.to === value.route);
 
-            console.log('value.route:', value.route, componentApi)
             return (
                 <Screen
                     options={(props) => {

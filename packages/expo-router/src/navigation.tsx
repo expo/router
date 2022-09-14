@@ -12,8 +12,12 @@ const StackNavigatorUpstream = createStackNavigator().Navigator;
 const NativeStackNavigatorUpstream = createNativeStackNavigator().Navigator;
 const DrawerNavigatorUpstream = createDrawerNavigator().Navigator;
 
-/** Return a navigator that automatically injects matched routes and renders nothing when there are no children. */
-function createWrappedNavigator<T extends React.ComponentType<any>>(Nav: T): T {
+type PickPartial<T, K extends keyof T> = Omit<T, K> &
+    Partial<Pick<T, K>>;
+
+/** Return a navigator that automatically injects matched routes and renders nothing when there are no children. Return type with children prop optional */
+function createWrappedNavigator<T extends React.ComponentType<any>>(Nav: T): React.ComponentType<PickPartial<React.ComponentProps<T>, 'children'>> {
+
     const Navigator = React.forwardRef((props, ref) => {
         const children = useNavigationChildren();
         // Prevent throwing an error when there are no screens.
