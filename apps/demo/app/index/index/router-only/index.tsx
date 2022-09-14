@@ -7,7 +7,7 @@ export default function App() {
                 margin: 24,
                 borderRadius: 20,
                 flex: 1,
-                backgroundColor: "blue",
+                backgroundColor: "coral",
                 padding: 24,
                 alignItems: "stretch",
             }}

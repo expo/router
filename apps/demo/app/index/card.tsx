@@ -7,7 +7,7 @@ export const getNavOptions = (): NativeStackNavigationOptions => ({
     title: 'Card!'
 })
 
-export default function App({ navigation }) {
+export default function App({ navigation, route }) {
     return (
         <View
             style={{
@@ -22,6 +22,7 @@ export default function App({ navigation }) {
             <Text style={{ position: 'absolute', top: 8, left: 8 }} onPress={() => {
                 navigation.goBack()
             }}>{__filename}</Text>
-        </View>
+            <Text style={{ color: 'white', fontSize: 16, }}> {JSON.stringify(route, null, 2)}</Text>
+        </View >
     );
 }

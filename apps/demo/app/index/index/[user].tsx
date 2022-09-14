@@ -13,13 +13,13 @@ import { useNavigationChildren, useNavigator } from "expo-router";
 
 const Nav = createMaterialTopTabNavigator();
 
+import { TabBarIcon } from "../../../components/TabBarIcon";
+import { DrawerNavigationOptions } from "@react-navigation/drawer";
 
-export const getNavOptions = () => {
-    return {
-        title: "Profile",
-    };
-};
-
+export const getNavOptions = (): DrawerNavigationOptions => ({
+    title: 'User',
+    drawerIcon: (props) => <TabBarIcon {...props} name="person-outline" />
+})
 
 export default function App() {
     const Navigator = useNavigator(Nav.Navigator);

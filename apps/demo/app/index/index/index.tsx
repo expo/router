@@ -1,6 +1,15 @@
 import { Link } from '@react-navigation/native';
 import { Text, View } from 'react-native';
 
+import { TabBarIcon } from "../../../components/TabBarIcon";
+import { DrawerNavigationOptions } from "@react-navigation/drawer";
+
+export const getNavOptions = (): DrawerNavigationOptions => ({
+    title: 'Home',
+    drawerIcon: (props) => <TabBarIcon {...props} name="home-outline" />
+})
+
+
 export default function App({ navigation }) {
     return (
         <View
@@ -27,6 +36,13 @@ export default function App({ navigation }) {
                 to={"/modal"}
             >
                 Push modal
+            </Link>
+
+            <Link
+                style={{ fontWeight: 'bold', fontSize: 24, color: 'white' }}
+                to={"/card"}
+            >
+                Push card
             </Link>
         </View>
     );

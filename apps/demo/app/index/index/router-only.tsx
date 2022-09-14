@@ -2,6 +2,13 @@
 import { View, Text } from "react-native";
 
 import { useChild } from "expo-router";
+import { TabBarIcon } from "../../../components/TabBarIcon";
+import { DrawerNavigationOptions } from "@react-navigation/drawer";
+
+export const getNavOptions = (): DrawerNavigationOptions => ({
+    title: 'Router-only',
+    drawerIcon: (props) => <TabBarIcon {...props} name="map-outline" />
+})
 
 export default function App() {
     // TODO: This currently doesn't work with linking because there's no in-memory navigator.
@@ -15,7 +22,7 @@ export default function App() {
                 margin: 24,
                 borderRadius: 20,
                 flex: 1,
-                backgroundColor: "green",
+                backgroundColor: "darkturquoise",
                 padding: 24,
                 alignItems: "stretch",
             }}
