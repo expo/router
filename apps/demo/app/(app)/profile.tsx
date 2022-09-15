@@ -6,9 +6,7 @@ export const getNavOptions = (): NativeStackNavigationOptions => ({
 
 });
 
-
 export const ErrorBoundary = Exception;
-
 
 export default function App({ navigation }) {
 
@@ -18,7 +16,7 @@ export default function App({ navigation }) {
                 margin: 24,
                 borderRadius: 20,
                 flex: 1,
-                backgroundColor: "crimson",
+                backgroundColor: "darkturquoise",
                 padding: 24,
                 alignItems: "stretch",
             }}

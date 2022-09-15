@@ -14,11 +14,11 @@ export default function App() {
 
   if (isRowLayout && Platform.OS === "web") {
     return (
-      <View style={{ flex: 1, flexDirection: "row-reverse" }}>
+      <View style={{ flex: 1, flexDirection: "row" }}>
+        <SideBar />
         <View style={{ paddingLeft: 80, flex: 1 }}>
           <Content />
         </View>
-        <SideBar />
       </View>
     );
   }
@@ -60,6 +60,7 @@ function SideBar() {
         left: 0,
         top: 0,
         bottom: 0,
+        zIndex: 1,
 
         height: "100%",
         justifyContent: "space-between",
