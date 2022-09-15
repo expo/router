@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, ViewStyle, Text, TouchableOpacity, View } from 'react-native';
 
 import { ErrorBoundaryProps } from '../ErrorBoundary';
 
@@ -89,7 +89,7 @@ function StackTrace({ error }: { error: Error }) {
     );
 }
 
-function ButtonContents({ title, style }) {
+function ButtonContents({ title, style }: { title: string, style?: ViewStyle }) {
     return (
         <View style={[{ backgroundColor: 'white', paddingVertical: 12, paddingHorizontal: 24, borderRadius: 8, }, style]}>
             <Text style={styles.buttonText}>

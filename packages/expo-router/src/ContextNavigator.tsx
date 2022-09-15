@@ -31,16 +31,12 @@ function useEntryModule(context: RequireContext) {
         const initialKeys = context.keys().filter((value) =>
             value.match(/^\.\/[^/]+\.(js|ts)x?$/)
         );
-        const first = initialKeys[0]
-        if (!initialKeys.length) {
-            console.warn('No initial route found in the app directory.');
-        }
-        return first;
+        return initialKeys[0]
     }, [context, url]);
 
     const EntryComponent = useMemo(() => {
         if ((!entryRouteId || !interopDefault(context(entryRouteId))) && process.env.NODE_ENV === 'development') {
-            const { Tutorial } = require('./Tutorial')
+            const { Tutorial } = require('./onboard/Tutorial')
             return Tutorial;
         }
         return null;
