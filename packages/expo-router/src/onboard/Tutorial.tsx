@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, Platform, Text, View } from 'react-native';
 import { DOCS_URL, createEntryFileAsync } from './createEntryFile';
 
+// TODO: hotter
 
 export function Tutorial() {
     return (

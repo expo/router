@@ -1,5 +1,5 @@
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-import { ErrorBoundaryProps } from 'expo-router';
+import { Exception } from 'expo-router';
 import { Text, View } from 'react-native';
 
 export const getNavOptions = (): NativeStackNavigationOptions => ({
@@ -8,20 +8,13 @@ export const getNavOptions = (): NativeStackNavigationOptions => ({
 });
 
 
-export function ErrorBoundary(props: ErrorBoundaryProps) {
-    return (
-        <View style={{ flex: 1, backgroundColor: "red" }}>
-            <Text>{props.error.message}</Text>
-            <Text onPress={props.retry}>Try Again?</Text>
-        </View>
-    );
-}
+export const ErrorBoundary = Exception;
 
 
 export default function App({ navigation }) {
-    if (Math.random() > 0.5) {
-        throw new Error("lol: " + __filename);
-    }
+    // if (Math.random() > 0.5) {
+    throw new Error("lol: " + __filename + " " + Date.now());
+    // }
 
     return (
         <View
