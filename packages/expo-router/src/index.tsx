@@ -7,5 +7,5 @@ export { ErrorBoundaryProps } from './ErrorBoundary'
 export * from './navigation';
 export * from './primitives';
 
-export { Root } from './Root';
+export { ExpoRoot } from './Root';
 export { NotFound } from './NotFound';

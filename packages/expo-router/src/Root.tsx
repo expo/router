@@ -10,7 +10,7 @@ import { ContextNavigator } from './ContextNavigator';
 // @ts-expect-error: welp
 type RequireContext = ReturnType<typeof require.context>;
 
-export function Root({ context }: { context: RequireContext }) {
+export function ExpoRoot({ context }: { context: RequireContext }) {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>

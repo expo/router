@@ -9,7 +9,7 @@ app/
 ```
 
 ```js
-// app/index.js
+// app/(stack).js
 import { createStackNavigator } from "@react-navigation/stack";
 import { useNavigator } from "expo-router";
 
@@ -37,7 +37,7 @@ export default function App() {
 ```
 
 ```js
-// app/index/home.js
+// app/(stack)/home.js
 import { View, Text, Image } from "react-native";
 
 function LogoTitle() {
@@ -85,7 +85,7 @@ export default function HomeScreen({ navigation }) {
 ```
 
 ```js
-// app/index/details.js
+// app/(stack)/details.js
 import { View, Text } from "react-native";
 
 export const getNavOptions = ({ route }) => ({
@@ -120,7 +120,7 @@ function DetailsScreen({ navigation, route }) {
 - Prefers a `<Header />` component in the `app/index.js` file:
 
 ```tsx
-// app/index.js
+// app/(stack).js
 import {
   // NOTE(EvanBacon): New API
   Stack,

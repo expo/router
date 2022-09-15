@@ -1,4 +1,8 @@
-import { registerRootComponent } from 'expo';
-import App from './App';
+import "@bacons/expo-metro-runtime";
 
-registerRootComponent(App);
+import { registerRootComponent } from "expo";
+import { ExpoRoot } from "expo-router";
+
+registerRootComponent(function App() {
+  return <ExpoRoot context={require.context("./app")} />;
+});
