@@ -2,22 +2,18 @@ Ports https://reactnavigation.org/docs/header-buttons
 
 ```
 app/
-├─ index.js
-├─ index/
+├─ (stack).js
+├─ (stack)/
 │  ├─ home.js
 ```
 
 ```js
-// app/index.js
-import { createStackNavigator } from "@react-navigation/stack";
-import { useNavigator } from "expo-router";
-
-const Nav = createStackNavigator();
+// app/(stack).js
+import { StackNavigator } from "expo-router";
 
 export default function App() {
-  const Navigator = useNavigator(Nav);
   return (
-    <Navigator
+    <StackNavigator
       initialRouteName="home"
       // https://reactnavigation.org/docs/headers#sharing-common-options-across-screens
       // Prefers using a `<Header />` component.
@@ -36,7 +32,7 @@ export default function App() {
 ```
 
 ```js
-// app/index/home.js
+// app/(stack)/home.js
 import { useLayoutEffect } from "react";
 import { View, Button, Text, Image } from "react-native";
 
@@ -49,7 +45,7 @@ function LogoTitle() {
   );
 }
 
-// NOTE(EvanBacon): Does not fast refresh. Prefers exposing a `<Header />` component in the `app/index.js`.
+// NOTE(EvanBacon): Does not fast refresh. Prefers exposing a `<Header />` component in the `app/(stack).js`.
 export const getNavOptions = () => ({
   headerTitle: (props) => <LogoTitle {...props} />,
   // https://reactnavigation.org/docs/header-buttons#adding-a-button-to-the-header
@@ -80,36 +76,39 @@ export default function HomeScreen({ navigation }) {
 
 ## Notes
 
-- Prefers a `<Header.Item />` component in the `app/index.js` file:
+- Prefers a `<Header.Item />` component in the `app/(stack).js` file:
 
 ```js
-// app/index.js
+// app/(stack).js
 import {
   // NOTE(EvanBacon): New API
-  Stack,
+  StackNavigator,
 } from "@react-navigation/stack";
 import { Button } from "react-native";
 
 export default function App() {
   return (
-    <Stack>
+    <StackNavigator>
       {/* mode="screen" would clone this component into a wrapper for all screens. */}
-      <Stack.Header tintColor="#fff" style={{ backgroundColor: "#f4511e" }}>
-        <Header.Title />
+      <StackNavigator.Header
+        tintColor="#fff"
+        style={{ backgroundColor: "#f4511e" }}
+      >
+        <StackNavigator.Header.Title />
         {/* Chooses the side (leading/trailing to support i18n). */}
-        <Header.Item position="trailing">
+        <StackNavigator.Header.Item position="trailing">
           {/* Render child component. */}
           <Button
             onPress={() => alert("This is a button!")}
             title="Info"
             color="#fff"
           />
-        </Header.Item>
-      </Stack.Header>
+        </StackNavigator.Header.Item>
+      </StackNavigator.Header>
 
       {/* Auto populated. */}
-      <Stack.Screens />
-    </Stack>
+      <StackNavigator.Screens />
+    </StackNavigator>
   );
 }
 ```

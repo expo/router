@@ -2,27 +2,23 @@ Ports https://reactnavigation.org/docs/navigating
 
 ```
 app/
-├─ index.js
-├─ index/
+├─ (stack).js
+├─ (stack)/
 │  ├─ home.js
 │  ├─ details.js
 ```
 
 ```js
-// app/index.js
-import { createStackNavigator } from "@react-navigation/stack";
-import { useNavigator } from "expo-router";
-
-const Nav = createStackNavigator();
+// app/(stack).js
+import { StackNavigator } from "expo-router";
 
 export default function App() {
-  const Navigator = useNavigator(Nav);
-  return <Navigator initialRouteName="home" />;
+  return <StackNavigator initialRouteName="home" />;
 }
 ```
 
 ```js
-// app/index/home.js
+// app/(stack)/home.js
 import { View, Text, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -40,7 +36,7 @@ export default function HomeScreen({ navigation }) {
 ```
 
 ```js
-// app/index/details.js
+// app/(stack)/details.js
 import { View, Text } from "react-native";
 
 function DetailsScreen({ navigation }) {

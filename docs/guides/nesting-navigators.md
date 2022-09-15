@@ -2,8 +2,8 @@ Ports https://reactnavigation.org/docs/nesting-navigators
 
 ```
 app/
-├─ index.js
-├─ index/
+├─ (stack).js
+├─ (stack)/
 │  ├─ home.js
 │  ├─ home/
 │    ├─ feed.js
@@ -11,55 +11,36 @@ app/
 ```
 
 ```js
-// app/index.js
-import { createStackNavigator } from "@react-navigation/stack";
-import { useNavigator } from "expo-router";
+// app/(stack).js
+import { StackNavigator } from "expo-router";
 
-const Nav = createStackNavigator();
-
-export default function App() {
-  const Navigator = useNavigator(Nav);
-  return <Navigator />;
-}
+export default StackNavigator;
 ```
 
 This is nested in the `App` navigator, so it will be rendered as a stack.
 
 ```js
-// app/index/home.js
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useNavigator } from "expo-router";
-
-const Nav = createBottomTabNavigator();
+// app/(stack)/home.js
+import { BottomTabNavigator } from "expo-router";
 
 export default function Home() {
-  const Navigator = useNavigator(Nav);
-  return <Navigator />;
+  return <BottomTabNavigator />;
 }
 ```
 
 ```js
-// app/index/profile.js
-import { Text } from "react-native";
+// app/(stack)/profile.js
+import { Link } from "@react-navigation/native";
 
-export default function Feed({ navigation }) {
-  return (
-    <Text
-      onPress={() => {
-        // NOTE(EvanBacon): Prefers `/home/messages`
-        navigation.navigate("home", { screen: "messages" });
-      }}
-    >
-      Navigate to nested route
-    </Text>
-  );
+export default function Feed() {
+  return <Link to="/home/messages">Navigate to nested route</Link>;
 }
 ```
 
 This is nested in the `Home` navigator, so it will be rendered as a tab.
 
 ```js
-// app/index/home/feed.js
+// app/(stack)/home/feed.js
 import { View } from "react-native";
 
 export default function Feed() {
@@ -68,7 +49,7 @@ export default function Feed() {
 ```
 
 ```js
-// app/index/home/messages.js
+// app/(stack)/home/messages.js
 import { View } from "react-native";
 
 export default function Messages() {

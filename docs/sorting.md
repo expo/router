@@ -49,7 +49,7 @@ The issue with this approach is that you may forget to add a screen to the navig
 The navigator could provide a more manual API for sorting, this is a bit nicer because it also removes the need for `getNavOptions`:
 
 ```tsx
-import { TabNavigator } from "foobar";
+import { TabNavigator } from "expo-router";
 
 export default function App() {
   return (

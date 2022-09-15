@@ -4,8 +4,8 @@ Routes are defined as files in the `app/` directory. The file name is the route 
 
 ```
 - app/
-  - index.js
-  - index/
+  - (stack).js
+  - (stack)/
     - home.js
     - profile.js
 ```
@@ -24,27 +24,23 @@ For example:
 
 ```
 - app/
-  - App.js
-  - routes/
-    - profile.js -- Matches /profile with: profile.js
-    - (layout).js
-    - (layout)
-      - home.js -- Matches /home with: (layout).js > home.js
-    - (alternate).js
-    - (alternate)
-      - settings.js -- Matches /settings with: (alternate).js > settings.js
+  - profile.js -- Matches /profile with: profile.js
+  - (layout).js
+  - (layout)
+    - home.js -- Matches /home with: (layout).js > home.js
+  - (alternate).js
+  - (alternate)
+    - settings.js -- Matches /settings with: (alternate).js > settings.js
 ```
 
 The issue with this feature is that it's a bit harder to reason about the routes at a glance. This feature also makes it possible to create conflicting routes like:
 
 ```
 - app/
-  - App.js
-  - routes/
-    - profile.js -- Matches /profile
-    - (layout).js
-    - (layout)
-      - profile.js -- Matches /profile (conflict)
+  - profile.js -- Matches /profile
+  - (layout).js
+  - (layout)
+    - profile.js -- Matches /profile (conflict)
 ```
 
 The format and naming is similar to Next.js layouts, but the implementation and usage is different.
@@ -56,7 +52,7 @@ The format and naming is similar to Next.js layouts, but the implementation and 
 - If is named `index`, it will not add a new path segment to the route.
 - Directories cannot be named `index`.
 - `/index.js` is reserved for leaf routes.
-- An `index` route cannot be next to a route group as they'd both match `/`.
+- An `index` route cannot be next to a **route group** as they'd both match `/`.
 
 ## Nested Routes
 
@@ -64,9 +60,9 @@ To render shared navigation elements like a header, tab bar, or drawer, you can 
 
 ```
 - app/
-  - index.js
-  - index/
-    - home.js -- This component is provided to `app/index.js` to be nested in the UI.
+  - (stack).js
+  - (stack)/
+    - home.js -- This component is provided to `app/(stack).js` to be nested in the UI.
 ```
 
 ## Dynamic Routes

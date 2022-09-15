@@ -2,23 +2,19 @@ Ports https://reactnavigation.org/docs/hello-react-navigation
 
 ```
 app/
-├─ index.js
-├─ index/
+├─ (stack).js
+├─ (stack)/
 │  ├─ home.js
 │  ├─ details.js
 ```
 
 ```js
-// app/index.js
-import { createStackNavigator } from "@react-navigation/stack";
-import { useNavigator } from "expo-router";
-
-const Nav = createStackNavigator();
+// app/(stack).js
+import { StackNavigator } from "expo-router";
 
 export default function App() {
-  const Navigator = useNavigator(Nav);
   return (
-    <Navigator
+    <StackNavigator
       // https://reactnavigation.org/docs/hello-react-navigation#configuring-the-navigator
       initialRouteName="home"
     />
@@ -27,7 +23,7 @@ export default function App() {
 ```
 
 ```js
-// app/index/home.js
+// app/(stack)/home.js
 import { View, Text } from "react-native";
 
 // https://reactnavigation.org/docs/hello-react-navigation#specifying-options
@@ -43,7 +39,7 @@ export default function HomeScreen() {
 ```
 
 ```js
-// app/index/details.js
+// app/(stack)/details.js
 import { View, Text } from "react-native";
 
 export default function DetailsScreen() {
@@ -57,7 +53,7 @@ export default function DetailsScreen() {
 
 ## Notes
 
-- Prefer `app/index/index.js` to `app/index/home.js` + `initialRouteName="home"`.
+- Prefer `app/(stack)/index.js` to `app/(stack)/home.js` + `initialRouteName="home"`.
 - Prefer `home` to `Home` for routes.
 - Prefer `Home` to `HomeScreen` for components.
 - `getNavOptions` does not allow for Fast Refresh.
