@@ -1,13 +1,25 @@
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { Exception } from 'expo-router';
 import { Text, View } from 'react-native';
 
+export const getNavOptions = (): NativeStackNavigationOptions => ({
+
+});
+
+
+export const ErrorBoundary = Exception;
+
+
 export default function App({ navigation }) {
+
+
     return (
         <View
             style={{
                 margin: 24,
                 borderRadius: 20,
                 flex: 1,
-                backgroundColor: "green",
+                backgroundColor: "crimson",
                 padding: 24,
                 alignItems: "stretch",
             }}

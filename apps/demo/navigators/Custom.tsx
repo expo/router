@@ -1,22 +1,28 @@
 import { A, Nav } from '@expo/html-elements';
 import { Slot } from '@radix-ui/react-slot';
-import NavigationScreen from '@react-navigation/core/src/Screen';
 import { TabActions, TabRouter, useNavigationBuilder } from '@react-navigation/native';
 import { useNavigationChildren } from 'expo-router';
 import * as React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 export const BuilderContext = React.createContext<any>(null);
 export const TabContext = React.createContext<any>(null);
 
-export function TabNavigator({ ctx, initialRouteName, screenOptions, children }) {
-    const screens = useNavigationChildren(ctx);
+export function Navigator({ initialRouteName, backBehavior, screenOptions, children, router = TabRouter }: {
+    initialRouteName?: string;
+    backBehavior?: 'initialRoute' | 'history' | 'order' | 'none';
+    screenOptions?: any;
+    children?: any;
+    router?: any;
+}) {
+    const screens = useNavigationChildren();
 
     const { state, navigation, descriptors, NavigationContent } =
-        useNavigationBuilder(TabRouter, {
+        useNavigationBuilder(router, {
             children: screens,
             screenOptions,
             initialRouteName,
+            backBehavior
         });
 
     return (
@@ -87,24 +93,18 @@ const Tab = React.forwardRef(({ to, children, style, ...props }, ref) => {
     );
 })
 
-function Screen() {
+/** Renders the currently selected content. */
+export function Content() {
     const { state, descriptors } = React.useContext(BuilderContext);
-    return state.routes.map((route, i) => {
-        return (
-            <View
-                key={route.key}
-                pointerEvents="box-none"
-                style={[
-                    StyleSheet.absoluteFill,
-                    { display: i === state.index ? "flex" : "none" },
-                ]}
-            >
-                {descriptors[route.key].render()}
-            </View>
-        );
-    });
+    const current = state.routes.find((route, i) => state.index === i);
+    if (!current) {
+        return null;
+    }
+    return descriptors[current.key]?.render() ?? null;
 }
 
-TabNavigator.Screen = Screen;
-TabNavigator.Tab = Tab;
-TabNavigator.TabBar = TabBar;
+Navigator.Content = Content;
+
+// TabNavigator.Content = Content;
+// TabNavigator.Tab = Tab;
+// TabNavigator.TabBar = TabBar;
