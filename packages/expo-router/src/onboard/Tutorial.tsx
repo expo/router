@@ -88,14 +88,12 @@ function ExpoLogo() {
 }
 
 function Button() {
-    const [hover, setHover] = React.useState(false);
     return (
         <Pressable
-            onHoverIn={() => setHover(true)}
-            onHoverOut={() => setHover(false)}
             onPress={() => {
                 createEntryFileAsync()
-            }} style={{
+            }}
+            style={{
                 margin: 8,
                 ...Platform.select({
                     native: {
@@ -106,16 +104,19 @@ function Button() {
                     }
                 })
             }}>
-            <View style={[{
-                transitionDuration: '200ms',
-                backgroundColor: 'transparent', borderColor: 'white', borderWidth: 2, paddingVertical: 12, paddingHorizontal: 24,
-            }, hover && {
-                backgroundColor: 'white'
-            }]}>
-                <Text style={[{ fontSize: 18, transitionDuration: '200ms', fontWeight: 'bold', color: 'white' }, styles.code, hover && { color: 'black' }]}>
-                    <Text style={{ opacity: 0.5 }}>$</Text> touch app/index.js
-                </Text>
-            </View>
+            {({ hovered }) => (
+
+                <View style={[{
+                    transitionDuration: '200ms',
+                    backgroundColor: 'transparent', borderColor: 'white', borderWidth: 2, paddingVertical: 12, paddingHorizontal: 24,
+                }, hovered && {
+                    backgroundColor: 'white'
+                }]}>
+                    <Text style={[{ fontSize: 18, transitionDuration: '200ms', fontWeight: 'bold', color: 'white' }, styles.code, hovered && { color: 'black' }]}>
+                        <Text style={{ opacity: 0.5 }}>$</Text> touch app/index.js
+                    </Text>
+                </View>
+            )}
         </Pressable>
     )
 }
