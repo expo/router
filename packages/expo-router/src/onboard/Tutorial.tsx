@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Pressable, Platform, Text, View } from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, Pressable, Platform, Text, View } from 'react-native';
+
 import { DOCS_URL, createEntryFileAsync } from './createEntryFile';
 
 // TODO: hotter
@@ -8,7 +9,8 @@ export function Tutorial() {
     return (
         // @ts-ignore
         <View style={{ backgroundColor: 'black', flex: 1, }}>
-            <View style={{ flex: 1, maxWidth: 960, marginHorizontal: 'auto', alignItems: "stretch", paddingHorizontal: 24, }}>
+            <StatusBar barStyle={"light-content"} />
+            <SafeAreaView style={{ flex: 1, maxWidth: 960, marginHorizontal: 'auto', alignItems: "stretch", paddingHorizontal: 24, }}>
                 <View accessibilityRole='main' style={styles.container}>
 
                     <Pressable>
@@ -16,7 +18,7 @@ export function Tutorial() {
                             <Text
                                 // @ts-ignore
                                 accessibilityRole="heading" accessibilityLevel={1}
-                                style={styles.title}
+                                style={[styles.title, Platform.OS !== 'web' && { textAlign: 'left' }]}
                             >
                                 Welcome to <Text href="https://expo.dev/" style={[{
                                     ...Platform.select({
@@ -41,12 +43,12 @@ export function Tutorial() {
                         )}
                     </Pressable>
                     {/* @ts-expect-error */}
-                    <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>Create a file in the <Text style={{ fontWeight: 'bold' }}>app/</Text> folder and export a React component.</Text>
+                    <Text accessibilityRole="heading" accessibilityLevel={2} style={[styles.subtitle, Platform.OS !== 'web' && { textAlign: 'left' }]}>Create a file in the <Text style={{ fontWeight: 'bold' }}>app/</Text> folder and export a React component.</Text>
                     <Button />
 
                 </View>
                 {Platform.OS === 'web' && <Footer />}
-            </View>
+            </SafeAreaView>
         </View>
     );
 }
@@ -95,6 +97,14 @@ function Button() {
                 createEntryFileAsync()
             }} style={{
                 margin: 8,
+                ...Platform.select({
+                    native: {
+                        position: 'absolute',
+                        bottom: 8,
+                        left: 24,
+                        right: 24,
+                    }
+                })
             }}>
             <View style={[{
                 transitionDuration: '200ms',
@@ -120,7 +130,10 @@ const styles = StyleSheet.create({
     },
     title: {
         color: "white",
-        fontSize: '4rem',
+        fontSize: Platform.select({
+            web: '4rem',
+            default: 64
+        }),
         paddingBottom: 24,
         marginBottom: 24,
         // borderBottomColor: "rgba(255,255,255,0.4)",
@@ -137,7 +150,10 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         color: "#BCC3CD",
-        fontSize: '2rem',
+        fontSize: Platform.select({
+            web: '2rem',
+            default: 36
+        }),
         marginBottom: 24,
         textAlign: "center",
     },
