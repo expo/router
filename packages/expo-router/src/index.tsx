@@ -12,3 +12,4 @@ export { NotFound } from './NotFound';
 export { Exception } from './onboard/Exception';
 
 export { Navigator, Content } from './Navigator'
+export { Link } from './Link';

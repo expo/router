@@ -1,6 +1,5 @@
 import { A, Footer, H1, Header, Nav } from '@expo/html-elements';
-import { Link } from '@react-navigation/native';
-import { BottomTabNavigator, Content } from 'expo-router';
+import { Link, BottomTabNavigator, Content } from 'expo-router';
 import React from 'react';
 import { Image, Platform, useWindowDimensions, View } from 'react-native';
 
@@ -74,18 +73,18 @@ function SideBar() {
       <HeaderLogo />
 
       <VerticalTabBar>
-        <Link to="/">
+        <Link href="/">
           <Icon />
         </Link>
-        <Link to="/profile">
+        <Link href="/profile">
           <Icon />
         </Link>
-        <A href="#">
+        <Link href="#">
           <Icon />
-        </A>
-        <A href="#">
+        </Link>
+        <Link href="#">
           <Icon />
-        </A>
+        </Link>
         <View>
           <View
             style={{
@@ -96,9 +95,9 @@ function SideBar() {
             }}
           />
         </View>
-        <A href="#">
+        <Link href="#">
           <Icon />
-        </A>
+        </Link>
       </VerticalTabBar>
 
       <Footer
