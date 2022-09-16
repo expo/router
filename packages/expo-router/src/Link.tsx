@@ -1,8 +1,8 @@
 // Fork of @react-navigation/native Link.tsx
 import type { NavigationAction } from '@react-navigation/core';
 import * as React from 'react';
-import { GestureResponderEvent, Platform, Text, TextProps } from 'react-native';
-
+import { GestureResponderEvent, Platform } from 'react-native';
+import { Text, TextProps } from '@bacons/react-views'
 import { useLinkProps, } from '@react-navigation/native';
 import { Slot } from '@radix-ui/react-slot'
 import type { To } from '@react-navigation/native/src/useLinkTo';

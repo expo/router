@@ -1,22 +1,21 @@
 import React from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, Pressable, Platform, Text, View } from 'react-native';
-
+import { SafeAreaView, StatusBar, Platform } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from '@bacons/react-views';
 import { DOCS_URL, createEntryFileAsync } from './createEntryFile';
 
 // TODO: hotter
 
 export function Tutorial() {
     return (
-        // @ts-ignore
+
         <View style={{ backgroundColor: 'black', flex: 1, }}>
             <StatusBar barStyle={"light-content"} />
             <SafeAreaView style={{ flex: 1, maxWidth: 960, marginHorizontal: 'auto', alignItems: "stretch", paddingHorizontal: 24, }}>
                 <View accessibilityRole='main' style={styles.container}>
 
                     <Pressable>
-                        {(props) => (
+                        {({ hovered }) => (
                             <Text
-                                // @ts-ignore
                                 accessibilityRole="heading" accessibilityLevel={1}
                                 style={[styles.title, Platform.OS !== 'web' && { textAlign: 'left' }]}
                             >
@@ -27,14 +26,13 @@ export function Tutorial() {
                                             WebkitBackgroundClip: 'text',
                                             textFillColor: 'transparent',
                                             color: 'transparent',
-                                            backgroundClip: 'text',
                                             backgroundImage: 'linear-gradient(90deg,#9344F9,#B200F0)'
                                         },
                                         default: {
                                             color: '#9344F9'
                                         }
                                     })
-                                }, props.hovered && {
+                                }, hovered && {
                                     textDecorationColor: 'white',
                                     textDecorationLine: 'underline'
                                 }]}>Expo</Text>
@@ -42,7 +40,6 @@ export function Tutorial() {
 
                         )}
                     </Pressable>
-                    {/* @ts-expect-error */}
                     <Text accessibilityRole="heading" accessibilityLevel={2} style={[styles.subtitle, Platform.OS !== 'web' && { textAlign: 'left' }]}>Create a file in the <Text style={{ fontWeight: 'bold' }}>app/</Text> folder and export a React component.</Text>
                     <Button />
 
@@ -131,7 +128,7 @@ const styles = StyleSheet.create({
     },
     title: {
         color: "white",
-        fontSize: Platform.select({
+        fontSize: Platform.select<string | number>({
             web: '4rem',
             default: 64
         }),
@@ -151,7 +148,7 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         color: "#BCC3CD",
-        fontSize: Platform.select({
+        fontSize: Platform.select<string | number>({
             web: '2rem',
             default: 36
         }),

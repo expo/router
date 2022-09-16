@@ -1184,6 +1184,11 @@
   dependencies:
     qs "^6.10.3"
 
+"@bacons/react-views@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@bacons/react-views/-/react-views-1.0.5.tgz#30a63998cbad0130fdc97663817ddd6791003956"
+  integrity sha512-kDzz3qgCRiVcRroX1zPi5ELIGjR6UmjRk0/kx0GKJEHZ9kCWOu/Ptot2YgqBMjJ3SKgxlMZa9nfZPQq3ToUjgw==
+
 "@bcoe/v8-coverage@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"

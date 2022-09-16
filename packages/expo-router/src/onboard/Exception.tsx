@@ -1,16 +1,16 @@
-import React from 'react';
-import { Platform, ScrollView, StyleSheet, ViewStyle, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from '@bacons/react-views';
 import { Link } from '@react-navigation/native';
+import React from 'react';
+import { Platform, ScrollView, TouchableOpacity } from 'react-native';
+
 import { ErrorBoundaryProps } from '../ErrorBoundary';
 
 export function Exception({ error, retry }: ErrorBoundaryProps) {
     return (
-        // @ts-ignore
         <View accessibilityRole='main' style={[styles.container]}>
             <View style={{ maxWidth: 720, marginHorizontal: 'auto' }}>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text
-                        // @ts-ignore
                         accessibilityRole="heading" accessibilityLevel={1}
                         style={styles.title}
                     >

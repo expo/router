@@ -9,8 +9,7 @@ type NavigationContainerProps = React.ComponentProps<typeof NavigationContainer>
 
 function useLinkingConfig(): LinkingOptions<{}> {
     const routes = useRoutesContext()
-    const linking = useMemo(() => getLinkingConfig(routes), [routes]);
-    return linking;
+    return useMemo(() => getLinkingConfig(routes), [routes]);
 }
 
 /** react-navigation `NavigationContainer` with automatic `linking` prop generated from the routes context. */
