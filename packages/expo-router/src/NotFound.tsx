@@ -1,7 +1,8 @@
 import React, { forwardRef } from 'react';
 import { useURL } from 'expo-linking';
 import { StyleSheet, Text, View } from 'react-native';
-
+import { Link } from '@react-navigation/native';
+import { A } from '@expo/html-elements';
 export const NotFound = forwardRef((props, ref) => {
     const url = useURL();
     return (
@@ -16,13 +17,13 @@ export const NotFound = forwardRef((props, ref) => {
             </Text>
             {/* @ts-expect-error */}
             <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>Page could not be found. {/* @ts-expect-error */}
-                <Text href={'/'} style={styles.link}>
+                <Link to="/" style={styles.link}>
                     Go back.
-                </Text></Text>
+                </Link></Text>
             {/* @ts-expect-error */}
-            <Text href={url} style={styles.link}>
+            <A href={url} style={styles.link}>
                 {url}
-            </Text>
+            </A>
 
         </View>
     );

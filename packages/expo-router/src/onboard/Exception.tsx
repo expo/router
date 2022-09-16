@@ -1,56 +1,14 @@
 import React from 'react';
-import { Platform, StyleSheet, ViewStyle, Text, TouchableOpacity, View } from 'react-native';
-
+import { Platform, ScrollView, StyleSheet, ViewStyle, Text, TouchableOpacity, View } from 'react-native';
+import { Link } from '@react-navigation/native';
 import { ErrorBoundaryProps } from '../ErrorBoundary';
-
-// import { parseLogBoxException } from 'react-native/Libraries/LogBox/Data/parseLogBoxLog';
-// import { LogBoxLog } from 'react-native/Libraries/LogBox/Data/LogBoxLog';
-
-
-// function symbolicateAsync(error) {
-//     return new Promise((resolve, reject) => {
-//         const metroError = new LogBoxLog(parseLogBoxException(error));
-//         if (metroError) {
-//             console.log("metroError", metroError);
-//             metroError.symbolicate(() => {
-//                 resolve(metroError);
-//             })
-//         } else {
-//             reject(new Error('Could not symbolicate error with Metro'));
-//         }
-//     });
-// }
-
-// TODO: Need to symbolicate the error with Metro using a universal LogBox implementation
-// function useSymbolicatedMetroError(error: Error) {
-//     return error;
-//     // const [results, setResults] = React.useState(null);
-//     // const isMounted = React.useRef(true);
-
-//     // React.useEffect(() => {
-//     //     symbolicateAsync(error).then((results) => {
-//     //         if (isMounted.current) {
-//     //             setResults(results);
-//     //         }
-//     //     }
-//     //     ).catch((e) => {
-//     //         console.error(e);
-//     //     }
-//     //     );
-//     //     return () => {
-//     //         isMounted.current = false;
-//     //     }
-//     // }, [error]);
-
-//     // return results;
-// }
 
 export function Exception({ error, retry }: ErrorBoundaryProps) {
     return (
         // @ts-ignore
         <View accessibilityRole='main' style={[styles.container]}>
             <View style={{ maxWidth: 720, marginHorizontal: 'auto' }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text
                         // @ts-ignore
                         accessibilityRole="heading" accessibilityLevel={1}
@@ -64,10 +22,9 @@ export function Exception({ error, retry }: ErrorBoundaryProps) {
                         }}>
                             <ButtonContents title="Retry" />
                         </TouchableOpacity>
-                        {/* @ts-expect-error */}
-                        <Text href="/" style={{ color: 'white' }}>
+                        <Link to="/" style={{ color: 'white' }}>
                             <ButtonContents title="Back" style={{ backgroundColor: 'rgba(255,255,255,0.4)' }} />
-                        </Text>
+                        </Link>
                     </View>
                 </View>
 
@@ -81,11 +38,11 @@ export function Exception({ error, retry }: ErrorBoundaryProps) {
 
 function StackTrace({ error }: { error: Error }) {
     return (
-        <View style={{ marginVertical: 8, borderColor: 'rgba(255,255,255,0.5)', borderWidth: 1, padding: 12, }}>
+        <ScrollView style={{ marginVertical: 8, borderColor: 'rgba(255,255,255,0.5)', borderWidth: 1, padding: 12, }}>
             <Text style={[styles.code, { color: 'white' }]}>
                 {error.stack}
             </Text>
-        </View>
+        </ScrollView>
     );
 }
 
