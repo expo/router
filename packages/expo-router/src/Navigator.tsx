@@ -6,6 +6,10 @@ import { useNavigationChildren } from "./routes";
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
 export const NavigatorContext = React.createContext<any>(null);
 
+if (process.env.NODE_ENV !== "production") {
+    NavigatorContext.displayName = "NavigatorContext";
+}
+
 /** An unstyled custom navigator. Good for basic web layouts */
 export function Navigator({
     initialRouteName,

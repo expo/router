@@ -5,6 +5,10 @@ import { Node } from "./getRoutes";
 // Routes context
 export const RoutesContext = createContext<Node[]>([]);
 
+if (process.env.NODE_ENV !== "production") {
+  RoutesContext.displayName = "RoutesContext";
+}
+
 export function useRoutesContext() {
   const routes = useContext(RoutesContext);
   if (!routes) {
