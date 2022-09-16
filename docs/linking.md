@@ -1,5 +1,19 @@
 # Linking
 
+The `expo-router` `Link` component supports client-side navigation to a route. It is similar to the `Link` component in `react-router-dom` and `next/link`.
+
+When JavaScript is disabled or the client is offline, the `Link` component will render a regular `<a>` element. Otherwise, the default behavior will be intercepted and the client-side router will navigate to the route (faster and smoother).
+
+Meaning you get the best of both worlds: a fast client-side navigation experience, and a fallback for when JavaScript is disabled or hasn't loaded yet.
+
+```tsx
+import { Link } from "expo-router";
+
+<Link href="/">Home</Link>;
+```
+
+## Testing
+
 On native, you can use the `uri-scheme` CLI to test opening native links on a device.
 
 ```

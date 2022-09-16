@@ -1,6 +1,6 @@
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { Exception } from 'expo-router';
-import { Text, View } from 'react-native';
+import { Text, View } from '@bacons/react-views';
 
 export const getNavOptions = (): NativeStackNavigationOptions => ({
 
@@ -18,8 +18,9 @@ export default function App({ navigation }) {
                 flex: 1,
                 backgroundColor: "darkturquoise",
                 padding: 24,
-                alignItems: "stretch",
+
             }}
+            center
         >
             <Text
                 style={{ position: "absolute", top: 8, left: 8 }}
@@ -29,6 +30,7 @@ export default function App({ navigation }) {
             >
                 {__filename}
             </Text>
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 36 }}>Profile</Text>
         </View>
     );
 }

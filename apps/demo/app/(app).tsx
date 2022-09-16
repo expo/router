@@ -76,14 +76,11 @@ function SideBar() {
         <Link href="/">
           <Icon />
         </Link>
+        <A href="/profile">
+          <Icon style={{ backgroundColor: 'firebrick' }} />
+        </A>
         <Link href="/profile">
-          <Icon />
-        </Link>
-        <Link href="#">
-          <Icon />
-        </Link>
-        <Link href="#">
-          <Icon />
+          <Icon style={{ backgroundColor: 'limegreen' }} />
         </Link>
         <View>
           <View
@@ -136,15 +133,15 @@ function ProfileImage({ style, ...props }) {
   );
 }
 
-function Icon() {
+function Icon({ style }: any) {
   return (
     <View
-      style={{
+      style={[{
         backgroundColor: "gray",
         width: 24,
         height: 24,
         borderRadius: 12,
-      }}
+      }, style]}
     />
   );
 }

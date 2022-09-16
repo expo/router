@@ -15,7 +15,7 @@ export const NotFound = forwardRef((props, ref) => {
             >
                 Not Found
             </Text>
-            <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>Page could not be found.
+            <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>Page could not be found.{' '}
                 <Link href="/" style={styles.link}>
                     Go back.
                 </Link></Text>
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     },
     title: {
         color: "white",
-        fontSize: 24,
+        fontSize: 36,
         paddingBottom: 12,
         marginBottom: 12,
         borderBottomColor: "rgba(255,255,255,0.4)",
@@ -48,9 +48,9 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         color: "white",
-        fontSize: 14,
+        fontSize: 18,
         marginBottom: 12,
         textAlign: "center",
     },
-    link: { color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center" },
+    link: { color: "rgba(255,255,255,0.4)", textAlign: "center" },
 });

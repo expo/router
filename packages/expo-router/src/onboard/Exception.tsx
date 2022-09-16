@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ViewStyle } from '@bacons/react-views';
+import { Pressable, StyleSheet, Text, View, ViewStyle } from '@bacons/react-views';
 import { Link } from '@react-navigation/native';
 import React from 'react';
 import { Platform, ScrollView, TouchableOpacity } from 'react-native';
@@ -9,7 +9,7 @@ export function Exception({ error, retry }: ErrorBoundaryProps) {
     return (
         <View accessibilityRole='main' style={[styles.container]}>
             <View style={{ maxWidth: 720, marginHorizontal: 'auto' }}>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View style={{ marginBottom: 12, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text
                         accessibilityRole="heading" accessibilityLevel={1}
                         style={styles.title}
@@ -17,20 +17,21 @@ export function Exception({ error, retry }: ErrorBoundaryProps) {
                         Something went wrong
                     </Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <TouchableOpacity onPress={retry} style={{
-                            marginHorizontal: 8,
-                        }}>
-                            <ButtonContents title="Retry" />
-                        </TouchableOpacity>
-                        <Link to="/" style={{ color: 'white' }}>
-                            <ButtonContents title="Back" style={{ backgroundColor: 'rgba(255,255,255,0.4)' }} />
-                        </Link>
+                        <Pressable>
+                            {({ hovered }) => (
+                                <TouchableOpacity onPress={retry}>
+                                    <View style={[{ transitionDuration: '100ms', paddingVertical: 12, paddingHorizontal: 24, borderColor: 'white', borderWidth: 2, marginLeft: 8 }, hovered && { backgroundColor: 'white' }]}>
+                                        <Text style={[styles.buttonText, { transitionDuration: '100ms', color: hovered ? 'black' : 'white' }]}>
+                                            Retry
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
+                            )}
+                        </Pressable>
                     </View>
                 </View>
 
                 <StackTrace error={error} />
-
-
             </View>
         </View>
     );
@@ -46,16 +47,6 @@ function StackTrace({ error }: { error: Error }) {
     );
 }
 
-function ButtonContents({ title, style }: { title: string, style?: ViewStyle }) {
-    return (
-        <View style={[{ backgroundColor: 'white', paddingVertical: 12, paddingHorizontal: 24, borderRadius: 8, }, style]}>
-            <Text style={styles.buttonText}>
-                {title}
-            </Text>
-        </View>
-    )
-}
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -66,12 +57,13 @@ const styles = StyleSheet.create({
     },
     title: {
         color: "white",
-        fontSize: 24,
+        fontSize: 36,
 
         // textAlign: "center",
         fontWeight: "bold",
     },
     buttonText: {
+        fontSize: 18,
         fontWeight: 'bold',
         color: 'black',
     },
