@@ -26,13 +26,16 @@ type Props<ParamList extends ReactNavigation.RootParamList> = {
  * @param props.action Optional action to use for in-page navigation. By default, the path is parsed to an action based on linking config.
  * @param props.children Child elements to render the content.
  */
-export function Link<ParamList extends ReactNavigation.RootParamList>({
+export const Link = React.forwardRef(BaseLink);
+
+function BaseLink<ParamList extends ReactNavigation.RootParamList>({
     to,
     href,
     action,
     asChild,
     ...rest
-}: Props<ParamList>) {
+}: Props<ParamList>, ref: React.ForwardedRef<Text>) {
+    // TODO: Auto use router's client-side event.
     const resolvedTo = React.useMemo(() => {
         const resolved = href ? href : to;
         if (resolved == null) {
@@ -58,6 +61,7 @@ export function Link<ParamList extends ReactNavigation.RootParamList>({
         // @ts-expect-error: slot is not type-safe
         asChild ? Slot : Text,
         {
+            ref,
             ...props,
             ...rest,
             ...Platform.select({

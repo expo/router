@@ -35,10 +35,56 @@ export function Navigator({
         });
 
     return (
-        <NavigatorContext.Provider value={{ state, navigation, descriptors }}>
+        <NavigatorContext.Provider value={{ state, navigation, descriptors, router }}>
             <NavigationContent>{children}</NavigationContent>
         </NavigatorContext.Provider>
     );
+}
+
+import { TabActions } from '@react-navigation/native';
+
+function useClientSideEvent(to) {
+    const { navigation, state, router } = useNavigatorContext();
+
+    const routeKey = React.useMemo(() => {
+        const route = state.routes.find((route) => route.name === to);
+        if (process.env.NODE_ENV === 'development' && !route) {
+            throw new Error(`No route with name "${to}" found. Options are: ${state.routes.map((route) => route.name).join(", ")}`);
+        }
+        return route.key;
+    }, [to]);
+
+
+    const onPress = React.useCallback(() => {
+        if (router === TabRouter) {
+            const event = navigation.emit({
+                type: "tabPress",
+                target: routeKey,
+                canPreventDefault: true,
+            });
+
+            if (!event.defaultPrevented) {
+                navigation.dispatch({
+                    ...TabActions.jumpTo(to),
+                    target: state.key,
+                });
+            }
+        } else {
+            throw new Error(`router is not supported: ${router}`);
+        }
+    }, [to, routeKey, router, state, navigation]);
+
+    return onPress;
+}
+
+export function useNavigatorContext() {
+    const context = React.useContext(NavigatorContext);
+    if (!context) {
+        throw new Error(
+            "useNavigatorContext must be used within a <Navigator />"
+        );
+    }
+    return context;
 }
 
 function useCurrentScreen(context) {
@@ -66,3 +112,5 @@ export function Content(props) {
 }
 
 Navigator.Content = Content;
+Navigator.useContext = useNavigatorContext;
+Navigator.useClientSideEvent = useClientSideEvent;

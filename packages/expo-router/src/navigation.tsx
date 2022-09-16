@@ -6,6 +6,8 @@ import React from 'react';
 
 import { useNavigationChildren } from './routes';
 
+// TODO: Move to different files for babel tree shaking plugin.
+
 // This is the only way to access the navigator.
 const BottomTabNavigatorUpstream = createBottomTabNavigator().Navigator;
 const StackNavigatorUpstream = createStackNavigator().Navigator;
