@@ -176,7 +176,7 @@ function getUserDefinedTopLevelCatch(routes: Node[]) {
     if (isCatchAll) {
       return route;
     }
-    // Recurse through pathless routes
+    // Recurse through fragment routes
     if (matchGroupName(route.route)) {
       const child = getUserDefinedTopLevelCatch(route.children);
       if (child) {
