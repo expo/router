@@ -13,20 +13,11 @@ import {
   convertDynamicRouteToReactNavigation,
   getNameFromFilePath,
   getReactNavigationScreenName,
+  RouteNode,
 } from "./routes";
 
-export type Node = {
-  route: string;
-  extras: Record<string, any>;
-  component: ReactNode;
-  children: Node[];
-  dynamic?: boolean;
-  /** require.context key, used for matching children. */
-  contextKey: string;
-};
-
 export function treeToReactNavigationLinkingRoutes(
-  nodes: Node[],
+  nodes: RouteNode[],
   depth = 0
 ): PathConfigMap<{}> {
   // TODO: Intercept errors, strip invalid routes, and warn instead.
@@ -70,7 +61,7 @@ function addNotFoundRoutes(
   };
 }
 
-export function getLinkingConfig(routes: Node[]): LinkingOptions<{}> {
+export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<{}> {
   return {
     prefixes: [
       /* your linking prefixes */
@@ -100,7 +91,7 @@ function convert(files: { route: string; node: any }[]) {
   }
 
   function toNodeArray(tree) {
-    const out: Node[] = [];
+    const out: RouteNode[] = [];
     // @ts-expect-error
     for (const [key, { ___child, ...obj }] of Object.entries(tree)) {
       out.push({
@@ -118,7 +109,7 @@ function convert(files: { route: string; node: any }[]) {
   return toNodeArray(tree);
 }
 
-function sortScreens(screens: Node[]) {
+function sortScreens(screens: RouteNode[]) {
   return screens.sort(
     ({ route, dynamic }, { route: idB, dynamic: isVariadicB }) => {
       if (route === "index") return -1;
@@ -134,7 +125,7 @@ function sortScreens(screens: Node[]) {
   );
 }
 
-export function getRoutes(pages): Node[] {
+export function getRoutes(pages): RouteNode[] {
   const names = pages
     .keys()
     .map((key) => {
@@ -151,15 +142,47 @@ export function getRoutes(pages): Node[] {
     .filter((node) => node);
   const routes = convert(names);
 
-  // Auto add not found route if it doesn't exist
-  const userDefinedNotFound = getUserDefinedTopLevelCatch(routes);
-  if (!userDefinedNotFound) {
+  // recurseAndAddDirectories(routes, []);
+
+  return routes;
+}
+
+function recurseAndAddDirectories(
+  routes: RouteNode[],
+  parents: RouteNode[]
+): RouteNode[] {
+  routes.map((route) => {
+    route.children = recurseAndAddDirectories(route.children, [
+      ...parents,
+      route,
+    ]);
+    return route;
+  });
+
+  const directory = getUserDefinedDirectory(routes);
+
+  if (!directory) {
     routes.push({
-      component: require("./NotFound").NotFound,
-      children: [],
+      generated: true,
+      component: require("./onboard/DirectoryIndex").DirectoryIndex,
+      // TODO: get siblings
+      children: routes.reduce((res, route) => {
+        if (route.children) {
+          for (const child of route.children) {
+            if (child.route !== "index") {
+              res.push(child);
+            }
+          }
+        }
+        return res;
+      }, []),
+      // children: [],
       extras: {},
-      route: "[...generated]",
-      contextKey: "./[...generated].tsx",
+      route: "index",
+      contextKey: parents.reduce(
+        (acc, cur) => `${acc}/${cur.route}`,
+        "./index.tsx"
+      ),
       dynamic: true,
     });
   }
@@ -167,7 +190,26 @@ export function getRoutes(pages): Node[] {
   return routes;
 }
 
-function getUserDefinedTopLevelCatch(routes: Node[]) {
+/** Fetch the `index` or `/`  */
+function getUserDefinedDirectory(routes: RouteNode[]) {
+  // Auto add not found route if it doesn't exist
+  for (const route of routes) {
+    const isEntryFile = route.route === "index";
+    if (isEntryFile) {
+      return route;
+    }
+    // Recurse through fragment routes
+    if (matchFragmentName(route.route)) {
+      const child = getUserDefinedTopLevelCatch(route.children);
+      if (child) {
+        return child;
+      }
+    }
+  }
+  return null;
+}
+
+function getUserDefinedTopLevelCatch(routes: RouteNode[]) {
   // Auto add not found route if it doesn't exist
   for (const route of routes) {
     const isCatchAll =

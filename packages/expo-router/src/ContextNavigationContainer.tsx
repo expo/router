@@ -15,5 +15,6 @@ function useLinkingConfig(): LinkingOptions<{}> {
 /** react-navigation `NavigationContainer` with automatic `linking` prop generated from the routes context. */
 export const ContextNavigationContainer = React.forwardRef((props: NavigationContainerProps, ref: NavigationContainerProps['ref']) => {
     const linking = useLinkingConfig();
+    console.log('linking', linking)
     return (<NavigationContainer ref={ref} linking={linking} {...props} />)
 })

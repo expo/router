@@ -8,25 +8,34 @@ import { Screen } from './primitives';
 
 const dev = process.env.NODE_ENV === "development";
 
-type RouteNode = {
+
+export type RouteNode<TComponent = React.ComponentType> = {
     /** nested routes */
-    children: RouteNode[];
+    children: RouteNode<TComponent>[];
     /** React component */
-    component: React.ComponentType<any>;
+    component: TComponent;
     /** Is the route a dynamic path */
     dynamic: boolean;
     /** All static exports from the file. */
     extras: Record<string, any>;
     /** `index`, `error-boundary`, etc. */
     route: string;
+    /** require.context key, used for matching children. */
+    contextKey: string;
+    /** Added in-memory */
+    generated?: boolean;
 };
 
 export const CurrentRouteContext = React.createContext<{
     filename: string | null;
     routes: RouteNode[];
+    siblings: RouteNode[];
+    parent: RouteNode | null;
 }>({
     filename: null,
     routes: [],
+    siblings: [],
+    parent: null,
 });
 
 if (dev) {
@@ -51,27 +60,27 @@ export function useRoutes() {
 }
 
 /** Return the route that matches the current URL. */
-export function useSelectedRoute() {
-    const url = useURL();
-    const routes = useRoutes();
+// export function useSelectedRoute() {
+//     const url = useURL();
+//     const routes = useRoutes();
 
-    const [route, setRoute] = React.useState<RouteNode | null>(null);
+//     const [route, setRoute] = React.useState<RouteNode | null>(null);
 
-    // TODO: This logic makes no sense
-    React.useEffect(() => {
-        if (!url) return;
-        const route = routes.find((route) => {
-            if (route.dynamic) {
-                return url.startsWith(route.route);
-            }
-            return url === route.route;
-        });
-        setRoute(route ?? null);
-    }, [url, routes]);
+//     // TODO: This logic makes no sense
+//     React.useEffect(() => {
+//         if (!url) return;
+//         const route = routes.find((route) => {
+//             if (route.dynamic) {
+//                 return url.startsWith(route.route);
+//             }
+//             return url === route.route;
+//         });
+//         setRoute(route ?? null);
+//     }, [url, routes]);
 
-    const Component = routes[0].component;
-    return <Component />
-}
+//     const Component = routes[0].component;
+//     return <Component />
+// }
 
 /** Provides the matching routes and filename to the children. */
 export function CurrentRoute({
@@ -81,16 +90,14 @@ export function CurrentRoute({
     filename: string;
     children: ReactNode;
 }) {
-    const routes = useRoutesAtPath(filename);
+    const { children: routes, siblings, parent } = useRoutesAtPath(filename);
 
     return (
-        <CurrentRouteContext.Provider value={{ filename, routes }}>
+        <CurrentRouteContext.Provider value={{ filename, routes, siblings, parent }}>
             {children}
         </CurrentRouteContext.Provider>
     );
 }
-
-
 
 // `[page]` -> `:page`
 // `page` -> `page`
@@ -134,27 +141,43 @@ function expandFilePath(filePath: string) {
     };
 }
 
-function useRoutesAtPath(filename: string): RouteNode[] {
+function useRoutesAtPath(filename: string): { children: RouteNode[], siblings: RouteNode[], parent: RouteNode | null } {
     const info = React.useMemo(() => expandFilePath(filename), [filename]);
-    // const name = getNameFromFilePath(filename).replace(/^app\//g, "");
     const routes = useContext(RoutesContext);
 
-    const matchingRoutes = React.useMemo(() => {
-        let current: any = routes;
+    const family = React.useMemo(() => {
+        let children: RouteNode[] = routes;
+        let siblings: RouteNode[] = [];
+        let current: RouteNode | null = null;
+        let parent: RouteNode | null = null;
 
         // Skip root directory
         if (info.id) {
             // split and search
             const parts = info.id.split("/");
             for (const part of parts) {
-                current = current.find(({ route }) => route === part)?.children;
-                if (!current) return [];
+
+                const next = children.find(({ route }) => route === part);
+
+                if (!next?.children) {
+                    return { siblings, children: [], parent };
+                }
+
+                parent = current;
+                siblings = children;
+                current = next;
+                children = next?.children;
             }
         }
-        return current.filter(({ component }) => component);
+
+        return { siblings, children: children, parent };
     }, [info, routes]);
 
-    return React.useMemo(() => {
+    const matchingRoutes = React.useMemo(() => {
+        return family.children.filter(({ component }) => component);
+    }, [family]);
+
+    const parsedRoutes = React.useMemo(() => {
         return matchingRoutes.map(({ component: Component, ...value }) => {
             const { ErrorBoundary } = value.extras;
             return {
@@ -173,6 +196,8 @@ function useRoutesAtPath(filename: string): RouteNode[] {
             };
         });
     }, [matchingRoutes]);
+
+    return { children: parsedRoutes, siblings: family.siblings, parent: family.parent };
 }
 
 /** Get the children React nodes as an array. */
