@@ -110,6 +110,11 @@ export function convertDynamicRouteToReactNavigation(name: string) {
     if (dynamicName) {
         return `:${dynamicName}`;
     }
+
+    if (name === 'index' || matchFragmentName(name)) {
+        return '';
+    }
+
     return name;
 }
 

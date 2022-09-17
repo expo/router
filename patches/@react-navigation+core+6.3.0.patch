@@ -1,0 +1,192 @@
+diff --git a/node_modules/@react-navigation/core/src/getStateFromPath.tsx b/node_modules/@react-navigation/core/src/getStateFromPath.tsx
+index b61e1e5..331aaa5 100644
+--- a/node_modules/@react-navigation/core/src/getStateFromPath.tsx
++++ b/node_modules/@react-navigation/core/src/getStateFromPath.tsx
+@@ -176,22 +176,22 @@ export default function getStateFromPath<ParamList extends {}>(
+       const a = acc[config.pattern].routeNames;
+       const b = config.routeNames;
+ 
+-      // It's not a problem if the path string omitted from a inner most screen
+-      // For example, it's ok if a path resolves to `A > B > C` or `A > B`
+-      const intersects =
+-        a.length > b.length
+-          ? b.every((it, i) => a[i] === it)
+-          : a.every((it, i) => b[i] === it);
+-
+-      if (!intersects) {
+-        throw new Error(
+-          `Found conflicting screens with the same pattern. The pattern '${
+-            config.pattern
+-          }' resolves to both '${a.join(' > ')}' and '${b.join(
+-            ' > '
+-          )}'. Patterns must be unique and cannot resolve to more than one screen.`
+-        );
+-      }
++      // // It's not a problem if the path string omitted from a inner most screen
++      // // For example, it's ok if a path resolves to `A > B > C` or `A > B`
++      // const intersects =
++      //   a.length > b.length
++      //     ? b.every((it, i) => a[i] === it)
++      //     : a.every((it, i) => b[i] === it);
++
++      // if (!intersects) {
++      //   throw new Error(
++      //     `Found conflicting screens with the same pattern. The pattern '${
++      //       config.pattern
++      //     }' resolves to both '${a.join(' > ')}' and '${b.join(
++      //       ' > '
++      //     )}'. Patterns must be unique and cannot resolve to more than one screen.`
++      //   );
++      // }
+     }
+ 
+     return Object.assign(acc, {
+@@ -407,17 +407,17 @@ const createConfigItem = (
+ 
+   const regex = pattern
+     ? new RegExp(
+-        `^(${pattern
+-          .split('/')
+-          .map((it) => {
+-            if (it.startsWith(':')) {
+-              return `(([^/]+\\/)${it.endsWith('?') ? '?' : ''})`;
+-            }
+-
+-            return `${it === '*' ? '.*' : escape(it)}\\/`;
+-          })
+-          .join('')})`
+-      )
++      `^(${pattern
++        .split('/')
++        .map((it) => {
++          if (it.startsWith(':')) {
++            return `(([^/]+\\/)${it.endsWith('?') ? '?' : ''})`;
++          }
++
++          return `${it === '*' ? '.*' : escape(it)}\\/`;
++        })
++        .join('')})`
++    )
+     : undefined;
+ 
+   return {
+diff --git a/node_modules/@react-navigation/core/src/useNavigationBuilder.tsx b/node_modules/@react-navigation/core/src/useNavigationBuilder.tsx
+index 8361727..223b59c 100644
+--- a/node_modules/@react-navigation/core/src/useNavigationBuilder.tsx
++++ b/node_modules/@react-navigation/core/src/useNavigationBuilder.tsx
+@@ -86,8 +86,7 @@ const getRouteConfigsFromChildren = <
+           throw new Error(
+             `Got an invalid 'navigationKey' prop (${JSON.stringify(
+               child.props.navigationKey
+-            )}) for the screen '${
+-              child.props.name
++            )}) for the screen '${child.props.name
+             }'. It must be a non-empty string or 'undefined'.`
+           );
+         }
+@@ -124,8 +123,8 @@ const getRouteConfigsFromChildren = <
+             child.type !== Group
+               ? groupOptions
+               : groupOptions != null
+-              ? [...groupOptions, child.props.screenOptions]
+-              : [child.props.screenOptions]
++                ? [...groupOptions, child.props.screenOptions]
++                : [child.props.screenOptions]
+           )
+         );
+         return acc;
+@@ -133,14 +132,11 @@ const getRouteConfigsFromChildren = <
+     }
+ 
+     throw new Error(
+-      `A navigator can only contain 'Screen', 'Group' or 'React.Fragment' as its direct children (found ${
+-        React.isValidElement(child)
+-          ? `'${
+-              typeof child.type === 'string' ? child.type : child.type?.name
+-            }'${
+-              child.props?.name ? ` for the screen '${child.props.name}'` : ''
+-            }`
+-          : typeof child === 'object'
++      `A navigator can only contain 'Screen', 'Group' or 'React.Fragment' as its direct children (found ${React.isValidElement(child)
++        ? `'${typeof child.type === 'string' ? child.type : child.type?.name
++        }'${child.props?.name ? ` for the screen '${child.props.name}'` : ''
++        }`
++        : typeof child === 'object'
+           ? JSON.stringify(child)
+           : `'${String(child)}'`
+       }). To render this component in the navigator, pass it in the 'component' prop to 'Screen'.`
+@@ -259,9 +255,9 @@ export default function useNavigationBuilder<
+     createRouter({
+       ...(rest as unknown as RouterOptions),
+       ...(route?.params &&
+-      route.params.state == null &&
+-      route.params.initial !== false &&
+-      typeof route.params.screen === 'string'
++        route.params.state == null &&
++        route.params.initial !== false &&
++        typeof route.params.screen === 'string'
+         ? { initialRouteName: route.params.screen }
+         : null),
+     })
+@@ -365,17 +361,17 @@ export default function useNavigationBuilder<
+       const { initialParams } = screens[curr].props;
+       const initialParamsFromParams =
+         route?.params?.state == null &&
+-        route?.params?.initial !== false &&
+-        route?.params?.screen === curr
++          route?.params?.initial !== false &&
++          route?.params?.screen === curr
+           ? route.params.params
+           : undefined;
+ 
+       acc[curr] =
+         initialParams !== undefined || initialParamsFromParams !== undefined
+           ? {
+-              ...initialParams,
+-              ...initialParamsFromParams,
+-            }
++            ...initialParams,
++            ...initialParamsFromParams,
++          }
+           : undefined;
+ 
+       return acc;
+@@ -487,19 +483,19 @@ export default function useNavigationBuilder<
+     // The update should be limited to current navigator only, so we call the router manually
+     const updatedState = action
+       ? router.getStateForAction(nextState, action, {
+-          routeNames,
+-          routeParamList,
+-          routeGetIdList,
+-        })
++        routeNames,
++        routeParamList,
++        routeGetIdList,
++      })
+       : null;
+ 
+     nextState =
+       updatedState !== null
+         ? router.getRehydratedState(updatedState, {
+-            routeNames,
+-            routeParamList,
+-            routeGetIdList,
+-          })
++          routeNames,
++          routeParamList,
++          routeGetIdList,
++        })
+         : nextState;
+   }
+ 
+@@ -596,8 +592,8 @@ export default function useNavigationBuilder<
+ 
+           return map
+             ? Object.keys(map)
+-                .filter((type) => type === e.type)
+-                .map((type) => map?.[type])
++              .filter((type) => type === e.type)
++              .map((type) => map?.[type])
+             : undefined;
+         })
+       )

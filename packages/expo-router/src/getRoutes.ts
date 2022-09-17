@@ -16,33 +16,29 @@ import {
 
 export function treeToReactNavigationLinkingRoutes(
   nodes: RouteNode[],
-  depth = 0
+  parents: string[] = []
 ): PathConfigMap<{}> {
   // TODO: Intercept errors, strip invalid routes, and warn instead.
   // Our warnings can be more helpful than upstream since we know the associated file name.
   const firstPass = nodes
     .map((node) => {
       let path = convertDynamicRouteToReactNavigation(node.route);
+
       return {
-        path,
+        path: path,
         screenName: getReactNavigationScreenName(node.route),
         screens: node.children.length
-          ? treeToReactNavigationLinkingRoutes(node.children, depth + 1)
+          ? treeToReactNavigationLinkingRoutes(node.children, [
+              ...parents,
+              path,
+            ])
           : undefined,
       };
     })
     .reduce<PathConfigMap<{}>>((acc, { screenName, ...cur }) => {
-      const path =
-        cur.path === "index" || matchFragmentName(cur.path) ? "" : cur.path;
-      if (!cur.screens) {
-        // TODO(EvanBacon): index should support both '/index' and '/'
-        acc[screenName] = path;
-      } else {
-        acc[screenName] = {
-          ...cur,
-          path,
-        };
-      }
+      acc[screenName] = {
+        ...cur,
+      };
       return acc;
     }, {});
 
@@ -147,6 +143,25 @@ export function getRoutes(pages): RouteNode[] {
 
   // recurseAndAddDirectories(routes, []);
 
+  // Auto add not found route if it doesn't exist
+  appendNotFoundRoute(routes);
+
+  return routes;
+}
+
+function appendNotFoundRoute(routes: RouteNode[]) {
+  // Auto add not found route if it doesn't exist
+  const userDefinedNotFound = getUserDefinedTopLevelCatch(routes);
+  if (!userDefinedNotFound) {
+    routes.push({
+      component: require("./NotFound").NotFound,
+      children: [],
+      extras: {},
+      route: "[...missing]",
+      contextKey: "./[...missing].tsx",
+      dynamic: { name: "missing", deep: true },
+    });
+  }
   return routes;
 }
 
@@ -203,7 +218,7 @@ function getUserDefinedDirectory(routes: RouteNode[]) {
     }
     // Recurse through fragment routes
     if (matchFragmentName(route.route)) {
-      const child = getUserDefinedTopLevelCatch(route.children);
+      const child = getUserDefinedDirectory(route.children);
       if (child) {
         return child;
       }
