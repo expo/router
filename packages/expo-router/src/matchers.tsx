@@ -5,14 +5,10 @@ export function matchDynamicName(name: string): string | undefined {
 }
 
 /** Match `[...page]` -> `page` */
-export function matchCatchAllRouteName(name: string): string | undefined {
+export function matchDeepDynamicRouteName(name: string): string | undefined {
     return name.match(/^\[\.\.\.([^/]+)\]$/)?.[1];
 }
 
-/** Match `[[...page]]` -> `page` */
-export function matchOptionalCatchAllRouteName(name: string): string | undefined {
-    return name.match(/^\[\[\.\.\.([^/]+)\]\]$/)?.[1];
-}
 
 /** Match `(page)` -> `page` */
 export function matchFragmentName(name: string): string | undefined {

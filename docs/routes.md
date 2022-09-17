@@ -121,16 +121,14 @@ To that end, if you visit a directory in Expo, you'll see a list of all the avai
 
 Dynamic routes are routes that have a variable part. For example, `/blog/post/[id]` is a dynamic route. The variable part (`[id]`) is called a "slug". The slug is the part of the URL that is dynamic. The slug is defined by the file name. For example, `/blog/post/bacon` is defined by the file `/blog/post/[id].tsx`.
 
-> By [popular demand](https://twitter.com/Baconbrix/status/1567538444246589441), the dynamic routes pattern is based on the [Next.js dynamic routes](https://nextjs.org/docs/routing/dynamic-routes) system.
-
 - `[id].js` will match `/blog/1` and `/blog/2` and provide the query `{ id: 1 }` and `{ id: 2 }` respectively.
-- `[...ids].js` will match `/blog/1/2/3` and provide the query `{ ids: [1, 2, 3] }`. This is known as a "catch-all route".
-- `[[...ids]].js` will match `/blog/1/2/3` and the unmatched `/blog/` and provide the query `{ ids: [1, 2, 3] }` and `{ ids: undefined }` respectively. This is known as an "optional catch-all route".
 
 Routes with higher specificity will be matched first. For example, `/blog/bacon` will match `blog/bacon.js` before `blog/[id].js`.
 
 <details>
   <summary>Interoperability</summary>
+
+> By [popular demand](https://twitter.com/Baconbrix/status/1567538444246589441), the dynamic routes pattern is based on the [Next.js dynamic routes](https://nextjs.org/docs/routing/dynamic-routes) system.
 
 There are a couple different ways to implement dynamic routes, here are some existing formats:
 
@@ -151,6 +149,19 @@ Due to my indifference, I had a [Twitter poll](https://twitter.com/Baconbrix/sta
 - [Remix](https://remix.run/docs/en/v1/routing/file-system-routing)
 - [`react-router`](https://reactrouter.com/web/guides/quick-start)
 - [Next.js layouts RFC, pt. 1](https://nextjs.org/blog/layouts-rfc)
+
+</details>
+
+## Deep Dynamic Routes
+
+Similar to dynamic routes, but the slug matches any number of path components in a route. For example, `/blog/post/[...id]` is a deep dynamic route. The variable part (`[...id]`) is called a "slug". The slug is the part of the URL that is dynamic. The slug is defined by the file name. For example, `/blog/post/bacon/cheese` is defined by the file `/blog/post/[...id].tsx`.
+
+- `[...ids].js` will match `/blog/1/2/3` and provide the query `{ ids: [1, 2, 3] }`.
+
+<details>
+  <summary>Interoperability</summary>
+
+This convention is functionally analogous to the 'optional catch-all dynamic routes' (`[[...id]].js`) feature from Next.js but the syntax is different. Unlike Next.js which has a separate syntax for matching everything except index, Expo uses the same syntax for both. If you want to match everything except index, you can implement an `index.js` file that has custom handling. We also reserve the term **catch** for error handling.
 
 </details>
 

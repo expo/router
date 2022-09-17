@@ -1,8 +1,4 @@
-import {
-  matchDynamicName,
-  matchCatchAllRouteName,
-  matchOptionalCatchAllRouteName,
-} from "../matchers";
+import { matchDynamicName, matchDeepDynamicRouteName } from "../matchers";
 
 describe(matchDynamicName, () => {
   it(`matches`, () => {
@@ -14,22 +10,12 @@ describe(matchDynamicName, () => {
   });
 });
 
-describe(matchOptionalCatchAllRouteName, () => {
+describe(matchDeepDynamicRouteName, () => {
   it(`matches`, () => {
-    expect(matchOptionalCatchAllRouteName("[[...foobar]]")).toEqual("foobar");
-    expect(matchOptionalCatchAllRouteName("[[foobar]]")).toEqual(undefined);
-    expect(matchOptionalCatchAllRouteName("[...foobar]")).toEqual(undefined);
-    expect(matchOptionalCatchAllRouteName("[foobar]")).toEqual(undefined);
-    expect(matchOptionalCatchAllRouteName("foobar")).toEqual(undefined);
-  });
-});
-
-describe(matchCatchAllRouteName, () => {
-  it(`matches`, () => {
-    expect(matchCatchAllRouteName("[[...foobar]]")).toEqual(undefined);
-    expect(matchCatchAllRouteName("[[foobar]]")).toEqual(undefined);
-    expect(matchCatchAllRouteName("[...foobar]")).toEqual("foobar");
-    expect(matchCatchAllRouteName("[foobar]")).toEqual(undefined);
-    expect(matchCatchAllRouteName("foobar")).toEqual(undefined);
+    expect(matchDeepDynamicRouteName("[[...foobar]]")).toEqual(undefined);
+    expect(matchDeepDynamicRouteName("[[foobar]]")).toEqual(undefined);
+    expect(matchDeepDynamicRouteName("[...foobar]")).toEqual("foobar");
+    expect(matchDeepDynamicRouteName("[foobar]")).toEqual(undefined);
+    expect(matchDeepDynamicRouteName("foobar")).toEqual(undefined);
   });
 });

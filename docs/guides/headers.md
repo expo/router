@@ -10,7 +10,6 @@ app/
 
 ```js
 // app/(stack).js
-import { createStackNavigator } from "@react-navigation/stack";
 import { StackNavigator } from "expo-router";
 
 export default function App() {

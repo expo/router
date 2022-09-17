@@ -5,7 +5,7 @@ import React from "react";
 import { Platform } from "react-native";
 import { useRoutesContext } from "../context";
 import { Link } from "../Link";
-import { matchDynamicName, matchOptionalCatchAllRouteName } from "../matchers";
+import { matchDynamicName } from "../matchers";
 import { Navigator } from "../Navigator";
 import { CurrentRouteContext } from "../routes";
 
@@ -21,7 +21,7 @@ export function DirectoryIndex() {
         .filter(({ generated }) => !generated)
         .map((value) => {
 
-            const href = matchDynamicName(value.route) ?? matchOptionalCatchAllRouteName(value.route) ? 'random' : value.route;
+            const href = matchDynamicName(value.route) ? 'random' : value.route;
             return {
                 ...value,
                 isDirectory: !value.component && !!value.children.length,

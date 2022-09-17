@@ -1,13 +1,11 @@
 import * as Linking from "expo-linking";
-import { ReactNode } from "react";
 import { LinkingOptions, PathConfigMap } from "@react-navigation/native";
 
 import { getAllWebRedirects } from "./aasa";
 import {
-  matchCatchAllRouteName,
+  matchDeepDynamicRouteName,
   matchDynamicName,
   matchFragmentName,
-  matchOptionalCatchAllRouteName,
 } from "./matchers";
 import {
   convertDynamicRouteToReactNavigation,
@@ -212,10 +210,8 @@ function getUserDefinedDirectory(routes: RouteNode[]) {
 function getUserDefinedTopLevelCatch(routes: RouteNode[]) {
   // Auto add not found route if it doesn't exist
   for (const route of routes) {
-    const isCatchAll =
-      matchCatchAllRouteName(route.route) ||
-      matchOptionalCatchAllRouteName(route.route);
-    if (isCatchAll) {
+    const isDeepDynamic = matchDeepDynamicRouteName(route.route);
+    if (isDeepDynamic) {
       return route;
     }
     // Recurse through fragment routes

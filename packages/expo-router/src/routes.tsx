@@ -3,7 +3,7 @@ import React, { forwardRef, ReactNode, useContext } from 'react';
 import { RoutesContext } from './context';
 
 import { AutoErrorBoundary } from './ErrorBoundary';
-import { matchCatchAllRouteName, matchDynamicName, matchFragmentName, matchOptionalCatchAllRouteName } from './matchers';
+import { matchDeepDynamicRouteName, matchDynamicName, matchFragmentName } from './matchers';
 import { Screen } from './primitives';
 
 const dev = process.env.NODE_ENV === "development";
@@ -103,7 +103,7 @@ export function CurrentRoute({
 // `page` -> `page`
 export function convertDynamicRouteToReactNavigation(name: string) {
 
-    if (matchCatchAllRouteName(name) || matchOptionalCatchAllRouteName(name)) {
+    if (matchDeepDynamicRouteName(name)) {
         return '*';
     }
     const dynamicName = matchDynamicName(name);
@@ -115,7 +115,7 @@ export function convertDynamicRouteToReactNavigation(name: string) {
 }
 
 export function getReactNavigationScreenName(name: string) {
-    return matchOptionalCatchAllRouteName(name) || matchCatchAllRouteName(name) || matchDynamicName(name) || name;
+    return matchDeepDynamicRouteName(name) || matchDynamicName(name) || name;
 }
 
 function expandFilePath(filePath: string) {
