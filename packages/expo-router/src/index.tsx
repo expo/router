@@ -8,7 +8,7 @@ export * from './navigation';
 export * from './primitives';
 
 export { ExpoRoot } from './Root';
-export { NotFound } from './NotFound';
+export { Unmatched } from './views/Unmatched';
 export { Exception } from './onboard/Exception';
 
 export { Navigator, Content, } from './Navigator'

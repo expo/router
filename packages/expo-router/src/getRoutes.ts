@@ -42,17 +42,7 @@ export function treeToReactNavigationLinkingRoutes(
       return acc;
     }, {});
 
-  return addNotFoundRoutes(firstPass);
-}
-
-function addNotFoundRoutes(
-  pathConfigMap: PathConfigMap<{}>
-): PathConfigMap<{}> {
-  // TODO: Append this in cases where there is a required catch-all route with no `index` route, to ensure `index` cannot be matched.
-  return {
-    // NotFound: "*",
-    ...pathConfigMap,
-  };
+  return firstPass;
 }
 
 export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<{}> {
@@ -144,17 +134,17 @@ export function getRoutes(pages): RouteNode[] {
   // recurseAndAddDirectories(routes, []);
 
   // Auto add not found route if it doesn't exist
-  appendNotFoundRoute(routes);
+  appendUnmatchedRoute(routes);
 
   return routes;
 }
 
-function appendNotFoundRoute(routes: RouteNode[]) {
+function appendUnmatchedRoute(routes: RouteNode[]) {
   // Auto add not found route if it doesn't exist
-  const userDefinedNotFound = getUserDefinedTopLevelCatch(routes);
-  if (!userDefinedNotFound) {
+  const userDefinedDynamicRoute = getUserDefinedTopLevelCatch(routes);
+  if (!userDefinedDynamicRoute) {
     routes.push({
-      component: require("./NotFound").NotFound,
+      component: require("./views/Unmatched").Unmatched,
       children: [],
       extras: {},
       route: "[...missing]",

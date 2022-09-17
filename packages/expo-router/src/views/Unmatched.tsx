@@ -1,10 +1,11 @@
 import React, { forwardRef } from 'react';
 import { useURL } from 'expo-linking';
 import { StyleSheet } from '@bacons/react-views';
-import { Link } from './Link';
+import { Link } from '../Link';
 import { Text, View } from '@bacons/react-views';
 
-export const NotFound = forwardRef((props, ref) => {
+/** Default screen for unmatched routes. */
+export const Unmatched = forwardRef((props, ref) => {
     const url = useURL();
     return (
         // @ts-ignore
@@ -13,7 +14,7 @@ export const NotFound = forwardRef((props, ref) => {
                 accessibilityRole="heading" accessibilityLevel={1}
                 style={styles.title}
             >
-                Not Found
+                Unmatched Route
             </Text>
             <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>Page could not be found.{' '}
                 <Link href="/" style={styles.link}>
