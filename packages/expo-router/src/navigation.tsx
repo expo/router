@@ -33,10 +33,10 @@ function createWrappedNavigator<T extends React.ComponentType<any>>(Nav: T) {
     return Navigator;
 }
 
-export const BottomTabNavigator = createWrappedNavigator(BottomTabNavigatorUpstream);
-export const StackNavigator = createWrappedNavigator(StackNavigatorUpstream);
-export const NativeStackNavigator = createWrappedNavigator(NativeStackNavigatorUpstream);
-export const DrawerNavigator = createWrappedNavigator(DrawerNavigatorUpstream);
+export const Tabs = createWrappedNavigator(BottomTabNavigatorUpstream);
+export const Stack = createWrappedNavigator(StackNavigatorUpstream);
+export const NativeStack = createWrappedNavigator(NativeStackNavigatorUpstream);
+export const Drawer = createWrappedNavigator(DrawerNavigatorUpstream);
 
 
 

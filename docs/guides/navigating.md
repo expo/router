@@ -10,10 +10,10 @@ app/
 
 ```js
 // app/(stack).js
-import { StackNavigator } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function App() {
-  return <StackNavigator initialRouteName="home" />;
+  return <Stack initialRouteName="home" />;
 }
 ```
 

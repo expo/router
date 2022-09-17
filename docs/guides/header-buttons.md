@@ -9,11 +9,11 @@ app/
 
 ```js
 // app/(stack).js
-import { StackNavigator } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function App() {
   return (
-    <StackNavigator
+    <Stack
       initialRouteName="home"
       // https://reactnavigation.org/docs/headers#sharing-common-options-across-screens
       // Prefers using a `<Header />` component.
@@ -82,33 +82,30 @@ export default function HomeScreen({ navigation }) {
 // app/(stack).js
 import {
   // NOTE(EvanBacon): New API
-  StackNavigator,
+  Stack,
 } from "@react-navigation/stack";
 import { Button } from "react-native";
 
 export default function App() {
   return (
-    <StackNavigator>
+    <Stack>
       {/* mode="screen" would clone this component into a wrapper for all screens. */}
-      <StackNavigator.Header
-        tintColor="#fff"
-        style={{ backgroundColor: "#f4511e" }}
-      >
-        <StackNavigator.Header.Title />
+      <Stack.Header tintColor="#fff" style={{ backgroundColor: "#f4511e" }}>
+        <Stack.Header.Title />
         {/* Chooses the side (leading/trailing to support i18n). */}
-        <StackNavigator.Header.Item position="trailing">
+        <Stack.Header.Item position="trailing">
           {/* Render child component. */}
           <Button
             onPress={() => alert("This is a button!")}
             title="Info"
             color="#fff"
           />
-        </StackNavigator.Header.Item>
-      </StackNavigator.Header>
+        </Stack.Header.Item>
+      </Stack.Header>
 
       {/* Auto populated. */}
-      <StackNavigator.Screens />
-    </StackNavigator>
+      <Stack.Content />
+    </Stack>
   );
 }
 ```

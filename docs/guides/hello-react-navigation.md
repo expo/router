@@ -10,11 +10,11 @@ app/
 
 ```js
 // app/(stack).js
-import { StackNavigator } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function App() {
   return (
-    <StackNavigator
+    <Stack
       // https://reactnavigation.org/docs/hello-react-navigation#configuring-the-navigator
       initialRouteName="home"
     />

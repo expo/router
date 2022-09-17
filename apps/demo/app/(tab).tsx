@@ -1,3 +1,3 @@
-import { BottomTabNavigator } from 'expo-router';
+import { Tabs } from 'expo-router';
 
-export default BottomTabNavigator;
+export default Tabs;

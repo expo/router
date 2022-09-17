@@ -37,5 +37,7 @@ The following are out of scope for the initial version, but carefully considered
 ## More
 
 - [Routes](routes.md)
+- [Navigators](navigators.md)
 - [Exports](exports.md)
+- [Linking](linking.md)
 - [FAQ](faq.md)

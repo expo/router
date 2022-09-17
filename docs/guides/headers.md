@@ -10,11 +10,11 @@ app/
 
 ```js
 // app/(stack).js
-import { StackNavigator } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function App() {
   return (
-    <StackNavigator
+    <Stack
       initialRouteName="home"
       // https://reactnavigation.org/docs/headers#sharing-common-options-across-screens
       // Prefers using a `<Header />` component.
@@ -119,25 +119,25 @@ function DetailsScreen({ navigation, route }) {
 // app/(stack).js
 import {
   // NOTE(EvanBacon): New API
-  StackNavigator,
+  Stack,
 } from "expo-router";
 
 export default function App() {
   const route = useRoute();
   return (
-    <StackNavigator>
+    <Stack>
       {/* mode="screen" would clone this component into a wrapper for all screens. */}
-      <StackNavigator.Header tintColor="#fff" style={{ backgroundColor: "#f4511e" }}>
-        <StackNavigator.Header.Title
+      <Stack.Header tintColor="#fff" style={{ backgroundColor: "#f4511e" }}>
+        <Stack.Header.Title
           style={{ fontWeight: "bold" }}
           {/* Could use context to populate some default values. */}
           title={route === "home" ? "Home" : "Details"}
         />
-      </StackNavigator.Header>
+      </Stack.Header>
 
       {/* Auto populated. */}
-      <StackNavigator.Screens initial="home" />
-    </StackNavigator>
+      <Stack.Screens initial="home" />
+    </Stack>
   );
 }
 ```

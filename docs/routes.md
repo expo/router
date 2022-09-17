@@ -165,10 +165,6 @@ This convention is functionally analogous to the 'optional catch-all dynamic rou
 
 </details>
 
-## Unmatched Routes
-
-Unmatched routes are routes that don't match any other routes. They are used to render a 404 page.
-
 ## App directory
 
 All routes are defined in the `app/` directory. The `app/` directory is a special directory that is used to define routes. The `app/` directory is a sibling to the `node_modules/` directory.
@@ -183,3 +179,7 @@ All routes are defined in the `app/` directory. The `app/` directory is a specia
 - `app/` directory in the [Next.js layouts RFC](https://nextjs.org/blog/layouts-rfc#introducing-the-app-directory).
 
 </details>
+
+## Next
+
+- Add custom handling for unmatched routes (404): [guide](not-found.md)

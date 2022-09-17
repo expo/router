@@ -12,19 +12,19 @@ app/
 
 ```js
 // app/(stack).js
-import { StackNavigator } from "expo-router";
+import { Stack } from "expo-router";
 
-export default StackNavigator;
+export default Stack;
 ```
 
 This is nested in the `App` navigator, so it will be rendered as a stack.
 
 ```js
 // app/(stack)/home.js
-import { BottomTabNavigator } from "expo-router";
+import { Tabs } from "expo-router";
 
 export default function Home() {
-  return <BottomTabNavigator />;
+  return <Tabs />;
 }
 ```
 
