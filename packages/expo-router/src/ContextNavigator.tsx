@@ -5,7 +5,7 @@ import { RoutesContext } from './context';
 import { ContextNavigationContainer } from './ContextNavigationContainer';
 import { getRoutes } from './getRoutes';
 import { NativeStack } from './navigation';
-import { CurrentRoute } from './routes';
+import { AutoRoute } from './routes';
 
 // @ts-expect-error: welp
 type RequireContext = ReturnType<typeof require.context>;
@@ -72,12 +72,12 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
 
     return (
         <RoutesContextProvider context={context}>
-            <CurrentRoute filename="./">
+            <AutoRoute filename="./">
                 <ContextNavigationContainer>
                     {/* Using a switch navigator at the root to host all pages. */}
                     <NativeStack screenOptions={{ animation: 'none', headerShown: false }} />
                 </ContextNavigationContainer>
-            </CurrentRoute>
+            </AutoRoute>
         </RoutesContextProvider>
     );
 }

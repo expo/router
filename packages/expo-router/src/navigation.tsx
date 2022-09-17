@@ -20,7 +20,7 @@ type PickPartial<T, K extends keyof T> = Omit<T, K> &
 /** Return a navigator that automatically injects matched routes and renders nothing when there are no children. Return type with children prop optional */
 function createWrappedNavigator<T extends React.ComponentType<any>>(Nav: T) {
 
-    const Navigator = React.forwardRef((props: PickPartial<React.ComponentProps<T>, 'children'>, ref) => {
+    const Navigator = React.forwardRef((props: PickPartial<React.ComponentProps<T>, 'children'> & { order?: string[] }, ref) => {
         const children = useNavigationChildren();
 
         // Prevent throwing an error when there are no screens.

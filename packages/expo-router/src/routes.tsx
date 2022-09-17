@@ -82,7 +82,7 @@ export function useRoutes() {
 // }
 
 /** Provides the matching routes and filename to the children. */
-export function CurrentRoute({
+export function AutoRoute({
     filename,
     children,
 }: {
@@ -201,7 +201,7 @@ function useRoutesAtPath(filename: string): { children: RouteNode[], siblings: R
                             </AutoErrorBoundary>
                         );
                     }
-                    return <CurrentRoute filename={value.contextKey}>{children}</CurrentRoute>;
+                    return <AutoRoute filename={value.contextKey}>{children}</AutoRoute>;
                 }),
                 ...value,
             };
@@ -219,19 +219,6 @@ function formatDynamicProps(path: string, dynamic: { name: string, deep: boolean
         return { [dynamic.name]: sanitized.split("/").map(value => value || '/') };
     }
     return { [dynamic.name]: sanitized };
-}
-
-
-/** Get the children React nodes as an array. */
-export function useChildren(): React.ReactNode[] {
-    const children = useRoutes();
-    return children.map((value) => <value.component key={value.route} />);
-}
-
-// TODO: Make this return only the selected component.
-export function useChild() {
-    const children = useRoutes();
-    return children?.map((value) => <value.component key={value.route} />)[0];
 }
 
 /** Wrap a navigator and export with the children for a given. */
