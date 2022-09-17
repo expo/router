@@ -1,8 +1,8 @@
-import { A, Footer, H1, Header, Nav } from '@expo/html-elements';
-import { Link, BottomTabNavigator, Content } from 'expo-router';
-import React from 'react';
-import { Image, Platform, useWindowDimensions, View } from 'react-native';
-
+import { A, Footer, H1, Header, Nav } from "@expo/html-elements";
+import { Link, BottomTabNavigator, Content } from "expo-router";
+import React from "react";
+import { Image, Platform, useWindowDimensions, View } from "react-native";
+import { SearchView } from "../components/SearchBar";
 
 function useWidth(size) {
   const { width } = useWindowDimensions();
@@ -22,7 +22,12 @@ export default function App() {
       </View>
     );
   }
-  return <BottomTabNavigator />;
+  return (
+    <>
+      <BottomTabNavigator />
+      {/* <SearchView /> */}
+    </>
+  );
 }
 
 function HeaderLogo() {
@@ -77,10 +82,10 @@ function SideBar() {
           <Icon />
         </Link>
         <A href="/profile">
-          <Icon style={{ backgroundColor: 'firebrick' }} />
+          <Icon style={{ backgroundColor: "firebrick" }} />
         </A>
         <Link href="/profile">
-          <Icon style={{ backgroundColor: 'limegreen' }} />
+          <Icon style={{ backgroundColor: "limegreen" }} />
         </Link>
         <View>
           <View
@@ -136,12 +141,15 @@ function ProfileImage({ style, ...props }) {
 function Icon({ style }: any) {
   return (
     <View
-      style={[{
-        backgroundColor: "gray",
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-      }, style]}
+      style={[
+        {
+          backgroundColor: "gray",
+          width: 24,
+          height: 24,
+          borderRadius: 12,
+        },
+        style,
+      ]}
     />
   );
 }

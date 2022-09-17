@@ -1,5 +1,5 @@
 import { useURL } from 'expo-linking';
-import React, { useMemo } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 
 import { RoutesContext } from './context';
 import { ContextNavigationContainer } from './ContextNavigationContainer';
@@ -26,13 +26,16 @@ function RoutesContextProvider({ context, children }: { context: RequireContext,
 
 /** Return the initial component in the `app/` folder and the associated module ID. If no module is defined, return a tutorial component. */
 function useEntryModule(context: RequireContext) {
+    // const previousRoute = useRef(null)
     const url = useURL();
-    const entryRouteId = useMemo(() => {
+    const entryRoutes = useMemo(() => {
         const initialKeys = context.keys().filter((value) =>
             value.match(/^\.\/[^/]+\.(js|ts)x?$/)
         );
-        return initialKeys[0]
+        return initialKeys;
     }, [context, url]);
+
+    const entryRouteId = useMemo(() => entryRoutes[0], [entryRoutes]);
 
     const EntryComponent = useMemo(() => {
         if ((!entryRouteId || !interopDefault(context(entryRouteId))) && process.env.NODE_ENV === 'development') {
@@ -41,6 +44,16 @@ function useEntryModule(context: RequireContext) {
         }
         return null;
     }, [entryRouteId]);
+
+
+    // useEffect(() => {
+    //     if (entryRoutes.length === 1 && !previousRoute.current) {
+    //         if (typeof location !== 'undefined') {
+    //             // window.location.pathname = '/'
+    //         }
+    //     }
+    //     previousRoute.current = entryRouteId;
+    // }, [entryRouteId, previousRoute.current]);
 
     return {
         id: entryRouteId,
@@ -52,13 +65,14 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
     const { Component } = useEntryModule(context);
 
     if (Component) {
+
         //  Tutorial
         return <Component />
     }
 
     return (
         <RoutesContextProvider context={context}>
-            <CurrentRoute filename={"./"}>
+            <CurrentRoute filename="./">
                 <ContextNavigationContainer>
                     {/* Using a switch navigator at the root to host all pages. */}
                     <NativeStackNavigator screenOptions={{ animation: 'none', headerShown: false }} />

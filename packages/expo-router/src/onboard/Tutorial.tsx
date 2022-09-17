@@ -3,49 +3,69 @@ import { SafeAreaView, StatusBar, Platform } from 'react-native';
 import { View, Text, Pressable, StyleSheet } from '@bacons/react-views';
 import { DOCS_URL, createEntryFileAsync } from './createEntryFile';
 
+import Reanimated, { FadeIn } from 'react-native-reanimated';
+
+
+
 // TODO: hotter
 
 export function Tutorial() {
+
+
+    React.useEffect(() => {
+        // Reset the route on web so the initial route isn't a 404 after
+        // the user has created the entry file.
+        // This is useful for cases where you are testing the tutorial.
+        // To test: touch the new file, then navigate to a missing route `/foobar`, then delete the app folder.
+        // you should see the tutorial again and be able to create the entry file once more.
+        if (typeof location !== 'undefined' && location.pathname !== '/') {
+            location.replace('/');
+        }
+    }, []);
+
     return (
-
         <View style={{ backgroundColor: 'black', flex: 1, }}>
-            <StatusBar barStyle={"light-content"} />
-            <SafeAreaView style={{ flex: 1, maxWidth: 960, marginHorizontal: 'auto', alignItems: "stretch", paddingHorizontal: 24, }}>
-                <View accessibilityRole='main' style={styles.container}>
+            <Reanimated.View entering={FadeIn} style={{ flex: 1 }}>
+                <StatusBar barStyle={"light-content"} />
 
-                    <Pressable>
-                        {({ hovered }) => (
-                            <Text
-                                accessibilityRole="heading" accessibilityLevel={1}
-                                style={[styles.title, Platform.OS !== 'web' && { textAlign: 'left' }]}
-                            >
-                                Welcome to <Text href="https://expo.dev/" style={[{
-                                    ...Platform.select({
-                                        web: {
-                                            backgroundClip: 'text',
-                                            WebkitBackgroundClip: 'text',
-                                            textFillColor: 'transparent',
-                                            color: 'transparent',
-                                            backgroundImage: 'linear-gradient(90deg,#9344F9,#B200F0)'
-                                        },
-                                        default: {
-                                            color: '#9344F9'
-                                        }
-                                    })
-                                }, hovered && {
-                                    textDecorationColor: 'white',
-                                    textDecorationLine: 'underline'
-                                }]}>Expo</Text>
-                            </Text>
 
-                        )}
-                    </Pressable>
-                    <Text accessibilityRole="heading" accessibilityLevel={2} style={[styles.subtitle, Platform.OS !== 'web' && { textAlign: 'left' }]}>Create a file in the <Text style={{ fontWeight: 'bold' }}>app/</Text> folder and export a React component.</Text>
-                    <Button />
+                <SafeAreaView style={{ flex: 1, maxWidth: 960, marginHorizontal: 'auto', alignItems: "stretch", paddingHorizontal: 24, }}>
+                    <View accessibilityRole='main' style={styles.container}>
 
-                </View>
-                {Platform.OS === 'web' && <Footer />}
-            </SafeAreaView>
+                        <Pressable>
+                            {({ hovered }) => (
+                                <Text
+                                    accessibilityRole="heading" accessibilityLevel={1}
+                                    style={[styles.title, Platform.OS !== 'web' && { textAlign: 'left' }]}
+                                >
+                                    Welcome to <Text href="https://expo.dev/" style={[{
+                                        ...Platform.select({
+                                            web: {
+                                                backgroundClip: 'text',
+                                                WebkitBackgroundClip: 'text',
+                                                textFillColor: 'transparent',
+                                                color: 'transparent',
+                                                backgroundImage: 'linear-gradient(90deg,#9344F9,#B200F0)'
+                                            },
+                                            default: {
+                                                color: '#9344F9'
+                                            }
+                                        })
+                                    }, hovered && {
+                                        textDecorationColor: 'white',
+                                        textDecorationLine: 'underline'
+                                    }]}>Expo</Text>
+                                </Text>
+
+                            )}
+                        </Pressable>
+                        <Text accessibilityRole="heading" accessibilityLevel={2} style={[styles.subtitle, Platform.OS !== 'web' && { textAlign: 'left' }]}>Create a file in the <Text style={{ fontWeight: 'bold' }}>app/</Text> folder and export a React component.</Text>
+                        <Button />
+
+                    </View>
+                    {Platform.OS === 'web' && <Footer />}
+                </SafeAreaView>
+            </Reanimated.View>
         </View>
     );
 }
@@ -60,7 +80,7 @@ function Footer() {
                 <Pressable style={{ flexDirection: 'row', alignItems: 'center' }}>
                     {({ hovered }) => (
                         <>
-                            <Text href={DOCS_URL} style={{ fontWeight: 'bold', color: '#BCC3CD', fontSize: 16, marginRight: 16 }}>Examples</Text>
+                            <Text style={{ fontWeight: 'bold', color: '#BCC3CD', fontSize: 16, marginRight: 16 }}>Examples</Text>
                             <View style={[{
                                 transitionDuration: '200ms',
                             }, hovered && { transform: [{ translateX: 10 }] }]}>

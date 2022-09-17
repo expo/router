@@ -1,7 +1,7 @@
 {
   "name": "metro-context-modules-demo",
   "version": "1.0.0",
-  "main": "./index.js",
+  "main": "index",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",

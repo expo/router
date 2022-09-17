@@ -43,8 +43,12 @@ function BaseLink<ParamList extends ReactNavigation.RootParamList>({
                 `You must specify either 'href' or 'to' prop in a <Link />.`
             );
         }
+        if (typeof resolved === 'string' && !resolved.startsWith('/')) {
+            // TODO: Auto delegate out external links
+            return '/'
+        }
         return resolved;
-    }, [href, to])
+    }, [href, to]);
     const props = useLinkProps<ParamList>({ to: resolvedTo, action });
 
     const onPress = (

@@ -46,6 +46,7 @@ export function treeToReactNavigationLinkingRoutes(
       const path =
         cur.path === "index" || matchGroupName(cur.path) ? "" : cur.path;
       if (!cur.screens) {
+        // TODO(EvanBacon): index should support both '/index' and '/'
         acc[screenName] = path;
       } else {
         acc[screenName] = {
