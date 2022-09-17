@@ -1,4 +1,3 @@
-import { useURL } from 'expo-linking';
 import React, { forwardRef, ReactNode, useContext } from 'react';
 import { RoutesContext } from './context';
 
@@ -9,13 +8,13 @@ import { Screen } from './primitives';
 const dev = process.env.NODE_ENV === "development";
 
 
-export type RouteNode<TComponent = React.ComponentType> = {
+export type RouteNode<TComponent = React.ComponentType<any>> = {
     /** nested routes */
     children: RouteNode<TComponent>[];
     /** React component */
     component: TComponent;
     /** Is the route a dynamic path */
-    dynamic: boolean;
+    dynamic: null | { name: string, deep: boolean };
     /** All static exports from the file. */
     extras: Record<string, any>;
     /** `index`, `error-boundary`, etc. */
@@ -129,7 +128,8 @@ function expandFilePath(filePath: string) {
 
     const last = id.split("/").pop();
 
-    const dynamicName = matchDynamicName(last);
+    const deepDynamicName = matchDeepDynamicRouteName(last);
+    const dynamicName = deepDynamicName ?? matchDynamicName(last);
     const fragment = matchFragmentName(last);
 
     return {
@@ -137,7 +137,7 @@ function expandFilePath(filePath: string) {
         id,
         fragment,
         lastPathName: dynamicName ?? last,
-        dynamic: !!dynamicName,
+        dynamic: dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null,
     };
 }
 
@@ -181,8 +181,14 @@ function useRoutesAtPath(filename: string): { children: RouteNode[], siblings: R
         return matchingRoutes.map(({ component: Component, ...value }) => {
             const { ErrorBoundary } = value.extras;
             return {
-                component: React.forwardRef((props, ref) => {
-                    const children = <Component ref={ref} {...props} />;
+                component: React.forwardRef((props: { route: any, navigation: any }, ref: any) => {
+                    // Surface dynamic name as props to the view
+                    const dynamicProps = React.useMemo(() => {
+                        if (!value.dynamic || props.route?.path == null) return {};
+                        return formatDynamicProps(props.route.path, value.dynamic)
+                    }, [value.dynamic?.name, props.route?.path])
+
+                    const children = <Component ref={ref} {...props} {...dynamicProps} />;
                     if (ErrorBoundary) {
                         return (
                             <AutoErrorBoundary component={ErrorBoundary}>
@@ -199,6 +205,17 @@ function useRoutesAtPath(filename: string): { children: RouteNode[], siblings: R
 
     return { children: parsedRoutes, siblings: family.siblings, parent: family.parent };
 }
+
+function formatDynamicProps(path: string, dynamic: { name: string, deep: boolean }) {
+    // Remove the first slash
+    const sanitized = path.replace(/^\//, "");
+
+    if (dynamic.deep) {
+        return { [dynamic.name]: sanitized.split("/").map(value => value || '/') };
+    }
+    return { [dynamic.name]: sanitized };
+}
+
 
 /** Get the children React nodes as an array. */
 export function useChildren(): React.ReactNode[] {

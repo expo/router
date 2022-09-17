@@ -92,13 +92,18 @@ function convert(files: { route: string; node: any }[]) {
     const out: RouteNode[] = [];
     // @ts-expect-error
     for (const [key, { ___child, ...obj }] of Object.entries(tree)) {
+      const deepDynamicName = matchDeepDynamicRouteName(key);
+      const dynamicName = deepDynamicName ?? matchDynamicName(key);
+
       out.push({
         route: key,
         extras: ___child?.extras,
         component: ___child?.node,
         contextKey: ___child?.contextKey,
         children: toNodeArray(obj),
-        dynamic: !!matchDynamicName(key),
+        dynamic: dynamicName
+          ? { name: dynamicName, deep: !!deepDynamicName }
+          : null,
       });
     }
     return sortScreens(out);
@@ -181,7 +186,7 @@ function recurseAndAddDirectories(
         (acc, cur) => `${acc}/${cur.route}`,
         "./index.tsx"
       ),
-      dynamic: true,
+      dynamic: null,
     });
   }
 
