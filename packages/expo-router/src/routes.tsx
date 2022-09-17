@@ -123,12 +123,12 @@ function expandFilePath(filePath: string) {
     const last = id.split("/").pop();
 
     const dynamicName = matchDynamicName(last);
-    const group = matchFragmentName(last);
+    const fragment = matchFragmentName(last);
 
     return {
         normalized,
         id,
-        group,
+        fragment,
         lastPathName: dynamicName ?? last,
         dynamic: !!dynamicName,
     };
