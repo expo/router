@@ -182,4 +182,4 @@ All routes are defined in the `app/` directory. The `app/` directory is a specia
 
 ## Next
 
-- Add custom handling for unmatched routes (404): [guide](not-found.md)
+- Add custom handling for unmatched routes (404): [guide](unmatched.md)
