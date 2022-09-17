@@ -47,7 +47,7 @@ function ClearButton() {
 }
 
 import { useRoutesContext } from 'expo-router/build/context'
-import { matchDynamicName, matchCatchAllRouteName, matchOptionalCatchAllRouteName, matchGroupName } from 'expo-router/build/matchers'
+import { matchDynamicName, matchCatchAllRouteName, matchOptionalCatchAllRouteName, matchFragmentName } from 'expo-router/build/matchers'
 import { treeToReactNavigationLinkingRoutes } from "expo-router/build/getRoutes";
 
 export function SearchView() {
@@ -65,7 +65,7 @@ export function SearchView() {
 
         acc.push({
             key: route.contextKey,
-            route: matchGroupName(route.route) ? '/' : route.route,
+            route: matchFragmentName(route.route) ? '/' : route.route,
             fileName: route.contextKey
         });
         return acc;

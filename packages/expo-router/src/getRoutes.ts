@@ -6,7 +6,7 @@ import { getAllWebRedirects } from "./aasa";
 import {
   matchCatchAllRouteName,
   matchDynamicName,
-  matchGroupName,
+  matchFragmentName,
   matchOptionalCatchAllRouteName,
 } from "./matchers";
 import {
@@ -44,7 +44,7 @@ export function treeToReactNavigationLinkingRoutes(
     })
     .reduce<PathConfigMap<{}>>((acc, { screenName, ...cur }) => {
       const path =
-        cur.path === "index" || matchGroupName(cur.path) ? "" : cur.path;
+        cur.path === "index" || matchFragmentName(cur.path) ? "" : cur.path;
       if (!cur.screens) {
         // TODO(EvanBacon): index should support both '/index' and '/'
         acc[screenName] = path;
@@ -177,7 +177,7 @@ function getUserDefinedTopLevelCatch(routes: Node[]) {
       return route;
     }
     // Recurse through fragment routes
-    if (matchGroupName(route.route)) {
+    if (matchFragmentName(route.route)) {
       const child = getUserDefinedTopLevelCatch(route.children);
       if (child) {
         return child;

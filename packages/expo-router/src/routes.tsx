@@ -3,7 +3,7 @@ import React, { forwardRef, ReactNode, useContext } from 'react';
 import { RoutesContext } from './context';
 
 import { AutoErrorBoundary } from './ErrorBoundary';
-import { matchCatchAllRouteName, matchDynamicName, matchGroupName, matchOptionalCatchAllRouteName } from './matchers';
+import { matchCatchAllRouteName, matchDynamicName, matchFragmentName, matchOptionalCatchAllRouteName } from './matchers';
 import { Screen } from './primitives';
 
 const dev = process.env.NODE_ENV === "development";
@@ -123,7 +123,7 @@ function expandFilePath(filePath: string) {
     const last = id.split("/").pop();
 
     const dynamicName = matchDynamicName(last);
-    const group = matchGroupName(last);
+    const group = matchFragmentName(last);
 
     return {
         normalized,

@@ -15,6 +15,6 @@ export function matchOptionalCatchAllRouteName(name: string): string | undefined
 }
 
 /** Match `(page)` -> `page` */
-export function matchGroupName(name: string): string | undefined {
+export function matchFragmentName(name: string): string | undefined {
     return name.match(/^\(([^/]+)\)$/)?.[1];
 }
