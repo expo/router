@@ -172,7 +172,7 @@ function recurseAndAddDirectories(
   if (!directory) {
     routes.push({
       generated: true,
-      component: require("./onboard/DirectoryIndex").DirectoryIndex,
+      component: require("./views/DirectoryIndex").DirectoryIndex,
       // TODO: get siblings
       children: routes.reduce((res, route) => {
         if (route.children) {

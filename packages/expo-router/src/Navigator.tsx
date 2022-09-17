@@ -1,7 +1,7 @@
-import { TabRouter, useNavigationBuilder } from "@react-navigation/native";
+import { TabActions, TabRouter, useNavigationBuilder } from '@react-navigation/native';
+import * as React from 'react';
 
-import * as React from "react";
-import { useNavigationChildren } from "./routes";
+import { useNavigationChildren } from './routes';
 
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
 export const NavigatorContext = React.createContext<any>(null);
@@ -40,8 +40,6 @@ export function Navigator({
         </NavigatorContext.Provider>
     );
 }
-
-import { TabActions } from '@react-navigation/native';
 
 function useClientSideEvent(to) {
     const { navigation, state, router } = useNavigatorContext();

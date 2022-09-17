@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react';
 import { useURL } from 'expo-linking';
 import { StyleSheet } from '@bacons/react-views';
-import { Link } from '../Link';
+import { Link } from './Link';
 import { Text, View } from '@bacons/react-views';
 
 /** Default screen for unmatched routes. */

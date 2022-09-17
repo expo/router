@@ -5,7 +5,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import React from "react";
 
-import { ContextNavigator } from './ContextNavigator';
+import { ContextNavigator } from '../ContextNavigator';
 
 // @ts-expect-error: welp
 type RequireContext = ReturnType<typeof require.context>;

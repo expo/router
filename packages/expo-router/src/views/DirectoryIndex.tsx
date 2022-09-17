@@ -4,7 +4,7 @@ import { useURL } from "expo-linking";
 import React from "react";
 import { Platform } from "react-native";
 import { useRoutesContext } from "../context";
-import { Link } from "../Link";
+import { Link } from "./Link";
 import { matchDynamicName } from "../matchers";
 import { Navigator } from "../Navigator";
 import { CurrentRouteContext } from "../routes";
