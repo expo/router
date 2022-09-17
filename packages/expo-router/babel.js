@@ -43,6 +43,31 @@ module.exports = function (api) {
           );
         }
       },
+
+      // Convert `process.env.EXPO_APP_ROOT` to a string literal
+      MemberExpression(path, state) {
+        if (
+          !t.isIdentifier(path.node.object, { name: "process" }) ||
+          !t.isIdentifier(path.node.property, { name: "env" })
+        ) {
+          return;
+        }
+
+        const parent = path.parentPath;
+        if (!t.isMemberExpression(parent.node)) {
+          return;
+        }
+
+        if (!t.isIdentifier(parent.node.property, { name: "EXPO_APP_ROOT" })) {
+          return;
+        }
+
+        if (parent.parentPath.isAssignmentExpression()) {
+          return;
+        }
+
+        parent.replaceWith(t.stringLiteral(process.env.EXPO_APP_ROOT));
+      },
     },
   };
 };

@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "main": "build/index.js",
   "files": [
+    "entry.js",
     "build",
     "babel.js"
   ],
