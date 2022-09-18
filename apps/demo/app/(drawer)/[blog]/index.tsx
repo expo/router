@@ -9,7 +9,7 @@ export default function App() {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      <Text style={{ fontSize: 36 }}> 👋</Text>
+      <Text style={{ fontSize: 36 }}>file 👋</Text>
     </View>
   );
 }

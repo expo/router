@@ -134,7 +134,7 @@ function FileItem({
             "/" +
             [...parents, route.route]
                 .map((v) => {
-                    return !!matchFragmentName(v) ? "" : v;
+                    return !!matchFragmentName(v) || v === 'index' ? "" : v;
                 })
                 .filter(Boolean)
                 .join("/")
