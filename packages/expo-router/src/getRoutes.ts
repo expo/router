@@ -13,6 +13,7 @@ import {
   getReactNavigationScreenName,
   RouteNode,
 } from "./routes";
+import { Content } from "./Navigator";
 
 export function treeToReactNavigationLinkingRoutes(
   nodes: RouteNode[],
@@ -131,6 +132,7 @@ export function getRoutes(pages): RouteNode[] {
     .filter((node) => node);
   const routes = convert(names);
 
+  console.log("Modify", routes);
   // Add all missing navigators
   recurseAndAddMissingNavigators(routes, []);
 
@@ -155,7 +157,9 @@ function recurseAndAddMissingNavigators(
   routes.forEach((route) => {
     // Route has children but no component and no contextKey (meaning no file path).
     if (route.children.length && !route.contextKey) {
-      route.component = require("./views/VirtualNavigator").VirtualNavigator;
+      console.log("Adding missing nav", route);
+
+      route.component = Content;
       route.generated = true;
       route.extras = {};
       route.contextKey = [".", ...parents, route.route + ".tsx"]
