@@ -38,7 +38,7 @@ export function Directory() {
     const routes = React.useMemo(
         () =>
             ctx
-                .filter((route) => !route.generated)
+                .filter((route) => !route.internal)
                 .sort((a, b) => {
                     // Emulate vscode's sorting
                     if (a.route < b.route) {
@@ -161,13 +161,11 @@ function FileItem({
                                     backgroundColor: hovered ? "rgba(255,255,255,0.1)" : "transparent",
                                 },
                                 pressed && { backgroundColor: gray },
+                                disabled && { opacity: 0.4 },
                             ]}
                         >
                             <View
-                                style={[
-                                    { flexDirection: "row", alignItems: "center" },
-                                    disabled && { opacity: 0.4 },
-                                ]}
+                                style={{ flexDirection: "row", alignItems: "center" }}
                             >
                                 {route.children.length ? <PkgIcon /> : <FileIcon />}
                                 <Text style={{ color: "white", fontSize: 20, marginLeft: 12 }}>
@@ -176,6 +174,7 @@ function FileItem({
                             </View>
 
                             {!disabled && <ForwardIcon />}
+                            {route.generated && <Text style={{ textAlign: 'right', color: 'white' }}>Virtual</Text>}
                         </View>
                     )}
                 </Pressable>

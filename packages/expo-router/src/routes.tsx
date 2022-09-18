@@ -23,6 +23,9 @@ export type RouteNode<TComponent = React.ComponentType<any>> = {
     contextKey: string;
     /** Added in-memory */
     generated?: boolean;
+
+    /** Internal screens like the directory or the auto 404 should be marked as internal. */
+    internal?: boolean;
 };
 
 export const CurrentRouteContext = React.createContext<{

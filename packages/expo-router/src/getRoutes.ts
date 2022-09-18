@@ -131,7 +131,8 @@ export function getRoutes(pages): RouteNode[] {
     .filter((node) => node);
   const routes = convert(names);
 
-  // recurseAndAddDirectories(routes, []);
+  // Add all missing navigators
+  recurseAndAddMissingNavigators(routes, []);
 
   // Auto add not found route if it doesn't exist
   appendUnmatchedRoute(routes);
@@ -139,6 +140,36 @@ export function getRoutes(pages): RouteNode[] {
   if (process.env.NODE_ENV === "development") {
     appendDirectoryRoute(routes);
   }
+
+  console.log("routes:", routes);
+
+  return routes;
+}
+
+// When there's a directory, but no sibling file with the same name, the directory won't work.
+// This method ensures that we have a file for every directory (containing valid children).
+function recurseAndAddMissingNavigators(
+  routes: RouteNode[],
+  parents: RouteNode[]
+): RouteNode[] {
+  routes.forEach((route) => {
+    // Route has children but no component and no contextKey (meaning no file path).
+    if (route.children.length && !route.contextKey) {
+      route.component = require("./views/VirtualNavigator").VirtualNavigator;
+      route.generated = true;
+      route.extras = {};
+      route.contextKey = [".", ...parents, route.route + ".tsx"]
+        .filter(Boolean)
+        .join("/");
+      // TODO: Handle if the directory is dynamic.
+    }
+
+    route.children = recurseAndAddMissingNavigators(route.children, [
+      ...parents,
+      route,
+    ]);
+    return route;
+  });
 
   return routes;
 }
@@ -153,6 +184,7 @@ function appendDirectoryRoute(routes: RouteNode[]) {
     contextKey: "./___index.tsx",
     dynamic: null,
     generated: true,
+    internal: true,
   });
   return routes;
 }
@@ -169,72 +201,10 @@ function appendUnmatchedRoute(routes: RouteNode[]) {
       contextKey: "./[...missing].tsx",
       dynamic: { name: "missing", deep: true },
       generated: true,
+      internal: true,
     });
   }
   return routes;
-}
-
-function recurseAndAddDirectories(
-  routes: RouteNode[],
-  parents: RouteNode[]
-): RouteNode[] {
-  routes.map((route) => {
-    route.children = recurseAndAddDirectories(route.children, [
-      ...parents,
-      route,
-    ]);
-    return route;
-  });
-
-  const directory = getUserDefinedDirectory(routes);
-
-  if (!directory) {
-    routes.push({
-      generated: true,
-      component: require("./views/DirectoryIndex").DirectoryIndex,
-      // TODO: get siblings
-      children: routes.reduce((res, route) => {
-        if (route.children) {
-          for (const child of route.children) {
-            if (child.route !== "index") {
-              // @ts-expect-error:  TODO
-              res.push(child);
-            }
-          }
-        }
-        return res;
-      }, []),
-      // children: [],
-      extras: {},
-      route: "index",
-      contextKey: parents.reduce(
-        (acc, cur) => `${acc}/${cur.route}`,
-        "./index.tsx"
-      ),
-      dynamic: null,
-    });
-  }
-
-  return routes;
-}
-
-/** Fetch the `index` or `/`  */
-function getUserDefinedDirectory(routes: RouteNode[]) {
-  // Auto add not found route if it doesn't exist
-  for (const route of routes) {
-    const isEntryFile = route.route === "index";
-    if (isEntryFile) {
-      return route;
-    }
-    // Recurse through fragment routes
-    if (matchFragmentName(route.route)) {
-      const child = getUserDefinedDirectory(route.children);
-      if (child) {
-        return child;
-      }
-    }
-  }
-  return null;
 }
 
 function getUserDefinedTopLevelCatch(routes: RouteNode[]) {
