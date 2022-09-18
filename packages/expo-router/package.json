@@ -5,7 +5,8 @@
   "files": [
     "entry.js",
     "build",
-    "babel.js"
+    "babel.js",
+    "assets"
   ],
   "scripts": {
     "build": "expo-module build",
