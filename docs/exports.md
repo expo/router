@@ -51,3 +51,10 @@ export default function App({ navigation }) {
   );
 }
 ```
+
+<details>
+  <summary>Interoperability</summary>
+
+The exports convention is somewhat similar to [Redwood cells](https://redwoodjs.com/docs/cells) and data loading in [Remix](https://remix.run/docs/en/v1/api/conventions#data-loading), Next.js, etc.
+
+</details>

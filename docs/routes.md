@@ -42,6 +42,17 @@ To render shared navigation elements like a header, tab bar, or drawer, you can 
     - home.js -- This component is provided to `app/(stack).js` to be nested in the UI.
 ```
 
+If you create a leaf route without a matching parent route, then a virtual, unstyled navigator will be generated in-memory to accommodate the leaf route:
+
+```
+- app/
+  - (stack)/
+    - home.js
+  - (stack).tsx -- This is created in-memory to render the `home.js` route. Creating the file will override the in-memory route.
+```
+
+The virtual route system exists to accommodate native navigation which requires a parent navigator to render a child route. Web apps traditionally don't need this due to web hosting.
+
 <details>
   <summary>Interoperability</summary>
 
@@ -132,20 +143,14 @@ Routes with higher specificity will be matched first. For example, `/blog/bacon`
 
 There are a couple different ways to implement dynamic routes, here are some existing formats:
 
-| Format              | Framework        |
-| ------------------- | ---------------- |
-| `/blog/[id].js`     | Next.js          |
-| `/blog/[id].svelte` | SvelteKit        |
-| `/blog/$id.js`      | Remix            |
-| `/blog/:id.js`      | React Navigation |
-
-> The React Navigation version is an implementation detail and not used for the route name.
-
-Due to my indifference, I had a [Twitter poll](https://twitter.com/Baconbrix/status/1567538444246589441) to decide on the format. The winner was `/blog/[id].js`. The runner-up was a made up format `*.js`, and last was the Remix style.
+| Format              | Framework |
+| ------------------- | --------- |
+| `/blog/[id].js`     | Next.js   |
+| `/blog/[id].svelte` | SvelteKit |
+| `/blog/$id.js`      | Remix     |
 
 **Related**
 
-- [Redwood cells](https://redwoodjs.com/docs/cells)
 - [Remix](https://remix.run/docs/en/v1/routing/file-system-routing)
 - [`react-router`](https://reactrouter.com/web/guides/quick-start)
 - [Next.js layouts RFC, pt. 1](https://nextjs.org/blog/layouts-rfc)
@@ -156,18 +161,20 @@ Due to my indifference, I had a [Twitter poll](https://twitter.com/Baconbrix/sta
 
 Similar to dynamic routes, but the slug matches any number of path components in a route. For example, `/blog/post/[...id]` is a deep dynamic route. The variable part (`[...id]`) is called a "slug". The slug is the part of the URL that is dynamic. The slug is defined by the file name. For example, `/blog/post/bacon/cheese` is defined by the file `/blog/post/[...id].tsx`.
 
-- `[...ids].js` will match `/blog/1/2/3` and provide the query `{ ids: [1, 2, 3] }`.
+`[...ids].js` will match `/blog/1/2/3` and provide the query `{ ids: [1, 2, 3] }`.
 
 <details>
   <summary>Interoperability</summary>
 
-This convention is functionally analogous to the 'optional catch-all dynamic routes' (`[[...id]].js`) feature from Next.js but the syntax is different. Unlike Next.js which has a separate syntax for matching everything except index, Expo uses the same syntax for both. If you want to match everything except index, you can implement an `index.js` file that has custom handling. We also reserve the term **catch** for error handling.
+This convention is functionally analogous to the 'optional catch-all dynamic routes' (`[[...id]].js`) feature from Next.js but the syntax is different. Unlike Next.js which has a separate syntax for matching everything except index, Expo uses the same syntax for both. If you want to match everything except index, you can add an `index.js` file that has custom handling or you could intercept the path and treat it differently. We also reserve the term **catch** for error handling.
+
+The convention is also similar to splats in Remix.
 
 </details>
 
 ## App directory
 
-All routes are defined in the `app/` directory. The `app/` directory is a special directory that is used to define routes. The `app/` directory is a sibling to the `node_modules/` directory.
+The `app/` directory is a special directory that is used to define routes. The `app/` directory must be at the project root, as a sibling to the `node_modules/` directory. This could be customizable in the future, but that's not a priority as of now.
 
 <details>
   <summary>Interoperability</summary>
@@ -177,6 +184,8 @@ All routes are defined in the `app/` directory. The `app/` directory is a specia
 - `pages/` directory in [Next.js](https://nextjs.org/docs/basic-features/pages).
 - `src/routes/` directory in [SvelteKit](https://kit.svelte.dev/docs/routing).
 - `app/` directory in the [Next.js layouts RFC](https://nextjs.org/blog/layouts-rfc#introducing-the-app-directory).
+
+The entry file for classic Expo apps is `App.js`, the Expo config file is `app.json` (or `app.config.js`), and the Expo conference is called **App.js conf** so to keep things relatively consistent, the root directory is called `app/`. Luckily, most web frameworks are also using `app/` so it aligns well. This does mean you'll need a monorepo if you want to use Expo and another framework in the same repo.
 
 </details>
 

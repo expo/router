@@ -1,7 +1,7 @@
 import { Image, Pressable, Text, View } from '@bacons/react-views';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import React from 'react';
-import { Platform, ScrollView, StatusBar, useWindowDimensions } from 'react-native';
+import { ScrollView, StatusBar, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useRoutesContext } from '../context';
@@ -82,18 +82,6 @@ export function Directory() {
                     }}
                     style={{ flex: 1 }}
                 >
-                    {Platform.OS === "android" && (
-                        <Text
-                            style={{
-                                marginBottom: 12,
-                                fontSize: 48,
-                                fontWeight: "bold",
-                                color: "white",
-                            }}
-                        >
-                            Index
-                        </Text>
-                    )}
                     {routes.map((child) => (
                         <View
                             key={child.contextKey}
