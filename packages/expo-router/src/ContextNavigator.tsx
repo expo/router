@@ -24,50 +24,38 @@ function RoutesContextProvider({ context, children }: { context: RequireContext,
     )
 }
 
+function isFunctionOrReactComponent(Component: any): Component is React.ComponentType {
+    return typeof Component === 'function' || Component.prototype?.isReactComponent;
+}
+
 /** Return the initial component in the `app/` folder and the associated module ID. If no module is defined, return a tutorial component. */
-function useEntryModule(context: RequireContext) {
-    // const previousRoute = useRef(null)
-    const url = useURL();
-    const entryRoutes = useMemo(() => {
-        const initialKeys = context.keys().filter((value) =>
-            value.match(/^\.\/[^/]+\.(js|ts)x?$/)
-        );
-        return initialKeys;
-    }, [context, url]);
-
-    const entryRouteId = useMemo(() => entryRoutes[0], [entryRoutes]);
-
-    const EntryComponent = useMemo(() => {
-        if ((!entryRouteId || !interopDefault(context(entryRouteId))) && process.env.NODE_ENV === 'development') {
-            const { Tutorial } = require('./onboard/Tutorial')
-            return Tutorial;
-        }
+function useTutorial(context: RequireContext) {
+    if (process.env.NODE_ENV === 'production') {
         return null;
-    }, [entryRouteId]);
-
-
-    // useEffect(() => {
-    //     if (entryRoutes.length === 1 && !previousRoute.current) {
-    //         if (typeof location !== 'undefined') {
-    //             // window.location.pathname = '/'
-    //         }
-    //     }
-    //     previousRoute.current = entryRouteId;
-    // }, [entryRouteId, previousRoute.current]);
-
-    return {
-        id: entryRouteId,
-        Component: EntryComponent,
     }
+
+    const keys = useMemo(() => context.keys(), [context]);
+    const hasAnyValidComponent = useMemo(() => {
+        for (const key of keys) {
+            const component = context(key)?.default;
+            if (isFunctionOrReactComponent(component)) {
+                return true;
+            }
+        }
+        return false;
+    }, [keys]);
+
+    if (hasAnyValidComponent) {
+        return null;
+    }
+
+    return require('./onboard/Tutorial').Tutorial
 }
 
 export function ContextNavigator({ context }: { context: RequireContext }) {
-    const { Component } = useEntryModule(context);
-
-    if (Component) {
-
-        //  Tutorial
-        return <Component />
+    const Tutorial = useTutorial(context);
+    if (Tutorial) {
+        return <Tutorial />
     }
 
     return (
