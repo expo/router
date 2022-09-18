@@ -136,6 +136,24 @@ export function getRoutes(pages): RouteNode[] {
   // Auto add not found route if it doesn't exist
   appendUnmatchedRoute(routes);
 
+  if (process.env.NODE_ENV === "development") {
+    appendDirectoryRoute(routes);
+  }
+
+  return routes;
+}
+
+function appendDirectoryRoute(routes: RouteNode[]) {
+  const { Directory, getNavOptions } = require("./views/Directory");
+  routes.push({
+    component: Directory,
+    children: [],
+    extras: { getNavOptions },
+    route: "___index",
+    contextKey: "./___index.tsx",
+    dynamic: null,
+    generated: true,
+  });
   return routes;
 }
 
@@ -150,6 +168,7 @@ function appendUnmatchedRoute(routes: RouteNode[]) {
       route: "[...missing]",
       contextKey: "./[...missing].tsx",
       dynamic: { name: "missing", deep: true },
+      generated: true,
     });
   }
   return routes;
@@ -178,6 +197,7 @@ function recurseAndAddDirectories(
         if (route.children) {
           for (const child of route.children) {
             if (child.route !== "index") {
+              // @ts-expect-error:  TODO
               res.push(child);
             }
           }

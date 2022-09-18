@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "context-irl",
-    "slug": "context-irl",
+    "name": "Router Demo",
+    "slug": "expo-router",
     "scheme": "bacontext",
     "web": {
       "bundler": "metro"
