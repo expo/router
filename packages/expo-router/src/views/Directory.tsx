@@ -134,6 +134,7 @@ function FileItem({
             "/" +
             [...parents, route.route]
                 .map((v) => {
+                    // groups and index must be erased
                     return !!matchFragmentName(v) || v === 'index' ? "" : v;
                 })
                 .filter(Boolean)

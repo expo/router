@@ -1,2 +1,4 @@
 import { Tabs } from 'expo-router'
-export default Tabs
+export default function Page() {
+    return <Tabs order={['home']} />
+}
