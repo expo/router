@@ -8,13 +8,13 @@ import { NativeStack } from './navigation';
 import { AutoRoute } from './routes';
 
 // @ts-expect-error: welp
-type RequireContext = ReturnType<typeof require.context>;
+type ContextModule = ReturnType<typeof require.context>;
 
-function useContextModuleAsRoutes(context: RequireContext) {
+function useContextModuleAsRoutes(context: ContextModule) {
     return useMemo(() => getRoutes(context), [context]);
 }
 
-function RoutesContextProvider({ context, children }: { context: RequireContext, children: React.ReactNode }) {
+function RoutesContextProvider({ context, children }: { context: ContextModule, children: React.ReactNode }) {
     const routes = useContextModuleAsRoutes(context);
 
     return (
@@ -28,8 +28,8 @@ function isFunctionOrReactComponent(Component: any): Component is React.Componen
     return typeof Component === 'function' || Component.prototype?.isReactComponent;
 }
 
-/** Return the initial component in the `app/` folder and the associated module ID. If no module is defined, return a tutorial component. */
-function useTutorial(context: RequireContext) {
+/** Returns the Tutorial component if there are no React components exported as default from any files in the provided context module. */
+function useTutorial(context: ContextModule) {
     if (process.env.NODE_ENV === 'production') {
         return null;
     }
@@ -52,7 +52,7 @@ function useTutorial(context: RequireContext) {
     return require('./onboard/Tutorial').Tutorial
 }
 
-export function ContextNavigator({ context }: { context: RequireContext }) {
+export function ContextNavigator({ context }: { context: ContextModule }) {
     const Tutorial = useTutorial(context);
     if (Tutorial) {
         return <Tutorial />

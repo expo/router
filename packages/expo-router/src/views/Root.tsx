@@ -8,9 +8,9 @@ import React from "react";
 import { ContextNavigator } from '../ContextNavigator';
 
 // @ts-expect-error: welp
-type RequireContext = ReturnType<typeof require.context>;
+type ContextModule = ReturnType<typeof require.context>;
 
-export function ExpoRoot({ context }: { context: RequireContext }) {
+export function ExpoRoot({ context }: { context: ContextModule }) {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
