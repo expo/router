@@ -22,6 +22,8 @@ Unlike the web, native apps have some constraints that make this more difficult:
 <!-- - **Universal links:** The router should be able to automatically parse incoming URLs and navigate to the correct page. This router should also be able to share URLs across platforms, enabling **perfect hand-off** between platforms. This means App Clips, Universal Links, and Deep Links should all work out of the box. -->
 - [404s and missing routes](unmatched.md).
 - Handles `BackHandler` on Android automatically.
+- Automatically handles hiding and showing the splash screen on iOS and Android until the navigation is ready. [Learn more](splash.md).
+- First-class support for appearance API.
 
 ## Follow up work
 

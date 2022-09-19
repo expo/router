@@ -1,5 +1,4 @@
-import { useURL } from 'expo-linking';
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { RoutesContext } from './context';
 import { ContextNavigationContainer } from './ContextNavigationContainer';

@@ -9,7 +9,6 @@ export function matchDeepDynamicRouteName(name: string): string | undefined {
     return name.match(/^\[\.\.\.([^/]+)\]$/)?.[1];
 }
 
-
 /** Match `(page)` -> `page` */
 export function matchFragmentName(name: string): string | undefined {
     return name.match(/^\(([^/]+)\)$/)?.[1];

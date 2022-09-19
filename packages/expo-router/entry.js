@@ -54,10 +54,27 @@ function convertError(error) {
   return new Error(String(error));
 }
 
+function preventAutoHide() {
+  try {
+    // Automatically handle hiding the splash screen if expo-splash-screen is installed.
+    return require("expo-splash-screen").preventAutoHideAsync();
+  } catch {}
+}
+
+function hideSplash() {
+  try {
+    return require("expo-splash-screen").hideAsync();
+  } catch {}
+}
+
 (() => {
   try {
+    preventAutoHide();
     registerRootComponent(App);
   } catch (e) {
+    // Hide the splash screen if there was an error so the user can see it.
+    hideSplash();
+
     const error = convertError(e);
     // Prevent the app from throwing confusing:
     //  ERROR  Invariant Violation: "main" has not been registered. This can happen if:

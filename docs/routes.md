@@ -1,10 +1,29 @@
+- **Slug** A dynamic URL path segment.
+
+## App directory
+
+The root level `app/` directory is used to define all routes and screens in the app. This could be customizable in the future, but that's not a priority as of now.
+
+<details>
+  <summary>Interoperability</summary>
+
+- The `app/` directory is similar to the:
+- `app/routes/` directory in [Remix](https://remix.run/docs/en/v1/guides/routing#defining-routes).
+- `pages/` directory in [Next.js](https://nextjs.org/docs/basic-features/pages).
+- `src/routes/` directory in [SvelteKit](https://kit.svelte.dev/docs/routing).
+- `app/` directory in the [Next.js layouts RFC](https://nextjs.org/blog/layouts-rfc#introducing-the-app-directory).
+
+The entry file for classic Expo apps is `App.js`, the Expo config file is `app.json` (or `app.config.js`), and the Expo conference is called **App.js conf** so to keep things relatively consistent, the root directory is called `app/`. Luckily, most web frameworks are also using `app/` so it aligns well. This does mean you'll need a monorepo if you want to use Expo and another framework in the same repo.
+
+</details>
+
 # Routes
 
 Routes are defined as files in the `app/` directory. The file name is the route path, and the file exports a React component that renders the page.
 
-```
-- app/
-  - index.js
+```sh
+app/
+  index.js
 ```
 
 ```tsx
@@ -14,6 +33,14 @@ import { Text } from "react-native";
 export default function Page() {
   return <Text>First page</Text>;
 }
+```
+
+This renders to:
+
+```xml
+<App>
+  <Index />
+</App>
 ```
 
 - Any path in the `app/` directory can be used as a root path. There is no global root path.
@@ -36,20 +63,20 @@ The routes convention is:
 To render shared navigation elements like a header, tab bar, or drawer, you can use a layout route.
 If a directory has a sibling file with the same name, it will be used as the parent for the files in the directory.
 
-```
-- app/
-  - (stack).js -- Layout route. This is where a header bar would go
-  - (stack)/ -- Children of `(stack).js`
-    - home.js -- A child route of `(stack).js`
+```sh
+app/
+  (stack).js # Layout route. This is where a header bar would go
+  (stack)/ # Children of (stack).js
+    home.js # A child route of (stack).js
 ```
 
 If you create a child route without a matching parent route, then a virtual, unstyled navigator will be generated in-memory to accommodate the child route:
 
-```
-- app/
-  - (stack)/ -- Unpaired layout route
-    - home.js -- Child route of a virtual navigator
-  - (stack).tsx -- This file exists in-memory to render the `(stack)/home.js` route. Creating this file will override the in-memory route
+```sh
+app/
+  (stack)/ # Unpaired layout route
+    home.js # Child route of a virtual navigator
+  (stack).tsx # This file exists in-memory to render the `(stack)/home.js` route. Creating this file will override the in-memory route
 ```
 
 The virtual route system exists to accommodate native navigation which requires a parent navigator to render a child route. Web apps traditionally don't need this due to web hosting.
@@ -63,37 +90,44 @@ This convention is analogous to [nested routing](https://remix.run/docs/en/v1/gu
 
 </details>
 
-## Leaf Routes
+## Child Routes
 
-A leaf route refers to a route that has no nested children, it shows up at the end of a URL.
+A child route refers to a route that has no nested children, it shows up at the end of a URL.
 
 ## Fragment Routes
 
-Fragment routes add nested layout without appending any path segments. These are most commonly used for adding navigators like tab, stack, drawer, etc...
+Fragment routes add nested layout without appending any path segments. Think of them like `index.js` but as a layout. These are most commonly used for adding navigators like tab, stack, drawer, etc... The format is `(name).js` and `/(name)`, the `name` is purely cosmetic.
 
-The format is `(name).js` and `/(name)`. The name currently serves no purpose other than to distinguish various fragment routes.
+```sh
+app/
+  layout.js # Layout route
+  layout/
+    home.js # 𝝠.com/layout/home
 
-For example:
+app/
+  (layout).js # Fragment route
+  (layout)/
+    home.js # 𝝠.com/home
+```
+
+Both of these will render:
 
 ```
-- app/
-  - profile.js -- Matches /profile with: profile.js
-  - (layout).js
-  - (layout)/
-    - home.js -- Matches /home with: (layout).js > home.js
-  - (alternate).js
-  - (alternate)/
-    - settings.js -- Matches /settings with: (alternate).js > settings.js
+<App>
+  <Layout>
+    <Home />
+  </Layout>
+</App>
 ```
 
 Be careful when using parallel fragment routes as they can create conflicting routes that match the same path. For example, the following routes will conflict:
 
-```
-- app/
-  - profile.js -- Matches /profile
-  - (layout).js
-  - (layout)
-    - profile.js -- Matches /profile (conflict)
+```sh
+app/
+  profile.js # Matches /profile
+  (layout).js
+  (layout)/
+    profile.js # Matches /profile (conflict)
 ```
 
 Expo router will assert when there are route collisions.
@@ -173,23 +207,6 @@ Similar to dynamic routes, but the slug matches any number of path components in
 This convention is functionally analogous to the 'optional catch-all dynamic routes' (`[[...id]].js`) feature from Next.js but the syntax is different. Unlike Next.js which has a separate syntax for matching everything except index, Expo uses the same syntax for both. If you want to match everything except index, you can add an `index.js` file that has custom handling or you could intercept the path and treat it differently. We also reserve the term **catch** for error handling.
 
 The convention is also similar to splats in Remix.
-
-</details>
-
-## App directory
-
-The `app/` directory is a special directory that is used to define routes. The `app/` directory must be at the project root, as a sibling to the `node_modules/` directory. This could be customizable in the future, but that's not a priority as of now.
-
-<details>
-  <summary>Interoperability</summary>
-
-- The `app/` directory is similar to the:
-- `app/routes/` directory in [Remix](https://remix.run/docs/en/v1/guides/routing#defining-routes).
-- `pages/` directory in [Next.js](https://nextjs.org/docs/basic-features/pages).
-- `src/routes/` directory in [SvelteKit](https://kit.svelte.dev/docs/routing).
-- `app/` directory in the [Next.js layouts RFC](https://nextjs.org/blog/layouts-rfc#introducing-the-app-directory).
-
-The entry file for classic Expo apps is `App.js`, the Expo config file is `app.json` (or `app.config.js`), and the Expo conference is called **App.js conf** so to keep things relatively consistent, the root directory is called `app/`. Luckily, most web frameworks are also using `app/` so it aligns well. This does mean you'll need a monorepo if you want to use Expo and another framework in the same repo.
 
 </details>
 
