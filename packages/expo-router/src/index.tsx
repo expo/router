@@ -10,5 +10,5 @@ export { ExpoRoot } from "./views/Root";
 export { Unmatched } from "./views/Unmatched";
 export { Exception } from "./views/Exception";
 
-export { Navigator, Content } from "./Navigator";
+export { Navigator, Children } from "./Navigator";
 export { Link } from "./views/Link";

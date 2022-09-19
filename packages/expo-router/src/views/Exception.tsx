@@ -1,5 +1,4 @@
-import { Pressable, StyleSheet, Text, View, ViewStyle } from '@bacons/react-views';
-import { Link } from '@react-navigation/native';
+import { Pressable, StyleSheet, Text, View } from '@bacons/react-views';
 import React from 'react';
 import { Platform, ScrollView, TouchableOpacity } from 'react-native';
 

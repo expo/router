@@ -95,13 +95,13 @@ function useCurrentScreen(context) {
 }
 
 /** Renders the currently selected content. */
-export function Content(props) {
+export function Children(props) {
     const context = React.useContext(NavigatorContext);
     if (!context) {
         // Qualify the content and re-export.
         return (
             <Navigator {...props}>
-                <Content />
+                <Children />
             </Navigator>
         );
     }
@@ -109,6 +109,6 @@ export function Content(props) {
     return useCurrentScreen(context);
 }
 
-Navigator.Content = Content;
+Navigator.Children = Children;
 Navigator.useContext = useNavigatorContext;
 Navigator.useClientSideEvent = useClientSideEvent;

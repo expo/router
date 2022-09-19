@@ -6,19 +6,19 @@ In `expo-router`, you currently need any parent route to be a navigator. This is
 
 The simplest version of this is:
 
-```tsx
-import { Content } from "expo-router";
+```js
+import { Children } from "expo-router";
 
 export default function Page() {
   // Renders the currently selected child, auto adds a custom navigator if none exists.
-  return <Content />;
+  return <Children />;
 }
 ```
 
 You can extend this to create a basic layout like the ones found in most websites:
 
-```tsx
-import { Content } from "expo-router";
+```js
+import { Children } from "expo-router";
 
 export default function App() {
   return (
@@ -31,7 +31,7 @@ export default function App() {
         <a href="/settings">Settings</a>
       </nav>
       {/* Renders the selected child element. */}
-      <Content />
+      <Children />
     </>
   );
 }
@@ -70,13 +70,13 @@ export default Tabs;
 import { View } from "react-native";
 import { TabRouter } from "@react-navigation/native";
 
-import { Navigator, Content, Link } from "expo-router";
+import { Navigator, Children, Link } from "expo-router";
 
 export default function App() {
   return (
     <Navigator router={TabRouter}>
       <Header />
-      <Content />
+      <Children />
     </Navigator>
   );
 }

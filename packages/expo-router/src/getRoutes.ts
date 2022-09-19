@@ -13,7 +13,7 @@ import {
   getReactNavigationScreenName,
   RouteNode,
 } from "./routes";
-import { Content } from "./Navigator";
+import { Children } from "./Navigator";
 
 export function treeToReactNavigationLinkingRoutes(
   nodes: RouteNode[],
@@ -159,7 +159,7 @@ function recurseAndAddMissingNavigators(
     if (route.children.length && !route.contextKey) {
       console.log("Adding missing nav", route);
 
-      route.component = Content;
+      route.component = Children;
       route.generated = true;
       route.extras = {};
       route.contextKey = [".", ...parents, route.route + ".tsx"]
