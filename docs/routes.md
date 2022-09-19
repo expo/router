@@ -16,7 +16,7 @@ export default function Page() {
 }
 ```
 
-- Any path in the `app/` directory can be used as a root path.
+- Any path in the `app/` directory can be used as a root path. There is no global root path.
 - You can use extensions: `js`, `tsx`, `ts`, `tsx`. In a future iteration we will add support for any extension in the Metro config [`resolver.sourceExts`](https://facebook.github.io/metro/docs/configuration#sourceexts).
 - Platform extensions like `.ios.js` or `.native.ts` are not currently supported in the `app/` directory.
 
@@ -31,24 +31,25 @@ The routes convention is:
 
 </details>
 
-## Nested Routes
+## Layout Routes
 
-To render shared navigation elements like a header, tab bar, or drawer, you can use a nested route. If a directory name matches a file name, then the matching routes can be nested.
-
-```
-- app/
-  - (stack).js
-  - (stack)/
-    - home.js -- This component is provided to `app/(stack).js` to be nested in the UI.
-```
-
-If you create a leaf route without a matching parent route, then a virtual, unstyled navigator will be generated in-memory to accommodate the leaf route:
+To render shared navigation elements like a header, tab bar, or drawer, you can use a layout route.
+If a directory has a sibling file with the same name, it will be used as the parent for the files in the directory.
 
 ```
 - app/
-  - (stack)/
-    - home.js
-  - (stack).tsx -- This is created in-memory to render the `home.js` route. Creating the file will override the in-memory route.
+  - (stack).js -- Layout route. This is where a header bar would go
+  - (stack)/ -- Children of `(stack).js`
+    - home.js -- A child route of `(stack).js`
+```
+
+If you create a child route without a matching parent route, then a virtual, unstyled navigator will be generated in-memory to accommodate the child route:
+
+```
+- app/
+  - (stack)/ -- Unpaired layout route
+    - home.js -- Child route of a virtual navigator
+  - (stack).tsx -- This file exists in-memory to render the `(stack)/home.js` route. Creating this file will override the in-memory route
 ```
 
 The virtual route system exists to accommodate native navigation which requires a parent navigator to render a child route. Web apps traditionally don't need this due to web hosting.
@@ -85,7 +86,7 @@ For example:
     - settings.js -- Matches /settings with: (alternate).js > settings.js
 ```
 
-The issue with this feature is that it's a bit harder to reason about the routes at a glance. This feature also makes it possible to create conflicting routes like:
+Be careful when using parallel fragment routes as they can create conflicting routes that match the same path. For example, the following routes will conflict:
 
 ```
 - app/
@@ -99,9 +100,12 @@ Expo router will assert when there are route collisions.
 
 The name 'Fragment' route is a nod to [React Fragments](https://reactjs.org/docs/fragments.html) (`<>{...}</>`) which wrap components without adding any additional views to the hierarchy.
 
-**Rejected**
+<details>
+  <summary>Previous iteration</summary>
 
 We originally considered using `index/` instead of `(index)/` since the leaf variation is automatically collapsed. This was rejected because `/index/index` was not a valid path for fragments but it was for leaf routes. Theoretically we should also be able to support multiple fragments in a single directory for swapping parent layouts.
+
+</details>
 
 <details>
   <summary>Interoperability</summary>

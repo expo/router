@@ -21,6 +21,7 @@ Unlike the web, native apps have some constraints that make this more difficult:
 - **Offline:** The router should be able to be used without a server. This means that the router must be able to run on the client in native environments. This is critical for app review.
 <!-- - **Universal links:** The router should be able to automatically parse incoming URLs and navigate to the correct page. This router should also be able to share URLs across platforms, enabling **perfect hand-off** between platforms. This means App Clips, Universal Links, and Deep Links should all work out of the box. -->
 - [404s and missing routes](unmatched.md).
+- Handles `BackHandler` on Android automatically.
 
 ## Follow up work
 
@@ -37,7 +38,7 @@ The following are out of scope for the initial version, but carefully considered
 ## More
 
 - [Routes](routes.md)
-- [Navigators](navigators.md)
+- [Layouts](layouts.md)
 - [Exports](exports.md)
 - [Linking](linking.md)
 - [FAQ](faq.md)
