@@ -13,16 +13,17 @@ app/
 import { Stack } from "expo-router";
 
 export default function App() {
-  return <Stack initialRouteName="home" />;
+  return <Stack order={["home"]} />;
 }
 ```
 
 ```js
 // app/(stack)/home.js
+import { useEffect } from "react";
 import { View, Text } from "react-native";
 
-export default function HomeScreen({ navigation, route }) {
-  React.useEffect(() => {
+export default function Home({ navigation, route }) {
+  useEffect(() => {
     if (route.params?.post) {
       // Post updated, do something with `route.params.post`
       // For example, send the post to the server
@@ -32,18 +33,15 @@ export default function HomeScreen({ navigation, route }) {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text>Home Screen</Text>
-      <Text
-        title="Go to Details"
-        onPress={() => {
+      <Link
+        href={{
+          screen: "details",
           /* 1. Navigate to the details route with query params */
-          navigation.navigate("details", {
-            itemId: 86,
-            otherParam: "anything you want here",
-          });
+          params: { itemId: 86, otherParam: "anything you want here" },
         }}
       >
         Go to Details
-      </Text>
+      </Link>
     </View>
   );
 }
@@ -53,7 +51,7 @@ export default function HomeScreen({ navigation, route }) {
 // app/(stack)/details.js
 import { View, Text } from "react-native";
 
-function DetailsScreen({ navigation, route }) {
+export default function Details({ navigation, route }) {
   const {
     // NOTE(EvanBacon): Prefer default value to initialParams -- https://reactnavigation.org/docs/params#initial-params
     itemId = 42,

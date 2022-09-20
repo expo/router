@@ -17,7 +17,7 @@ import { Stack } from "expo-router";
 export default Stack;
 ```
 
-This is nested in the `App` navigator, so it will be rendered as a stack.
+This is nested in the `(stack).js` layout, so it will be rendered as a stack.
 
 ```js
 // app/(stack)/home.js
@@ -37,7 +37,7 @@ export default function Feed() {
 }
 ```
 
-This is nested in the `Home` navigator, so it will be rendered as a tab.
+This is nested in the `(stack)/home.js` layout, so it will be rendered as a tab.
 
 ```js
 // app/(stack)/home/feed.js

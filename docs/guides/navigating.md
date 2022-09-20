@@ -13,23 +13,20 @@ app/
 import { Stack } from "expo-router";
 
 export default function App() {
-  return <Stack initialRouteName="home" />;
+  return <Stack order={["home"]} />;
 }
 ```
 
 ```js
 // app/(stack)/home.js
 import { View, Text, Button } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { Link } from "expo-router";
 
-export default function HomeScreen({ navigation }) {
+export default function Home() {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text>Home Screen</Text>
-      <Button
-        title="Go to Details"
-        onPress={() => navigation.navigate("details")}
-      />
+      <Link href="/details">Go to Details</Link>
     </View>
   );
 }
@@ -38,16 +35,19 @@ export default function HomeScreen({ navigation }) {
 ```js
 // app/(stack)/details.js
 import { View, Text } from "react-native";
+import { Link } from "expo-router";
 
-function DetailsScreen({ navigation }) {
+export default function Details({ navigation }) {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text>Details Screen</Text>
+
+      <Link href="/home">Go to Home</Link>
+
       <Button
         title="Go to Details... again"
         onPress={() => navigation.push("details")}
       />
-      <Button title="Go to Home" onPress={() => navigation.navigate("home")} />
       <Button title="Go back" onPress={() => navigation.goBack()} />
       <Button
         title="Go back to first screen in stack"

@@ -13,3 +13,4 @@ export { ErrorBoundary } from "./views/ErrorBoundary";
 export { Navigator, Children } from "./Navigator";
 export { Link } from "./views/Link";
 export { ContextContainer, useNavigationContainerContext } from "./ContextNavigationContainer";
+export { ScreenOptions } from './ScreenOptions';
