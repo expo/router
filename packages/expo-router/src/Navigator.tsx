@@ -10,20 +10,20 @@ if (process.env.NODE_ENV !== "production") {
     NavigatorContext.displayName = "NavigatorContext";
 }
 
+export type NavigatorProps = {
+    initialRouteName?: Parameters<typeof useNavigationBuilder>[1]['initialRouteName'];
+    screenOptions?: Parameters<typeof useNavigationBuilder>[1]['screenOptions'];
+    children?: Parameters<typeof useNavigationBuilder>[1]['children'];
+    router?: Parameters<typeof useNavigationBuilder>[0];
+}
+
 /** An unstyled custom navigator. Good for basic web layouts */
 export function Navigator({
     initialRouteName,
-    backBehavior,
     screenOptions,
     children,
     router = TabRouter,
-}: {
-    initialRouteName?: string;
-    backBehavior?: "initialRoute" | "history" | "order" | "none";
-    screenOptions?: any;
-    children?: any;
-    router?: any;
-}) {
+}: NavigatorProps) {
     const screens = useScreens();
 
     const { state, navigation, descriptors, NavigationContent } =
@@ -31,7 +31,6 @@ export function Navigator({
             children: screens,
             screenOptions,
             initialRouteName,
-            backBehavior,
         });
 
     return (
@@ -52,7 +51,6 @@ function useClientSideEvent(to) {
         }
         return route.key;
     }, [to]);
-
 
     const onPress = React.useCallback(() => {
         if (router === TabRouter) {
@@ -86,7 +84,9 @@ export function useNavigatorContext() {
     return context;
 }
 
-function useCurrentScreen(context) {
+function useChild() {
+    const context = React.useContext(NavigatorContext);
+
     const { state, descriptors } = context;
     const current = state.routes.find((route, i) => state.index === i);
     if (!current) {
@@ -96,7 +96,7 @@ function useCurrentScreen(context) {
 }
 
 /** Renders the currently selected content. */
-export function Children(props) {
+export function Children(props: Omit<NavigatorProps, 'children'>) {
     const context = React.useContext(NavigatorContext);
     if (!context) {
         // Qualify the content and re-export.
@@ -107,7 +107,7 @@ export function Children(props) {
         );
     }
 
-    return useCurrentScreen(context);
+    return useChild();
 }
 
 Navigator.Children = Children;

@@ -62,14 +62,6 @@ if (dev) {
     CurrentRouteContext.displayName = "Route";
 }
 
-export function useModuleRoute() {
-    const { filename } = useContext(CurrentRouteContext);
-    if (dev && !filename) {
-        throw new Error("No filename found. This is likely a bug in expo-router.");
-    }
-    return filename;
-}
-
 /** Return all the routes for the current boundary. */
 export function useRoutes(): RouteNode[] {
     const { filename, routes } = useContext(CurrentRouteContext);
@@ -181,11 +173,17 @@ function formatDynamicProps(
     return [dynamic.name, sanitized]
 }
 
+/**
+ * @returns React Navigation screens for the route.
+ */
 export function useScreens(): ReactNode[] {
     const children = useRoutes();
     return React.useMemo(() => children.map((value) => routeToScreen(value)), [children]);
 }
 
+/** 
+ * @returns React Navigation screens sorted by the `route` property.
+ */
 export function useScreensRecord(): Record<string, ReactNode> {
     const children = useRoutes();
     return React.useMemo(() => Object.fromEntries(
@@ -193,6 +191,7 @@ export function useScreensRecord(): Record<string, ReactNode> {
     ), [children]);
 }
 
+/** Wrap the component with various enhancements and add access to child routes. */
 function getQualifiedRouteComponent(value: RouteNode) {
     // console.log('getQualifiedRouteComponent:', value)
     const getDynamicProps = !value.dynamic
@@ -260,5 +259,5 @@ function routeToScreen(route: RouteNode) {
 }
 
 export function getNameFromFilePath(name: string): string {
-    return name.replace(/(^.\/)|(\.[jt]sx?$)/g, "");
+    return name.replace(/(^\.\/)|(\.[jt]sx?$)/g, "");
 }
