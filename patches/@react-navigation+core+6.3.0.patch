@@ -1,3 +1,17 @@
+diff --git a/node_modules/@react-navigation/core/src/getPathFromState.tsx b/node_modules/@react-navigation/core/src/getPathFromState.tsx
+index f3e30de..37ba67d 100644
+--- a/node_modules/@react-navigation/core/src/getPathFromState.tsx
++++ b/node_modules/@react-navigation/core/src/getPathFromState.tsx
+@@ -184,7 +184,8 @@ export default function getPathFromState<ParamList extends {}>(
+           // Showing the route name seems ok, though whatever we show here will be incorrect
+           // Since the page doesn't actually exist
+           if (p === '*') {
+-            return route.name;
++            // This can occurr when a wildcard matches all routes and the given path was `/`.
++            return '';
+           }
+ 
+           // If the path has a pattern for a param, put the param in the path
 diff --git a/node_modules/@react-navigation/core/src/getStateFromPath.tsx b/node_modules/@react-navigation/core/src/getStateFromPath.tsx
 index b61e1e5..331aaa5 100644
 --- a/node_modules/@react-navigation/core/src/getStateFromPath.tsx
