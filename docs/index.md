@@ -1,6 +1,8 @@
 # Expo Router RFC
 
-The goal is to create a routing system that is automatically generated based on the app's file system. Routes will prioritize nesting as this is a basic requirement for native navigation, the system is analogous to Remix and the upcoming Next.js layouts API.
+Expo router is a new, opinionated routing system for React Native apps. It's designed to be easy to use, and to be a good fit for most apps.
+
+Expo router is built on our [React Navigation suite](https://reactnavigation.org/) making it easy to bring your existing React Navigation code to the new router.
 
 ## Challenges
 

@@ -4,7 +4,7 @@ Ports https://reactnavigation.org/docs/params
 app/
 ├─ (stack).js
 ├─ (stack)/
-│  ├─ home.js
+│  ├─ index.js
 │  ├─ details.js
 ```
 
@@ -13,12 +13,12 @@ app/
 import { Stack } from "expo-router";
 
 export default function App() {
-  return <Stack order={["home"]} />;
+  return <Stack order={["index"]} />;
 }
 ```
 
 ```js
-// app/(stack)/home.js
+// app/(stack)/index.js
 import { useEffect } from "react";
 import { View, Text } from "react-native";
 

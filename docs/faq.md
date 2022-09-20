@@ -13,11 +13,7 @@
 
 ## Can I use Expo Routing in my React Native app?
 
-Yes, the router is a feature of the `expo` package, which can be used in any React Native app! The router must be used with `npx expo start` due to the advanced bundler functionality, you can run `npx expo start --port 8081` to run the dev server on the default port for React Native.
-
-## Does this replace React Navigation?
-
-No, this is a new feature of the `expo` package. Our package React Navigation is a view layer on top of the router, which provides complex native behavior.
+Yes, all of Expo's tools can be used with any React Native project. The router must be used with `npx expo start` due to the advanced bundler functionality, you can run `npx expo start --port 8081` to run the dev server on the default port for React Native.
 
 ## How do I use Expo Routing with Next.js?
 

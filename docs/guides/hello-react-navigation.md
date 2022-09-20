@@ -1,61 +1,63 @@
 Ports https://reactnavigation.org/docs/hello-react-navigation
 
-```
-app/
+**File Structure**
+
+```sh
+app
 ├─ (stack).js
-├─ (stack)/
-│  ├─ home.js
+├─ (stack)
+│  ├─ index.js
 │  ├─ details.js
 ```
+
+First create a **layout route** in `app/stack.js` which uses the pre-built `Stack` component from `expo-router` to render a native stack navigator.
 
 ```js
 // app/(stack).js
 import { Stack } from "expo-router";
 
-export default function App() {
-  return (
-    <Stack
-      // https://reactnavigation.org/docs/hello-react-navigation#configuring-the-navigator
-      initialRouteName="home"
-    />
-  );
+export default function Layout() {
+  return <Stack />;
 }
 ```
 
+Now create a **child route** in `app/(stack)/index.js` which will be rendered inside the stack navigator.
+
 ```js
-// app/(stack)/home.js
+// app/(stack)/index.js
 import { View, Text } from "react-native";
-import { ScreenOptions } from "expo-router";
+import { Link, ScreenOptions } from "expo-router";
 
 export default function Home() {
   return (
-    <View>
-      {/* https://reactnavigation.org/docs/hello-react-navigation#specifying-options */}
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      {/* Use the `ScreenOptions` component to configure the layout. */}
       <ScreenOptions title="Overview" />
-      <Text>Home Screen</Text>
+      {/* Use the `Link` component to enable optimized client-side routing. */}
+      <Link href="/details">Go to Details</Link>
     </View>
   );
 }
 ```
+
+Now create a second child route to navigate to:
 
 ```js
 // app/(stack)/details.js
 import { View, Text } from "react-native";
 
-export default function Details() {
+export default function Details({ navigation }) {
   return (
     <View>
-      <Text>Home Screen</Text>
+      <Text
+        onPress={() => {
+          // Go back to the previous screen
+          navigation.goBack();
+        }}
+      >
+        Details Screen
+      </Text>
     </View>
   );
 }
 ```
-
-## Notes
-
-- Prefer `app/(stack)/index.js` to `app/(stack)/home.js` + `initialRouteName="home"`.
-- Prefer `home` to `Home` for routes.
-- Prefer `Home` to `HomeScreen` for components.
-- `getNavOptions` does not allow for Fast Refresh but can be loaded statically (good for drawers and tab bars). Use `<ScreenOptions />` otherwise.
-
-- Use a React context: https://reactnavigation.org/docs/hello-react-navigation#passing-additional-props

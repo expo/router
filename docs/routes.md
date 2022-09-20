@@ -1,11 +1,19 @@
-- **Slug** A dynamic URL path segment.
+# Routing convention
+
+The file system-based routing convention enables developers to structure their app in a logic and intuitive way. Expo router uses the convention to optimize the app by generating native deep links and web routes automatically.
+
+The convention is based on the concept of nesting routes inside each other to create shared UI elements like tab bars and headers across multiple children. This format should feel familiar to React developers.
 
 ## App directory
 
-The root level `app/` directory is used to define all routes and screens in the app. This could be customizable in the future, but that's not a priority as of now.
+The root level `app/` directory is used to define all routes and screens in the app.
+
+![](./assets/main.png)
 
 <details>
   <summary>Interoperability</summary>
+
+The app directory name could be customizable in the future, but that's not a priority as of now.
 
 - The `app/` directory is similar to the:
 - `app/routes/` directory in [Remix](https://remix.run/docs/en/v1/guides/routing#defining-routes).
@@ -19,11 +27,13 @@ The entry file for classic Expo apps is `App.js`, the Expo config file is `app.j
 
 # Routes
 
-Routes are defined as files in the `app/` directory. The file name is the route path, and the file exports a React component that renders the page.
+Routes are defined as files in the `app/` directory that export a React component as _default_. The file path is the route path.
 
 ```sh
 app/
-  index.js
+  index.js # Matches: 𝝠.com/
+  home.js # Matches: 𝝠.com/home
+  blog/posts.js # Matches: 𝝠.com/blog/posts
 ```
 
 ```tsx
@@ -43,60 +53,49 @@ This renders to:
 </App>
 ```
 
-- Any path in the `app/` directory can be used as a root path. There is no global root path.
 - You can use extensions: `js`, `tsx`, `ts`, `tsx`. In a future iteration we will add support for any extension in the Metro config [`resolver.sourceExts`](https://facebook.github.io/metro/docs/configuration#sourceexts).
+- Any path in the `app/` directory can be used as a root path. There are no global root paths.
 - Platform extensions like `.ios.js` or `.native.ts` are not currently supported in the `app/` directory.
-
-<details>
-  <summary>Interoperability</summary>
-
-The routes convention is:
-
-- Most closely related to the routes system in Remix.
-- Similar to the [pages API](https://nextjs.org/docs/basic-features/pages) in Next.js but with the added nested functionality, effectively Remix.
-- The routes convention is the largest departure from the Next.js Layouts RFC.
-
-</details>
 
 ## Layout Routes
 
-To render shared navigation elements like a header, tab bar, or drawer, you can use a layout route.
-If a directory has a sibling file with the same name, it will be used as the parent for the files in the directory.
+To render shared navigation elements like a header, tab bar, or drawer, you can use a **layout route**.
+If a **route** has a sibling directory by the same name, it will be used as the layout component for all the files in the respective directory.
 
 ```sh
 app/
-  (stack).js # Layout route. This is where a header bar would go
-  (stack)/ # Children of (stack).js
-    home.js # A child route of (stack).js
+  stack.js # Layout route. This is where a header bar would go
+  stack/ # Children of stack.js
+    home.js # A child route of stack.js
 ```
 
-If you create a child route without a matching parent route, then a virtual, unstyled navigator will be generated in-memory to accommodate the child route:
+If a nested route does not have a layout route then a virtual, unstyled navigator will be generated in-memory to accommodate the child route:
 
 ```sh
 app/
-  (stack)/ # Unpaired layout route
+  stack/ # Unpaired layout route
     home.js # Child route of a virtual navigator
-  (stack).tsx # This file exists in-memory to render the `(stack)/home.js` route. Creating this file will override the in-memory route
+
+  stack.tsx # This file exists in-memory to render the `stack/home.js` route. Creating this file will override the in-memory route
 ```
 
-The virtual route system exists to accommodate native navigation which requires a parent navigator to render a child route. Web apps traditionally don't need this due to web hosting.
+The virtual route system exists to accommodate native navigation which requires a parent navigator to render a child route.
 
 <details>
   <summary>Interoperability</summary>
 
 Nested routes are used to implement nested navigation in [React Navigation](https://reactnavigation.org/docs/nesting-navigators).
 
-This convention is analogous to [nested routing](https://remix.run/docs/en/v1/guides/routing#what-is-nested-routing) (same format) in Remix, `pages/_app.js` in Next.js, and [Layouts](https://nextjs.org/blog/layouts-rfc#layouts) (`folder/layout.js`) in the Next.js layouts RFC.
+This convention is analogous to [nested routing](https://remix.run/docs/en/v1/guides/routing#what-is-nested-routing) (same format) in Remix.
+Layout routes are also similar to `pages/_app.js` in Next.js.
 
 </details>
 
-## Child Routes
-
-A child route refers to a route that has no nested children, it shows up at the end of a URL.
-
 ## Fragment Routes
 
-Fragment routes add nested layout without appending any path segments. Think of them like `index.js` but as a layout. These are most commonly used for adding navigators like tab, stack, drawer, etc... The format is `(name).js` and `/(name)`, the `name` is purely cosmetic.
+![](./assets/fragment-routes.png)
+
+Fragment routes add nested layout without appending any path segments. Think of them like `index.js` but as a layout. These are most commonly used for adding navigators like tab, stack, drawer, etc... The format is `(name).js` and `/(name)`, the `name` is purely cosmetic and not provided to the route component.
 
 ```sh
 app/
@@ -112,7 +111,7 @@ app/
 
 Both of these will render:
 
-```
+```xml
 <App>
   <Layout>
     <Home />
@@ -120,7 +119,7 @@ Both of these will render:
 </App>
 ```
 
-Be careful when using parallel fragment routes as they can create conflicting routes that match the same path. For example, the following routes will conflict:
+Be careful when using parallel fragment routes as they can create conflicting matches. For example, the following routes will conflict:
 
 ```sh
 app/
@@ -150,29 +149,41 @@ The Fragment convention is similar to:
 - [pathless layout routes](https://remix.run/docs/en/v1/guides/routing#pathless-layout-routes) in Remix (`__group`)
 - [Route Groups](https://nextjs.org/blog/layouts-rfc#route-groups) in the upcoming Next.js layouts RFC (`(group)`).
 
-The format is the same as SvelteKit/upcoming Next.js but the implementation and usage is a bit different.
-
 </details>
 
 ## Index Routes
 
 - If a route is named `./index.js`, it will add both `index` and `/` to the route, effectively acting as a [fragment route](#fragment-routes).
 - Directories cannot be named `/index/`. The filename `/index.js` is reserved for [leaf routes](#leaf-routes).
-- An index route cannot be at the same level as a [fragment route](#fragment-routes) as they'd both match `/`.
 
-Index routes are based on the original `index.html` system from the Tim Berners-Lee/Apache HTTP Server days. The idea is that if you visit a directory, you'll see a list of all the available files by default making it easy to navigate the site in development. Users could then override the default behavior by creating an `index.html` file to provide a better navigation experience.
+<details>
+  <summary>Interoperability</summary>
 
-To that end, if you visit a directory in Expo, you'll see a list of all the available files. If you visit a directory in Expo that has an `index.js` or nested parent route, you'll see the rendered page instead.
+Index routes are based on the original `index.html` system from the Tim Berners-Lee/Apache HTTP Server days.
 
-> Learn more in this ancient [blog post](https://www.w3.org/Provider/Style/URI.html#dirindex), or this one from [Apache](https://httpd.apache.org/docs/2.4/mod/mod_dir.html#directoryindex).
+</details>
 
 ## Dynamic Routes
 
-Dynamic routes are routes that have a variable part. For example, `/blog/post/[id]` is a dynamic route. The variable part (`[id]`) is called a "slug". The slug is the part of the URL that is dynamic. The slug is defined by the file name. For example, `/blog/post/bacon` is defined by the file `/blog/post/[id].tsx`.
+![](./assets/dynamic-routes.png)
 
-- `[id].js` will match `/blog/1` and `/blog/2` and provide the query `{ id: 1 }` and `{ id: 2 }` respectively.
+Dynamic routes match any unmatched path at a given segment level. For example, `/blog/[id]` is a dynamic route. The variable part (`[id]`) is called a "slug". Routes with higher specificity will be matched before a dynamic route. For example, `/blog/bacon` will match `blog/bacon.js` before `blog/[id].js`.
 
-Routes with higher specificity will be matched first. For example, `/blog/bacon` will match `blog/bacon.js` before `blog/[id].js`.
+```
+app/
+  blog/
+    [id].js # 𝝠.com/blog/123
+```
+
+The slug can be accessed as a prop in the route component:
+
+> This is subject to change.
+
+```tsx
+export default function BlogPost({ id }) {
+  return <Text>Blog post: {id}</Text>;
+}
+```
 
 <details>
   <summary>Interoperability</summary>
@@ -197,18 +208,27 @@ There are a couple different ways to implement dynamic routes, here are some exi
 
 ## Deep Dynamic Routes
 
-Similar to dynamic routes, but the slug matches any number of path components in a route. For example, `/blog/post/[...id]` is a deep dynamic route. The variable part (`[...id]`) is called a "slug". The slug is the part of the URL that is dynamic. The slug is defined by the file name. For example, `/blog/post/bacon/cheese` is defined by the file `/blog/post/[...id].tsx`.
+![](./assets/deep-dynamic-roots.png)
 
-`[...ids].js` will match `/blog/1/2/3` and provide the query `{ ids: [1, 2, 3] }`.
+Similar to dynamic routes, but the slug matches any number of unmatched path components in a route. For example, `/blog/[...id]` is a deep dynamic route where `[...id]` is the slug. `blog/[...ids].js` will match `/blog/1/2/3`.
+
+> This is subject to change.
+
+Directory names can also be deep dynamic routes. For example, `/blog/[...id]/home.js` will match `/blog/1/2/3/home`.
 
 <details>
   <summary>Interoperability</summary>
 
-This convention is functionally analogous to the 'optional catch-all dynamic routes' (`[[...id]].js`) feature from Next.js but the syntax is different. Unlike Next.js which has a separate syntax for matching everything except index, Expo uses the same syntax for both. If you want to match everything except index, you can add an `index.js` file that has custom handling or you could intercept the path and treat it differently. We also reserve the term **catch** for error handling.
+Deep dynamic routes are functionally analogous to the 'optional catch-all dynamic routes' (`[[...id]].js`) feature from Next.js but the syntax is the same as the 'required catch-all dynamic routes'. Unlike Next.js which has a separate syntax for matching everything except `/`, Expo uses the same syntax for both. If you want to match everything except index, you can add an `index.js` file that has custom handling or you could simply handle the slug differently. We also reserve the term **catch** for error handling.
 
 The convention is also similar to splats in Remix.
 
 </details>
+
+## Glossary
+
+- **Slug** A dynamic URL path segment.
+- **Child route** A route that has no nested children, it shows up at the end of a URL.
 
 ## Next
 
