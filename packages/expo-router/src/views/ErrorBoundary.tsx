@@ -1,13 +1,15 @@
 import { Pressable, StyleSheet, Text, View } from '@bacons/react-views';
 import React from 'react';
 import { Platform, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ErrorBoundaryProps } from '../ErrorBoundary';
+import { Link } from './Link';
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
     return (
         <View accessibilityRole='main' style={[styles.container]}>
-            <View style={{ maxWidth: 720, marginHorizontal: 'auto' }}>
+            <SafeAreaView style={{ flex: 1, maxWidth: 720, marginHorizontal: 'auto' }}>
                 <View style={{ marginBottom: 12, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text
                         accessibilityRole="heading" accessibilityLevel={1}
@@ -31,7 +33,10 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
                 </View>
 
                 <StackTrace error={error} />
-            </View>
+                {process.env.NODE_ENV === 'development' && <Link href={'/___index'} style={styles.link}>
+                    Sitemap
+                </Link>}
+            </SafeAreaView>
         </View>
     );
 }

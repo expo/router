@@ -52,7 +52,7 @@ export function Directory() {
         [ctx]
     );
 
-    const { top, bottom } = useSafeAreaInsets();
+    const { bottom } = useSafeAreaInsets();
     const { width } = useWindowDimensions();
     return (
         <View

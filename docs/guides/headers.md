@@ -117,9 +117,6 @@ export default function Layout() {
           title={route === "home" ? "Home" : "Details"}
         />
       </Stack.Header>
-
-      {/* Auto populated. */}
-      <Stack.Screens initial="home" />
     </Stack>
   );
 }

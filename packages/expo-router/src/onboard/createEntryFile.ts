@@ -24,7 +24,7 @@ export function createEntryFileAsync() {
 const TEMPLATE = `import { View, Text } from 'react-native';
 
 // Learn more: ${DOCS_URL}
-export default function App() {
+export default function Page() {
   return (
     <View
       style={{

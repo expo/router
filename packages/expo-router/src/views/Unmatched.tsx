@@ -1,12 +1,12 @@
 import React, { forwardRef } from 'react';
-import { useURL } from 'expo-linking';
+import { createURL } from 'expo-linking';
 import { StyleSheet } from '@bacons/react-views';
 import { Link } from './Link';
 import { Text, View } from '@bacons/react-views';
 
 /** Default screen for unmatched routes. */
 export const Unmatched = forwardRef((props, ref) => {
-    const url = useURL();
+    const url = createURL('');
     return (
         // @ts-ignore
         <View ref={ref} accessibilityRole='main' style={styles.container}>
@@ -21,9 +21,16 @@ export const Unmatched = forwardRef((props, ref) => {
                     Go back.
                 </Link></Text>
 
-            <Link href={url ?? '/'} style={styles.link}>
+            <Link href={'/'} style={styles.link}>
                 {url}
             </Link>
+
+
+            {process.env.NODE_ENV === 'development' && <Link href={'/___index'} style={styles.link}>
+                Sitemap
+            </Link>}
+
+
 
         </View>
     );

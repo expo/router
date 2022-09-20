@@ -1,13 +1,13 @@
 Ports https://reactnavigation.org/docs/nesting-navigators
 
-```
+```sh
 app/
 ├─ (stack).js
 ├─ (stack)/
 │  ├─ home.js
 │  ├─ home/
-│    ├─ feed.js
-│    ├─ messages.js
+│    ├─ feed.js # Matches /home/feed
+│    ├─ messages.js # Matches /home/messages
 ```
 
 ```js
@@ -30,10 +30,10 @@ export default function Home() {
 
 ```js
 // app/(stack)/profile.js
-import { Link } from "@react-navigation/native";
+import { Link } from "expo-router";
 
 export default function Feed() {
-  return <Link to="/home/messages">Navigate to nested route</Link>;
+  return <Link href="/home/messages">Navigate to nested route</Link>;
 }
 ```
 
@@ -58,3 +58,5 @@ export default function Messages() {
 ```
 
 ## Notes
+
+- Navigation UI elements (Link, Tabs, Stack) may move out of the router package.
