@@ -1,5 +1,5 @@
 diff --git a/node_modules/@react-navigation/core/src/getPathFromState.tsx b/node_modules/@react-navigation/core/src/getPathFromState.tsx
-index f3e30de..72d445c 100644
+index f3e30de..13a212f 100644
 --- a/node_modules/@react-navigation/core/src/getPathFromState.tsx
 +++ b/node_modules/@react-navigation/core/src/getPathFromState.tsx
 @@ -133,6 +133,7 @@ export default function getPathFromState<ParamList extends {}>(
@@ -20,6 +20,16 @@ index f3e30de..72d445c 100644
            }
  
            // If the path has a pattern for a param, put the param in the path
+@@ -195,8 +197,7 @@ export default function getPathFromState<ParamList extends {}>(
+               // Optional params without value assigned in route.params should be ignored
+               return '';
+             }
+-
+-            return encodeURIComponent(value);
++            return value ? encodeURIComponent(value) : '';
+           }
+ 
+           return encodeURIComponent(p);
 diff --git a/node_modules/@react-navigation/core/src/getStateFromPath.tsx b/node_modules/@react-navigation/core/src/getStateFromPath.tsx
 index b61e1e5..a2d8662 100644
 --- a/node_modules/@react-navigation/core/src/getStateFromPath.tsx
