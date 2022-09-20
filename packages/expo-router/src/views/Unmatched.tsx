@@ -1,40 +1,45 @@
-import React, { forwardRef } from 'react';
-import { createURL } from 'expo-linking';
-import { StyleSheet } from '@bacons/react-views';
-import { Link } from './Link';
-import { Text, View } from '@bacons/react-views';
+import React, { forwardRef } from "react";
+import { createURL } from "expo-linking";
+import { StyleSheet } from "@bacons/react-views";
+import { Link } from "./Link";
+import { Text, View } from "@bacons/react-views";
 
 /** Default screen for unmatched routes. */
 export const Unmatched = forwardRef((props, ref) => {
-    const url = createURL('');
+    const url = createURL("");
     return (
         // @ts-ignore
-        <View ref={ref} accessibilityRole='main' style={styles.container}>
+        <View ref={ref} accessibilityRole="main" style={styles.container}>
             <Text
-                accessibilityRole="heading" accessibilityLevel={1}
+                accessibilityRole="heading"
+                accessibilityLevel={1}
                 style={styles.title}
             >
                 Unmatched Route
             </Text>
-            <Text accessibilityRole="heading" accessibilityLevel={2} style={styles.subtitle}>Page could not be found.{' '}
+            <Text
+                accessibilityRole="heading"
+                accessibilityLevel={2}
+                style={styles.subtitle}
+            >
+                Page could not be found.{" "}
                 <Link href="/" style={styles.link}>
                     Go back.
-                </Link></Text>
+                </Link>
+            </Text>
 
-            <Link href={'/'} style={styles.link}>
+            <Link href={"/"} style={styles.link}>
                 {url}
             </Link>
 
-
-            {process.env.NODE_ENV === 'development' && <Link href={'/___index'} style={styles.link}>
-                Sitemap
-            </Link>}
-
-
-
+            {process.env.NODE_ENV === "development" && (
+                <Link href={"/__index"} style={styles.link}>
+                    Sitemap
+                </Link>
+            )}
         </View>
     );
-})
+});
 
 const styles = StyleSheet.create({
     container: {

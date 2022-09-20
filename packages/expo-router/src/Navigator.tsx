@@ -1,7 +1,7 @@
 import { TabActions, TabRouter, useNavigationBuilder } from '@react-navigation/native';
 import * as React from 'react';
 
-import { useNavigationChildren } from './routes';
+import { useScreens } from './routes';
 
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
 export const NavigatorContext = React.createContext<any>(null);
@@ -24,7 +24,7 @@ export function Navigator({
     children?: any;
     router?: any;
 }) {
-    const screens = useNavigationChildren();
+    const screens = useScreens();
 
     const { state, navigation, descriptors, NavigationContent } =
         useNavigationBuilder(router, {

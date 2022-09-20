@@ -63,6 +63,7 @@ const InternalContextNavigationContainer = React.forwardRef(
     (props: {}, ref: NavigationContainerProps["ref"]) => {
         const [contextProps] = useNavigationContainerContext();
         return (
+            // @ts-expect-error
             <NavigationContainer
                 ref={ref}
                 {...props}

@@ -22,12 +22,11 @@ The router API could provide a hook for returning named children instead of an a
 
 ```tsx
 import { createStackNavigator } from "@react-navigation/stack";
-import { useNamedChildren } from "expo/router";
+import { Navigator, createNavigator, useNamedChildren } from "expo/router";
 
 const Nav = createStackNavigator();
 
 export default function App() {
-  const Navigator = useNavigator(Nav);
   // Screen components named by route
   const { home, settings, "[profile]": profile } = useNamedChildren();
   return (

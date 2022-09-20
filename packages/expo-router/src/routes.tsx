@@ -1,22 +1,28 @@
-import React, { forwardRef, ReactNode, useContext } from 'react';
-import { RoutesContext } from './context';
+import React, { ReactNode, useContext } from "react";
+import { RoutesContext } from "./context";
 
-import { Try } from './ErrorBoundary';
-import { matchDeepDynamicRouteName, matchDynamicName, matchFragmentName } from './matchers';
-import { Screen } from './primitives';
+import { Try } from "./ErrorBoundary";
+import {
+    matchDeepDynamicRouteName,
+    matchDynamicName,
+    matchFragmentName,
+} from "./matchers";
+import { Screen } from "./primitives";
 
 const dev = process.env.NODE_ENV === "development";
-
+/** The list of input keys will become optional, everything else will remain the same. */
+export type PickPartial<T, K extends keyof T> = Omit<T, K> &
+    Partial<Pick<T, K>>;
 
 export type RouteNode<TComponent = React.ComponentType<any>> = {
     /** nested routes */
     children: RouteNode<TComponent>[];
-    /** React component */
-    component: TComponent;
+    /** Lazily get the React component */
+    getComponent: () => TComponent;
     /** Is the route a dynamic path */
-    dynamic: null | { name: string, deep: boolean };
+    dynamic: null | { name: string; deep: boolean };
     /** All static exports from the file. */
-    extras: Record<string, any>;
+    getExtras: () => Record<string, any>;
     /** `index`, `error-boundary`, etc. */
     route: string;
     /** require.context key, used for matching children. */
@@ -26,18 +32,30 @@ export type RouteNode<TComponent = React.ComponentType<any>> = {
 
     /** Internal screens like the directory or the auto 404 should be marked as internal. */
     internal?: boolean;
+
+    /** React Navigation screen name. */
+    screenName: string;
 };
+
+export function createRouteNode(route: PickPartial<RouteNode, 'screenName' | 'dynamic' | 'children'>): RouteNode {
+    return {
+        screenName: getReactNavigationScreenName(route.route),
+        children: [],
+        dynamic: null,
+        ...route,
+    }
+}
 
 export const CurrentRouteContext = React.createContext<{
     filename: string | null;
     routes: RouteNode[];
-    siblings: RouteNode[];
-    parent: RouteNode | null;
+    // siblings: RouteNode[];
+    // parent: RouteNode | null;
 }>({
     filename: null,
     routes: [],
-    siblings: [],
-    parent: null,
+    // siblings: [],
+    // parent: null,
 });
 
 if (dev) {
@@ -53,36 +71,13 @@ export function useModuleRoute() {
 }
 
 /** Return all the routes for the current boundary. */
-export function useRoutes() {
+export function useRoutes(): RouteNode[] {
     const { filename, routes } = useContext(CurrentRouteContext);
     if (dev && !filename) {
         throw new Error("No filename found. This is likely a bug in expo-router.");
     }
     return routes;
 }
-
-/** Return the route that matches the current URL. */
-// export function useSelectedRoute() {
-//     const url = useURL();
-//     const routes = useRoutes();
-
-//     const [route, setRoute] = React.useState<RouteNode | null>(null);
-
-//     // TODO: This logic makes no sense
-//     React.useEffect(() => {
-//         if (!url) return;
-//         const route = routes.find((route) => {
-//             if (route.dynamic) {
-//                 return url.startsWith(route.route);
-//             }
-//             return url === route.route;
-//         });
-//         setRoute(route ?? null);
-//     }, [url, routes]);
-
-//     const Component = routes[0].component;
-//     return <Component />
-// }
 
 /** Provides the matching routes and filename to the children. */
 export function AutoRoute({
@@ -92,10 +87,12 @@ export function AutoRoute({
     filename: string;
     children: ReactNode;
 }) {
-    const { children: routes, siblings, parent } = useRoutesAtPath(filename);
+    const { children: routes } = useRoutesAtPath(filename);
 
     return (
-        <CurrentRouteContext.Provider value={{ filename, routes, siblings, parent }}>
+        <CurrentRouteContext.Provider
+            value={{ filename, routes }}
+        >
             {children}
         </CurrentRouteContext.Provider>
     );
@@ -104,9 +101,8 @@ export function AutoRoute({
 // `[page]` -> `:page`
 // `page` -> `page`
 export function convertDynamicRouteToReactNavigation(name: string) {
-
     if (matchDeepDynamicRouteName(name)) {
-        return '*';
+        return "*";
     }
     const dynamicName = matchDynamicName(name);
 
@@ -114,8 +110,8 @@ export function convertDynamicRouteToReactNavigation(name: string) {
         return `:${dynamicName}`;
     }
 
-    if (name === 'index' || matchFragmentName(name)) {
-        return '';
+    if (name === "index" || matchFragmentName(name)) {
+        return "";
     }
 
     return name;
@@ -125,144 +121,144 @@ export function getReactNavigationScreenName(name: string) {
     return matchDeepDynamicRouteName(name) || matchDynamicName(name) || name;
 }
 
-function expandFilePath(filePath: string) {
-    // `./app/page.tsx` => `app/page`
-    const normalized = getNameFromFilePath(filePath);
-    // `app/page` => `page`
-    const id = normalized;
-    // const id = normalized.replace(/^app\//g, "");
-    // `app/[page]` => `page`
-    // `app/page` => `undefined`
-
-    const last = id.split("/").pop();
-
-    const deepDynamicName = matchDeepDynamicRouteName(last);
-    const dynamicName = deepDynamicName ?? matchDynamicName(last);
-    const fragment = matchFragmentName(last);
-
-    return {
-        normalized,
-        id,
-        fragment,
-        lastPathName: dynamicName ?? last,
-        dynamic: dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null,
-    };
-}
-
-function useRoutesAtPath(filename: string): { children: RouteNode[], siblings: RouteNode[], parent: RouteNode | null } {
-    const info = React.useMemo(() => expandFilePath(filename), [filename]);
+function useRoutesAtPath(filename: string): {
+    children: RouteNode[];
+    // siblings: RouteNode[];
+    // parent: RouteNode | null;
+} {
+    const normalName = React.useMemo(() => getNameFromFilePath(filename), [filename]);
     const routes = useContext(RoutesContext);
+    const keys = React.useMemo(() => routes.keys(), [routes]);
 
     const family = React.useMemo(() => {
         let children: RouteNode[] = routes;
-        let siblings: RouteNode[] = [];
         let current: RouteNode | null = null;
-        let parent: RouteNode | null = null;
+        // let siblings: RouteNode[] = [];
+        // let parent: RouteNode | null = null;
 
         // Skip root directory
-        if (info.id) {
+        if (normalName) {
             // split and search
-            const parts = info.id.split("/");
+            const parts = normalName.split("/");
             for (const part of parts) {
-
                 const next = children.find(({ route }) => route === part);
 
                 if (!next?.children) {
-                    return { siblings, children: [], parent };
+                    return {
+                        // siblings, 
+                        // parent ,
+                        children: [],
+                    };
                 }
 
-                parent = current;
-                siblings = children;
+                // parent = current;
+                // siblings = children;
                 current = next;
                 children = next?.children;
             }
         }
 
-        return { siblings, children: children, parent };
-    }, [info, routes]);
+        return {
+            // siblings, 
+            // parent,
+            children,
+        };
+    }, [normalName, keys]);
 
-    const matchingRoutes = React.useMemo(() => {
-        return family.children.filter(({ component }) => component);
-    }, [family]);
-
-    const parsedRoutes = React.useMemo(() => {
-        return matchingRoutes.map(({ component: Component, ...value }) => {
-            const { ErrorBoundary } = value.extras;
-            return {
-                component: React.forwardRef((props: { route: any, navigation: any }, ref: any) => {
-                    // Surface dynamic name as props to the view
-                    const dynamicProps = React.useMemo(() => {
-                        if (!value.dynamic || props.route?.path == null) return {};
-                        return formatDynamicProps(props.route.path, value.dynamic)
-                    }, [value.dynamic?.name, props.route?.path])
-
-                    const children = <Component ref={ref} {...props} {...dynamicProps} />;
-                    if (ErrorBoundary) {
-                        return (
-                            <Try catch={ErrorBoundary}>
-                                {children}
-                            </Try>
-                        );
-                    }
-                    return <AutoRoute filename={value.contextKey}>{children}</AutoRoute>;
-                }),
-                ...value,
-            };
-        });
-    }, [matchingRoutes]);
-
-    return { children: parsedRoutes, siblings: family.siblings, parent: family.parent };
+    return family;
 }
 
-function formatDynamicProps(path: string, dynamic: { name: string, deep: boolean }) {
+function formatDynamicProps(
+    path: string,
+    dynamic: { name: string; deep: boolean }
+): [string, string | string[]] {
     // Remove the first slash
     const sanitized = path.replace(/^\//, "");
 
     if (dynamic.deep) {
-        return { [dynamic.name]: sanitized.split("/").map(value => value || '/') };
+        return [dynamic.name, sanitized.split("/").map((value) => value || "/")]
     }
-    return { [dynamic.name]: sanitized };
+    return [dynamic.name, sanitized]
 }
 
-/** Wrap a navigator and export with the children for a given. */
-export function useNavigator(Nav) {
-    const children = useNavigationChildren();
-    if (!children?.length) return function EmptyNavigator() { };
-
-    const Navigator = forwardRef((props, ref) => {
-        return <Nav {...props} ref={ref} children={children} />;
-    });
-
-    return Navigator;
-}
-
-export function useNavigationChildren() {
+export function useScreens(): ReactNode[] {
     const children = useRoutes();
-    return children.map((value) => (
+    return React.useMemo(() => children.map((value) => routeToScreen(value)), [children]);
+}
+
+export function useScreensRecord(): Record<string, ReactNode> {
+    const children = useRoutes();
+    return React.useMemo(() => Object.fromEntries(
+        children.map((value) => [value.route, routeToScreen(value)])
+    ), [children]);
+}
+
+function getQualifiedRouteComponent(value: RouteNode) {
+    // console.log('getQualifiedRouteComponent:', value)
+    const getDynamicProps = !value.dynamic
+        ? () => ([])
+        : (path?: string | null) => {
+            if (path == null) {
+                return [];
+            }
+            return formatDynamicProps(path, value.dynamic!);
+        };
+
+
+    const Component = value.getComponent();
+
+    const { ErrorBoundary } = value.getExtras();
+
+    const QualifiedRoute = React.forwardRef(
+        (props: { route: any; navigation: any }, ref: any) => {
+            // Surface dynamic name as props to the view
+            const [dynamicKey, dynamicValue] = React.useMemo(
+                () => getDynamicProps(props.route?.path),
+                [props.route?.path]
+            );
+
+            const children = React.createElement(Component, {
+                ...props,
+                ref,
+                [dynamicKey]: dynamicValue,
+            });
+
+            const errorBoundary = ErrorBoundary ? (
+                <Try catch={ErrorBoundary}>{children}</Try>
+            ) : (
+                children
+            );
+
+            return (
+                <AutoRoute filename={value.contextKey}>
+                    {errorBoundary}
+                </AutoRoute>
+            );
+        }
+    );
+
+    QualifiedRoute.displayName = `Route(${Component.displayName || Component.name || value.route})`;
+
+    return QualifiedRoute;
+}
+
+function routeToScreen(route: RouteNode) {
+    return (
         <Screen
-            options={value.extras?.getNavOptions}
-            name={getReactNavigationScreenName(value.route)}
-            key={value.route}
-            component={value.component}
+            options={(props) => {
+                const extras = route.getExtras?.();
+                if (typeof extras?.getNavOptions === "function") {
+                    return extras.getNavOptions(props);
+                }
+                return extras?.getNavOptions;
+            }}
+            name={route.screenName}
+            key={route.route}
+            component={getQualifiedRouteComponent(route)}
         />
-    ));
-}
-
-export function useNamedNavigationChildren(): Record<string, ReactNode> {
-    const children = useRoutes();
-    return Object.fromEntries(
-        children.map((value) => [
-            value.route,
-            <Screen
-                options={value.extras?.getNavOptions}
-                name={getReactNavigationScreenName(value.route)}
-                key={value.route}
-                component={value.component}
-            />,
-        ])
     );
 }
 
-export function getNameFromFilePath(name) {
+export function getNameFromFilePath(name: string): string {
     return name.replace(/(^.\/)|(\.[jt]sx?$)/g, "");
 }

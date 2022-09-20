@@ -1,6 +1,6 @@
 // import React from 'react';
 // import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// import { convertDynamicRouteToReactNavigation, Screen, useNavigationChildren, useRoutes } from 'expo-router';
+// import { convertDynamicRouteToReactNavigation, Screen, useScreens, useRoutes } from 'expo-router';
 
 
 // const UpstreamNavigator = createBottomTabNavigator();

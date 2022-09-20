@@ -9,8 +9,8 @@ import {
 } from "./matchers";
 import {
   convertDynamicRouteToReactNavigation,
+  createRouteNode,
   getNameFromFilePath,
-  getReactNavigationScreenName,
   RouteNode,
 } from "./routes";
 import { Children } from "./Navigator";
@@ -25,25 +25,23 @@ export function treeToReactNavigationLinkingRoutes(
     .map((node) => {
       let path = convertDynamicRouteToReactNavigation(node.route);
 
-      return {
-        path: path,
-        screenName: getReactNavigationScreenName(node.route),
-        screens: node.children.length
-          ? treeToReactNavigationLinkingRoutes(node.children, [
-              ...parents,
-              path,
-            ])
-          : undefined,
-      };
+      return [
+        node.screenName,
+        {
+          path: path,
+          screens: node.children.length
+            ? treeToReactNavigationLinkingRoutes(node.children, [
+                ...parents,
+                path,
+              ])
+            : undefined,
+        },
+      ] as const;
     })
-    .reduce<PathConfigMap<{}>>((acc, { screenName, ...cur }) => {
-      acc[screenName] = {
-        ...cur,
-      };
+    .reduce<PathConfigMap<{}>>((acc, [screenName, current]) => {
+      acc[screenName] = current;
       return acc;
     }, {});
-
-  console.log("firstPass", firstPass);
 
   return firstPass;
 }
@@ -65,10 +63,14 @@ export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<{}> {
 }
 
 // Recursively convert flat map of file paths to tree
-function convert(files: { route: string; node: any }[]) {
+function convert(
+  files: (Pick<RouteNode, "contextKey" | "getComponent" | "getExtras"> & {
+    normalizedName: string;
+  })[]
+): RouteNode[] {
   const tree = {};
   for (const file of files) {
-    const parts = file.route.split("/");
+    const parts = file.normalizedName.split("/");
     let current = tree;
     for (const part of parts) {
       current = current[part] = current[part] || {};
@@ -77,31 +79,33 @@ function convert(files: { route: string; node: any }[]) {
     current.___child = file;
   }
 
-  function toNodeArray(tree) {
+  const toNodeArray = (tree): RouteNode[] => {
     const out: RouteNode[] = [];
     // @ts-expect-error
     for (const [key, { ___child, ...obj }] of Object.entries(tree)) {
       const deepDynamicName = matchDeepDynamicRouteName(key);
       const dynamicName = deepDynamicName ?? matchDynamicName(key);
 
-      out.push({
-        route: key,
-        extras: ___child?.extras,
-        component: ___child?.node,
-        contextKey: ___child?.contextKey,
-        children: toNodeArray(obj),
-        dynamic: dynamicName
-          ? { name: dynamicName, deep: !!deepDynamicName }
-          : null,
-      });
+      out.push(
+        createRouteNode({
+          route: key,
+          getExtras: ___child?.getExtras,
+          getComponent: ___child?.getComponent,
+          contextKey: ___child?.contextKey,
+          children: toNodeArray(obj),
+          dynamic: dynamicName
+            ? { name: dynamicName, deep: !!deepDynamicName }
+            : null,
+        })
+      );
     }
-    return sortScreens(out);
-  }
+    return sortRoutes(out);
+  };
 
   return toNodeArray(tree);
 }
 
-function sortScreens(screens: RouteNode[]) {
+function sortRoutes(screens: RouteNode[]): RouteNode[] {
   return screens.sort(
     ({ route, dynamic }, { route: idB, dynamic: isVariadicB }) => {
       if (route === "index") return -1;
@@ -121,20 +125,31 @@ export function getRoutes(pages): RouteNode[] {
   const names = pages
     .keys()
     .map((key) => {
-      const _import = pages(key);
-      if (!_import?.default) return null;
-      const { default: mod, ...extras } = _import;
+      // In development, check if the file exports a default component
+      // this helps keep things snappy when creating files. In production we load all screens lazily.
+      if (process.env.NODE_ENV === "development") {
+        const _import = pages(key);
+        if (!_import?.default) {
+          return null;
+        }
+      }
+
       return {
-        route: getNameFromFilePath(key),
-        node: _import.default,
+        normalizedName: getNameFromFilePath(key),
+        getComponent() {
+          return pages(key).default;
+        },
         contextKey: key,
-        extras,
+        getExtras() {
+          const { default: mod, ...extras } = pages(key);
+          return extras;
+        },
       };
     })
     .filter((node) => node);
+
   const routes = convert(names);
 
-  console.log("Modify", routes);
   // Add all missing navigators
   recurseAndAddMissingNavigators(routes, []);
 
@@ -144,8 +159,6 @@ export function getRoutes(pages): RouteNode[] {
   if (process.env.NODE_ENV === "development") {
     appendDirectoryRoute(routes);
   }
-
-  console.log("routes:", routes);
 
   return routes;
 }
@@ -159,11 +172,9 @@ function recurseAndAddMissingNavigators(
   routes.forEach((route) => {
     // Route has children but no component and no contextKey (meaning no file path).
     if (route.children.length && !route.contextKey) {
-      console.log("Adding missing nav", route);
-
-      route.component = Children;
+      route.getComponent = () => Children;
       route.generated = true;
-      route.extras = {};
+      route.getExtras = () => ({});
       route.contextKey = [".", ...parents, route.route + ".tsx"]
         .filter(Boolean)
         .join("/");
@@ -182,16 +193,20 @@ function recurseAndAddMissingNavigators(
 
 function appendDirectoryRoute(routes: RouteNode[]) {
   const { Directory, getNavOptions } = require("./views/Directory");
-  routes.push({
-    component: Directory,
-    children: [],
-    extras: { getNavOptions },
-    route: "___index",
-    contextKey: "./___index.tsx",
-    dynamic: null,
-    generated: true,
-    internal: true,
-  });
+  routes.push(
+    createRouteNode({
+      getComponent() {
+        return Directory;
+      },
+      getExtras() {
+        return { getNavOptions };
+      },
+      route: "__index",
+      contextKey: "./__index.tsx",
+      generated: true,
+      internal: true,
+    })
+  );
   return routes;
 }
 
@@ -199,16 +214,21 @@ function appendUnmatchedRoute(routes: RouteNode[]) {
   // Auto add not found route if it doesn't exist
   const userDefinedDynamicRoute = getUserDefinedTopLevelCatch(routes);
   if (!userDefinedDynamicRoute) {
-    routes.push({
-      component: require("./views/Unmatched").Unmatched,
-      children: [],
-      extras: {},
-      route: "[...404]",
-      contextKey: "./[...404].tsx",
-      dynamic: { name: "404", deep: true },
-      generated: true,
-      internal: true,
-    });
+    routes.push(
+      createRouteNode({
+        getComponent() {
+          return require("./views/Unmatched").Unmatched;
+        },
+        getExtras() {
+          return {};
+        },
+        route: "[...404]",
+        contextKey: "./[...404].tsx",
+        dynamic: { name: "404", deep: true },
+        generated: true,
+        internal: true,
+      })
+    );
   }
   return routes;
 }

@@ -15,7 +15,7 @@ function useContextModuleAsRoutes(context: ContextModule) {
 
 function RoutesContextProvider({ context, children }: { context: ContextModule, children: React.ReactNode }) {
     const routes = useContextModuleAsRoutes(context);
-
+    console.log('routes render', routes);
     return (
         <RoutesContext.Provider value={routes}>
             {children}
@@ -37,6 +37,7 @@ function useTutorial(context: ContextModule) {
     const keys = useMemo(() => context.keys(), [context]);
     const hasAnyValidComponent = useMemo(() => {
         for (const key of keys) {
+            // NOTE(EvanBacon): This should only ever occur in development as it breaks lazily loading.
             const component = context(key)?.default;
             if (isFunctionOrReactComponent(component)) {
                 return true;

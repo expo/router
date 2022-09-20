@@ -33,7 +33,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
                 </View>
 
                 <StackTrace error={error} />
-                {process.env.NODE_ENV === 'development' && <Link href={'/___index'} style={styles.link}>
+                {process.env.NODE_ENV === 'development' && <Link href={'/__index'} style={styles.link}>
                     Sitemap
                 </Link>}
             </SafeAreaView>

@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
-import { useNamedNavigationChildren } from './routes';
+import { useScreensRecord } from './routes';
 
 // TODO: Move to different files for babel tree shaking plugin.
 
@@ -47,7 +47,7 @@ function useSortedChildren(children: Record<string, React.ReactNode>, order?: st
 function createWrappedNavigator<T extends React.ComponentType<any>>(Nav: T) {
 
     const Navigator = React.forwardRef(({ order, ...props }: PickPartial<React.ComponentProps<T>, 'children'> & { order?: string[] }, ref) => {
-        const children = useNamedNavigationChildren();
+        const children = useScreensRecord();
 
         const sorted = useSortedChildren(children, order);
 
