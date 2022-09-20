@@ -43,6 +43,8 @@ export function treeToReactNavigationLinkingRoutes(
       return acc;
     }, {});
 
+  console.log("firstPass", firstPass);
+
   return firstPass;
 }
 
@@ -201,9 +203,9 @@ function appendUnmatchedRoute(routes: RouteNode[]) {
       component: require("./views/Unmatched").Unmatched,
       children: [],
       extras: {},
-      route: "[...missing]",
-      contextKey: "./[...missing].tsx",
-      dynamic: { name: "missing", deep: true },
+      route: "[...404]",
+      contextKey: "./[...404].tsx",
+      dynamic: { name: "404", deep: true },
       generated: true,
       internal: true,
     });
