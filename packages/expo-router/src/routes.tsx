@@ -1,7 +1,7 @@
 import React, { ReactNode, useContext } from "react";
 import { RoutesContext } from "./context";
 
-import { Try } from "./ErrorBoundary";
+import { Try } from "./views/Try";
 import {
     matchDeepDynamicRouteName,
     matchDynamicName,

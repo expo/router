@@ -41,6 +41,7 @@ export function Navigator({
     );
 }
 
+// TODO: Support all routers and document
 function useClientSideEvent(to) {
     const { navigation, state, router } = useNavigatorContext();
 
