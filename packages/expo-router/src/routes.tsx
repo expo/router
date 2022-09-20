@@ -14,11 +14,11 @@ const dev = process.env.NODE_ENV === "development";
 export type PickPartial<T, K extends keyof T> = Omit<T, K> &
     Partial<Pick<T, K>>;
 
-export type RouteNode<TComponent = React.ComponentType<any>> = {
+export type RouteNode = {
     /** nested routes */
-    children: RouteNode<TComponent>[];
+    children: RouteNode[];
     /** Lazily get the React component */
-    getComponent: () => TComponent;
+    getComponent: () => React.ComponentType<any>;
     /** Is the route a dynamic path */
     dynamic: null | { name: string; deep: boolean };
     /** All static exports from the file. */

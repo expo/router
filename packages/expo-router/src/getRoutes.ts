@@ -99,37 +99,20 @@ function convert(
         })
       );
     }
-    return sortRoutes(out);
+    return out;
   };
 
   return toNodeArray(tree);
-}
-
-function sortRoutes(screens: RouteNode[]): RouteNode[] {
-  return screens.sort(
-    ({ route, dynamic }, { route: idB, dynamic: isVariadicB }) => {
-      if (route === "index") return -1;
-      if (idB === "index") return 1;
-      // Sort variadic to be last
-      if (dynamic) return 1;
-      if (isVariadicB) return -1;
-
-      // if (a > b) return 1;
-      // if (a < b) return -1;
-      return 0;
-    }
-  );
 }
 
 export function getRoutes(pages): RouteNode[] {
   const names = pages
     .keys()
     .map((key) => {
-      // In development, check if the file exports a default component
-      // this helps keep things snappy when creating files. In production we load all screens lazily.
       if (process.env.NODE_ENV === "development") {
-        const _import = pages(key);
-        if (!_import?.default) {
+        // In development, check if the file exports a default component
+        // this helps keep things snappy when creating files. In production we load all screens lazily.
+        if (!pages(key)?.default) {
           return null;
         }
       }
@@ -212,7 +195,7 @@ function appendDirectoryRoute(routes: RouteNode[]) {
 
 function appendUnmatchedRoute(routes: RouteNode[]) {
   // Auto add not found route if it doesn't exist
-  const userDefinedDynamicRoute = getUserDefinedTopLevelCatch(routes);
+  const userDefinedDynamicRoute = getUserDefinedDeepDynamicRoute(routes);
   if (!userDefinedDynamicRoute) {
     routes.push(
       createRouteNode({
@@ -233,7 +216,7 @@ function appendUnmatchedRoute(routes: RouteNode[]) {
   return routes;
 }
 
-function getUserDefinedTopLevelCatch(routes: RouteNode[]) {
+function getUserDefinedDeepDynamicRoute(routes: RouteNode[]): RouteNode | null {
   // Auto add not found route if it doesn't exist
   for (const route of routes) {
     const isDeepDynamic = matchDeepDynamicRouteName(route.route);
@@ -242,7 +225,7 @@ function getUserDefinedTopLevelCatch(routes: RouteNode[]) {
     }
     // Recurse through fragment routes
     if (matchFragmentName(route.route)) {
-      const child = getUserDefinedTopLevelCatch(route.children);
+      const child = getUserDefinedDeepDynamicRoute(route.children);
       if (child) {
         return child;
       }

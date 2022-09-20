@@ -20,7 +20,9 @@ type PickPartial<T, K extends keyof T> = Omit<T, K> &
 
 function useSortedChildren(children: Record<string, React.ReactNode>, order?: string[]): React.ReactNode[] {
     return React.useMemo(() => {
-        if (!order) return Object.values(children);
+        if (!order?.length) {
+            return Object.values(children);
+        }
         const entries = Object.entries(children);
 
         const ordered = order.map(name => {
