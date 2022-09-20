@@ -4,7 +4,7 @@ import { Platform, ScrollView, TouchableOpacity } from 'react-native';
 
 import { ErrorBoundaryProps } from '../ErrorBoundary';
 
-export function Exception({ error, retry }: ErrorBoundaryProps) {
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
     return (
         <View accessibilityRole='main' style={[styles.container]}>
             <View style={{ maxWidth: 720, marginHorizontal: 'auto' }}>

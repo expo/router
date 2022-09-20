@@ -1,14 +1,12 @@
 import { View, Text } from 'react-native';
 
-import { Exception } from 'expo-router';
-
-export const ErrorBoundary = Exception
+export { ErrorBoundary } from 'expo-router';
+import { ContextContainer } from 'expo-router';
+import { DarkTheme } from '@react-navigation/native';
+import { useEffect } from 'react';
 
 // Learn more: TODO
 export default function App({ foobar }) {
-
-  // throw new Error('ded')
-
   return (
     <View
       style={{
@@ -16,6 +14,7 @@ export default function App({ foobar }) {
         justifyContent: 'center',
         alignItems: 'center',
       }}>
+      <ContextContainer theme={DarkTheme} />
       <Text style={{ fontSize: 36 }}>Entry file {foobar} 👋</Text>
     </View>
   );

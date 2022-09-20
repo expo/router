@@ -9,9 +9,9 @@ export type ErrorBoundaryProps = {
 }
 
 // No way to access `getDerivedStateFromError` from a functional component afaict.
-export class AutoErrorBoundary extends React.Component<
+export class Try extends React.Component<
     {
-        component: React.ComponentType<ErrorBoundaryProps>;
+        catch: React.ComponentType<ErrorBoundaryProps>;
         children: React.ReactNode;
     },
     { error?: Error }
@@ -32,7 +32,7 @@ export class AutoErrorBoundary extends React.Component<
 
     render() {
         const { error } = this.state
-        const { component: ErrorBoundary, children } = this.props;
+        const { catch: ErrorBoundary, children } = this.props;
         if (!error) {
             return children;
         }

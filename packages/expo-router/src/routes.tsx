@@ -1,7 +1,7 @@
 import React, { forwardRef, ReactNode, useContext } from 'react';
 import { RoutesContext } from './context';
 
-import { AutoErrorBoundary } from './ErrorBoundary';
+import { Try } from './ErrorBoundary';
 import { matchDeepDynamicRouteName, matchDynamicName, matchFragmentName } from './matchers';
 import { Screen } from './primitives';
 
@@ -199,9 +199,9 @@ function useRoutesAtPath(filename: string): { children: RouteNode[], siblings: R
                     const children = <Component ref={ref} {...props} {...dynamicProps} />;
                     if (ErrorBoundary) {
                         return (
-                            <AutoErrorBoundary component={ErrorBoundary}>
+                            <Try catch={ErrorBoundary}>
                                 {children}
-                            </AutoErrorBoundary>
+                            </Try>
                         );
                     }
                     return <AutoRoute filename={value.contextKey}>{children}</AutoRoute>;
