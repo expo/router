@@ -37,7 +37,6 @@
   "dependencies": {
     "@bacons/react-views": "^1.0.6",
     "expo-linking": "^3.2.2",
-    "expo-splash-screen": "^0.16.2",
     "expo-status-bar": "^1.4.0"
   }
 }
