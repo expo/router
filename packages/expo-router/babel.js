@@ -44,7 +44,7 @@ module.exports = function (api) {
         }
       },
 
-      // Convert `process.env.EXPO_APP_ROOT` to a string literal
+      // Convert `process.env.EXPO_ROUTER_APP_ROOT` to a string literal
       MemberExpression(path, state) {
         if (
           !t.isIdentifier(path.node.object, { name: "process" }) ||
@@ -58,7 +58,11 @@ module.exports = function (api) {
           return;
         }
 
-        if (!t.isIdentifier(parent.node.property, { name: "EXPO_APP_ROOT" })) {
+        if (
+          !t.isIdentifier(parent.node.property, {
+            name: "EXPO_ROUTER_APP_ROOT",
+          })
+        ) {
           return;
         }
 
@@ -66,7 +70,7 @@ module.exports = function (api) {
           return;
         }
 
-        parent.replaceWith(t.stringLiteral(process.env.EXPO_APP_ROOT));
+        parent.replaceWith(t.stringLiteral(process.env.EXPO_ROUTER_APP_ROOT));
       },
     },
   };
