@@ -1,8 +1,5 @@
 import { getDevServer } from "../getDevServer";
 
-// Docs page for expo router
-export const DOCS_URL = "TODO";
-
 /** Middleware for creating an entry file in the project. */
 export function createEntryFileAsync() {
   if (process.env.NODE_ENV === "production") {
@@ -21,18 +18,39 @@ export function createEntryFileAsync() {
   });
 }
 
-const TEMPLATE = `import { View, Text } from 'react-native';
+const TEMPLATE = `import { StyleSheet, Text, View } from "react-native";
 
-// Learn more: ${DOCS_URL}
 export default function Page() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <Text style={{ fontSize: 36 }}>Entry file 👋</Text>
+    <View style={styles.container}>
+      <View style={styles.main}>
+        <Text style={styles.title}>Hello World</Text>
+        <Text style={styles.subtitle}>
+          This is the first page of your{"\\n"}native app, and website.
+        </Text>
+      </View>
     </View>
   );
-}`;
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+  },
+  main: {
+    flex: 1,
+    justifyContent: "center",
+    maxWidth: 960,
+    marginHorizontal: "auto",
+  },
+  title: {
+    fontSize: 64,
+    fontWeight: "bold",
+  },
+  subtitle: {
+    fontSize: 36,
+    color: "#38434D",
+  },
+});
+`;
