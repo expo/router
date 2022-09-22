@@ -73,7 +73,7 @@ const InternalContextNavigationContainer = React.forwardRef(
     }
 );
 
-export function ContextContainer(props: Omit<NavigationContainerProps, 'children' | 'linking'>) {
+export function RootContainer(props: Omit<NavigationContainerProps, 'children' | 'linking'>) {
     const [, setProps] = useNavigationContainerContext();
 
     React.useEffect(() => {

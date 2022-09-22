@@ -4,13 +4,13 @@ import * as React from 'react';
 import { useScreens } from './routes';
 
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
-export const NavigatorContext = React.createContext<any>(null);
+export const LayoutContext = React.createContext<any>(null);
 
 if (process.env.NODE_ENV !== "production") {
-    NavigatorContext.displayName = "NavigatorContext";
+    LayoutContext.displayName = "LayoutContext";
 }
 
-export type NavigatorProps = {
+export type LayoutProps = {
     initialRouteName?: Parameters<typeof useNavigationBuilder>[1]['initialRouteName'];
     screenOptions?: Parameters<typeof useNavigationBuilder>[1]['screenOptions'];
     children?: Parameters<typeof useNavigationBuilder>[1]['children'];
@@ -18,12 +18,12 @@ export type NavigatorProps = {
 }
 
 /** An unstyled custom navigator. Good for basic web layouts */
-export function Navigator({
+export function Layout({
     initialRouteName,
     screenOptions,
     children,
     router = TabRouter,
-}: NavigatorProps) {
+}: LayoutProps) {
     const screens = useScreens();
 
     const { state, navigation, descriptors, NavigationContent } =
@@ -34,15 +34,15 @@ export function Navigator({
         });
 
     return (
-        <NavigatorContext.Provider value={{ state, navigation, descriptors, router }}>
+        <LayoutContext.Provider value={{ state, navigation, descriptors, router }}>
             <NavigationContent>{children}</NavigationContent>
-        </NavigatorContext.Provider>
+        </LayoutContext.Provider>
     );
 }
 
 // TODO: Support all routers and document
 function useClientSideEvent(to) {
-    const { navigation, state, router } = useNavigatorContext();
+    const { navigation, state, router } = useLayoutContext();
 
     const routeKey = React.useMemo(() => {
         const route = state.routes.find((route) => route.name === to);
@@ -74,18 +74,18 @@ function useClientSideEvent(to) {
     return onPress;
 }
 
-export function useNavigatorContext() {
-    const context = React.useContext(NavigatorContext);
+export function useLayoutContext() {
+    const context = React.useContext(LayoutContext);
     if (!context) {
         throw new Error(
-            "useNavigatorContext must be used within a <Navigator />"
+            "useLayoutContext must be used within a <Layout />"
         );
     }
     return context;
 }
 
 function useChild() {
-    const context = React.useContext(NavigatorContext);
+    const context = React.useContext(LayoutContext);
 
     const { state, descriptors } = context;
     const current = state.routes.find((route, i) => state.index === i);
@@ -96,20 +96,20 @@ function useChild() {
 }
 
 /** Renders the currently selected content. */
-export function Children(props: Omit<NavigatorProps, 'children'>) {
-    const context = React.useContext(NavigatorContext);
+export function Children(props: Omit<LayoutProps, 'children'>) {
+    const context = React.useContext(LayoutContext);
     if (!context) {
         // Qualify the content and re-export.
         return (
-            <Navigator {...props}>
+            <Layout {...props}>
                 <Children />
-            </Navigator>
+            </Layout>
         );
     }
 
     return useChild();
 }
 
-Navigator.Children = Children;
-Navigator.useContext = useNavigatorContext;
-Navigator.useClientSideEvent = useClientSideEvent;
+Layout.Children = Children;
+Layout.useContext = useLayoutContext;
+Layout.useClientSideEvent = useClientSideEvent;

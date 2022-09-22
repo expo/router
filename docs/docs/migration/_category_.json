@@ -1,0 +1,8 @@
+{
+  "label": "Migration",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Migrating existing concepts to the Expo router."
+  }
+}

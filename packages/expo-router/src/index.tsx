@@ -10,7 +10,7 @@ export { ExpoRoot } from "./views/Root";
 export { Unmatched } from "./views/Unmatched";
 export { ErrorBoundary } from "./views/ErrorBoundary";
 
-export { Navigator, Children } from "./Navigator";
+export { Layout, Children } from "./Navigator";
 export { Link } from "./views/Link";
-export { ContextContainer, useNavigationContainerContext } from "./ContextNavigationContainer";
-export { ScreenOptions } from './views/ScreenOptions';
+export { RootContainer, useNavigationContainerContext } from "./ContextNavigationContainer";
+export { LayoutOptions } from './views/LayoutOptions';
