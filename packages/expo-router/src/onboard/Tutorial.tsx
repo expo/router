@@ -73,7 +73,9 @@ export function Tutorial() {
 function Footer() {
     return (
         <View style={{ borderTopColor: '#BCC3CD', borderTopWidth: 1, paddingVertical: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <ExpoLogo />
+            <a href="https://github.com/expo/expo">
+                <ExpoLogo />
+            </a>
 
             <Text href={DOCS_URL} >
 
@@ -121,15 +123,17 @@ function Button() {
                     }
                 })
             }}>
-            {({ hovered }) => (
+            {({ pressed, hovered }) => (
 
                 <View style={[{
                     transitionDuration: '200ms',
                     backgroundColor: 'transparent', borderColor: 'white', borderWidth: 2, paddingVertical: 12, paddingHorizontal: 24,
                 }, hovered && {
                     backgroundColor: 'white'
+                }, pressed && {
+                    backgroundColor: 'rgba(255,255,255,0.7)'
                 }]}>
-                    <Text style={[{ fontSize: 18, transitionDuration: '200ms', fontWeight: 'bold', color: 'white' }, styles.code, hovered && { color: 'black' }]}>
+                    <Text selectable={false} style={[{ fontSize: 18, transitionDuration: '200ms', fontWeight: 'bold', color: 'white' }, styles.code, hovered && { color: 'black' }]}>
                         <Text style={{ opacity: 0.5 }}>$</Text> touch app/index.js
                     </Text>
                 </View>
