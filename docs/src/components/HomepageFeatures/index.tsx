@@ -14,34 +14,37 @@ const FeatureList: FeatureItem[] = [
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Expo router's File System-based routing system makes it easy
+        to develop and maintain complex applications with ease. Features like
+        deep linking and 404s are built-in automatically.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
+    title: 'Share Anywhere',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        By simply using Expo router, every part of your application is
+        automatically shareable with a native URI. You can link users to
+        the parts of your app that matter most.
       </>
     ),
   },
   {
-    title: 'Powered by React',
+    title: 'Powered by React Native',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Expo router is built on top of React Native, a library used to power
+        the largest apps from around the world: Facebook, Instagram, Coinbase,
+        Discord, Shopify, Tesla, Pintrest, Xbox, Playstation and many more.
       </>
     ),
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({ title, Svg, description }: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">

@@ -127,7 +127,7 @@ const config = {
                 href: "https://twitter.com/baconbrix",
               },
               {
-                label: "Work with me at Expo",
+                label: "Work with us at Expo",
                 href: "https://expo.dev/careers",
               },
             ],
