@@ -16,7 +16,7 @@ export function createEntryFileAsync() {
     method: "POST",
     body: JSON.stringify({
       contents: TEMPLATE,
-      path: "./app/index",
+      path: "./app/index.js",
     }),
   });
 }
