@@ -207,7 +207,6 @@ export default function getStateFromPath<ParamList extends {}>(
       return bParts.length - aParts.length;
     });
 
-  console.log("configs", configs);
   // Match full paths
 
   // Check for duplicate patterns in the config
@@ -337,7 +336,7 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
     if (match) {
       const matchedParams = config.pattern
         ?.split("/")
-        .filter((p) => p.startsWith(":"))
+        .filter((p) => p.startsWith(":") || p === "*")
         .reduce<Record<string, any>>(
           (acc, p, i) =>
             Object.assign(acc, {
@@ -351,7 +350,7 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
         const config = configs.find((c) => c.screen === name);
         const params = config?.path
           ?.split("/")
-          .filter((p) => p.startsWith(":"))
+          .filter((p) => p.startsWith(":") || p === "*")
           .reduce<Record<string, any>>((acc, p) => {
             const value = matchedParams[p];
 
