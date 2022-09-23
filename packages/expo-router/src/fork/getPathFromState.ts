@@ -187,7 +187,7 @@ export default function getPathFromState<ParamList extends {}>(
           // Showing the route name seems ok, though whatever we show here will be incorrect
           // Since the page doesn't actually exist
           if (p === "*") {
-            // This can occurr when a wildcard matches all routes and the given path was `/`.
+            // This can occur when a wildcard matches all routes and the given path was `/`.
             return route.path ?? "";
           }
 

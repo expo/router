@@ -31,6 +31,7 @@ type RouteConfig = {
   routeNames: string[];
   parse?: ParseConfig;
   hasChildren: boolean;
+  userReadableName: string;
 };
 
 type InitialRouteConfig = {
@@ -192,74 +193,60 @@ export default function getStateFromPath<ParamList extends {}>(
       return bParts.length - aParts.length;
     });
 
-  // TODO: Assert invalid paths accounting for fragment routes
-
   // Match full paths
 
   // Check for duplicate patterns in the config
-  //   configs.reduce<Record<string, RouteConfig>>((acc, config) => {
-  //     if (
-  //       acc[config.pattern] &&
-  //       !acc[config.pattern].hasChildren &&
-  //       !config.hasChildren
-  //     ) {
-  //       const a = acc[config.pattern].routeNames;
-  //       const b = config.routeNames;
+  configs.reduce<Record<string, RouteConfig>>((acc, config) => {
+    // NOTE(EvanBacon): Uses the regex pattern as key to detect duplicate slugs.
+    const indexedKey = config.regex?.toString() ?? config.pattern;
+    const alpha = acc[indexedKey];
+    // NOTE(EvanBacon): Skips checking nodes that have children.
+    if (alpha && !alpha.hasChildren && !config.hasChildren) {
+      const a = alpha.routeNames;
+      const b = config.routeNames;
 
-  //       // It's not a problem if the path string omitted from a inner most screen
-  //       // For example, it's ok if a path resolves to `A > B > C` or `A > B`
-  //       const intersects =
-  //         a.length > b.length
-  //           ? b.every((it, i) => a[i] === it)
-  //           : a.every((it, i) => b[i] === it);
+      // It's not a problem if the path string omitted from a inner most screen
+      // For example, it's ok if a path resolves to `A > B > C` or `A > B`
+      const intersects =
+        a.length > b.length
+          ? b.every((it, i) => a[i] === it)
+          : a.every((it, i) => b[i] === it);
 
-  //       if (!intersects) {
-  //         throw new Error(
-  //           `Found conflicting screens with the same pattern. The pattern '${
-  //             config.pattern
-  //           }' resolves to both '${a.join(" > ")}' and '${b.join(
-  //             " > "
-  //           )}'. Patterns must be unique and cannot resolve to more than one screen.`
-  //         );
-  //       }
-  //     }
+      if (!intersects) {
+        // NOTE(EvanBacon): Adds more context to the error message since we know about the
+        // file system-based routing.
+        const last = config.pattern.split("/").pop();
+        const routeType = last?.startsWith(":")
+          ? "dynamic route"
+          : last === "*"
+          ? "deep dynamic route"
+          : "route";
+        throw new Error(
+          `The ${routeType} pattern '${
+            config.pattern || "/"
+          }' resolves to both '${alpha.userReadableName}' and '${
+            config.userReadableName
+          }'. Patterns must be unique and cannot resolve to more than one route.`
+        );
+      }
+    }
 
-  //     return Object.assign(acc, {
-  //       [config.pattern]: config,
-  //     });
-  //   }, {});
+    return Object.assign(acc, {
+      [indexedKey]: config,
+    });
+  }, {});
 
   if (remaining === "/") {
     // We need to add special handling of empty path so navigation to empty path also works
     // When handling empty path, we should only look at the root level config
-    const match =
-      configs.find(
-        (config) =>
-          config.path === "" &&
-          config.routeNames.every(
-            // Make sure that none of the parent configs have a non-empty path defined
-            (name) => !configs.find((c) => c.screen === name)?.path
-          )
-      ) ??
-      // Search for slug matches
-      configs.find(
-        (config) =>
-          config.path.startsWith(":") &&
-          config.routeNames.every(
-            // Make sure that none of the parent configs have a non-empty path defined
-            (name) =>
-              configs.find((c) => c.screen === name)?.path.startsWith(":")
-          )
-      ) ??
-      // Search for wild card matches
-      configs.find(
-        (config) =>
-          config.path === "*" &&
-          config.routeNames.every(
-            // Make sure that none of the parent configs have a non-empty path defined
-            (name) => configs.find((c) => c.screen === name)?.path === "*"
-          )
-      );
+    const match = configs.find(
+      (config) =>
+        config.path === "" &&
+        config.routeNames.every(
+          // Make sure that none of the parent configs have a non-empty path defined
+          (name) => !configs.find((c) => c.screen === name)?.path
+        )
+    );
 
     if (match) {
       return createNestedStateObject(
@@ -479,6 +466,7 @@ const createConfigItem = (
     // The routeNames array is mutated, so copy it to keep the current state
     routeNames: [...routeNames],
     parse,
+    userReadableName: [...routeNames.slice(0, -1), path || screen].join("/"),
     hasChildren: !!hasChildren,
   };
 };
