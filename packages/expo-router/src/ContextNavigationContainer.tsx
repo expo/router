@@ -2,6 +2,8 @@ import { LinkingOptions, NavigationContainer } from "@react-navigation/native";
 import React, { useMemo, useCallback } from "react";
 import { useRoutesContext } from "./context";
 import { getLinkingConfig } from "./getLinkingConfig";
+import getStateFromPath from './fork/getStateFromPath'
+import getPathFromState from './fork/getPathFromState'
 
 type NavigationContainerProps = React.ComponentProps<
     typeof NavigationContainer
@@ -24,13 +26,14 @@ export function useNavigationContainerContext() {
     return context;
 }
 
+
 /** react-navigation `NavigationContainer` with automatic `linking` prop generated from the routes context. */
 export const ContextNavigationContainer = React.forwardRef(
     (props: NavigationContainerProps, ref: NavigationContainerProps["ref"]) => {
         const [state, setState] = React.useState<Partial<NavigationContainerProps>>({});
 
         const linking = useLinkingConfig();
-
+        console.log('linking', linking);
         const onReady = useCallback(() => {
             props.onReady?.();
             try {
@@ -46,6 +49,8 @@ export const ContextNavigationContainer = React.forwardRef(
                 {
                     ...props,
                     linking,
+                    getStateFromPath,
+                    getPathFromState,
                     onReady,
                     ...state,
                 },
@@ -63,7 +68,6 @@ const InternalContextNavigationContainer = React.forwardRef(
     (props: {}, ref: NavigationContainerProps["ref"]) => {
         const [contextProps] = useNavigationContainerContext();
         return (
-            // @ts-expect-error
             <NavigationContainer
                 ref={ref}
                 {...props}
