@@ -27,13 +27,13 @@
   },
   "peerDependencies": {
     "expo": "^46.0.2",
-    "react-native-gesture-handler": "^2.6.0",
-    "react-native-safe-area-context": "^4.3.3"
+    "metro": "~0.72.3"
   },
   "devDependencies": {
     "@radix-ui/react-slot": "^1.0.0",
     "expo-module-scripts": "^2.0.0",
-    "jest": "^26.6.3"
+    "jest": "^26.6.3",
+    "@types/jest": "^26"
   },
   "dependencies": {
     "@bacons/expo-metro-runtime": "^1.2.0",

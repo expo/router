@@ -19,14 +19,23 @@ type PickPartial<T, K extends keyof T> = Omit<T, K> &
     Partial<Pick<T, K>>;
 
 
-function useSortedChildren(children: Record<string, React.ReactNode>, order?: { name: string, options?: { [key: string]: any } }[]): React.ReactNode[] {
+    
+type ScreenProps<TOptions extends Record<string, any> = Record<string, any>> = { 
+    /** Name is required when used inside a Layout component. */
+    name?: string, 
+    initialParams?: { [key: string]: any }; 
+    options?: TOptions;
+}
+
+
+function useSortedChildren(children: Record<string, React.ReactNode>, order?: ScreenProps[]): React.ReactNode[] {
     return React.useMemo(() => {
         if (!order?.length) {
             return Object.values(children);
         }
         const entries = Object.entries(children);
 
-        const ordered = order.map(({ name, options }) => {
+        const ordered = order.map(({ name, initialParams, options }) => {
             const matchIndex = entries.findIndex((child) => child[0] === name)
             if (matchIndex === -1) {
                 console.warn(`[Layout children]: No route named "${name}" exists in nested children:`, Object.keys(children));
@@ -36,7 +45,7 @@ function useSortedChildren(children: Record<string, React.ReactNode>, order?: { 
                 const [, match] = entries[matchIndex];
                 entries.splice(matchIndex, 1);
                 // @ts-expect-error
-                return React.cloneElement(match, { options });
+                return React.cloneElement(match, { initialParams, options });
             }
         }).filter(Boolean)
 
@@ -51,10 +60,7 @@ function useSortedChildren(children: Record<string, React.ReactNode>, order?: { 
 /** Return a navigator that automatically injects matched routes and renders nothing when there are no children. Return type with children prop optional */
 function createWrappedNavigator<TOptions extends {}, T extends React.ComponentType<any>>(
     Nav: T): (React.ForwardRefExoticComponent<React.PropsWithoutRef<PickPartial<React.ComponentProps<T>, "children">> & React.RefAttributes<unknown>>) & {
-        Screen: (props: {
-            /** Name is required when used inside a Layout component. */
-            name?: string, options: TOptions
-        }) => null
+        Screen: (props: ScreenProps<TOptions>) => null
     } {
 
 

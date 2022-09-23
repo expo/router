@@ -5,12 +5,12 @@ import React from "react";
 export function Screen<TOptions extends {} = {}>({
     name,
     options
-}: { name?: string, options: TOptions }) {
+}: { name?: string, initialParams?: Record<string, any>; options?: TOptions }) {
     // TODO: Maybe disable all this hook stuff when name is defined.
     const navigation = useNavigation();
 
     React.useLayoutEffect(() => {
-        navigation.setOptions(options);
+        navigation.setOptions(options ?? {});
     }, [navigation, options]);
 
     if (process.env.NODE_ENV !== "production") {
