@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
 
-export default function Page() {
+export default function Page({ route }) {
     const [state, setState] = useState(0);
+    console.log('route', route)
     return (
         <View style={styles.container}>
             <View style={styles.main}>

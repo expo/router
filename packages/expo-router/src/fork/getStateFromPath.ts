@@ -334,9 +334,10 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
 
     // If our regex matches, we need to extract params from the path
     if (match) {
+      // TODO: Add support for wildcard routes
       const matchedParams = config.pattern
         ?.split("/")
-        .filter((p) => p.startsWith(":") || p === "*")
+        .filter((p) => p.startsWith(":"))
         .reduce<Record<string, any>>(
           (acc, p, i) =>
             Object.assign(acc, {
@@ -350,12 +351,13 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
         const config = configs.find((c) => c.screen === name);
         const params = config?.path
           ?.split("/")
-          .filter((p) => p.startsWith(":") || p === "*")
+          .filter((p) => p.startsWith(":"))
           .reduce<Record<string, any>>((acc, p) => {
-            const value = matchedParams[p];
+            const paramName = p;
+            const value = matchedParams[paramName];
 
             if (value) {
-              const key = p.replace(/^:/, "").replace(/\?$/, "");
+              const key = paramName.replace(/^:/, "").replace(/\?$/, "");
               acc[key] = config.parse?.[key] ? config.parse[key](value) : value;
             }
 
