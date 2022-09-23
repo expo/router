@@ -4,7 +4,7 @@ import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react
 import { createStackNavigator, StackNavigationOptions } from '@react-navigation/stack';
 import React from 'react';
 
-import { useScreensRecord } from './routes';
+import { useScreensRecord } from './useScreens';
 import { Screen } from './views/Screen';
 
 // TODO: Move to different files for babel tree shaking plugin.

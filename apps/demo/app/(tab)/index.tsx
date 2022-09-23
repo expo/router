@@ -5,14 +5,16 @@ export default function Page() {
     const [state, setState] = useState(0);
     return (
         <View style={styles.container}>
-
             <View style={styles.main}>
-                <Text onPress={() => {
-                    setState(state + 1)
-                }} style={styles.title}>Hello World</Text>
-                <Text style={styles.subtitle}>
-                    Index
+                <Text
+                    onPress={() => {
+                        setState(state + 1);
+                    }}
+                    style={styles.title}
+                >
+                    Hello World
                 </Text>
+                <Text style={styles.subtitle}>Index</Text>
             </View>
         </View>
     );

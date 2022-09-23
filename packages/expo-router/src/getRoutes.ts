@@ -1,64 +1,25 @@
-import * as Linking from "expo-linking";
-import { LinkingOptions, PathConfigMap } from "@react-navigation/native";
-
-import { getAllWebRedirects } from "./aasa";
 import {
+  getNameFromFilePath,
   matchDeepDynamicRouteName,
   matchDynamicName,
   matchFragmentName,
 } from "./matchers";
-import {
-  convertDynamicRouteToReactNavigation,
-  createRouteNode,
-  getNameFromFilePath,
-  RouteNode,
-} from "./routes";
-import { Children } from "./Navigator";
+import { PickPartial, RouteNode } from "./Route";
+import { RequireContext } from "./types";
+import { Children } from "./views/Layout";
 
-export function treeToReactNavigationLinkingRoutes(
-  nodes: RouteNode[],
-  parents: string[] = []
-): PathConfigMap<{}> {
-  // TODO: Intercept errors, strip invalid routes, and warn instead.
-  // Our warnings can be more helpful than upstream since we know the associated file name.
-  const firstPass = nodes
-    .map((node) => {
-      let path = convertDynamicRouteToReactNavigation(node.route);
-
-      return [
-        node.screenName,
-        {
-          path: path,
-          screens: node.children.length
-            ? treeToReactNavigationLinkingRoutes(node.children, [
-                ...parents,
-                path,
-              ])
-            : undefined,
-        },
-      ] as const;
-    })
-    .reduce<PathConfigMap<{}>>((acc, [screenName, current]) => {
-      acc[screenName] = current;
-      return acc;
-    }, {});
-
-  return firstPass;
+function getReactNavigationScreenName(name: string) {
+  return matchDeepDynamicRouteName(name) || matchDynamicName(name) || name;
 }
 
-export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<{}> {
+export function createRouteNode(
+  route: PickPartial<RouteNode, "screenName" | "dynamic" | "children">
+): RouteNode {
   return {
-    prefixes: [
-      /* your linking prefixes */
-      Linking.createURL("/"),
-
-      // This ensures that we can redirect correctly when the user comes from an associated domain
-      // i.e. iOS Safari banner.
-      ...getAllWebRedirects(),
-    ],
-    config: {
-      screens: treeToReactNavigationLinkingRoutes(routes),
-    },
+    screenName: getReactNavigationScreenName(route.route),
+    children: [],
+    dynamic: null,
+    ...route,
   };
 }
 
@@ -105,14 +66,15 @@ function convert(
   return toNodeArray(tree);
 }
 
-export function getRoutes(pages): RouteNode[] {
-  const names = pages
+/** Given a Metro context module, return an array of nested routes. */
+export function getRoutes(contextModule: RequireContext): RouteNode[] {
+  const names = contextModule
     .keys()
     .map((key) => {
       if (process.env.NODE_ENV === "development") {
         // In development, check if the file exports a default component
         // this helps keep things snappy when creating files. In production we load all screens lazily.
-        if (!pages(key)?.default) {
+        if (!contextModule(key)?.default) {
           return null;
         }
       }
@@ -120,11 +82,11 @@ export function getRoutes(pages): RouteNode[] {
       return {
         normalizedName: getNameFromFilePath(key),
         getComponent() {
-          return pages(key).default;
+          return contextModule(key).default;
         },
         contextKey: key,
         getExtras() {
-          const { default: mod, ...extras } = pages(key);
+          const { default: mod, ...extras } = contextModule(key);
           return extras;
         },
       };
@@ -136,25 +98,25 @@ export function getRoutes(pages): RouteNode[] {
   // Add all missing navigators
   recurseAndAddMissingNavigators(routes, []);
 
-  // Auto add not found route if it doesn't exist
-  appendUnmatchedRoute(routes);
-
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV !== "production") {
     appendDirectoryRoute(routes);
   }
+
+  // Auto add not found route if it doesn't exist
+  appendUnmatchedRoute(routes);
 
   return routes;
 }
 
 // When there's a directory, but no sibling file with the same name, the directory won't work.
 // This method ensures that we have a file for every directory (containing valid children).
-function recurseAndAddMissingNavigators(
+export function recurseAndAddMissingNavigators(
   routes: RouteNode[],
-  parents: RouteNode[]
+  parents: string[]
 ): RouteNode[] {
   routes.forEach((route) => {
     // Route has children but no component and no contextKey (meaning no file path).
-    if (route.children.length && !route.contextKey) {
+    if (route.children.length && route.contextKey == null) {
       route.getComponent = () => Children;
       route.generated = true;
       route.getExtras = () => ({});
@@ -166,7 +128,7 @@ function recurseAndAddMissingNavigators(
 
     route.children = recurseAndAddMissingNavigators(route.children, [
       ...parents,
-      route,
+      route.route,
     ]);
     return route;
   });
@@ -175,6 +137,9 @@ function recurseAndAddMissingNavigators(
 }
 
 function appendDirectoryRoute(routes: RouteNode[]) {
+  if (!routes.length) {
+    return routes;
+  }
   const { Directory, getNavOptions } = require("./views/Directory");
   routes.push(
     createRouteNode({
@@ -216,7 +181,13 @@ function appendUnmatchedRoute(routes: RouteNode[]) {
   return routes;
 }
 
-function getUserDefinedDeepDynamicRoute(routes: RouteNode[]): RouteNode | null {
+/**
+ * Exposed for testing.
+ * @returns a top-level deep dynamic route if it exists, otherwise null.
+ */
+export function getUserDefinedDeepDynamicRoute(
+  routes: RouteNode[]
+): RouteNode | null {
   // Auto add not found route if it doesn't exist
   for (const route of routes) {
     const isDeepDynamic = matchDeepDynamicRouteName(route.route);

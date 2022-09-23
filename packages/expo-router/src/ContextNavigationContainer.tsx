@@ -1,7 +1,7 @@
 import { LinkingOptions, NavigationContainer } from "@react-navigation/native";
 import React, { useMemo, useCallback } from "react";
 import { useRoutesContext } from "./context";
-import { getLinkingConfig } from "./getRoutes";
+import { getLinkingConfig } from "./getLinkingConfig";
 
 type NavigationContainerProps = React.ComponentProps<
     typeof NavigationContainer

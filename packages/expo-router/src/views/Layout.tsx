@@ -1,7 +1,7 @@
 import { TabRouter, useNavigationBuilder } from '@react-navigation/native';
 import * as React from 'react';
 
-import { useScreens } from './routes';
+import { useScreens } from '../useScreens';
 
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
 export const LayoutContext = React.createContext<any>(null);

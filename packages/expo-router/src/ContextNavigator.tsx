@@ -1,15 +1,15 @@
-import React, { useMemo } from "react";
+import React, { useMemo } from 'react';
 
-import { RoutesContext } from "./context";
-import { ContextNavigationContainer } from "./ContextNavigationContainer";
-import { getRoutes } from "./getRoutes";
-import { NativeStack } from "./navigation";
-import { AutoRoute } from "./routes";
+import { RoutesContext } from './context';
+import { ContextNavigationContainer } from './ContextNavigationContainer';
+import { getRoutes } from './getRoutes';
+import { NativeStack } from './navigation';
+import { Route } from './Route';
+import { RequireContext } from './types';
 
-// @ts-expect-error: welp
-type ContextModule = ReturnType<typeof require.context>;
 
-function useContextModuleAsRoutes(context: ContextModule) {
+function useContextModuleAsRoutes(context: RequireContext) {
+    // TODO: Is this an optimal hook dependency?
     return useMemo(() => getRoutes(context), [context]);
 }
 
@@ -17,7 +17,7 @@ function RoutesContextProvider({
     context,
     children,
 }: {
-    context: ContextModule;
+    context: RequireContext;
     children: React.ReactNode;
 }) {
     const routes = useContextModuleAsRoutes(context);
@@ -38,7 +38,7 @@ function isFunctionOrReactComponent(
 }
 
 /** Returns the Tutorial component if there are no React components exported as default from any files in the provided context module. */
-function useTutorial(context: ContextModule) {
+function useTutorial(context: RequireContext) {
     if (process.env.NODE_ENV === "production") {
         return null;
     }
@@ -62,7 +62,7 @@ function useTutorial(context: ContextModule) {
     return require("./onboard/Tutorial").Tutorial;
 }
 
-export function ContextNavigator({ context }: { context: ContextModule }) {
+export function ContextNavigator({ context }: { context: RequireContext }) {
     const Tutorial = useTutorial(context);
     if (Tutorial) {
         return <Tutorial />;
@@ -70,14 +70,14 @@ export function ContextNavigator({ context }: { context: ContextModule }) {
 
     return (
         <RoutesContextProvider context={context}>
-            <AutoRoute filename="./">
+            <Route filename="./">
                 <ContextNavigationContainer>
                     {/* Using a switch navigator at the root to host all pages. */}
                     <NativeStack
                         screenOptions={{ animation: "none", headerShown: false }}
                     />
                 </ContextNavigationContainer>
-            </AutoRoute>
+            </Route>
         </RoutesContextProvider>
     );
 }

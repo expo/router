@@ -13,3 +13,17 @@ export function matchDeepDynamicRouteName(name: string): string | undefined {
 export function matchFragmentName(name: string): string | undefined {
     return name.match(/^\(([^/]+?)\)$/)?.[1];
 }
+
+export function getNameFromFilePath(name: string): string {
+    return removeSupportedExtensions(removeFileSystemDots(name));
+}
+
+/** Remove `.js`, `.ts`, `.jsx`, `.tsx` */
+function removeSupportedExtensions(name: string): string {
+    return name.replace(/\.[jt]sx?$/g, "");
+}
+
+// Remove any amount of `./` and `../` from the start of the string
+function removeFileSystemDots(filePath: string): string {
+    return filePath.replace(/^(?:\.\.?\/)+/g, "");
+}

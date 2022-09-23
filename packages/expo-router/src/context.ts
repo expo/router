@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-import { RouteNode } from "./routes";
+import { RouteNode } from "./Route";
 
 // Routes context
 export const RoutesContext = createContext<RouteNode[]>([]);

@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useRoutesContext } from '../context';
 import { matchFragmentName } from '../matchers';
-import { RouteNode } from '../routes';
+import { RouteNode } from '../Route';
 import { Link } from './Link';
 
 export function getNavOptions(): NativeStackNavigationOptions {

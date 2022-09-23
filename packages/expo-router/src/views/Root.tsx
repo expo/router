@@ -1,17 +1,16 @@
 import "react-native-gesture-handler";
 
+import React from "react";
+
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from 'expo-status-bar';
 
-import React from "react";
-
 import { ContextNavigator } from '../ContextNavigator';
+import { RequireContext } from '../types';
 
-// @ts-expect-error: welp
-type ContextModule = ReturnType<typeof require.context>;
 
-export function ExpoRoot({ context }: { context: ContextModule }) {
+export function ExpoRoot({ context }: { context: RequireContext }) {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
