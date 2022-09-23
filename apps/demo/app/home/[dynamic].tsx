@@ -14,7 +14,7 @@ export default function Page() {
                 >
                     Hello World
                 </Text>
-                <Text style={styles.subtitle}>Index</Text>
+                <Text style={styles.subtitle}>{__filename}</Text>
             </View>
         </View>
     );
