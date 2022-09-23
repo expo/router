@@ -6,31 +6,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useRoutesContext } from '../context';
 import { matchFragmentName } from '../matchers';
+import { NativeStack } from '../navigation';
 import { RouteNode } from '../Route';
 import { Link } from './Link';
-
-export function getNavOptions(): NativeStackNavigationOptions {
-    return {
-        title: "Index",
-        headerShown: true,
-        presentation: "modal",
-        animation: "default",
-        headerLargeTitle: true,
-        headerTitleStyle: {
-            color: "white",
-        },
-
-        headerTintColor: "white",
-        headerLargeTitleStyle: {
-            color: "white",
-        },
-        headerStyle: {
-            backgroundColor: "black",
-            // @ts-expect-error: mistyped
-            borderBottomColor: gray,
-        },
-    };
-}
 
 export function Directory() {
     const ctx = useRoutesContext();
@@ -62,6 +40,26 @@ export function Directory() {
                 alignItems: "stretch",
             }}
         >
+            <NativeStack.Screen options={{
+                title: "Index",
+                headerShown: true,
+                presentation: "modal",
+                animation: "default",
+                headerLargeTitle: true,
+                headerTitleStyle: {
+                    color: "white",
+                },
+
+                headerTintColor: "white",
+                headerLargeTitleStyle: {
+                    color: "white",
+                },
+                headerStyle: {
+                    backgroundColor: "black",
+                    // @ts-expect-error: mistyped
+                    borderBottomColor: '#323232',
+                },
+            }} />
             <StatusBar barStyle="light-content" />
             <View
                 style={{
@@ -87,7 +85,7 @@ export function Directory() {
                             key={child.contextKey}
                             style={{
                                 borderWidth: 1,
-                                borderColor: gray,
+                                borderColor: '#323232',
                                 borderRadius: 19,
                                 marginBottom: 12,
                                 overflow: "hidden",
@@ -103,8 +101,6 @@ export function Directory() {
 }
 
 const INDENT = 18;
-
-const gray = `rgba(50,50,50,1)`;
 
 function FileItem({
     route,
@@ -149,7 +145,7 @@ function FileItem({
                                     transitionDuration: '100ms',
                                     backgroundColor: hovered ? "rgba(255,255,255,0.1)" : "transparent",
                                 },
-                                pressed && { backgroundColor: gray },
+                                pressed && { backgroundColor: '#323232' },
                                 disabled && { opacity: 0.4 },
                             ]}
                         >

@@ -140,14 +140,14 @@ function appendDirectoryRoute(routes: RouteNode[]) {
   if (!routes.length) {
     return routes;
   }
-  const { Directory, getNavOptions } = require("./views/Directory");
+  const { Directory } = require("./views/Directory");
   routes.push(
     createRouteNode({
       getComponent() {
         return Directory;
       },
       getExtras() {
-        return { getNavOptions };
+        return {};
       },
       route: "__index",
       contextKey: "./__index.tsx",

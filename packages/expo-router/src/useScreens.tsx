@@ -88,13 +88,6 @@ function getQualifiedRouteComponent(value: RouteNode) {
 function routeToScreen(route: RouteNode) {
     return (
         <Screen
-            options={(props) => {
-                const extras = route.getExtras?.();
-                if (typeof extras?.getNavOptions === "function") {
-                    return extras.getNavOptions(props);
-                }
-                return extras?.getNavOptions;
-            }}
             name={route.screenName}
             key={route.route}
             component={getQualifiedRouteComponent(route)}

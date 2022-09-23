@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
         fontSize: 36,
         paddingBottom: 12,
         marginBottom: 12,
-        borderBottomColor: "rgba(255,255,255,0.4)",
+        borderBottomColor: "#323232",
         borderBottomWidth: 1,
         textAlign: "center",
         fontWeight: "bold",
