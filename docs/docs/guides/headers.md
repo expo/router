@@ -32,7 +32,7 @@ export default function Layout() {
 ```
 
 ```js title=app/(stack)/home.js
-import { Link, LayoutOptions } from "expo-router";
+import { Link, Stack } from "expo-router";
 import { Image, Text, View } from "react-native";
 
 function LogoTitle() {
@@ -47,17 +47,19 @@ function LogoTitle() {
 export default function Home() {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <LayoutOptions
-        // https://reactnavigation.org/docs/headers#setting-the-header-title
-        title="My home"
-        // https://reactnavigation.org/docs/headers#adjusting-header-styles
-        headerStyle={{ backgroundColor: "#f4511e" }}
-        headerTintColor="#fff"
-        headerTitleStyle={{
-          fontWeight: "bold",
+      <Stack.Screen
+        options={{
+          // https://reactnavigation.org/docs/headers#setting-the-header-title
+          title: "My home",
+          // https://reactnavigation.org/docs/headers#adjusting-header-styles
+          headerStyle: { backgroundColor: "#f4511e" },
+          headerTintColor: "#fff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
+          // https://reactnavigation.org/docs/headers#replacing-the-title-with-a-custom-component
+          headerTitle: (props) => <LogoTitle {...props} />,
         }}
-        // https://reactnavigation.org/docs/headers#replacing-the-title-with-a-custom-component
-        headerTitle={(props) => <LogoTitle {...props} />}
       />
 
       <Text>Home Screen</Text>
@@ -72,13 +74,17 @@ export default function Home() {
 
 ```js title=app/(stack)/details.tsx
 import { View, Text } from "react-native";
-import { LayoutOptions } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function Details({ navigation, route }) {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       {/* NOTE(EvanBacon): Preferred way to use route to update navigation options. */}
-      <LayoutOptions title={route?.params?.name} />
+      <Stack.Screen
+        option={{
+          title: route?.params?.name,
+        }}
+      />
       <Text
         onPress={() => {
           navigation.setParams({ name: "Updated" });
@@ -87,34 +93,6 @@ export default function Details({ navigation, route }) {
         Update the title
       </Text>
     </View>
-  );
-}
-```
-
-## Notes
-
-- Prefers a `<Header />` component in the `app/index.js` file:
-
-```tsx
-// app/(stack).js
-import {
-  // NOTE(EvanBacon): New API
-  Stack,
-} from "expo-router";
-
-export default function Layout() {
-  const route = useRoute();
-  return (
-    <Stack>
-      {/* mode="screen" would clone this component into a wrapper for all screens. */}
-      <Stack.Header tintColor="#fff" style={{ backgroundColor: "#f4511e" }}>
-        <Stack.Header.Title
-          style={{ fontWeight: "bold" }}
-          {/* Could use context to populate some default values. */}
-          title={route === "home" ? "Home" : "Details"}
-        />
-      </Stack.Header>
-    </Stack>
   );
 }
 ```

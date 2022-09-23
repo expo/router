@@ -1,4 +1,4 @@
-import { TabActions, TabRouter, useNavigationBuilder } from '@react-navigation/native';
+import { TabRouter, useNavigationBuilder } from '@react-navigation/native';
 import * as React from 'react';
 
 import { useScreens } from './routes';
@@ -40,40 +40,6 @@ export function Layout({
     );
 }
 
-// TODO: Support all routers and document
-function useClientSideEvent(to) {
-    const { navigation, state, router } = useLayoutContext();
-
-    const routeKey = React.useMemo(() => {
-        const route = state.routes.find((route) => route.name === to);
-        if (process.env.NODE_ENV === 'development' && !route) {
-            throw new Error(`No route with name "${to}" found. Options are: ${state.routes.map((route) => route.name).join(", ")}`);
-        }
-        return route.key;
-    }, [to]);
-
-    const onPress = React.useCallback(() => {
-        if (router === TabRouter) {
-            const event = navigation.emit({
-                type: "tabPress",
-                target: routeKey,
-                canPreventDefault: true,
-            });
-
-            if (!event.defaultPrevented) {
-                navigation.dispatch({
-                    ...TabActions.jumpTo(to),
-                    target: state.key,
-                });
-            }
-        } else {
-            throw new Error(`router is not supported: ${router}`);
-        }
-    }, [to, routeKey, router, state, navigation]);
-
-    return onPress;
-}
-
 export function useLayoutContext() {
     const context = React.useContext(LayoutContext);
     if (!context) {
@@ -112,4 +78,3 @@ export function Children(props: Omit<LayoutProps, 'children'>) {
 
 Layout.Children = Children;
 Layout.useContext = useLayoutContext;
-Layout.useClientSideEvent = useClientSideEvent;

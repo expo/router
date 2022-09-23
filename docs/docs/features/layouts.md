@@ -72,21 +72,6 @@ import { Tabs } from "expo-router";
 export default Tabs;
 ```
 
-## Ordering screens
-
-> This API is subject to breaking changes!
-
-Some layouts like tabs and drawers have a concept of order. You can specify the order of screens in the layout by using the `order` prop.
-
-```tsx
-import { Tabs } from "expo-router";
-
-export default function Layout() {
-  // File names:
-  return <Tabs order={["home", "profile", "settings"]} />;
-}
-```
-
 ## Custom
 
 Custom layouts have an internal context that is ignored when using the `<Children />` component without a `<Layout />` component wrapping it.

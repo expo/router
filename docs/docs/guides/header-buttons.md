@@ -33,7 +33,7 @@ export default function Layout() {
 ```js title=app/(stack)/home.js
 import { useLayoutEffect } from "react";
 import { View, Button, Text, Image } from "react-native";
-import { LayoutOptions } from "expo-router";
+import { Stack } from "expo-router";
 
 function LogoTitle() {
   return (
@@ -50,51 +50,19 @@ export default function Home() {
   return (
     // https://reactnavigation.org/docs/header-buttons#header-interaction-with-its-screen-component
     <>
-      <LayoutOptions
-        headerTitle={(props) => <LogoTitle {...props} />}
-        headerRight={() => (
-          <Button onPress={() => setCount((c) => c + 1)} title="Update count" />
-        )}
+      <Stack.Screen
+        options={{
+          headerTitle: (props) => <LogoTitle {...props} />,
+          headerRight: () => (
+            <Button
+              onPress={() => setCount((c) => c + 1)}
+              title="Update count"
+            />
+          ),
+        }}
       />
       <Text>Count: {count}</Text>
     </>
   );
 }
 ```
-
-## Notes
-
-- Prefers a `<Header.Item />` component in the `app/(stack).js` file:
-
-```js title=app/(stack).js
-import {
-  // NOTE(EvanBacon): New API
-  Stack,
-} from "@react-navigation/stack";
-import { Button } from "react-native";
-
-export default function App() {
-  return (
-    <Stack>
-      {/* mode="screen" would clone this component into a wrapper for all screens. */}
-      <Stack.Header tintColor="#fff" style={{ backgroundColor: "#f4511e" }}>
-        <Stack.Header.Title />
-        {/* Chooses the side (leading/trailing to support i18n). */}
-        <Stack.Header.Item position="trailing">
-          {/* Render child component. */}
-          <Button
-            onPress={() => alert("This is a button!")}
-            title="Info"
-            color="#fff"
-          />
-        </Stack.Header.Item>
-      </Stack.Header>
-
-      {/* Auto populated. */}
-      <Stack.Content />
-    </Stack>
-  );
-}
-```
-
-- [overriding the back button](https://reactnavigation.org/docs/header-buttons#overriding-the-back-button): add to navigator.

@@ -2,7 +2,7 @@
 title: From React Navigation
 ---
 
-Prefer using index routes to setting `initialRouteName` in the navigator. Also prefer using `order={['...']}` to `initialRouteName` as this is more flexible across navigators.
+Prefer using index routes to setting `initialRouteName` in the navigator.
 
 Use lowercase route names to be more consistent with the web: `Home` -> `home`.
 
@@ -51,15 +51,15 @@ Use `Link` from `expo-router` as this provides child context.
 
 > Think of this component like a `<head />` component from web frameworks.
 
-Use `<LayoutOptions />` in your screens to keep configuration in a single file. We don't currently bundle split as Metro doesn't support this yet, but we will in the future and self-contained configuration will lead to faster app startup.
+Use `<[Layout].Screen />` in your screens to keep configuration in a single file. We don't currently bundle split as Metro doesn't support this yet, but we will in the future and self-contained configuration will lead to faster app startup.
 
 ```tsx
-import { LayoutOptions } from "expo-router";
+import { Tabs } from "expo-router";
 
 export default function Home() {
   return (
     <View>
-      <LayoutOptions title="Home" />
+      <Tabs.Screen option={{ title: "Home" }} />
     </View>
   );
 }

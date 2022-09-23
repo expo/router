@@ -12,7 +12,7 @@ app/
 import { Stack } from "expo-router";
 
 export default function App() {
-  return <Stack order={["index"]} />;
+  return <Stack initialRouteName="index" />;
 }
 ```
 
