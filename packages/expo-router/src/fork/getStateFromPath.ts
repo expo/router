@@ -140,16 +140,30 @@ export default function getStateFromPath<ParamList extends {}>(
 
       // If one of the patterns starts with the other, it's more exhaustive
       // So move it up
-      if (a.pattern.startsWith(b.pattern)) {
+      if (
+        a.pattern.startsWith(b.pattern) &&
+        // NOTE(EvanBacon): This is a hack to make sure that `*` is always at the end
+        b.screen !== "index"
+      ) {
         return -1;
       }
 
-      if (b.pattern.startsWith(a.pattern)) {
+      if (b.pattern.startsWith(a.pattern) && a.screen !== "index") {
         return 1;
       }
 
+      // NOTE(EvanBacon): Here we append `index` if the screen was `index` so the length is the same
+      // as a slug or wildcard when nested more than one level deep.
+      // This is so we can compare the length of the pattern, e.g. `foo/*` > `foo` vs `*` < ``.
       const aParts = a.pattern.split("/");
+      if (a.screen === "index") {
+        aParts.push("index");
+      }
+
       const bParts = b.pattern.split("/");
+      if (b.screen === "index") {
+        bParts.push("index");
+      }
 
       for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
         // if b is longer, b get higher priority
@@ -193,6 +207,7 @@ export default function getStateFromPath<ParamList extends {}>(
       return bParts.length - aParts.length;
     });
 
+  console.log("configs", configs);
   // Match full paths
 
   // Check for duplicate patterns in the config
@@ -239,14 +254,26 @@ export default function getStateFromPath<ParamList extends {}>(
   if (remaining === "/") {
     // We need to add special handling of empty path so navigation to empty path also works
     // When handling empty path, we should only look at the root level config
-    const match = configs.find(
-      (config) =>
-        config.path === "" &&
-        config.routeNames.every(
-          // Make sure that none of the parent configs have a non-empty path defined
-          (name) => !configs.find((c) => c.screen === name)?.path
-        )
-    );
+
+    // NOTE(EvanBacon): We only care about matching leaf nodes.
+    const leafNodes = configs.filter((config) => !config.hasChildren);
+
+    const match =
+      leafNodes.find(
+        (config) =>
+          // NOTE(EvanBacon): Test leaf node index routes that either don't have a regex or match an empty string.
+          config.path === "" && (!config.regex || config.regex.test(""))
+      ) ??
+      leafNodes.find(
+        (config) =>
+          // NOTE(EvanBacon): Test leaf node dynamic routes that match an empty string.
+          config.path.startsWith(":") && config.regex!.test("")
+      ) ??
+      // NOTE(EvanBacon): Test leaf node deep dynamic routes that match a slash.
+      // This should be done last to enable dynamic routes having a higher priority.
+      leafNodes.find(
+        (config) => config.path === "*" && config.regex!.test("/")
+      );
 
     if (match) {
       return createNestedStateObject(
