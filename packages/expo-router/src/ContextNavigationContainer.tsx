@@ -2,8 +2,6 @@ import { LinkingOptions, NavigationContainer } from "@react-navigation/native";
 import React, { useMemo, useCallback } from "react";
 import { useRoutesContext } from "./context";
 import { getLinkingConfig } from "./getLinkingConfig";
-import getStateFromPath from './fork/getStateFromPath'
-import getPathFromState from './fork/getPathFromState'
 
 type NavigationContainerProps = React.ComponentProps<
     typeof NavigationContainer
@@ -49,8 +47,6 @@ export const ContextNavigationContainer = React.forwardRef(
                 {
                     ...props,
                     linking,
-                    getStateFromPath,
-                    getPathFromState,
                     onReady,
                     ...state,
                 },

@@ -2,6 +2,8 @@ import { LinkingOptions, PathConfigMap } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 
 import { getAllWebRedirects } from "./aasa";
+import getPathFromState from "./fork/getPathFromState";
+import getStateFromPath from "./fork/getStateFromPath";
 import {
   matchDeepDynamicRouteName,
   matchDynamicName,
@@ -72,5 +74,7 @@ export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<{}> {
     config: {
       screens: treeToReactNavigationLinkingRoutes(routes),
     },
+    getStateFromPath,
+    getPathFromState,
   };
 }
