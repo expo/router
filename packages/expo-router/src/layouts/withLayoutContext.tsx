@@ -1,32 +1,17 @@
-import { createBottomTabNavigator, BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator, DrawerNavigationOptions } from '@react-navigation/drawer';
-import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react-navigation/native-stack';
-import { createStackNavigator, StackNavigationOptions } from '@react-navigation/stack';
 import React from 'react';
 
-import { useScreensRecord } from './useScreens';
-import { Screen } from './views/Screen';
-
-// TODO: Move to different files for babel tree shaking plugin.
-
-// This is the only way to access the navigator.
-const BottomTabNavigatorUpstream = createBottomTabNavigator().Navigator;
-const StackNavigatorUpstream = createStackNavigator().Navigator;
-const NativeStackNavigatorUpstream = createNativeStackNavigator().Navigator;
-const DrawerNavigatorUpstream = createDrawerNavigator().Navigator;
+import { useScreensRecord } from '../useScreens';
+import { Screen } from '../views/Screen';
 
 type PickPartial<T, K extends keyof T> = Omit<T, K> &
     Partial<Pick<T, K>>;
 
-
-    
-type ScreenProps<TOptions extends Record<string, any> = Record<string, any>> = { 
+type ScreenProps<TOptions extends Record<string, any> = Record<string, any>> = {
     /** Name is required when used inside a Layout component. */
-    name?: string, 
-    initialParams?: { [key: string]: any }; 
+    name?: string,
+    initialParams?: { [key: string]: any };
     options?: TOptions;
 }
-
 
 function useSortedChildren(children: Record<string, React.ReactNode>, order?: ScreenProps[]): React.ReactNode[] {
     return React.useMemo(() => {
@@ -58,7 +43,7 @@ function useSortedChildren(children: Record<string, React.ReactNode>, order?: Sc
 }
 
 /** Return a navigator that automatically injects matched routes and renders nothing when there are no children. Return type with children prop optional */
-function createWrappedNavigator<TOptions extends {}, T extends React.ComponentType<any>>(
+export function withLayoutContext<TOptions extends {}, T extends React.ComponentType<any>>(
     Nav: T): (React.ForwardRefExoticComponent<React.PropsWithoutRef<PickPartial<React.ComponentProps<T>, "children">> & React.RefAttributes<unknown>>) & {
         Screen: (props: ScreenProps<TOptions>) => null
     } {
@@ -111,11 +96,3 @@ function createWrappedNavigator<TOptions extends {}, T extends React.ComponentTy
     // @ts-expect-error
     return Navigator;
 }
-
-export const Tabs = createWrappedNavigator<BottomTabNavigationOptions, typeof BottomTabNavigatorUpstream>(BottomTabNavigatorUpstream);
-export const Stack = createWrappedNavigator<StackNavigationOptions, typeof StackNavigatorUpstream>(StackNavigatorUpstream);
-export const NativeStack = createWrappedNavigator<NativeStackNavigationOptions, typeof NativeStackNavigatorUpstream>(NativeStackNavigatorUpstream);
-export const Drawer = createWrappedNavigator<DrawerNavigationOptions, typeof DrawerNavigatorUpstream>(DrawerNavigatorUpstream);
-
-
-

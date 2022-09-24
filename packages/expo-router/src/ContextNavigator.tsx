@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { RoutesContext } from './context';
 import { ContextNavigationContainer } from './ContextNavigationContainer';
 import { getRoutes } from './getRoutes';
-import { NativeStack } from './navigation';
+import { NativeStack } from './layouts/NativeStack';
 import { Route } from './Route';
 import { RequireContext } from './types';
 

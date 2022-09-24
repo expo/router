@@ -55,15 +55,15 @@ function getQualifiedRouteComponent(value: RouteNode) {
     const QualifiedRoute = React.forwardRef(
         (props: { route: any; navigation: any }, ref: any) => {
             // Surface dynamic name as props to the view
-            const [dynamicKey, dynamicValue] = React.useMemo(
-                () => getDynamicProps(props.route?.path),
-                [props.route?.path]
-            );
+            // const [dynamicKey, dynamicValue] = React.useMemo(
+            //     () => getDynamicProps(props.route?.path),
+            //     [props.route?.path]
+            // );
 
             const children = React.createElement(Component, {
                 ...props,
                 ref,
-                [dynamicKey]: dynamicValue,
+                // [dynamicKey]: dynamicValue,
             });
 
             const errorBoundary = ErrorBoundary ? (

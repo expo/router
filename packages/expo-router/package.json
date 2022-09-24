@@ -36,7 +36,6 @@
     "@types/jest": "^26"
   },
   "dependencies": {
-    "@bacons/expo-metro-runtime": "^1.2.0",
     "@bacons/react-views": "^1.0.6",
     "@radix-ui/react-slot": "^1.0.0",
     "@react-navigation/bottom-tabs": "^6.3.3",
