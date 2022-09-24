@@ -1,3 +1,8 @@
+---
+title: Configuring the header bar
+sidebar_position: 5
+---
+
 Ports https://reactnavigation.org/docs/headers
 
 ```

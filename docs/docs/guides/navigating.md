@@ -1,3 +1,8 @@
+---
+title: Moving between screens
+sidebar_position: 3
+---
+
 Ports https://reactnavigation.org/docs/navigating
 
 ```

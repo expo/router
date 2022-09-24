@@ -1,3 +1,8 @@
+---
+title: Header buttons
+sidebar_position: 6
+---
+
 Ports https://reactnavigation.org/docs/header-buttons
 
 ```

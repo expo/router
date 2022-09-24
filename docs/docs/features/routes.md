@@ -3,9 +3,9 @@ title: Routes
 sidebar_position: 1
 ---
 
-:::note Request for Comments
+:::warning Beta Release
 
-This convention is still a work-in-progress and subject to breaking changes! Please [contribute to the discussion](https://github.com/expo/router/discussions/1) if you have any ideas or suggestions on how we can improve the convention.
+Expo Router is in the earliest stage of development. The API is subject to breaking changes. The documentation is incomplete and may be inaccurate. The project is not yet ready for production use. Please [contribute to the discussion](https://github.com/expo/router/discussions/1) if you have any ideas or suggestions on how we can improve the convention.
 
 :::
 

@@ -1,3 +1,8 @@
+---
+title: Passing parameters to the routes
+sidebar_position: 4
+---
+
 Ports https://reactnavigation.org/docs/params
 
 ```
