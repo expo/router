@@ -8,8 +8,8 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "Expo Router",
   tagline: "File-based routing for native apps",
-  url: "https://your-docusaurus-test-site.com",
-  baseUrl: "/",
+  url: "https://expo.github.io",
+  baseUrl: "/router",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",

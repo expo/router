@@ -93,6 +93,7 @@ export function getRoutes(contextModule: RequireContext): RouteNode[] {
     })
     .filter((node) => node);
 
+  // @ts-expect-error
   const routes = convert(names);
 
   // Add all missing navigators

@@ -1,6 +1,7 @@
 import { registerRootComponent } from "expo";
 import { ExpoRoot } from "expo-router";
 import { View, Platform } from "react-native";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 
 // Must be exported or Fast Refresh won't update the context >:[
 export function App() {
@@ -53,10 +54,13 @@ function convertError(error) {
 }
 
 function preventAutoHide() {
-  try {
-    // Automatically handle hiding the splash screen if expo-splash-screen is installed.
-    return require("expo-splash-screen").preventAutoHideAsync();
-  } catch {}
+  // Not applicable to Expo Go.
+  if (Constants.executionEnvironment !== ExecutionEnvironment.StoreClient) {
+    try {
+      // Automatically handle hiding the splash screen if expo-splash-screen is installed.
+      return require("expo-splash-screen").preventAutoHideAsync();
+    } catch {}
+  }
 }
 
 function hideSplash() {
@@ -68,6 +72,7 @@ function hideSplash() {
 (() => {
   try {
     preventAutoHide();
+
     registerRootComponent(App);
   } catch (e) {
     // Hide the splash screen if there was an error so the user can see it.

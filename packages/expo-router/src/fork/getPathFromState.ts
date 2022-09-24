@@ -11,7 +11,7 @@ import {
   PathConfigMap,
 } from "@react-navigation/core";
 
-type Options<ParamList> = {
+type Options<ParamList extends {}> = {
   initialRouteName?: string;
   screens: PathConfigMap<ParamList>;
 };

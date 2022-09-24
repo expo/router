@@ -24,6 +24,13 @@ export function useNavigationContainerContext() {
     return context;
 }
 
+let hideAsync: () => Promise<boolean> | undefined;
+try {
+    hideAsync =
+        (require("expo-splash-screen") as typeof import("expo-splash-screen")).hideAsync;
+    // Automatically handle hiding the splash screen if expo-splash-screen is installed.
+} catch { }
+
 
 /** react-navigation `NavigationContainer` with automatic `linking` prop generated from the routes context. */
 export const ContextNavigationContainer = React.forwardRef(
@@ -34,12 +41,9 @@ export const ContextNavigationContainer = React.forwardRef(
         console.log('linking', linking);
         const onReady = useCallback(() => {
             props.onReady?.();
-            try {
-                const { hideAsync } =
-                    require("expo-splash-screen") as typeof import("expo-splash-screen");
-                // Automatically handle hiding the splash screen if expo-splash-screen is installed.
+            if (hideAsync) {
                 hideAsync();
-            } catch { }
+            }
         }, [props.onReady]);
 
         return (
@@ -64,6 +68,7 @@ const InternalContextNavigationContainer = React.forwardRef(
     (props: {}, ref: NavigationContainerProps["ref"]) => {
         const [contextProps] = useNavigationContainerContext();
         return (
+            // @ts-expect-error: children are required
             <NavigationContainer
                 ref={ref}
                 {...props}

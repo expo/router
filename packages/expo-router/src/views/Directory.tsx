@@ -155,6 +155,7 @@ function FileItem({
 
     return (
         <>
+            {/* @ts-expect-error: disabled not on type */}
             <Link href={href} disabled={disabled} asChild>
                 <Pressable>
                     {({ pressed, hovered }) => (
