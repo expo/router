@@ -30,6 +30,8 @@ function Header() {
     );
 }
 
+const canAutoTouchFile = process.env.EXPO_ROUTER_APP_ROOT != null;
+
 export function Tutorial() {
     React.useEffect(() => {
         // Reset the route on web so the initial route isn't a 404 after
@@ -77,7 +79,7 @@ export function Tutorial() {
                         <Text style={{ fontWeight: "bold" }}>app</Text> directory{"\n"}that
                         exports a React component.
                     </Text>
-                    <Button />
+                    {canAutoTouchFile && <Button />}
                 </View>
             </SafeAreaView>
         </View>

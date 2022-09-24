@@ -70,7 +70,9 @@ module.exports = function (api) {
           return;
         }
 
-        parent.replaceWith(t.stringLiteral(process.env.EXPO_ROUTER_APP_ROOT));
+        if (process.env.EXPO_ROUTER_APP_ROOT != null) {
+          parent.replaceWith(t.stringLiteral(process.env.EXPO_ROUTER_APP_ROOT));
+        }
       },
     },
   };

@@ -1,6 +1,6 @@
 {
   "name": "expo-router",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "main": "build/index.js",
   "files": [
     "entry.js",
@@ -9,6 +9,11 @@
     "assets",
     "metro-config.js"
   ],
+  "repository": {
+    "url": "https://github.com/expo/router.git",
+    "type": "git",
+    "directory": "packages/expo-router"
+  },
   "scripts": {
     "build": "expo-module build",
     "clean": "expo-module clean",
