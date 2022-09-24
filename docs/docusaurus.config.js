@@ -9,7 +9,7 @@ const config = {
   title: "Expo Router",
   tagline: "File-based routing for native apps",
   url: "https://expo.github.io",
-  baseUrl: "/router",
+  baseUrl: "/router/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
