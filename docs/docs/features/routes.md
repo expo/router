@@ -3,7 +3,11 @@ title: Routes
 sidebar_position: 1
 ---
 
-# Routing convention
+:::note Request for Comments
+
+This convention is still a work-in-progress and subject to breaking changes! Please [contribute to the discussion](https://github.com/expo/router/discussions/1) if you have any ideas or suggestions on how we can improve the convention.
+
+:::
 
 The file system-based routing convention enables developers to structure their app in a logic and intuitive way. Expo router uses this convention to optimize the app by generating native deep links and web routes automatically.
 
