@@ -27,7 +27,9 @@
   },
   "peerDependencies": {
     "expo": "^46.0.2",
-    "metro": "~0.72.3"
+    "metro": "~0.72.3",
+    "expo-splash-screen": "^0.16.2",
+    "react-native-gesture-handler": "~2.5.0"
   },
   "devDependencies": {
     "@radix-ui/react-slot": "^1.0.0",
@@ -44,7 +46,6 @@
     "@react-navigation/native-stack": "^6.8.0",
     "@react-navigation/stack": "^6.2.3",
     "expo-linking": "^3.2.2",
-    "expo-splash-screen": "^0.16.2",
     "expo-status-bar": "^1.4.0",
     "react-native-gesture-handler": "~2.5.0",
     "react-native-reanimated": "~2.9.1",

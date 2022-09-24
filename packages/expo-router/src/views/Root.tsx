@@ -1,16 +1,22 @@
-import "react-native-gesture-handler";
-
 import React from "react";
 
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from 'expo-status-bar';
 
 import { ContextNavigator } from '../ContextNavigator';
 import { RequireContext } from '../types';
 
+function getGestureHandlerRootView() {
+    try {
+        return require("react-native-gesture-handler").GestureHandlerRootView as typeof import('react-native-gesture-handler').GestureHandlerRootView;
+    } catch {
+        return React.Fragment;
+    }
+}
 
 export function ExpoRoot({ context }: { context: RequireContext }) {
+    const GestureHandlerRootView = React.useMemo(() => getGestureHandlerRootView(), []);
+
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaProvider>
