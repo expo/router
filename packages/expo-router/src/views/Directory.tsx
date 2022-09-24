@@ -1,10 +1,10 @@
 import { Image, Pressable, StyleSheet, Text, View } from "@bacons/react-views";
+import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import React from "react";
 import { ScrollView, StatusBar, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useRoutesContext } from "../context";
-import { NativeStack } from "../layouts/NativeStack";
 import { matchFragmentName } from "../matchers";
 import { RouteNode } from "../Route";
 import { Link } from "./Link";
@@ -71,34 +71,36 @@ const styles = StyleSheet.create({
     image: { width: 24, height: 24, resizeMode: "contain" },
 });
 
+export function getNavOptions(): NativeStackNavigationOptions {
+    return {
+        title: "Index",
+        headerShown: true,
+        presentation: "modal",
+        animation: "default",
+        headerLargeTitle: true,
+        headerTitleStyle: {
+            color: "white",
+        },
+
+        headerTintColor: "white",
+        headerLargeTitleStyle: {
+            color: "white",
+        },
+        headerStyle: {
+            backgroundColor: "black",
+            // @ts-expect-error: mistyped
+            borderBottomColor: "#323232",
+        },
+    }
+}
+
 export function Directory() {
     const routes = useSortedRoutes();
     const { bottom } = useSafeAreaInsets();
     const { width } = useWindowDimensions();
     return (
         <View style={styles.container}>
-            <NativeStack.Screen
-                options={{
-                    title: "Index",
-                    headerShown: true,
-                    presentation: "modal",
-                    animation: "default",
-                    headerLargeTitle: true,
-                    headerTitleStyle: {
-                        color: "white",
-                    },
 
-                    headerTintColor: "white",
-                    headerLargeTitleStyle: {
-                        color: "white",
-                    },
-                    headerStyle: {
-                        backgroundColor: "black",
-                        // @ts-expect-error: mistyped
-                        borderBottomColor: "#323232",
-                    },
-                }}
-            />
             <StatusBar barStyle="light-content" />
             <View
                 style={[

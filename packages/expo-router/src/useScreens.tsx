@@ -4,19 +4,6 @@ import { Screen } from './primitives';
 import { Route, RouteNode, useRoutes } from './Route';
 import { Try } from './views/Try';
 
-function formatDynamicProps(
-    path: string,
-    dynamic: { name: string; deep: boolean }
-): [string, string | string[]] {
-    // Remove the first slash
-    const sanitized = path.replace(/^\//, "");
-
-    if (dynamic.deep) {
-        return [dynamic.name, sanitized.split("/").map((value) => value || "/")]
-    }
-    return [dynamic.name, sanitized]
-}
-
 /**
  * @returns React Navigation screens for the route.
  */
@@ -37,16 +24,6 @@ export function useScreensRecord(): Record<string, React.ReactNode> {
 
 /** Wrap the component with various enhancements and add access to child routes. */
 function getQualifiedRouteComponent(value: RouteNode) {
-    // console.log('getQualifiedRouteComponent:', value)
-    const getDynamicProps = !value.dynamic
-        ? () => ([])
-        : (path?: string | null) => {
-            if (path == null) {
-                return [];
-            }
-            return formatDynamicProps(path, value.dynamic!);
-        };
-
 
     const Component = value.getComponent();
 
@@ -55,15 +32,9 @@ function getQualifiedRouteComponent(value: RouteNode) {
     const QualifiedRoute = React.forwardRef(
         (props: { route: any; navigation: any }, ref: any) => {
             // Surface dynamic name as props to the view
-            // const [dynamicKey, dynamicValue] = React.useMemo(
-            //     () => getDynamicProps(props.route?.path),
-            //     [props.route?.path]
-            // );
-
             const children = React.createElement(Component, {
                 ...props,
                 ref,
-                // [dynamicKey]: dynamicValue,
             });
 
             const errorBoundary = ErrorBoundary ? (
@@ -90,6 +61,7 @@ function routeToScreen(route: RouteNode) {
         <Screen
             name={route.screenName}
             key={route.route}
+            options={route.getExtras()?.getNavOptions}
             component={getQualifiedRouteComponent(route)}
         />
     );

@@ -3,6 +3,7 @@ import { SafeAreaView, StatusBar, Platform } from "react-native";
 import { View, Text, Pressable, StyleSheet } from "@bacons/react-views";
 import { createEntryFileAsync } from "./createEntryFile";
 
+// TODO: Use openLinkFromBrowser thing
 function Header() {
     return (
         <Pressable>
@@ -14,7 +15,7 @@ function Header() {
                 >
                     Welcome to{" "}
                     <Text
-                        href="https://github.com/expo/expo/"
+                        href="https://github.com/expo/expo-router/"
                         style={[
                             hovered && {
                                 textDecorationColor: "white",
