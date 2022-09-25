@@ -1,6 +1,6 @@
 ---
 title: Unmatched Routes
-sidebar_position: 6
+sidebar_position: 8
 ---
 
 Native apps don't have a server so there are technically no 404s. However, if you're implementing a router universally, then it makes sense to handle missing routes. This is done automatically for each app, but you can also customize it.

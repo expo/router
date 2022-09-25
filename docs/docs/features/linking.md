@@ -1,6 +1,6 @@
 ---
 title: Linking
-sidebar_position: 4
+sidebar_position: 2
 ---
 
 The `expo-router` `Link` component supports client-side navigation to a route. It is similar to the `Link` component in `react-router-dom` and `next/link`.
@@ -12,11 +12,17 @@ Meaning you get the best of both worlds: a fast client-side navigation experienc
 ```tsx
 import { Link } from "expo-router";
 
-<Link href="/">Home</Link>;
+export default function Page() {
+  return (
+    <View>
+      <Link href="/">Home</Link>
+    </View>
+  );
+}
 ```
 
 - Try to migrate as many: `navigation.navigate` calls to `Link` components. This will make your app faster and more accessible.
-- Unlike `navigation.navigate`, `Link` components support relative paths like `/profile/settings`.
+- Unlike `navigation.navigate`, the `Link` component supports using full paths like `/profile/settings`. This same link could be implemented imperatively using `navigation.navigate('profile', { screen: 'settings' })`
 
 ## Imperative API
 

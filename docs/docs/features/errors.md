@@ -1,6 +1,6 @@
 ---
 title: Error handling
-sidebar_position: 6
+sidebar_position: 7
 ---
 
 Expo router enables fine-tuned error handling to enable a more opinionated data loading strategy in the future. You can export a nested `ErrorBoundary` component from any route to intercept and format component-level errors using [React Error Boundaries](https://reactjs.org/docs/error-boundaries.html):

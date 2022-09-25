@@ -1,6 +1,6 @@
 ---
 title: Layouts
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 Layouts are parent components that provide a shared UI-driven navigation experience across multiple screens.
@@ -13,7 +13,7 @@ import { Children } from "expo-router";
 
 export default function Page() {
   // Renders the matching child route.
-  // highlight-next-line 
+  // highlight-next-line
   return <Children />;
 }
 ```
