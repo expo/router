@@ -35,16 +35,18 @@ const canAutoTouchFile = process.env.EXPO_ROUTER_APP_ROOT != null;
 
 export function Tutorial() {
     React.useEffect(() => {
-        // Reset the route on web so the initial route isn't a 404 after
-        // the user has created the entry file.
-        // This is useful for cases where you are testing the tutorial.
-        // To test: touch the new file, then navigate to a missing route `/foobar`, then delete the app folder.
-        // you should see the tutorial again and be able to create the entry file once more.
-        if (typeof location !== "undefined" && location.pathname !== "/") {
-            location.replace("/");
-        }
-        if (typeof window !== "undefined") {
-            window.document.title = "npx expo start";
+        if (Platform.OS === "web") {
+            // Reset the route on web so the initial route isn't a 404 after
+            // the user has created the entry file.
+            // This is useful for cases where you are testing the tutorial.
+            // To test: touch the new file, then navigate to a missing route `/foobar`, then delete the app folder.
+            // you should see the tutorial again and be able to create the entry file once more.
+            if (typeof location !== "undefined" && location.pathname !== "/") {
+                location.replace("/");
+            }
+            if (typeof window !== "undefined" && typeof window.document !== "undefined") {
+                window.document.title = "npx expo start";
+            }
         }
     }, []);
 

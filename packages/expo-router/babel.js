@@ -58,6 +58,21 @@ module.exports = function (api) {
           return;
         }
 
+        // Used for log box and stuff
+        if (
+          t.isIdentifier(parent.node.property, {
+            name: "EXPO_PROJECT_ROOT",
+          }) &&
+          !parent.parentPath.isAssignmentExpression()
+        ) {
+          parent.replaceWith(
+            t.stringLiteral(
+              process.env.EXPO_PROJECT_ROOT || state.file.opts.root || ""
+            )
+          );
+          return;
+        }
+
         if (
           !t.isIdentifier(parent.node.property, {
             name: "EXPO_ROUTER_APP_ROOT",
