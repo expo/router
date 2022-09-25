@@ -112,6 +112,14 @@ registerRootComponent(App);
 
 > This will be replaced with a single `expo-router/entry` import in the future, but it requires [extra CLI functionality](https://github.com/expo/expo/pull/19231).
 
+Install packages which need to be in the local package.json due to the way React Native CLI links native modules:
+
+```bash
+npx expo install react-native-safe-area-context react-native-screens react-native-reanimated react-native-gesture-handler
+```
+
+> We plan to move the installation of these packages to the `expo-router` package in the future.
+
 ## Metro web setup
 
 The router is tied to the bundler which is currently only built for Metro. If you want to use the router with web, you'll need to enable Expo CLI's experimental Metro web support:
