@@ -142,5 +142,5 @@ Create files in the `app` directory and they will be automatically added to the 
 
 ## Next Steps
 
-- [Guides](/docs/guides).
-- [Features and conventions](/docs/features).
+- [Guides](/docs/category/guides).
+- [Features and conventions](/docs/category/features).

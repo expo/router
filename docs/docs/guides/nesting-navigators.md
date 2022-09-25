@@ -7,12 +7,12 @@ Ports the guide [React Navigation: Nesting navigators](https://reactnavigation.o
 
 ```bash title="File System"
 app/
-├─ (stack).js
-├─ (stack)/
-│  ├─ home.js
-│  ├─ home/
-│    ├─ feed.js # Matches /home/feed
-│    ├─ messages.js # Matches /home/messages
+  (stack).js
+  (stack)/
+    home.js
+    home/
+      feed.js # Matches /home/feed
+      messages.js # Matches /home/messages
 ```
 
 ```js title=app/(stack).js

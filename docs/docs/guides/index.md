@@ -58,11 +58,11 @@ export default function Details({ navigation }) {
 The final **file structure** should look like this:
 
 ```bash title="File System"
-app
-├─ (stack).js
-├─ (stack)
-│  ├─ index.js
-│  ├─ details.js
+app/
+  (stack).js
+  (stack)
+    index.js
+    details.js
 ```
 
 Ports the guide [React Navigation: Hello world](https://reactnavigation.org/docs/hello-react-navigation) to Expo router.

@@ -7,9 +7,9 @@ Ports the guide [React Navigation: header buttons](https://reactnavigation.org/d
 
 ```bash title="File System"
 app/
-├─ (stack).js
-├─ (stack)/
-│  ├─ home.js
+  (stack).js
+  (stack)/
+    home.js
 ```
 
 You can use the `<Stack.Screen name={routeName} />` component in the layout component route to statically configure screen options. This is useful for tab bars or drawers which need to have an icon defined ahead of time.

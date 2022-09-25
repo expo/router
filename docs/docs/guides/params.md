@@ -7,10 +7,10 @@ Ports the guide [React Navigation: Params](https://reactnavigation.org/docs/para
 
 ```bash title="File System"
 app/
-├─ (stack).js
-├─ (stack)/
-│  ├─ index.js
-│  ├─ details.js
+  (stack).js
+  (stack)/
+    index.js
+    details.js
 ```
 
 ```js title=app/(stack).js

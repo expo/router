@@ -7,10 +7,10 @@ Ports the guide [React Navigation: Navigating](https://reactnavigation.org/docs/
 
 ```bash title="File System"
 app/
-├─ (stack).js
-├─ (stack)/
-│  ├─ home.js
-│  ├─ details.js
+  (stack).js
+  (stack)/
+    home.js
+    details.js
 ```
 
 ```js title=app/(stack).js
