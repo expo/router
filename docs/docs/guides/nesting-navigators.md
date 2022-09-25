@@ -3,7 +3,7 @@ title: Nesting navigators
 sidebar_position: 7
 ---
 
-Ports https://reactnavigation.org/docs/nesting-navigators
+Ports the guide [React Navigation: Nesting navigators](https://reactnavigation.org/docs/nesting-navigators) to Expo router.
 
 ```bash title="File System"
 app/
@@ -26,9 +26,7 @@ This is nested in the `(stack).js` layout, so it will be rendered as a stack.
 ```js title=app/(stack)/home.js
 import { Tabs } from "expo-router";
 
-export default function Home() {
-  return <Tabs />;
-}
+export default Tabs;
 ```
 
 ```js title=app/(stack)/profile.js

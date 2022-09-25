@@ -1,6 +1,6 @@
 ---
-title: Layout Options
-sidebar_position: 8
+title: Screen Options
+sidebar_position: 5
 ---
 
 In React Navigation, you often use `screenOptions` to configure layout options. In `expo-router`, you can use the `<Screen />` component from any built-in layout to configure the nearest layout.

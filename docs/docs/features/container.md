@@ -13,6 +13,7 @@ export default function Page() {
   return (
     <>
       {/* These props will be applied to the parent NavigationContainer. */}
+      // highlight-next-line
       <RootContainer theme={DarkTheme} />
     </>
   );

@@ -3,9 +3,9 @@ title: Configuring the header bar
 sidebar_position: 5
 ---
 
-Ports https://reactnavigation.org/docs/headers
+Ports the guide [React Navigation: header buttons](https://reactnavigation.org/docs/headers) to Expo router.
 
-```
+```bash title="File System"
 app/
 ├─ (stack).js
 ├─ (stack)/
@@ -69,7 +69,7 @@ export default function Home() {
 
       <Text>Home Screen</Text>
 
-      <Link href={{ screen: "details", params: { name: "Bacon" } }}>
+      <Link to={{ screen: "details", params: { name: "Bacon" } }}>
         Go to Details
       </Link>
     </View>

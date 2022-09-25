@@ -3,9 +3,9 @@ title: Passing parameters to the routes
 sidebar_position: 4
 ---
 
-Ports https://reactnavigation.org/docs/params
+Ports the guide [React Navigation: Params](https://reactnavigation.org/docs/params) to Expo router.
 
-```
+```bash title="File System"
 app/
 ├─ (stack).js
 ├─ (stack)/
@@ -16,8 +16,8 @@ app/
 ```js title=app/(stack).js
 import { Stack } from "expo-router";
 
-export default function App() {
-  return <Stack initialRouteName="index" />;
+export default function Layout() {
+  return <Stack />;
 }
 ```
 

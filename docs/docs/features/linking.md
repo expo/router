@@ -18,6 +18,39 @@ import { Link } from "expo-router";
 - Try to migrate as many: `navigation.navigate` calls to `Link` components. This will make your app faster and more accessible.
 - Unlike `navigation.navigate`, `Link` components support relative paths like `/profile/settings`.
 
+## Imperative API
+
+Use the [`navigation` object](https://reactnavigation.org/docs/navigation-prop) from React Navigation to imperatively navigate:
+
+```js
+export default function Route({ navigation }) {
+  return (
+    <View>
+      <Text
+        onPress={() => {
+          // Go back to the previous screen using the imperative API.
+          navigation.goBack();
+        }}
+      >
+        Details Screen
+      </Text>
+    </View>
+  );
+}
+```
+
+Alternatively, you can access the `navigation` prop from any component using the hook:
+
+```js
+import { useNavigation } from "@react-navigation/native";
+
+function MyBackButton() {
+  const navigation = useNavigation();
+
+  return <Button title="Go back" onPress={() => navigation.goBack()} />;
+}
+```
+
 ## Testing
 
 On native, you can use the `uri-scheme` CLI to test opening native links on a device.
@@ -26,10 +59,7 @@ On native, you can use the `uri-scheme` CLI to test opening native links on a de
 npx uri-scheme open exp://192.168.87.39:19000/--/form-sheet --ios
 ```
 
-You can also search for links directly in a browser like Safari or Chrome to test deep linking on physical devices.
-
-- https://reactnavigation.org/docs/deep-linking
-- https://reactnavigation.org/docs/configuring-links
+You can also search for links directly in a browser like Safari or Chrome to test deep linking on physical devices. Learn more about [testing deep links](https://reactnavigation.org/docs/deep-linking).
 
 ## Dev mode
 

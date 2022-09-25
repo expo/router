@@ -3,14 +3,16 @@ title: Header buttons
 sidebar_position: 6
 ---
 
-Ports https://reactnavigation.org/docs/header-buttons
+Ports the guide [React Navigation: header buttons](https://reactnavigation.org/docs/header-buttons) to Expo router.
 
-```
+```bash title="File System"
 app/
 ├─ (stack).js
 ├─ (stack)/
 │  ├─ home.js
 ```
+
+You can use the `<Stack.Screen name={routeName} />` component in the layout component route to statically configure screen options. This is useful for tab bars or drawers which need to have an icon defined ahead of time.
 
 ```js title=app/(stack).js
 import { Stack } from "expo-router";
@@ -20,7 +22,7 @@ export default function Layout() {
     <Stack
       initialRouteName="home"
       // https://reactnavigation.org/docs/headers#sharing-common-options-across-screens
-      // Prefers using a `<Header />` component.
+      // highlight-next-line
       screenOptions={{
         headerStyle: {
           backgroundColor: "#f4511e",
@@ -30,14 +32,21 @@ export default function Layout() {
           fontWeight: "bold",
         },
       }}
-    />
+    >
+      {/* Optionally configure static options outside the route. */}
+      // highlight-next-line
+      <Stack.Screen name="home" options={{}} />
+    </Stack>
   );
 }
 ```
 
+Use the `<Stack.Screen />` component in the child route to dynamically configure options.
+
 ```js title=app/(stack)/home.js
 import { useLayoutEffect } from "react";
 import { View, Button, Text, Image } from "react-native";
+// highlight-next-line
 import { Stack } from "expo-router";
 
 function LogoTitle() {
@@ -55,6 +64,7 @@ export default function Home() {
   return (
     // https://reactnavigation.org/docs/header-buttons#header-interaction-with-its-screen-component
     <>
+      // highlight-next-line
       <Stack.Screen
         options={{
           headerTitle: (props) => <LogoTitle {...props} />,

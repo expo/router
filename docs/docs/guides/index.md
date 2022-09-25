@@ -9,6 +9,7 @@ First create a **layout route** in `app/stack.js` which uses the pre-built `Stac
 import { Stack } from "expo-router";
 
 export default function Layout() {
+  // highlight-next-line
   return <Stack />;
 }
 ```
@@ -25,6 +26,7 @@ export default function Home() {
       {/* Use the `Screen` component to configure the layout. */}
       <Stack.Screen options={{ title: "Overview" }} />
       {/* Use the `Link` component to enable optimized client-side routing. */}
+      // highlight-next-line
       <Link href="/details">Go to Details</Link>
     </View>
   );
@@ -41,7 +43,8 @@ export default function Details({ navigation }) {
     <View>
       <Text
         onPress={() => {
-          // Go back to the previous screen
+          // Go back to the previous screen using the imperative API.
+          // highlight-next-line
           navigation.goBack();
         }}
       >
@@ -62,4 +65,4 @@ app
 │  ├─ details.js
 ```
 
-> Ports the guide from [React Navigation](https://reactnavigation.org/docs/hello-react-navigation).
+Ports the guide [React Navigation: Hello world](https://reactnavigation.org/docs/hello-react-navigation) to Expo router.

@@ -3,9 +3,9 @@ title: Moving between screens
 sidebar_position: 3
 ---
 
-Ports https://reactnavigation.org/docs/navigating
+Ports the guide [React Navigation: Navigating](https://reactnavigation.org/docs/navigating) to Expo router.
 
-```
+```bash title="File System"
 app/
 ├─ (stack).js
 ├─ (stack)/
@@ -16,7 +16,7 @@ app/
 ```js title=app/(stack).js
 import { Stack } from "expo-router";
 
-export default function App() {
+export default function Layout() {
   return <Stack initialRouteName="home" />;
 }
 ```
