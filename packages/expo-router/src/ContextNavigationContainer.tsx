@@ -2,6 +2,7 @@ import { LinkingOptions, NavigationContainer } from "@react-navigation/native";
 import React, { useMemo, useCallback } from "react";
 import { useRoutesContext } from "./context";
 import { getLinkingConfig } from "./getLinkingConfig";
+import SplashModule from "./splash";
 
 type NavigationContainerProps = React.ComponentProps<
     typeof NavigationContainer
@@ -24,14 +25,6 @@ export function useNavigationContainerContext() {
     return context;
 }
 
-let hideAsync: () => Promise<boolean> | undefined;
-try {
-    hideAsync =
-        (require("expo-splash-screen") as typeof import("expo-splash-screen")).hideAsync;
-    // Automatically handle hiding the splash screen if expo-splash-screen is installed.
-} catch { }
-
-
 /** react-navigation `NavigationContainer` with automatic `linking` prop generated from the routes context. */
 export const ContextNavigationContainer = React.forwardRef(
     (props: NavigationContainerProps, ref: NavigationContainerProps["ref"]) => {
@@ -41,9 +34,7 @@ export const ContextNavigationContainer = React.forwardRef(
         console.log('linking', linking);
         const onReady = useCallback(() => {
             props.onReady?.();
-            if (hideAsync) {
-                hideAsync();
-            }
+            SplashModule?.hideAsync();
         }, [props.onReady]);
 
         return (
