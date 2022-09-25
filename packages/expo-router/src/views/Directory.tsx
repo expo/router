@@ -1,11 +1,12 @@
 import { Image, Pressable, StyleSheet, Text, View } from "@bacons/react-views";
+import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import React from "react";
-import { ScrollView, StatusBar, useWindowDimensions } from "react-native";
+import { ScrollView, Platform, StatusBar, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useRoutesContext } from "../context";
-import { matchFragmentName } from "../matchers";
+import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
 import { RouteNode } from "../Route";
 import { Link } from "./Link";
 
@@ -142,11 +143,16 @@ function FileItem({
 }) {
     const disabled = route.children.length > 0;
 
+    const navigation = useNavigation();
     const href = React.useMemo(() => {
         return (
             "/" +
             [...parents, route.route]
                 .map((v) => {
+                    // add an extra layer of entropy to the url for deep dynamic routes
+                    if (matchDeepDynamicRouteName(v)) {
+                        return v + '/' + Date.now()
+                    }
                     // groups and index must be erased
                     return !!matchFragmentName(v) || v === "index" ? "" : v;
                 })
@@ -157,8 +163,14 @@ function FileItem({
 
     return (
         <>
-            {/* @ts-expect-error: disabled not on type */}
-            <Link href={href} disabled={disabled} asChild>
+            <Link href={href} onPress={() => {
+                if (Platform.OS !== 'web') {
+                    // Ensure the modal pops
+                    navigation.goBack();
+                }
+            }}
+                // @ts-expect-error: disabled not on type
+                disabled={disabled} asChild>
                 <Pressable>
                     {({ pressed, hovered }) => (
                         <View

@@ -21,22 +21,22 @@ export type ScreenProps<TOptions extends Record<string, any> = Record<string, an
 
 function getSortedChildren(children: RouteNode[], order?: ScreenProps[]): { route: RouteNode, props: any }[] {
     if (!order?.length) {
-        return Object.values(children).sort(sortRoutes).map((route) => ({ route, props: {} }));
+        return children.sort(sortRoutes).map((route) => ({ route, props: {} }));
     }
-    const entries = Object.entries(children);
+    const entries = [...children];
 
     const ordered = order.map(({ name, initialParams, options }) => {
-        if (entries.length === 0) {
+        if (!entries.length) {
             console.warn(`[Layout children]: Too many screens defined. Route "${name}" is extraneous.`);
             return null;
         }
-        const matchIndex = entries.findIndex((child) => child[0] === name)
+        const matchIndex = entries.findIndex((child) => child.route === name)
         if (matchIndex === -1) {
-            console.warn(`[Layout children]: No route named "${name}" exists in nested children:`, Object.keys(children));
+            console.warn(`[Layout children]: No route named "${name}" exists in nested children:`, children.map(({ route }) => route));
             return null;
         } else {
             // Get match and remove from entries
-            const [, match] = entries[matchIndex];
+            const match = entries[matchIndex];
             entries.splice(matchIndex, 1);
 
             return { route: match, props: { initialParams, options } }
@@ -47,7 +47,7 @@ function getSortedChildren(children: RouteNode[], order?: ScreenProps[]): { rout
     }[]
 
     // Add any remaining children
-    ordered.push(...entries.map(([, child]) => child).sort(sortRoutes).map((route) => ({ route, props: {} })));
+    ordered.push(...entries.sort(sortRoutes).map((route) => ({ route, props: {} })));
 
     return ordered;
 }
