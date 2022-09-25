@@ -11,14 +11,14 @@ export const Unmatched = forwardRef((props, ref) => {
         // @ts-ignore
         <View ref={ref} accessibilityRole="main" style={styles.container}>
             <Text
-                accessibilityRole="heading"
+                accessibilityRole="header"
                 accessibilityLevel={1}
                 style={styles.title}
             >
                 Unmatched Route
             </Text>
             <Text
-                accessibilityRole="heading"
+                accessibilityRole="header"
                 accessibilityLevel={2}
                 style={styles.subtitle}
             >

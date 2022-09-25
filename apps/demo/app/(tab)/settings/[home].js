@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>{__filename}</Text>
+      <Text accessibilityRole="header">{__filename}</Text>
     </View>
   );
 }

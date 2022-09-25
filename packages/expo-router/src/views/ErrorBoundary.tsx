@@ -12,7 +12,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
             <SafeAreaView style={{ flex: 1, maxWidth: 720, marginHorizontal: 'auto' }}>
                 <View style={{ marginBottom: 12, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text
-                        accessibilityRole="heading" accessibilityLevel={1}
+                        accessibilityRole="header" accessibilityLevel={1}
                         style={styles.title}
                     >
                         Something went wrong

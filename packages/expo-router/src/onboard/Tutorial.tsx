@@ -9,7 +9,7 @@ function Header() {
         <Pressable>
             {({ hovered }) => (
                 <Text
-                    accessibilityRole="heading"
+                    accessibilityRole="header"
                     accessibilityLevel={1}
                     style={[styles.title, Platform.OS !== "web" && { textAlign: "left" }]}
                 >
@@ -74,7 +74,7 @@ export function Tutorial() {
                 <View accessibilityRole="main" style={styles.container}>
                     <Header />
                     <Text
-                        accessibilityRole="heading"
+                        accessibilityRole="header"
                         accessibilityLevel={2}
                         style={styles.subtitle}
                     >
