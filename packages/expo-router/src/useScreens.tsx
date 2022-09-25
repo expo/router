@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Screen } from './primitives';
-import { Route, RouteNode, useRoutes } from './Route';
+import { Route, RouteNode, sortRoutes, useRoutes } from './Route';
 import { Try } from './views/Try';
 
 /**
@@ -12,18 +12,67 @@ export function useScreens(): React.ReactNode[] {
     return React.useMemo(() => children.map((value) => routeToScreen(value)), [children]);
 }
 
+export type ScreenProps<TOptions extends Record<string, any> = Record<string, any>> = {
+    /** Name is required when used inside a Layout component. */
+    name?: string,
+    initialParams?: { [key: string]: any };
+    options?: TOptions;
+}
+
+function getSortedChildren(children: RouteNode[], order?: ScreenProps[]): { route: RouteNode, props: any }[] {
+    if (!order?.length) {
+        return Object.values(children).sort(sortRoutes).map((route) => ({ route, props: {} }));
+    }
+    const entries = Object.entries(children);
+
+    const ordered = order.map(({ name, initialParams, options }) => {
+        if (entries.length === 0) {
+            console.warn(`[Layout children]: Too many screens defined. Route "${name}" is extraneous.`);
+            return null;
+        }
+        const matchIndex = entries.findIndex((child) => child[0] === name)
+        if (matchIndex === -1) {
+            console.warn(`[Layout children]: No route named "${name}" exists in nested children:`, Object.keys(children));
+            return null;
+        } else {
+            // Get match and remove from entries
+            const [, match] = entries[matchIndex];
+            entries.splice(matchIndex, 1);
+
+            return { route: match, props: { initialParams, options } }
+        }
+    }).filter(Boolean) as {
+        route: RouteNode;
+        props: Partial<ScreenProps>;
+    }[]
+
+    // Add any remaining children
+    ordered.push(...entries.map(([, child]) => child).sort(sortRoutes).map((route) => ({ route, props: {} })));
+
+    return ordered;
+}
+
+
 /** 
  * @returns React Navigation screens sorted by the `route` property.
  */
-export function useScreensRecord(): Record<string, React.ReactNode> {
+export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
     const children = useRoutes();
-    return React.useMemo(() => Object.fromEntries(
-        children.map((value) => [value.route, routeToScreen(value)])
-    ), [children]);
+    const sorted = getSortedChildren(children, order);
+    return React.useMemo(() =>
+        sorted.map((value) => routeToScreen(value.route, value.props)), [sorted]);
 }
+
+
+// TODO: Maybe there's a more React-y way to do this?
+// Without this store, the process enters a recursive loop.
+const qualifiedStore = new WeakMap<RouteNode, React.ComponentType<any>>();
 
 /** Wrap the component with various enhancements and add access to child routes. */
 function getQualifiedRouteComponent(value: RouteNode) {
+    if (qualifiedStore.has(value)) {
+        return qualifiedStore.get(value);
+    }
 
     const Component = value.getComponent();
 
@@ -52,16 +101,26 @@ function getQualifiedRouteComponent(value: RouteNode) {
     );
 
     QualifiedRoute.displayName = `Route(${Component.displayName || Component.name || value.route})`;
-
+    qualifiedStore.set(value, QualifiedRoute);
     return QualifiedRoute;
 }
 
-function routeToScreen(route: RouteNode) {
+function routeToScreen(route: RouteNode, { options, ...props }: Partial<ScreenProps> = {}) {
+    const staticOptions = route.getExtras()?.getNavOptions;
     return (
+        // @ts-expect-error: fixme
         <Screen
-            name={route.screenName}
+            {...props}
+            name={route.route}
             key={route.route}
-            options={route.getExtras()?.getNavOptions}
+            options={options ? (args) => {
+                const staticResult = typeof staticOptions === 'function' ? staticOptions(args) : staticOptions;
+                const dynamicResult = typeof options === 'function' ? options?.(args) : options;
+                return {
+                    ...staticResult,
+                    ...dynamicResult,
+                };
+            } : staticOptions}
             component={getQualifiedRouteComponent(route)}
         />
     );

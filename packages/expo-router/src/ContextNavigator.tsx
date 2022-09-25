@@ -10,7 +10,8 @@ import { RequireContext } from './types';
 
 function useContextModuleAsRoutes(context: RequireContext) {
     // TODO: Is this an optimal hook dependency?
-    return useMemo(() => getRoutes(context), [context]);
+    const keys = useMemo(() => context.keys(), [context]);
+    return useMemo(() => getRoutes(context), [keys]);
 }
 
 function RoutesContextProvider({
@@ -68,16 +69,21 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
         return <Tutorial />;
     }
 
+    const children = useMemo(() => (
+        <Route filename="./">
+            <ContextNavigationContainer>
+                {/* Using a switch navigator at the root to host all pages. */}
+                <NativeStack
+                    screenOptions={{ animation: "none", headerShown: false }}
+                />
+            </ContextNavigationContainer>
+        </Route>
+    ), []);
+
     return (
         <RoutesContextProvider context={context}>
-            <Route filename="./">
-                <ContextNavigationContainer>
-                    {/* Using a switch navigator at the root to host all pages. */}
-                    <NativeStack
-                        screenOptions={{ animation: "none", headerShown: false }}
-                    />
-                </ContextNavigationContainer>
-            </Route>
+            {children}
         </RoutesContextProvider>
     );
 }
+

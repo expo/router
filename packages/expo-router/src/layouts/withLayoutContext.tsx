@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useScreensRecord } from '../useScreens';
+import { useSortedScreens } from '../useScreens';
 import { Screen } from '../views/Screen';
 
 type PickPartial<T, K extends keyof T> = Omit<T, K> &
@@ -13,41 +13,11 @@ type ScreenProps<TOptions extends Record<string, any> = Record<string, any>> = {
     options?: TOptions;
 }
 
-function useSortedChildren(children: Record<string, React.ReactNode>, order?: ScreenProps[]): React.ReactNode[] {
-    return React.useMemo(() => {
-        if (!order?.length) {
-            return Object.values(children);
-        }
-        const entries = Object.entries(children);
-
-        const ordered = order.map(({ name, initialParams, options }) => {
-            const matchIndex = entries.findIndex((child) => child[0] === name)
-            if (matchIndex === -1) {
-                console.warn(`[Layout children]: No route named "${name}" exists in nested children:`, Object.keys(children));
-                return null;
-            } else {
-                // Get match and remove from entries
-                const [, match] = entries[matchIndex];
-                entries.splice(matchIndex, 1);
-                // @ts-expect-error
-                return React.cloneElement(match, { initialParams, options });
-            }
-        }).filter(Boolean)
-
-        // Add any remaining children
-        // @ts-expect-error
-        ordered.push(...entries.map(([, child]) => child));
-
-        return ordered;
-    }, [children, order]);
-}
-
 /** Return a navigator that automatically injects matched routes and renders nothing when there are no children. Return type with children prop optional */
 export function withLayoutContext<TOptions extends {}, T extends React.ComponentType<any>>(
     Nav: T): (React.ForwardRefExoticComponent<React.PropsWithoutRef<PickPartial<React.ComponentProps<T>, "children">> & React.RefAttributes<unknown>>) & {
         Screen: (props: ScreenProps<TOptions>) => null
     } {
-
 
     const Navigator = React.forwardRef(({ children: userDefinedChildren, ...props }: PickPartial<React.ComponentProps<T>, 'children'>, ref) => {
         const userDefinedOptions = React.useMemo(() => {
@@ -78,9 +48,7 @@ export function withLayoutContext<TOptions extends {}, T extends React.Component
             return screens;
         }, [userDefinedChildren]);
 
-        const children = useScreensRecord();
-
-        const sorted = useSortedChildren(children, userDefinedOptions);
+        const sorted = useSortedScreens(userDefinedOptions ?? []);
 
         // Prevent throwing an error when there are no screens.
         if (!sorted.length) {

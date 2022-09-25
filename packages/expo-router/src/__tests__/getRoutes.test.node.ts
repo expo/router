@@ -2,7 +2,6 @@ import {
   getRoutes,
   createRouteNode,
   getUserDefinedDeepDynamicRoute,
-  recurseAndAddMissingNavigators,
 } from "../getRoutes";
 import { RouteNode } from "../Route";
 import { RequireContext } from "../types";
@@ -28,7 +27,6 @@ const ROUTE_404 = {
   getExtras: expect.any(Function),
   internal: true,
   route: "[...404]",
-  screenName: "404",
 };
 const ROUTE_DIRECTORY = {
   children: [],
@@ -39,7 +37,6 @@ const ROUTE_DIRECTORY = {
   getExtras: expect.any(Function),
   internal: true,
   route: "__index",
-  screenName: "__index",
 };
 
 const asRouteNode = (route: Partial<RouteNode>) =>
@@ -122,64 +119,6 @@ describe(getUserDefinedDeepDynamicRoute, () => {
   });
 });
 
-describe(recurseAndAddMissingNavigators, () => {
-  it(`should add a navigator to a route with children`, () => {
-    const routes = [
-      asRouteNode({
-        // @ts-expect-error
-        contextKey: null,
-        route: "home",
-        children: [
-          asRouteNode({
-            // @ts-expect-error
-            contextKey: null,
-            route: "user",
-            children: [
-              asRouteNode({
-                route: "user",
-                contextKey: "./home/user.tsx",
-              }),
-            ],
-          }),
-        ],
-      }),
-    ];
-    expect(recurseAndAddMissingNavigators(routes, [])).toEqual([
-      {
-        children: [
-          {
-            children: [
-              {
-                children: [],
-                contextKey: "./home/user.tsx",
-                dynamic: null,
-                getComponent: expect.any(Function),
-                getExtras: expect.any(Function),
-                route: "user",
-                screenName: "user",
-              },
-            ],
-            generated: true,
-            contextKey: "./home/user.tsx",
-            dynamic: null,
-            getComponent: expect.any(Function),
-            getExtras: expect.any(Function),
-            route: "user",
-            screenName: "user",
-          },
-        ],
-        contextKey: "./home.tsx",
-        dynamic: null,
-        generated: true,
-        getComponent: expect.any(Function),
-        getExtras: expect.any(Function),
-        route: "home",
-        screenName: "home",
-      },
-    ]);
-  });
-});
-
 describe(getRoutes, () => {
   it(`should add missing layouts for nested routes`, () => {
     expect(
@@ -200,7 +139,6 @@ describe(getRoutes, () => {
                 getComponent: expect.any(Function),
                 getExtras: expect.any(Function),
                 route: "value",
-                screenName: "value",
               },
             ],
             contextKey: "./some/nested.tsx",
@@ -209,7 +147,6 @@ describe(getRoutes, () => {
             getComponent: expect.any(Function),
             getExtras: expect.any(Function),
             route: "nested",
-            screenName: "nested",
           },
         ],
         contextKey: "./some.tsx",
@@ -218,7 +155,6 @@ describe(getRoutes, () => {
         getComponent: expect.any(Function),
         getExtras: expect.any(Function),
         route: "some",
-        screenName: "some",
       },
       ROUTE_DIRECTORY,
       ROUTE_404,
@@ -244,7 +180,6 @@ describe(getRoutes, () => {
         getComponent: expect.any(Function),
         getExtras: expect.any(Function),
         route: "[dynamic]",
-        screenName: "dynamic",
       },
       {
         children: [],
@@ -256,7 +191,6 @@ describe(getRoutes, () => {
         getComponent: expect.any(Function),
         getExtras: expect.any(Function),
         route: "[...deep]",
-        screenName: "deep",
       },
       ROUTE_DIRECTORY,
       // No 404 route because we have a dynamic route
@@ -287,12 +221,10 @@ describe(getRoutes, () => {
           mockRoute({
             contextKey: "./(stack)/home.tsx",
             route: "home",
-            screenName: "home",
           }),
           mockRoute({
             contextKey: "./(stack)/settings.tsx",
             route: "settings",
-            screenName: "settings",
           }),
           mockRoute({
             children: [
@@ -301,17 +233,14 @@ describe(getRoutes, () => {
                   mockRoute({
                     contextKey: "./(stack)/user/(default)/posts.tsx",
                     route: "posts",
-                    screenName: "posts",
                   }),
                 ],
                 contextKey: "./(stack)/user/(default).tsx",
                 route: "(default)",
-                screenName: "(default)",
               }),
               mockRoute({
                 contextKey: "./(stack)/user/profile.tsx",
                 route: "profile",
-                screenName: "profile",
               }),
               mockRoute({
                 contextKey: "./(stack)/user/[profile].tsx",
@@ -320,14 +249,12 @@ describe(getRoutes, () => {
                   name: "profile",
                 },
                 route: "[profile]",
-                screenName: "profile",
               }),
               mockRoute({
                 children: [
                   mockRoute({
                     contextKey: "./(stack)/user/settings/info.tsx",
                     route: "info",
-                    screenName: "info",
                   }),
                   mockRoute({
                     contextKey: "./(stack)/user/settings/[...other].tsx",
@@ -336,28 +263,23 @@ describe(getRoutes, () => {
                       name: "other",
                     },
                     route: "[...other]",
-                    screenName: "other",
                   }),
                 ],
                 contextKey: "./(stack)/user/settings.tsx",
                 route: "settings",
-                screenName: "settings",
               }),
             ],
             contextKey: "./(stack)/user.tsx",
             generated: true,
             route: "user",
-            screenName: "user",
           }),
         ],
         contextKey: "./(stack).tsx",
         route: "(stack)",
-        screenName: "(stack)",
       }),
       mockRoute({
         contextKey: "./another.tsx",
         route: "another",
-        screenName: "another",
       }),
       mockRoute({
         children: [
@@ -366,19 +288,16 @@ describe(getRoutes, () => {
               mockRoute({
                 contextKey: "./some/nested/value.tsx",
                 route: "value",
-                screenName: "value",
               }),
             ],
             contextKey: "./some/nested.tsx",
             generated: true,
             route: "nested",
-            screenName: "nested",
           }),
         ],
         contextKey: "./some.tsx",
         generated: true,
         route: "some",
-        screenName: "some",
       }),
       ROUTE_DIRECTORY,
       ROUTE_404,

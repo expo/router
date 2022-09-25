@@ -38,23 +38,21 @@ export function treeToReactNavigationLinkingRoutes(
   // Our warnings can be more helpful than upstream since we know the associated file name.
   const firstPass = nodes
     .map((node) => {
-      let path = convertDynamicRouteToReactNavigation(node.route);
+      const path = convertDynamicRouteToReactNavigation(node.route);
 
-      return [
-        node.screenName,
-        {
-          path: path,
-          screens: node.children.length
-            ? treeToReactNavigationLinkingRoutes(node.children, [
-                ...parents,
-                path,
-              ])
-            : undefined,
-        },
-      ] as const;
+      if (!node.children.length) {
+        return [node.route, path];
+      }
+
+      const screens = treeToReactNavigationLinkingRoutes(node.children, [
+        ...parents,
+        path,
+      ]);
+
+      return [node.route, { path, screens }] as const;
     })
-    .reduce<PathConfigMap<{}>>((acc, [screenName, current]) => {
-      acc[screenName] = current;
+    .reduce<PathConfigMap<{}>>((acc, [route, current]) => {
+      acc[route] = current;
       return acc;
     }, {});
 
