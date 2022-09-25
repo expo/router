@@ -8,6 +8,7 @@ Expo router enables fine-tuned error handling to enable a more opinionated data 
 ```tsx title=app/home.tsx
 import { View, Text } from 'react-native';
 
+// highlight-next-line
 export function ErrorBoundary(props: ErrorBoundaryProps) {
   return (
     <View style={{ flex: 1, backgroundColor: "red" }}>
@@ -22,7 +23,7 @@ export default function Page() { ... }
 
 When you export an `ErrorBoundary` the route will be wrapped with a React Error Boundary effectively:
 
-```tsx
+```tsx title="virtual"
 function Route({ ErrorBoundary, Component }) {
   return (
     <Try catch={ErrorBoundary}>
@@ -54,8 +55,8 @@ export { ErrorBoundary } from "expo-router";
 
 ## TODO
 
-- Metro errors need to be symbolicated in order to show the correct file name and line number.
-- React Native LogBox needs to be presented less aggressively in order to develop with errors.
+- Metro errors need to be symbolicated in order to show the correct file name and line number on web.
+- React Native LogBox needs to be presented less aggressively in order to develop with errors. Currently it shows for `console.error`s and `console.warn`s but it should ideally only show for uncaught errors.
 
 <details>
   <summary>Interoperability</summary>

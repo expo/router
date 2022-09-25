@@ -8,9 +8,11 @@ In React Navigation, you often use `screenOptions` to configure layout options. 
 Consider the following stack layout:
 
 ```tsx title=app/(stack).tsx
+// highlight-next-line
 import { Stack } from "expo-router";
 
 export default function Layout() {
+  // highlight-next-line
   return <Stack />;
 }
 ```
@@ -24,6 +26,7 @@ import { Stack } from "expo-router";
 export default function Home() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      // highlight-next-line
       <Stack.Screen options={{ title: "Overview" }} />
     </View>
   );
@@ -40,6 +43,7 @@ import { Tabs } from "expo-router";
 export default function Layout() {
   return (
     <Tabs>
+      // highlight-next-line
       <Tabs.Screen name="index" options={{ title: "Overview" }} />
     </Tabs>
   );

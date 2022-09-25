@@ -22,7 +22,7 @@ import { Link } from "expo-router";
 
 On native, you can use the `uri-scheme` CLI to test opening native links on a device.
 
-```
+```bash
 npx uri-scheme open exp://192.168.87.39:19000/--/form-sheet --ios
 ```
 

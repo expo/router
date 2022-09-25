@@ -38,7 +38,7 @@ The entry file for classic Expo apps is `App.js`, the Expo config file is `app.j
 
 Routes are defined as files in the `app/` directory that export a React component as _default_. The file path is the route path.
 
-```sh
+```bash title="File System"
 app/
   index.js # Matches: 𝝠.com/
   home.js # Matches: 𝝠.com/home
@@ -53,14 +53,6 @@ export default function Page() {
 }
 ```
 
-This renders to:
-
-```xml
-<App>
-  <Index />
-</App>
-```
-
 - You can use extensions: `js`, `tsx`, `ts`, `tsx`. In a future iteration we will add support for any extension in the Metro config [`resolver.sourceExts`](https://facebook.github.io/metro/docs/configuration#sourceexts).
 - Any path in the `app/` directory can be used as a root path. There are no global root paths.
 - Platform extensions like `.ios.js` or `.native.ts` are not currently supported in the `app/` directory.
@@ -70,21 +62,24 @@ This renders to:
 To render shared navigation elements like a header, tab bar, or drawer, you can use a **layout route**.
 If a **route** has a sibling directory by the same name, it will be used as the layout component for all the files in the respective directory.
 
-```sh
+```bash title="File System"
 app/
+# highlight-next-line
   stack.js # Layout route. This is where a header bar would go
+  # highlight-next-line
   stack/ # Children of stack.js
     home.js # A child route of stack.js
 ```
 
 If a nested route does not have a layout route then a virtual, unstyled navigator will be generated in-memory to accommodate the child route:
 
-```sh
+```bash title="File System"
 app/
   stack/ # Unpaired layout route
     home.js # Child route of a virtual navigator
 
-  stack.tsx # This file exists in-memory to render the `stack/home.js` route. Creating this file will override the in-memory route
+# highlight-next-line
+  stack.tsx # This file exists in-memory to render the `stack/home.js` route. Creating this file will override the in-memory route.
 ```
 
 The virtual route system exists to accommodate native navigation which requires a parent navigator to render a child route.
@@ -105,14 +100,16 @@ Layout routes are also similar to `pages/_app.js` in Next.js.
 
 Fragment routes add nested layout without appending any path segments. Think of them like `index.js` but as a layout. These are most commonly used for adding navigators like tab, stack, drawer, etc... The format is `(name).js` and `/(name)`, the `name` is purely cosmetic and not provided to the route component.
 
-```sh
+```bash title="File System"
 app/
   layout.js # Layout route
   layout/
     home.js # 𝝠.com/layout/home
 
 app/
+# highlight-next-line
   (layout).js # Fragment route
+  # highlight-next-line
   (layout)/
     home.js # 𝝠.com/home
 ```
@@ -129,11 +126,13 @@ Both of these will render:
 
 Be careful when using parallel fragment routes as they can create conflicting matches. For example, the following routes will conflict:
 
-```sh
+```bash title="File System"
 app/
+# highlight-next-line
   profile.js # Matches /profile
   (layout).js
   (layout)/
+  # highlight-next-line
     profile.js # Matches /profile (conflict)
 ```
 
@@ -161,6 +160,15 @@ The Fragment convention is similar to:
 
 ## Index Routes
 
+```bash title="File System"
+app/
+   # highlight-next-line
+  index.js # Matches: 𝝠.com/
+    home/
+     # highlight-next-line
+      index.js # Matches: 𝝠.com/home/
+```
+
 - If a route is named `./index.js`, it will add both `index` and `/` to the route, effectively acting as a [fragment route](#fragment-routes).
 - Directories cannot be named `/index/`. The filename `/index.js` is reserved for [leaf routes](#leaf-routes).
 
@@ -175,25 +183,25 @@ Index routes are based on the original `index.html` system from the Tim Berners-
 
 ![](./assets/dynamic-routes.png)
 
-Dynamic routes match any unmatched path at a given segment level. For example, `/blog/[id]` is a dynamic route. The variable part (`[id]`) is called a "slug". Routes with higher specificity will be matched before a dynamic route. For example, `/blog/bacon` will match `blog/bacon.js` before `blog/[id].js`.
-
-```
+```bash title="File System"
 app/
   blog/
-    [id].js # 𝝠.com/blog/123
+    # highlight-next-line
+    [id].js # Matches: 𝝠.com/blog/123
 ```
 
-The slug can be accessed as a prop in the route component:
+Dynamic routes match any unmatched path at a given segment level. For example, `/blog/[id]` is a dynamic route. The variable part (`[id]`) is called a "slug". Routes with higher specificity will be matched before a dynamic route. For example, `/blog/bacon` will match `blog/bacon.js` before `blog/[id].js`.
 
-:::danger Pending research
-
-This convention is subject to breaking changes.
-
-:::
+The slug can be accessed from the `route.params.[name]` prop in the component:
 
 ```tsx title=app/blog/[id].js
-export default function BlogPost({ id }) {
-  return <Text>Blog post: {id}</Text>;
+export default function BlogPost({ route }) {
+  return (
+    <Text>
+    // highlight-next-line 
+      {route.params.id} 
+    </Text>
+  );
 }
 ```
 
@@ -222,6 +230,13 @@ There are a couple different ways to implement dynamic routes, here are some exi
 
 ![](./assets/deep-dynamic-roots.png)
 
+```bash title="File System"
+app/
+  blog/
+    # highlight-next-line
+    [...id].js # Matches: 𝝠.com/blog/123/456
+```
+
 Similar to dynamic routes, but the slug matches any number of unmatched path components in a route. For example, `/blog/[...id]` is a deep dynamic route where `[...id]` is the slug. `blog/[...ids].js` will match `/blog/1/2/3`.
 
 :::danger Pending research
@@ -240,6 +255,25 @@ Deep dynamic routes are functionally analogous to the 'optional catch-all dynami
 The convention is also similar to splats in Remix.
 
 </details>
+
+## Priority
+
+Routes with the highest specificity will be matched first. For example a **deep dynamic route** is less specific than a **dynamic route**, which is less specific than a named **route**. The following routes will match in the following order:
+
+```bash title="File System"
+app/
+  blog/
+    index.js # Matches: 𝝠.com/blog/
+    hello.js # Matches: 𝝠.com/blog/hello
+    [dynamic].js # Matches: 𝝠.com/blog/123
+    [...deep].js # Matches: 𝝠.com/blog/123/456
+```
+
+:::warning Beta Release
+
+Nested priority is a bit buggy right now. Please report broken configurations to [expo/router](https://github.com/expo/router/issues) repo.
+
+:::
 
 ## Glossary
 

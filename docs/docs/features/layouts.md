@@ -8,15 +8,19 @@ Layouts are parent components that provide a shared UI-driven navigation experie
 The simplest layouts (suited for web) are custom navigators that provide a single screen at a time. You can create a custom navigator by using the `<Children />` component.
 
 ```js title=app/parent.js
+// highlight-next-line
 import { Children } from "expo-router";
 
 export default function Page() {
-  // Renders the currently selected child.
+  // Renders the matching child route.
+  // highlight-next-line 
   return <Children />;
 }
 ```
 
-```js title=app/parent/profile.js
+Now create a child route to render inside the parent route:
+
+```js title=app/parent/child.js
 export default function Page() {
   return <View />;
 }
@@ -25,7 +29,8 @@ export default function Page() {
 You can extend this to create a basic layout like the ones found in most websites:
 
 ```js title=app/parent.js
-import { View } from "expo-router";
+import { View } from "react-native";
+// highlight-next-line
 import { Children, Link } from "expo-router";
 
 export default function App() {
@@ -55,11 +60,13 @@ For that native feel, we have a few native navigators that you can use. These ar
 - `NativeStack` - A stack navigator that renders a screen from a stack. This is a native stack navigator that uses native animations and gestures. `@react-navigation/native-stack`
 
 ```tsx
+// highlight-next-line
 import { Drawer } from 'expo-router';
 
 export default function Page() {
   // Accepts the same props as the React Navigation Drawer Navigator.
   // The most common props are `screenOptions` and `initialRouteName`.
+  // highlight-next-line
   return <Drawer { ... } />
 }
 ```
@@ -84,6 +91,7 @@ import { Layout, Children, Link } from "expo-router";
 
 export default function App() {
   return (
+    // highlight-next-line
     <Layout router={TabRouter}>
       <Header />
       <Children />

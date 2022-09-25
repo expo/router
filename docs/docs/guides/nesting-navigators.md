@@ -5,7 +5,7 @@ sidebar_position: 7
 
 Ports https://reactnavigation.org/docs/nesting-navigators
 
-```sh
+```bash title="File System"
 app/
 ├─ (stack).js
 ├─ (stack)/

@@ -9,14 +9,12 @@ Expo Router is in the earliest stage of development. The API is subject to break
 
 :::
 
-Expo Router is a zero-config framework for building complex native iOS and Android apps based on the project's file system. Build fast apps that run offline-first, with complete deep linking support automatically enabled for every screen in your app.
-
-Expo router is built on top of our powerful [React Navigation suite](https://reactnavigation.org/) of libraries, making it easy to bring your existing React Navigation code to the new router.
+Expo router is a new system for building complex native iOS and Android apps based on the project's file system. Expo router is built on top of our powerful [React Navigation suite](https://reactnavigation.org/) of libraries, making it easy to bring your existing React Navigation code to the new router.
 
 ## Features
 
 - **Native** Truly native navigation with the most cutting-edge developer experience.
-- **Zero-config** No need to configure anything, just start building your app.
+<!-- - **Zero-config** No need to configure anything, just start building your app. -->
 - **Deep linking** Every screen in your app is automatically deep linkable. Making any part of your app shareable.
 - **Offline-first** Apps are cached and run offline-first, with automatic updates when you publish a new version. Handles all incoming native URLs without a network connection or server.
 - **Scale** Apps are built with a modular architecture that scales to any size. Refactoring and upgrading are a breeze due to the declarative nature of the API.
@@ -28,23 +26,23 @@ Ensure your computer is [setup for running an Expo app](https://docs.expo.dev/ge
 
 Create a new Expo project:
 
-```sh
+```bash
 npx create-expo-app
 ```
 
 Install `expo-router`:
 
-```sh
+```bash
 npx expo install expo-router
 ```
 
-Then use `expo-router/entry` as the entry point to your app in your `package.json`:
+<!-- Then use `expo-router/entry` as the entry point to your app in your `package.json`:
 
 ```json
 {
   "main": "expo-router/entry"
 }
-```
+``` -->
 
 ## Beta setup
 
@@ -53,45 +51,96 @@ During the beta, you'll also need to use the latest version of [Expo CLI](https:
 And you'll need to configure your `metro.config.js` file as such:
 
 ```js title=metro.config.js
-// Learn more https://docs.expo.io/guides/customizing-metro
-const { getDefaultConfig } = require("expo/metro-config");
-
-const config = getDefaultConfig(__dirname);
-
-config.transformer = {
-  ...config.transformer,
-  unstable_allowRequireContext: true,
-};
-
-module.exports = config;
+// NOTE: `expo-router/metro-config` is a temporary version of `expo/metro-config`.
+const { getDefaultConfig } = require("expo-router/metro-config");
+module.exports = require("expo-router/metro-config").getDefaultConfig(
+  __dirname
+);
 ```
 
-You'll also need to resolve the latest version of Metro bundler to use our upstreamed features:
+You'll also need to resolve the latest version of Metro bundler to use our upstreamed features (this is required for Expo SDK 46):
 
 ```json title=package.json
 {
   "resolutions": {
-    "metro": "0.72.2",
-    "metro-babel-transformer": "0.72.2",
-    "metro-cache": "0.72.2",
-    "metro-cache-key": "0.72.2",
-    "metro-config": "0.72.2",
-    "metro-core": "0.72.2",
-    "metro-hermes-compiler": "0.72.2",
-    "metro-minify-uglify": "0.72.2",
-    "metro-react-native-babel-preset": "0.72.2",
-    "metro-react-native-babel-transformer": "0.72.2",
-    "metro-resolver": "0.72.2",
-    "metro-source-map": "0.72.2",
-    "metro-symbolicate": "0.72.2",
-    "metro-transform-plugins": "0.72.2",
-    "metro-transform-worker": "0.72.2"
+    "metro": "0.72.3"
   }
 }
 ```
 
+Configure the babel plugin:
+
+```js title=babel.config.js
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ["babel-preset-expo"],
+    plugins: [
+      "react-native-reanimated/plugin",
+      // NOTE: `expo-router/babel` is a temporary extension to `babel-preset-expo`.
+      require.resolve("expo-router/babel"),
+    ],
+  };
+};
+```
+
+Configure the entry point in your `package.json`:
+
+```json title=package.json
+{
+  "main": "index.js"
+}
+```
+
+Now create a new `index.js` file:
+
+```tsx title=index.js
+// Only required for Metro web
+import "@bacons/expo-metro-runtime";
+
+import { registerRootComponent } from "expo";
+import { ExpoRoot } from "expo-router";
+
+// Must be exported or Fast Refresh won't update the context module
+export function App() {
+  const ctx = require.context("./app");
+  return <ExpoRoot context={ctx} />;
+}
+
+registerRootComponent(App);
+```
+
+> This will be replaced with a single `expo-router/entry` import in the future, but it requires [extra CLI functionality](https://github.com/expo/expo/pull/19231).
+
+## Metro web setup
+
+The router is tied to the bundler which is currently only built for Metro. If you want to use the router with web, you'll need to enable Expo CLI's experimental Metro web support:
+
+```js title=app.json
+{
+  "expo": {
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
+```
+
+> Metro web font icons don't work: [pending PR](https://github.com/expo/expo/pull/19234).
+
 ## Usage
+
+Start the server with:
 
 ```
 yarn expo start
 ```
+
+Then open by pressing `i`, `a`, or `w` for web (only tested against Metro web).
+
+Create files in the `app` directory and they will be automatically added to the app.
+
+## Next Steps
+
+- [Guides](/docs/guides).
+- [Features and conventions](/docs/features).

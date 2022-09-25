@@ -54,7 +54,7 @@ export default function Details({ navigation }) {
 
 The final **file structure** should look like this:
 
-```sh
+```bash title="File System"
 app
 ├─ (stack).js
 ├─ (stack)

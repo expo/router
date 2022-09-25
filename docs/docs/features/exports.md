@@ -10,12 +10,13 @@ The router supports the following exports per page:
 
 ## ErrorBoundary
 
-A React component that wraps the page. If the page throws an error, the error boundary will catch it and render the error page. The `ErrorBoundary` is passed the props `{ error: Error, retry: () => Promise<void> }`, where `error` is the caught error and `retry` is a function that will rerender the component. Error boundaries are optional. Error boundaries are loaded with the page meaning they cannot be used to catch any errors that are thrown while loading the page asynchronously from a network request, to handle this, use a router at a lower level in the tree.
+Error boundary is an optional a React component that wraps the route component. If the route component throws an error, the error boundary will catch it and render a fallback UI. This is useful for data fetching. The `ErrorBoundary` is passed the props `{ error: Error, retry: () => Promise<void> }`, where `error` is the caught error and `retry` is a function that will re-render the route component.
 
 ```js title=app/index.tsx
 import { Text, View } from "react-native";
 import { ErrorBoundaryProps } from "expo-router";
 
+// highlight-next-line
 export function ErrorBoundary(props: ErrorBoundaryProps) {
   return (
     <View style={{ flex: 1, backgroundColor: "red" }}>
@@ -27,35 +28,9 @@ export function ErrorBoundary(props: ErrorBoundaryProps) {
 
 export default function App({ navigation }) {
   if (Math.random() > 0.5) {
-    throw new Error("lol: " + __filename);
+    // highlight-next-line
+    throw new Error("fake component error: " + __filename);
   }
-  return (
-    <View
-      style={{
-        margin: 24,
-        borderRadius: 20,
-        flex: 1,
-        backgroundColor: "blue",
-        padding: 24,
-        alignItems: "stretch",
-      }}
-    >
-      <Text
-        style={{ position: "absolute", top: 8, left: 8 }}
-        onPress={() => {
-          navigation.goBack();
-        }}
-      >
-        {__filename}
-      </Text>
-    </View>
-  );
+  return <Text>Component</Text>;
 }
 ```
-
-<details>
-  <summary>Interoperability</summary>
-
-The exports convention is somewhat similar to [Redwood cells](https://redwoodjs.com/docs/cells) and data loading in [Remix](https://remix.run/docs/en/v1/api/conventions#data-loading), Next.js, etc.
-
-</details>
