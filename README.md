@@ -4,8 +4,9 @@ This is a preview of the new router for React Native apps. It is currently in al
 The repo also acts as an **RFC for the router**. Please open a discussion if you have any questions or feedback.
 
 - [Router](/packages/expo-router) - Current implementation.
-- [Documentation](/docs/index.md) - Current documentation for the router (WIP / RFC).
+- [Documentation](https://expo.github.io/router) - Current documentation for the router (WIP / RFC).
 - [Example](/apps/demo) - Test app.
+- [RFC](https://github.com/expo/router/discussions/1) - Add your feedback here.
 
 ## Demo
 
