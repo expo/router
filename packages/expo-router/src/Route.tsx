@@ -1,6 +1,7 @@
 import React, { ReactNode, useContext } from 'react';
-import { getNameFromFilePath } from './matchers';
+
 import { RoutesContext } from './context';
+import { getNameFromFilePath, matchFragmentName } from './matchers';
 
 /** The list of input keys will become optional, everything else will remain the same. */
 export type PickPartial<T, K extends keyof T> = Omit<T, K> &
@@ -24,36 +25,28 @@ export type RouteNode = {
 
     /** Internal screens like the directory or the auto 404 should be marked as internal. */
     internal?: boolean;
-
-    /** React Navigation screen name. */
-    screenName: string;
 };
 
-const CurrentRouteContext = React.createContext<{
-    filename: string | null;
-    routes: RouteNode[];
-    // siblings: RouteNode[];
-    // parent: RouteNode | null;
-}>({
-    filename: null,
-    routes: [],
-    // siblings: [],
-    // parent: null,
-});
+const CurrentRoutePathContext = React.createContext<string | null>(null);
 
-if (process.env.NODE_ENV === "development") {
+const CurrentRouteContext = React.createContext<RouteNode[]>([]);
+
+if (process.env.NODE_ENV !== "production") {
+    CurrentRoutePathContext.displayName = "RoutePath";
     CurrentRouteContext.displayName = "Route";
 }
 
 /** Return all the routes for the current boundary. */
 export function useRoutes(): RouteNode[] {
-    const { filename, routes } = useContext(CurrentRouteContext);
-    if (process.env.NODE_ENV === "development") {
-        if (!filename) {
-            throw new Error("No filename found. This is likely a bug in expo-router.");
-        }
+    return useContext(CurrentRouteContext);
+}
+
+export function useContextKey(): string {
+    const filename = useContext(CurrentRoutePathContext);
+    if (!filename) {
+        throw new Error("No filename found. This is likely a bug in expo-router.");
     }
-    return routes;
+    return filename;
 }
 
 /** Provides the matching routes and filename to the children. */
@@ -67,11 +60,15 @@ export function Route({
     const routes = useRoutesAtPath(filename);
 
     return (
-        <CurrentRouteContext.Provider
-            value={{ filename, routes }}
+        <CurrentRoutePathContext.Provider
+            value={filename}
         >
-            {children}
-        </CurrentRouteContext.Provider>
+            <CurrentRouteContext.Provider
+                value={routes}
+            >
+                {children}
+            </CurrentRouteContext.Provider>
+        </CurrentRoutePathContext.Provider>
     );
 }
 
@@ -82,9 +79,6 @@ function useRoutesAtPath(filename: string): RouteNode[] {
 
     const family = React.useMemo(() => {
         let children: RouteNode[] = routes;
-        let current: RouteNode | null = null;
-        // let siblings: RouteNode[] = [];
-        // let parent: RouteNode | null = null;
 
         // Skip root directory
         if (normalName) {
@@ -97,15 +91,42 @@ function useRoutesAtPath(filename: string): RouteNode[] {
                     return [];
                 }
 
-                // parent = current;
-                // siblings = children;
-                current = next;
                 children = next?.children;
             }
         }
 
-        return children
+        return children.sort(sortRoutes)
     }, [normalName, keys]);
 
     return family;
+}
+
+export function sortRoutes(a: RouteNode, b: RouteNode): number {
+    if (a.dynamic && !b.dynamic) {
+        return 1;
+    }
+    if (!a.dynamic && b.dynamic) {
+        return -1;
+    }
+    if (a.dynamic && b.dynamic) {
+        if (a.dynamic.deep && !b.dynamic.deep) {
+            return 1;
+        }
+        if (!a.dynamic.deep && b.dynamic.deep) {
+            return -1;
+        }
+        return 0;
+    }
+
+    const aIndex = a.route === "index" || matchFragmentName(a.route) != null;
+    const bIndex = b.route === "index" || matchFragmentName(b.route) != null;
+
+    if (aIndex && !bIndex) {
+        return -1;
+    }
+    if (!aIndex && bIndex) {
+        return 1;
+    }
+
+    return a.route.length - b.route.length;
 }

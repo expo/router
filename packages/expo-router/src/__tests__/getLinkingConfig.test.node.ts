@@ -2,10 +2,8 @@ import { treeToReactNavigationLinkingRoutes } from "../getLinkingConfig";
 
 const mockRoutes = [
   {
-    screenName: "(second-fragment)",
     children: [
       {
-        screenName: "people",
         children: [],
         dynamic: null,
         route: "people",
@@ -17,10 +15,8 @@ const mockRoutes = [
     contextKey: "./(second-fragment).tsx",
   },
   {
-    screenName: "(fragment)",
     children: [
       {
-        screenName: "deep",
         children: [],
         dynamic: {
           name: "deep",
@@ -30,7 +26,6 @@ const mockRoutes = [
         contextKey: "./(fragment)/[...deep].tsx",
       },
       {
-        screenName: "dynamic",
         children: [],
         dynamic: {
           name: "dynamic",
@@ -40,7 +35,6 @@ const mockRoutes = [
         contextKey: "./(fragment)/[dynamic].tsx",
       },
       {
-        screenName: "index",
         children: [],
         dynamic: null,
         route: "index",
@@ -52,13 +46,10 @@ const mockRoutes = [
     contextKey: "./(fragment).tsx",
   },
   {
-    screenName: "other",
     children: [
       {
-        screenName: "nested",
         children: [
           {
-            screenName: "screen",
             children: [],
             dynamic: {
               name: "screen",
@@ -80,7 +71,6 @@ const mockRoutes = [
     generated: true,
   },
   {
-    screenName: "__index",
     children: [],
     dynamic: null,
     route: "__index",
@@ -92,32 +82,24 @@ const mockRoutes = [
 
 describe(treeToReactNavigationLinkingRoutes, () => {
   it("should return a valid linking config", () => {
-    // @ts-expect-error
-    expect(treeToReactNavigationLinkingRoutes(mockRoutes)).toEqual({
-      "(second-fragment)": {
-        path: "",
-        screens: {
-          people: { path: "people" },
-        },
-      },
+    expect(
+      treeToReactNavigationLinkingRoutes(
+        // @ts-expect-error
+        mockRoutes
+      )
+    ).toEqual({
       "(fragment)": {
         path: "",
-        screens: {
-          deep: { path: "*" },
-          dynamic: { path: ":dynamic" },
-          index: { path: "" },
-        },
+        screens: { "[...deep]": "*", "[dynamic]": ":dynamic", index: "" },
       },
+      "(second-fragment)": { path: "", screens: { people: "people" } },
+      __index: "__index",
       other: {
         path: "other",
         screens: {
-          nested: {
-            path: "nested",
-            screens: { screen: { path: "*" } },
-          },
+          nested: { path: "nested", screens: { "[...screen]": "*" } },
         },
       },
-      __index: { path: "__index" },
     });
   });
 });
