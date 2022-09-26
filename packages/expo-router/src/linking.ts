@@ -1,27 +1,8 @@
 import Constants, { ExecutionEnvironment } from "expo-constants";
 import * as Linking from "expo-linking";
-import { Platform } from "react-native";
 
 import getPathFromState from "./fork/getPathFromState";
 import getStateFromPath from "./fork/getStateFromPath";
-import { useOptionalNavigation } from "./useOptionalNavigation";
-
-/**
- * Get the client-side URL. On web this is always the current URL, on native this may differ from the native Linking state.
- *
- * You can use `Linking.createURL(useClientURL())` to get the absolute URL.
- */
-export function useClientURL() {
-  if (Platform.OS === "web") {
-    return Linking.useURL() ?? window.location.href;
-  }
-  const navigation = useOptionalNavigation();
-
-  if (navigation) {
-    return getPathFromState(navigation.getState());
-  }
-  return "/";
-}
 
 // A custom getInitialURL is used on native to ensure the app always starts at
 // the root path if it's launched from something other than a deep link.
