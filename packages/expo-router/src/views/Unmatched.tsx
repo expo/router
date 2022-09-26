@@ -9,7 +9,7 @@ export const Unmatched = forwardRef((props, ref) => {
     const url = createURL("");
     return (
         // @ts-ignore
-        <View ref={ref} accessibilityRole="main" style={styles.container}>
+        <View ref={ref} style={styles.container}>
             <Text
                 accessibilityRole="header"
                 accessibilityLevel={1}

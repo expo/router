@@ -71,7 +71,7 @@ export function Tutorial() {
                     alignItems: "stretch",
                 }}
             >
-                <View accessibilityRole="main" style={styles.container}>
+                <View style={styles.container}>
                     <Header />
                     <Text
                         accessibilityRole="header"
