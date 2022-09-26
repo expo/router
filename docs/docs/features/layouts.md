@@ -102,6 +102,7 @@ export default function App() {
 function Header() {
   const {
     // Access the internal state of the navigator.
+    pathname,
     navigation,
     state,
     descriptors,
@@ -111,7 +112,14 @@ function Header() {
   return (
     <View>
       <Link href="/">Home</Link>
-      <Link href="/profile">Profile</Link>
+      <Link
+        href="/profile"
+        // Use `pathname` to determine if the link is active.
+        // highlight-next-line
+        style={[pathname === "profile" && { color: "blue" }]}
+      >
+        Profile
+      </Link>
       <Link href="/settings">Settings</Link>
     </View>
   );

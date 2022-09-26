@@ -116,13 +116,17 @@ function treeNodeToRouteNode({
 
 function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
   const nodes = contextModule.keys().map((key) => {
-    // if (process.env.NODE_ENV === "development") {
     // In development, check if the file exports a default component
     // this helps keep things snappy when creating files. In production we load all screens lazily.
-    if (!contextModule(key)?.default) {
+    try {
+      if (!contextModule(key)?.default) {
+        return null;
+      }
+    } catch (error) {
+      // Probably this won't stop metro from freaking out but it's worth a try.
+      console.warn('Error loading route "' + key + '"', error);
       return null;
     }
-    // }
 
     const node: FileNode = {
       normalizedName: getNameFromFilePath(key),
