@@ -1,6 +1,6 @@
 ---
 title: Layouts
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 Layouts are parent components that provide a shared UI-driven navigation experience across multiple screens.
