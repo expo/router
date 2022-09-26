@@ -9,7 +9,7 @@ Expo Router is in the earliest stage of development. The API is subject to break
 
 :::
 
-Expo router is a new system for building complex native iOS and Android apps based on the project's file system. Expo router is built on top of our powerful [React Navigation suite](https://reactnavigation.org/) of libraries, making it easy to bring your existing React Navigation code to the new router.
+Expo Router brings the best routing concepts from the web to native iOS and Android apps. Every file in the **app** directory automatically becomes a route in your mobile navigation, making it easier than ever to build, maintain, and scale your project. It's built on top of our powerful [React Navigation suite](https://reactnavigation.org/) enabling truly native navigation. The entire deep linking system is automatically generated live, so users can share links to any route in your app.
 
 ## Features
 
@@ -18,7 +18,8 @@ Expo router is a new system for building complex native iOS and Android apps bas
 - **Deep linking** Every screen in your app is automatically deep linkable. Making any part of your app shareable.
 - **Offline-first** Apps are cached and run offline-first, with automatic updates when you publish a new version. Handles all incoming native URLs without a network connection or server.
 - **Scale** Apps are built with a modular architecture that scales to any size. Refactoring and upgrading are a breeze due to the declarative nature of the API.
-- **Iteration** Universal Fast Refresh across iOS, Android, and web along with intelligent artifact memoziation in the bundler keep you moving fast at scale.
+- **Iteration** Universal Fast Refresh across iOS, Android, and web along with artifact memoziation in the bundler keep you moving fast at scale.
+- **Cross-Platform** Expo router is a large step towards universal React apps. The same codebase can be used to build iOS, Android, and web apps.
 
 ## Getting Started
 
