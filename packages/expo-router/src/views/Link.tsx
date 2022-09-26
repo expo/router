@@ -1,15 +1,21 @@
 // Fork of @react-navigation/native Link.tsx
-import type { NavigationAction } from '@react-navigation/core';
+import { Text, TextProps } from '@bacons/react-views';
+import { Slot } from '@radix-ui/react-slot';
+import { useLinkProps } from '@react-navigation/native';
 import * as React from 'react';
 import { GestureResponderEvent, Platform } from 'react-native';
-import { Text, TextProps } from '@bacons/react-views'
-import { useLinkProps, } from '@react-navigation/native';
-import { Slot } from '@radix-ui/react-slot'
+
+import type { NavigationAction } from '@react-navigation/core';
 import type { To } from '@react-navigation/native/src/useLinkTo';
 
 type Props<ParamList extends ReactNavigation.RootParamList> = {
+    /** Add a property which is familiar to  */
+    href?: string | { pathname?: string; query?: Record<string, any> };
+
+    /** Forward props to child component. Useful for custom buttons. */
     asChild?: boolean;
-    href?: string;
+
+
     to?: To<ParamList>;
     action?: NavigationAction;
     target?: string;
@@ -28,6 +34,63 @@ type Props<ParamList extends ReactNavigation.RootParamList> = {
  */
 export const Link = React.forwardRef(BaseLink);
 
+
+const parseHrefProps = (href: { pathname?: string; query?: Record<string, any> } | string) => {
+    if (typeof href === 'string') {
+        return href ?? '';
+    }
+    const path = href.pathname ?? '';
+    if (!href?.query) {
+        return path
+    }
+    const { pathname, query } = createQualifiedPathname(path, { ...href.query });
+    return pathname + (Object.keys(query).length ? `?${createQuery(query)}` : '')
+}
+
+function createQualifiedPathname(pathname: string, query: Record<string, any>) {
+    for (const [key, value = ''] of Object.entries(query)) {
+        const dynamicKey = `[${key}]`;
+        const deepDynamicKey = `[...${key}]`;
+        if (pathname.includes(dynamicKey)) {
+            pathname = pathname.replace(dynamicKey, Array.isArray(value) ? value.join('/') : value)
+        } else if (pathname.includes(deepDynamicKey)) {
+            pathname = pathname.replace(deepDynamicKey, Array.isArray(value) ? value.join('/') : value)
+        } else {
+            continue;
+        }
+
+        delete query[key]
+    }
+    return { pathname, query }
+}
+
+function createQuery(query: Record<string, any>) {
+    return Object.keys(query)
+        .map((key) => `${key}=${query[key]}`)
+        .join('&');
+}
+
+function useResolvedHref<ParamList extends ReactNavigation.RootParamList>({ href, to }: Pick<Props<ParamList>, 'href' | "to">) {
+    // TODO: Auto use router's client-side event.
+    return React.useMemo(() => {
+        if (href) {
+            return parseHrefProps(href);
+        }
+
+        if (to == null) {
+            throw new Error(
+                `You must specify either 'href' or 'to' prop in a <Link />.`
+            );
+        }
+        if (typeof to === 'string' && !to.startsWith('/')) {
+            // TODO: Auto delegate out external links
+            return '/'
+        }
+        return to;
+    }, [href, to]);
+}
+
+
 function BaseLink<ParamList extends ReactNavigation.RootParamList>({
     to,
     href,
@@ -36,19 +99,8 @@ function BaseLink<ParamList extends ReactNavigation.RootParamList>({
     ...rest
 }: Props<ParamList>, ref: React.ForwardedRef<Text>) {
     // TODO: Auto use router's client-side event.
-    const resolvedTo = React.useMemo(() => {
-        const resolved = href ? href : to;
-        if (resolved == null) {
-            throw new Error(
-                `You must specify either 'href' or 'to' prop in a <Link />.`
-            );
-        }
-        if (typeof resolved === 'string' && !resolved.startsWith('/')) {
-            // TODO: Auto delegate out external links
-            return '/'
-        }
-        return resolved;
-    }, [href, to]);
+    const resolvedTo = useResolvedHref({ href, to });
+
     const props = useLinkProps<ParamList>({ to: resolvedTo, action });
 
     const onPress = (
@@ -57,9 +109,9 @@ function BaseLink<ParamList extends ReactNavigation.RootParamList>({
         if ('onPress' in rest) {
             rest.onPress?.(e);
         }
-
         props.onPress(e);
     };
+
 
     return React.createElement(
         // @ts-expect-error: slot is not type-safe
