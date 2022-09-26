@@ -1,26 +1,13 @@
-import {
-    findFocusedRoute,
-    LinkingOptions,
-    NavigationContainer,
-    NavigationContainerRef,
-    ParamListBase,
-} from '@react-navigation/native';
-import React, { useCallback, useMemo } from 'react';
+import { findFocusedRoute, NavigationContainer, NavigationContainerRef, ParamListBase } from '@react-navigation/native';
+import React, { useCallback } from 'react';
 
-import { useRoutesContext } from './context';
-import { getLinkingConfig } from './getLinkingConfig';
+import { useLinkingConfig } from './getLinkingConfig';
 import SplashModule from './splash';
+import { VirtualRouteContext } from './useCurrentRoute';
 
 type NavigationContainerProps = React.ComponentProps<
     typeof NavigationContainer
 >;
-
-function useLinkingConfig(): LinkingOptions<{}> {
-    const routes = useRoutesContext();
-    return useMemo(() => getLinkingConfig(routes), [routes]);
-}
-
-const ClientRouteContext = React.createContext<{ pathname: string | null, query: Record<string, any> }>({ pathname: null, query: {} });
 
 const NavigationContainerContext = React.createContext<[Partial<NavigationContainerProps>, (props: Partial<NavigationContainerProps>) => void]>([{}, function () { }]);
 
@@ -34,16 +21,6 @@ export function useNavigationContainerContext() {
     return context;
 }
 
-export function useCurrentRoute() {
-    const context = React.useContext(ClientRouteContext);
-    if (!context) {
-        throw new Error(
-            "useCurrentRoute must be used within a NavigationContainerContext"
-        );
-    }
-    return context;
-}
-
 /** react-navigation `NavigationContainer` with automatic `linking` prop generated from the routes context. */
 export const ContextNavigationContainer = React.forwardRef(
     (props: NavigationContainerProps, ref: NavigationContainerProps["ref"]) => {
@@ -51,17 +28,12 @@ export const ContextNavigationContainer = React.forwardRef(
 
         const linking = useLinkingConfig();
         console.log('linking', linking);
-        const onReady = useCallback(() => {
-            props.onReady?.();
-            SplashModule?.hideAsync();
-        }, [props.onReady]);
 
         return (
             <NavigationContainerContext.Provider value={[
                 {
                     ...props,
                     linking,
-                    onReady,
                     ...state,
                 },
                 setState,
@@ -99,7 +71,7 @@ const InternalContextNavigationContainer = React.forwardRef(
         React.useImperativeHandle(ref, () => navigationRef.current!, [navigationRef]);
 
         return (
-            <ClientRouteContext.Provider value={state}>
+            <VirtualRouteContext.Provider value={state}>
                 { /* @ts-expect-error: children are required */}
                 <NavigationContainer
                     {...props}
@@ -107,6 +79,7 @@ const InternalContextNavigationContainer = React.forwardRef(
                     ref={navigationRef}
                     onReady={() => {
                         contextProps.onReady?.();
+                        SplashModule?.hideAsync();
                         const initialState = navigationRef.current?.getRootState();
                         onStateChange(initialState);
                     }}
@@ -115,7 +88,7 @@ const InternalContextNavigationContainer = React.forwardRef(
                         onStateChange(state);
                     }}
                 />
-            </ClientRouteContext.Provider>
+            </VirtualRouteContext.Provider>
         );
     }
 );

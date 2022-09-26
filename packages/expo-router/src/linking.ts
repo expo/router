@@ -26,23 +26,30 @@ export async function getInitialURL(): Promise<string> {
         // If the URL is defined (default in Expo Go dev apps) and the URL has no path:
         // `exp://192.168.87.39:19000/` then use the default `exp://192.168.87.39:19000/--/`
         if (parsed.path === null || ["", "/"].includes(parsed.path)) {
-          return rootURL;
+          return getRootURL();
         }
       }
       // The path will be nullish in bare apps when the app is launched from the home screen.
       // TODO(EvanBacon): define some policy around notifications.
-      return url ?? rootURL;
+      return url ?? getRootURL();
     })(),
     new Promise<string>((resolve) =>
       // Timeout in 150ms if `getInitialState` doesn't resolve
       // Workaround for https://github.com/facebook/react-native/issues/25675
-      setTimeout(() => resolve(rootURL), 150)
+      setTimeout(() => resolve(getRootURL()), 150)
     ),
   ]);
   return url;
 }
 
-export const rootURL = Linking.createURL("/");
+let _rootURL: string | undefined;
+
+export function getRootURL() {
+  if (_rootURL === undefined) {
+    _rootURL = Linking.createURL("/");
+  }
+  return _rootURL;
+}
 
 export function addEventListener(listener: (url: string) => void) {
   let callback: (({ url }: { url: string }) => void) | undefined = undefined;
@@ -54,7 +61,7 @@ export function addEventListener(listener: (url: string) => void) {
       // If the URL is defined (default in Expo Go dev apps) and the URL has no path:
       // `exp://192.168.87.39:19000/` then use the default `exp://192.168.87.39:19000/--/`
       if (parsed.path === null || ["", "/"].includes(parsed.path)) {
-        listener(rootURL);
+        listener(getRootURL());
       } else {
         listener(url);
       }
