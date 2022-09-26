@@ -1,5 +1,5 @@
-export { useRoutes } from "./Route";
-export { useScreens } from "./useScreens";
+// export { useRoutes } from "./Route";
+// export { useScreens } from "./useScreens";
 
 export { ErrorBoundaryProps } from "./views/Try";
 
@@ -15,7 +15,8 @@ export { ErrorBoundary } from "./views/ErrorBoundary";
 
 export { Layout, Children } from "./views/Layout";
 export { Link } from "./views/Link";
-export { RootContainer, useNavigationContainerContext } from "./ContextNavigationContainer";
-export { useCurrentRoute } from "./useCurrentRoute";
+export { useLink } from "./useLink";
+export { RootContainer } from "./ContextNavigationContainer";
+// export { useCurrentRoute } from "./useCurrentRoute";
 
-export * as Linking from './linking'
+export * as Linking from "./linking";
