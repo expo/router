@@ -12,7 +12,7 @@ import { RouteNode } from "./Route";
 import {
   addEventListener,
   getInitialURL,
-  rootURL,
+  getRootURL,
   getPathFromState,
   getStateFromPath,
 } from "./linking";
@@ -70,7 +70,7 @@ export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<{}> {
   return {
     prefixes: [
       /* your linking prefixes */
-      rootURL,
+      getRootURL(),
 
       // This ensures that we can redirect correctly when the user comes from an associated domain
       // i.e. iOS Safari banner.

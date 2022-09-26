@@ -1,6 +1,6 @@
 {
   "name": "expo-router",
-  "version": "0.0.11",
+  "version": "0.0.13",
   "main": "build/index.js",
   "files": [
     "entry.js",
@@ -54,6 +54,7 @@
     "@react-navigation/stack": "^6.2.3",
     "expo-constants": "~13.2.4",
     "expo-linking": "^3.2.2",
+    "expo-splash-screen": "^0.16.2",
     "expo-status-bar": "^1.4.0",
     "react-native-gesture-handler": "~2.5.0",
     "react-native-reanimated": "~2.9.1",
