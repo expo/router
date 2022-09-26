@@ -16,3 +16,5 @@ export { ErrorBoundary } from "./views/ErrorBoundary";
 export { Layout, Children } from "./views/Layout";
 export { Link } from "./views/Link";
 export { RootContainer, useNavigationContainerContext } from "./ContextNavigationContainer";
+
+export * as Linking from './linking'
