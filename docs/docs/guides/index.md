@@ -65,4 +65,4 @@ app/
     details.js
 ```
 
-Ports the guide [React Navigation: Hello world](https://reactnavigation.org/docs/hello-react-navigation) to Expo router.
+Ports the guide [React Navigation: Hello world](https://reactnavigation.org/docs/hello-react-navigation) to Expo Router.

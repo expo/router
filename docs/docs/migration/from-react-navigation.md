@@ -31,7 +31,7 @@ If you were passing complex options through the navigator, you should move to us
 | `createDrawerNavigator`      | `Drawer`      |
 | `createNativeStackNavigator` | `NativeStack` |
 
-Expo router wraps React Navigation APIs and re-exports them with light-weight context-aware wrappers.
+Expo Router wraps React Navigation APIs and re-exports them with light-weight context-aware wrappers.
 
 ```tsx
 // No: This is a React Navigation API.
@@ -39,7 +39,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 const Stack = createStackNavigator();
 
-// Yes: This is an Expo router API.
+// Yes: This is an Expo Router API.
 import { Stack } from "expo-router";
 ```
 

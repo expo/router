@@ -3,7 +3,7 @@ title: Nesting navigators
 sidebar_position: 7
 ---
 
-Ports the guide [React Navigation: Nesting navigators](https://reactnavigation.org/docs/nesting-navigators) to Expo router.
+Ports the guide [React Navigation: Nesting navigators](https://reactnavigation.org/docs/nesting-navigators) to Expo Router.
 
 ```bash title="File System"
 app/

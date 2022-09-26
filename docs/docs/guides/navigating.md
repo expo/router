@@ -3,7 +3,7 @@ title: Moving between screens
 sidebar_position: 3
 ---
 
-Ports the guide [React Navigation: Navigating](https://reactnavigation.org/docs/navigating) to Expo router.
+Ports the guide [React Navigation: Navigating](https://reactnavigation.org/docs/navigating) to Expo Router.
 
 ```bash title="File System"
 app/

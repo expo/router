@@ -9,7 +9,7 @@ Expo Router is in the earliest stage of development. The API is subject to break
 
 :::
 
-The file system-based routing convention enables developers to structure their app in a logic and intuitive way. Expo router uses this convention to optimize the app by generating native deep links and web routes automatically.
+The file system-based routing convention enables developers to structure their app in a logic and intuitive way. Expo Router uses this convention to optimize the app by generating native deep links and web routes automatically.
 
 The convention is based on the concept of nesting routes inside each other to create shared UI elements like tab bars and headers across multiple children. This format should feel familiar to React developers.
 
@@ -136,7 +136,7 @@ app/
     profile.js # Matches /profile (conflict)
 ```
 
-Expo router will assert when there are route collisions.
+Expo Router will assert when there are route collisions.
 
 The name 'Fragment' route is a nod to [React Fragments](https://reactjs.org/docs/fragments.html) (`<>{...}</>`) which wrap components without adding any additional views to the hierarchy.
 
@@ -198,8 +198,8 @@ The slug can be accessed from the `route.params.[name]` prop in the component:
 export default function BlogPost({ route }) {
   return (
     <Text>
-    // highlight-next-line 
-      {route.params.id} 
+      // highlight-next-line
+      {route.params.id}
     </Text>
   );
 }

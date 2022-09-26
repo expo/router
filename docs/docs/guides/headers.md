@@ -3,7 +3,7 @@ title: Configuring the header bar
 sidebar_position: 5
 ---
 
-Ports the guide [React Navigation: header buttons](https://reactnavigation.org/docs/headers) to Expo router.
+Ports the guide [React Navigation: header buttons](https://reactnavigation.org/docs/headers) to Expo Router.
 
 ```bash title="File System"
 app/

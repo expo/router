@@ -11,7 +11,7 @@ Discuss them with us on [GitHub](https://github.com/expo/router/discussions).
 
 ## Expo Router vs. Expo vs. React Native CLI
 
-Expo router is akin to modern web frameworks like Next.js or Remix, whereas default Expo/React Native projects are more closely related to default React projects built with Create React App.
+Expo Router is akin to modern web frameworks like Next.js or Remix, whereas default Expo/React Native projects are more closely related to default React projects built with Create React App.
 
 After this framework has been proven at scale and we have had time to collect and implement community feedback then we will consider moving this framework into the `expo` default offering. If this happens then `expo-router` will become `expo/router` and the entire process will be even easier to use.
 
@@ -36,7 +36,7 @@ Yes, all of Expo's tools and services can be used with any React Native project.
 
 > TL;DR: You use the `expo` router _with_ React Navigation, it's not a replacement.
 
-Automation is not only easier but it's more reliable. Having to manually maintain the React Navigation components and the deep linking configuration is prone to errors. The Expo router turns your file system into a single source of truth for navigation and deep linking.
+Automation is not only easier but it's more reliable. Having to manually maintain the React Navigation components and the deep linking configuration is prone to errors. The Expo Router turns your file system into a single source of truth for navigation and deep linking.
 
 Expo's routing API is designed to be universal for iOS, Android, and web but our priority is to solving native development. This means there may be aspects of a web-only framework that are more optimal for web, and we recommend using the tools that best suit your needs.
 

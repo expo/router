@@ -3,7 +3,7 @@ title: Header buttons
 sidebar_position: 6
 ---
 
-Ports the guide [React Navigation: header buttons](https://reactnavigation.org/docs/header-buttons) to Expo router.
+Ports the guide [React Navigation: header buttons](https://reactnavigation.org/docs/header-buttons) to Expo Router.
 
 ```bash title="File System"
 app/

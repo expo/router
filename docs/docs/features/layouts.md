@@ -122,7 +122,7 @@ function Header() {
 
 ## Pure Native
 
-Expo router exports the `NativeStack` component which provides access to the underlying native navigation primitives like `UINavigationController` on iOS and `Fragment` on Android. This is a drop-in replacement for `createNativeStackNavigator` from React Navigation.
+Expo Router exports the `NativeStack` component which provides access to the underlying native navigation primitives like `UINavigationController` on iOS and `Fragment` on Android. This is a drop-in replacement for `createNativeStackNavigator` from React Navigation.
 
 ```tsx title=app/(stack).tsx
 import { NativeStack } from "expo-router";

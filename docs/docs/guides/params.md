@@ -3,7 +3,7 @@ title: Passing parameters to the routes
 sidebar_position: 4
 ---
 
-Ports the guide [React Navigation: Params](https://reactnavigation.org/docs/params) to Expo router.
+Ports the guide [React Navigation: Params](https://reactnavigation.org/docs/params) to Expo Router.
 
 ```bash title="File System"
 app/
