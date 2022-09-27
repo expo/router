@@ -25,7 +25,7 @@ Expo Router brings the best routing concepts from the web to native iOS and Andr
 
 Ensure your computer is [setup for running an Expo app](https://docs.expo.dev/get-started/installation/).
 
-Create a new Expo project:
+Create a new Expo project (`expo@46.0.13` and greater):
 
 ```bash
 npx create-expo-app
@@ -37,29 +37,17 @@ Install `expo-router`:
 npx expo install expo-router
 ```
 
-<!-- Then use `expo-router/entry` as the entry point to your app in your `package.json`:
+Then use `expo-router/entry` as the entry point to your app in your `package.json`:
 
 ```json
 {
   "main": "expo-router/entry"
 }
-``` -->
+```
 
 ## Beta setup
 
-During the beta, you'll also need to use the latest version of [Expo CLI](https://github.com/expo/expo/blob/main/packages/%40expo/cli/README.md#contributing) from the [`@evanbacon/cli/touch-middleware`](https://github.com/expo/expo/compare/%40evanbacon/cli/touch-middleware) branch.
-
-And you'll need to configure your `metro.config.js` file as such:
-
-```js title=metro.config.js
-// NOTE: `expo-router/metro-config` is a temporary version of `expo/metro-config`.
-const { getDefaultConfig } = require("expo-router/metro-config");
-module.exports = require("expo-router/metro-config").getDefaultConfig(
-  __dirname
-);
-```
-
-You'll also need to resolve the latest version of Metro bundler to use our upstreamed features (this is required for Expo SDK 46):
+Ensure you're using at least `metro@0.72.3` by setting a yarn resolution (this step goes away in Expo SDK 47):
 
 ```json title=package.json
 {
@@ -85,34 +73,6 @@ module.exports = function (api) {
 };
 ```
 
-Configure the entry point in your `package.json`:
-
-```json title=package.json
-{
-  "main": "index.js"
-}
-```
-
-Now create a new `index.js` file:
-
-```tsx title=index.js
-// Only required for Metro web
-import "@bacons/expo-metro-runtime";
-
-import { registerRootComponent } from "expo";
-import { ExpoRoot } from "expo-router";
-
-// Must be exported or Fast Refresh won't update the context module
-export function App() {
-  const ctx = require.context("./app");
-  return <ExpoRoot context={ctx} />;
-}
-
-registerRootComponent(App);
-```
-
-> This will be replaced with a single `expo-router/entry` import in the future, but it requires [extra CLI functionality](https://github.com/expo/expo/pull/19231).
-
 Install packages which need to be in the local package.json due to the way React Native CLI links native modules:
 
 ```bash
@@ -123,7 +83,7 @@ npx expo install react-native-safe-area-context react-native-screens react-nativ
 
 ## Metro web setup
 
-The router is tied to the bundler which is currently only built for Metro. If you want to use the router with web, you'll need to enable Expo CLI's experimental Metro web support:
+The router is tied to the bundler which is currently only built for Metro. If you want to use the router with web, you'll need to enable Expo CLI's [experimental Metro web support](https://docs.expo.dev/guides/customizing-metro/#web-support):
 
 ```js title=app.json
 {
@@ -134,8 +94,6 @@ The router is tied to the bundler which is currently only built for Metro. If yo
   }
 }
 ```
-
-> Metro web font icons don't work: [pending PR](https://github.com/expo/expo/pull/19234).
 
 ## Usage
 
