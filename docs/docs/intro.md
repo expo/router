@@ -35,9 +35,11 @@ Install `expo-router`:
 
 ```bash
 npx expo install expo-router
+```
 
-# install peer dependencies required for compiling
+Install peer dependencies:
 
+```
 npx expo install react-native-safe-area-context react-native-screens react-native-reanimated react-native-gesture-handler
 ```
 
@@ -48,6 +50,18 @@ Then use `expo-router/entry` as the entry point to your app in your `package.jso
   "main": "expo-router/entry"
 }
 ```
+
+And add a scheme to your `app.json` (or `app.config.js`):
+
+```json
+{
+  "expo": {
+    "scheme": "myapp"
+  }
+}
+```
+
+The following beta setup steps are required for now, but will not be necessary when we release a stable version of Expo Router.
 
 ## Beta setup
 
@@ -86,7 +100,7 @@ If you want to use the router with web, you'll need to enable Expo CLI's [experi
 Start the server with:
 
 ```
-yarn expo start
+npx expo start --clear
 ```
 
 Then open by pressing `i`, `a`, or `w` for web (only tested against Metro web).
