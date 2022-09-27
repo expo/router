@@ -81,9 +81,8 @@ export function Tutorial() {
             accessibilityLevel={2}
             style={styles.subtitle}
           >
-            Get started by creating a file{"\n"}in the{" "}
-            <Text style={{ fontWeight: "bold" }}>app</Text> directory{"\n"}that
-            exports a React component.
+            Start by creating a file{"\n"}in the{" "}
+            <Text style={{ fontWeight: "bold" }}>app</Text> directory.
           </Text>
           {canAutoTouchFile && <Button />}
         </View>
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    alignItems: "start",
+    alignItems: "flex-start",
     justifyContent: "center",
   },
   title: {
@@ -183,7 +182,7 @@ const styles = StyleSheet.create({
   subtitle: {
     color: "#BCC3CD",
     fontSize: 36,
-    fontWeight: "light",
+    fontWeight: "100",
     paddingBottom: 36,
     maxWidth: 960,
   },
