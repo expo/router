@@ -10,8 +10,6 @@ The repo also acts as an **RFC for the router**. Please open a discussion if you
 
 ## Demo
 
-> Onboarding and entry-less startup require [`@evanbacon/cli/touch-middleware`](https://github.com/expo/expo/compare/%40evanbacon/cli/touch-middleware) branch on `expo/expo` for Expo CLI features.
-
 - Run `yarn` in the root of the repo to install dependencies.
 - Run `yarn start` in the root to compile the `packages/`
 - Change directory to `apps/demo` and run `yarn start` to start the demo app.
