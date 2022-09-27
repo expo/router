@@ -36,7 +36,7 @@ export default function Home() {
 ```
 
 ```js title=app/(stack)/details.js
-import { View, Text } from "react-native";
+import { View, Text, Button } from "react-native";
 import { Link } from "expo-router";
 
 export default function Details({ navigation }) {
