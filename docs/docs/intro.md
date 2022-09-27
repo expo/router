@@ -127,7 +127,7 @@ If you want to use the router with web, you'll need to enable Expo CLI's [experi
 Start the server with:
 
 ```
-npx expo start --clear
+EXPO_ROUTER_APP_ROOT="path/to/appRoot" npx expo start --clear
 ```
 
 Then open by pressing `i`, `a`, or `w` for web (only tested against Metro web).
