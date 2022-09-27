@@ -61,11 +61,15 @@ And add a scheme to your `app.json` (or `app.config.js`):
 }
 ```
 
-The following beta setup steps are required for now, but will not be necessary when we release a stable version of Expo Router.
-
 ## Beta setup
 
-Ensure you're using at least `metro@0.72.3` by setting a yarn resolution (this step goes away in Expo SDK 47):
+The following beta setup steps are required for now, but will not be necessary when we release a stable version of Expo Router.
+
+### Override the Metro version
+
+Ensure you're using at least `metro@0.72.3` by setting a Yarn resolution or npm override (this step goes away in Expo SDK 47).
+
+If you use Yarn:
 
 ```json title=package.json
 {
@@ -75,7 +79,17 @@ Ensure you're using at least `metro@0.72.3` by setting a yarn resolution (this s
 }
 ```
 
-Configure the babel plugin:
+If you use npm, this requires npm 8.3.0 or higher. You can install this with `npm i -g npm@^8.3.0`. After that, configure `overrides` in `package.json`:
+
+```json title=package.json
+{
+  "overrides": {
+    "metro": "0.72.3"
+  }
+}
+```
+
+### Configure the Babel plugin
 
 ```js title=babel.config.js
 module.exports = function (api) {
