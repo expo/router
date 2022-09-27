@@ -13,6 +13,8 @@ Expo Router brings the best routing concepts from the web to native iOS and Andr
 
 ## Features
 
+<video src="/router/demo/routing.mp4" controls style={{ width: "100%" }} autoplay loop />
+
 - **Native** Truly native navigation with the most cutting-edge developer experience.
 <!-- - **Zero-config** No need to configure anything, just start building your app. -->
 - **Deep linking** Every screen in your app is automatically deep linkable. Making any part of your app shareable.

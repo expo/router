@@ -111,6 +111,8 @@ You can also search for links directly in a browser like Safari or Chrome to tes
 
 ## Dev mode
 
+![](/router/img/directory.png)
+
 We currently inject a `/__index` file which provides a list of all routes in the app. This is useful for debugging and development. This screen is only injected during development, and won't be available in production.
 
 We may remove this feature for the official release, but it's useful for now.
