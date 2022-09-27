@@ -116,6 +116,10 @@ module.exports = function (api) {
 };
 ```
 
+## Troubleshooting
+
+If you run into any issues, please check the [troubleshooting guide](/router/docs/troubleshooting). If you're still running into problems, please [open an issue](https://github.com/expo/router/issues).
+
 ## Web setup
 
 If you want to use the router with web, you'll need to enable Expo CLI's [experimental Metro web support](https://docs.expo.dev/guides/customizing-metro/#web-support-how). Webpack is not currently supported.
