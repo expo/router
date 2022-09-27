@@ -34,6 +34,11 @@ app/
 
 The virtual route system exists to accommodate native navigation which requires a parent navigator to render a child route.
 
+<iframe src="https://universal-routing.netlify.app/" style={{width: 
+"100%", height: 500, border:0, borderRadius: 4, overflow:"hidden" }}
+     title="expo-router"
+     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"></iframe>
+     
 <details>
   <summary>Interoperability</summary>
 
