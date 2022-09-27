@@ -3,7 +3,7 @@ title: Error handling
 sidebar_position: 7
 ---
 
-![](/router/img/error-boundary.png)
+![](/img/error-boundary.png)
 
 Expo Router enables fine-tuned error handling to enable a more opinionated data loading strategy in the future. You can export a nested `ErrorBoundary` component from any route to intercept and format component-level errors using [React Error Boundaries](https://reactjs.org/docs/error-boundaries.html):
 

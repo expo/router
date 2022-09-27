@@ -3,7 +3,7 @@ title: Unmatched Routes
 sidebar_position: 8
 ---
 
-![](/router/img/unmatched.png)
+![](/img/unmatched.png)
 
 Native apps don't have a server so there are technically no 404s. However, if you're implementing a router universally, then it makes sense to handle missing routes. This is done automatically for each app, but you can also customize it.
 
