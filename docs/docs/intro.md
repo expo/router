@@ -100,6 +100,12 @@ If you use npm, this requires npm 8.3.0 or higher. You can install this with `np
 }
 ```
 
+enable the require context feature in metro by adding the following line to your `metro.config.js`
+
+```javascript title=metro.config.js
+defaultConfig.transformer.unstable_allowRequireContext = true
+```
+
 ### Configure the Babel plugin
 
 ```js title=babel.config.js
