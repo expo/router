@@ -1,6 +1,7 @@
+import { View, Text, Pressable, StyleSheet } from "@bacons/react-views";
 import React from "react";
 import { SafeAreaView, StatusBar, Platform } from "react-native";
-import { View, Text, Pressable, StyleSheet } from "@bacons/react-views";
+
 import { createEntryFileAsync } from "./createEntryFile";
 
 // TODO: Use openLinkFromBrowser thing

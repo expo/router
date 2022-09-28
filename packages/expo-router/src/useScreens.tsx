@@ -1,7 +1,7 @@
 import React from "react";
 
-import { Screen } from "./primitives";
 import { Route, RouteNode, sortRoutes, useRoutes } from "./Route";
+import { Screen } from "./primitives";
 import { Try } from "./views/Try";
 
 /**
