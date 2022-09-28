@@ -54,15 +54,21 @@ Install peer dependencies:
 npx expo install react-native-safe-area-context react-native-screens react-native-reanimated react-native-gesture-handler
 ```
 
-Then use `expo-router/entry` as the entry point to your app in your `package.json`:
+Then delete the entry point in your `package.json`, or replace it with `index.js` to be explicit:
 
 ```json
 {
-  "main": "expo-router/entry"
+  "main": "index.js"
 }
 ```
 
-And add a scheme to your `app.json` (or `app.config.js`):
+Create a new file `index.js` in the root of your project. If it exists already, replace it with the following:
+
+```js
+import "expo-router/entry";
+```
+
+Add a scheme to your `app.json` (or `app.config.js`):
 
 ```json
 {
