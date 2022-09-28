@@ -368,8 +368,20 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
           return { name, params };
         }
 
-        return { name };
+        return { name, params: {} };
       });
+
+      // TODO(EvanBacon): Maybe we should warn / assert if multiple slugs use the same param name.
+      const combinedParams = routes.reduce<Record<string, any>>(
+        (acc, r) => Object.assign(acc, r.params),
+        {}
+      );
+
+      // Combine all params so a route `[foo]/[bar]/other.js` has access to `{ foo, bar }`
+      routes = routes.map((r) => ({
+        ...r,
+        params: combinedParams,
+      }));
 
       remainingPath = remainingPath.replace(match[1], "");
 
@@ -618,7 +630,7 @@ const createNestedStateObject = (
   );
 
   if (params) {
-    route.params = { ...route.params, ...params };
+    route.params = { ...route.params, ...params, more: "power" };
   }
 
   return state;
