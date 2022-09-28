@@ -1,9 +1,33 @@
-const { relative } = require("path");
+const nodePath = require("path");
+const resolveFrom = require("resolve-from");
+
+const debug = require("debug")("expo:router:babel");
+
+function getExpoRouterAppRoot(projectRoot) {
+  if (process.env.EXPO_ROUTER_APP_ROOT) {
+    return process.env.EXPO_ROUTER_APP_ROOT;
+  }
+  const routerEntry = resolveFrom.silent(projectRoot, "expo-router/entry");
+
+  if (!routerEntry) {
+    console.warn(
+      `Required environment variable EXPO_ROUTER_APP_ROOT is not defined, bundle with Expo CLI (expo@^46.0.13) to fix.`
+    );
+    process.env.EXPO_ROUTER_APP_ROOT = "../../app";
+    return process.env.EXPO_ROUTER_APP_ROOT;
+  }
+  // It doesn't matter if the app folder exists.
+  const appFolder = nodePath.join(projectRoot, "app");
+  const appRoot = nodePath.relative(nodePath.dirname(routerEntry), appFolder);
+  debug("routerEntry", routerEntry, appFolder, appRoot);
+
+  return appRoot;
+}
 
 module.exports = function (api) {
   const { types: t } = api;
   const getRelPath = (state) =>
-    "./" + relative(state.file.opts.root, state.filename);
+    "./" + nodePath.relative(state.file.opts.root, state.filename);
 
   return {
     name: "expo-router",
@@ -12,35 +36,6 @@ module.exports = function (api) {
       Identifier(path, state) {
         if (path.node.name === "__filename") {
           path.replaceWith(t.stringLiteral(getRelPath(state)));
-        }
-      },
-
-      // Auto add the React prop `context={require.context('./app')}` to a component named `Root` that's
-      JSXOpeningElement(path, state) {
-        if (!getRelPath(state).match(/^\.\/app\//)) {
-          return;
-        }
-        if (path.node.name.name === "ExpoRoot") {
-          // Check if the context prop already exists
-          const contextProp = path.node.attributes.find(
-            (attr) => attr.name.name === "context"
-          );
-          if (contextProp) {
-            return;
-          }
-
-          path.node.attributes.push(
-            t.jsxAttribute(
-              t.jsxIdentifier("context"),
-              t.jsxExpressionContainer(
-                t.callExpression(t.identifier("require"), [
-                  t.callExpression(t.identifier("context"), [
-                    t.stringLiteral("./app"),
-                  ]),
-                ])
-              )
-            )
-          );
         }
       },
 
@@ -85,9 +80,10 @@ module.exports = function (api) {
           return;
         }
 
-        if (process.env.EXPO_ROUTER_APP_ROOT != null) {
-          parent.replaceWith(t.stringLiteral(process.env.EXPO_ROUTER_APP_ROOT));
-        }
+        parent.replaceWith(
+          // This is defined in Expo CLI when using Metro. It points to the relative path for the project app directory.
+          t.stringLiteral(getExpoRouterAppRoot(state.file.opts.root))
+        );
       },
     },
   };
