@@ -9,7 +9,7 @@ function getWebUrlsFromManifest() {
   const applinks = domains
     .filter((domain) => domain.startsWith("applinks:"))
     .map((domain) => {
-      let clean = domain.replace(/^applinks:/, "");
+      const clean = domain.replace(/^applinks:/, "");
       return clean.endsWith("/") ? clean.slice(0, -1) : clean;
     });
 

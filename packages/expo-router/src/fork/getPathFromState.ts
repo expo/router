@@ -1,3 +1,8 @@
+import {
+  validatePathConfig,
+  PathConfig,
+  PathConfigMap,
+} from "@react-navigation/core";
 import type {
   NavigationState,
   PartialState,
@@ -5,13 +10,7 @@ import type {
 } from "@react-navigation/routers";
 import * as queryString from "query-string";
 
-import {
-  validatePathConfig,
-  PathConfig,
-  PathConfigMap,
-} from "@react-navigation/core";
-
-type Options<ParamList extends {}> = {
+type Options<ParamList extends object> = {
   initialRouteName?: string;
   screens: PathConfigMap<ParamList>;
 };
@@ -68,7 +67,7 @@ const getActiveRoute = (state: State): { name: string; params?: object } => {
  * @param options Extra options to fine-tune how to serialize the path.
  * @returns Path representing the state, e.g. /foo/bar?count=42.
  */
-export default function getPathFromState<ParamList extends {}>(
+export default function getPathFromState<ParamList extends object>(
   state: State,
   options?: Options<ParamList>
 ): string {
@@ -101,11 +100,11 @@ export default function getPathFromState<ParamList extends {}>(
     let pattern: string | undefined;
 
     let focusedParams: Record<string, any> | undefined;
-    let focusedRoute = getActiveRoute(state);
+    const focusedRoute = getActiveRoute(state);
     let currentOptions = configs;
 
     // Keep all the route names that appeared during going deeper in config in case the pattern is resolved to undefined
-    let nestedRouteNames = [];
+    const nestedRouteNames = [];
 
     let hasNext = true;
 
@@ -216,7 +215,7 @@ export default function getPathFromState<ParamList extends {}>(
     if (route.state) {
       path += "/";
     } else if (focusedParams) {
-      for (let param in focusedParams) {
+      for (const param in focusedParams) {
         if (focusedParams[param] === "undefined") {
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
           delete focusedParams[param];
@@ -260,17 +259,15 @@ const createConfigItem = (
     return { pattern };
   }
 
-  // If an object is specified as the value (e.g. Foo: { ... }),
-  // It can have `path` property and `screens` prop which has nested configs
-  let pattern: string | undefined;
-
   if (config.exact && config.path === undefined) {
     throw new Error(
       "A 'path' needs to be specified when specifying 'exact: true'. If you don't want this screen in the URL, specify it as empty string, e.g. `path: ''`."
     );
   }
 
-  pattern =
+  // If an object is specified as the value (e.g. Foo: { ... }),
+  // It can have `path` property and `screens` prop which has nested configs
+  const pattern =
     config.exact !== true
       ? joinPaths(parentPattern || "", config.path || "")
       : config.path || "";
