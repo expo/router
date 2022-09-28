@@ -368,7 +368,7 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
           return { name, params };
         }
 
-        return { name, params: {} };
+        return { name };
       });
 
       // TODO(EvanBacon): Maybe we should warn / assert if multiple slugs use the same param name.
@@ -630,7 +630,7 @@ const createNestedStateObject = (
   );
 
   if (params) {
-    route.params = { ...route.params, ...params, more: "power" };
+    route.params = { ...route.params, ...params };
   }
 
   return state;
