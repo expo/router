@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - ".github/workflows/deploy.yml"
+      - ".github/workflows/docs.yml"
       - "docs/**"
   pull_request:
 
 jobs:
   deploy:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     concurrency:
@@ -20,33 +20,27 @@ jobs:
       run:
         working-directory: docs
     steps:
-      - uses: actions/checkout@v3
+      - name: 🏗 Setup repository
+        uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: 🏗 Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: "18"
+          cache: yarn
+          cache-dependency-path: docs/yarn.lock
 
-      - name: Get yarn cache
-        id: yarn-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: 📦 Install dependencies
+        run: yarn install --frozen-lockfile
 
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-docs-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-docs-
+      - name: 👷 Build docs
+        run: yarn build
 
-      - run: yarn install --frozen-lockfile
-      - run: yarn build
-
-      - name: Deploy
+      - name: 🚀 Deploy docs
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ github.token }}
           publish_dir: ./docs/build
           # The following lines assign commit authorship to the official
           # GH-Actions bot for deploys to `gh-pages` branch:
