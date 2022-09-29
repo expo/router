@@ -1,15 +1,17 @@
-import { useLinkTo, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { useMemo } from "react";
 
 import { Href, resolveHref } from "./views/Link";
+import { useLinkToPath } from "./fork/useLinkToPath";
 
 // Wraps useLinkTo to provide an API which is similar to the Link component.
 export function useLink(): {
   push: (href: Href) => void;
+  replace: (href: Href) => void;
   back: () => void;
   parse: typeof resolveHref;
 } {
-  const linkTo = useLinkTo();
+  const linkTo = useLinkToPath();
   const navigation = useNavigation();
 
   return useMemo(
@@ -18,9 +20,13 @@ export function useLink(): {
         const href = resolveHref(url);
         linkTo(href);
       },
+      replace: (url: Href) => {
+        const href = resolveHref(url);
+        linkTo(href, "REPLACE");
+      },
       back: () => navigation?.goBack(),
       parse: resolveHref,
-      // TODO(EvanBacon): add `replace`, `pathname`, `query`, maybe `reload`
+      // TODO(EvanBacon): add `pathname`, `query`, maybe `reload`
       // TODO(EvanBacon): add `canGoBack` but maybe more like a `hasContext`
     }),
     [navigation, linkTo]
