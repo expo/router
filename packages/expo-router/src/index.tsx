@@ -14,9 +14,8 @@ export { Unmatched } from "./views/Unmatched";
 export { ErrorBoundary } from "./views/ErrorBoundary";
 
 export { Layout, Children } from "./views/Layout";
-export { Link } from "./views/Link";
-export { useLink } from "./useLink";
+export { Link } from "./link/Link";
+export { useLink } from "./link/useLink";
 export { RootContainer } from "./ContextNavigationContainer";
-// export { useCurrentRoute } from "./useCurrentRoute";
 
-export * as Linking from "./linking";
+export * as Linking from "./link/linking";
