@@ -5,11 +5,11 @@ import {
   useNavigationBuilder,
 } from "@react-navigation/native";
 import * as React from "react";
+
+import { useContextKey } from "../Route";
 import getPathFromState from "../fork/getPathFromState";
 import { resolveHref } from "../link/href";
 import { matchFragmentName } from "../matchers";
-
-import { useContextKey } from "../Route";
 import { useScreens } from "../useScreens";
 
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
