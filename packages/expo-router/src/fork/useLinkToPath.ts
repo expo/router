@@ -3,10 +3,9 @@ import {
   getStateFromPath,
   NavigationContainerRefContext,
 } from "@react-navigation/core";
+import { LinkingContext } from "@react-navigation/native";
 import * as React from "react";
 import { Linking } from "react-native";
-
-import { LinkingContext } from "@react-navigation/native";
 
 export function useLinkToPath() {
   const navigation = React.useContext(NavigationContainerRefContext);

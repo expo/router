@@ -1,8 +1,8 @@
 import { useNavigation } from "@react-navigation/native";
 import { useMemo } from "react";
 
-import { Href, resolveHref } from "./views/Link";
 import { useLinkToPath } from "./fork/useLinkToPath";
+import { Href, resolveHref } from "./views/Link";
 
 // Wraps useLinkTo to provide an API which is similar to the Link component.
 export function useLink(): {
