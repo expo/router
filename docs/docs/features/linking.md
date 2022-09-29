@@ -53,6 +53,7 @@ Prefer the `useLink` hook to `useNavigation` from React Navigation as `useLink` 
 ## `useLink` API
 
 - **push**: _`(href: Href) => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', query: { id: '123' } }`.
+- **replace**: _`(href: Href) => void`_ Same API as `push` but replaces the current route in the history instead of pushing a new one. This is useful for redirects.
 - **back**: _`() => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', query: { id: '123' } }`.
 
 > This API is similar to Next.js's `useRouter` hook, but adjusted to work around the state management requirements of native.
