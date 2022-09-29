@@ -1,23 +1,26 @@
-// Fork of @react-navigation/native Link.tsx
+// Fork of @react-navigation/native Link.tsx with `href` and `replace` support added and
+// `to` / `action` support removed.
 import { Text, TextProps } from "@bacons/react-views";
 import { Slot } from "@radix-ui/react-slot";
-import type { NavigationAction } from "@react-navigation/core";
-import { useLinkProps } from "@react-navigation/native";
-import type { To } from "@react-navigation/native/src/useLinkTo";
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
+import useLinkToPathProps from "../fork/useLinkToPathProps";
+
 export type Href = string | { pathname?: string; query?: Record<string, any> };
 
-type Props<ParamList extends ReactNavigation.RootParamList> = {
+type Props = {
   /** Add a property which is familiar to  */
-  href?: Href;
+  href: Href;
 
   /** Forward props to child component. Useful for custom buttons. */
   asChild?: boolean;
 
-  to?: To<ParamList>;
-  action?: NavigationAction;
+  /** Should replace the current screen without adding to the history. */
+  replace?: boolean;
+
+  // to?: To<ParamList>;
+  // action?: NavigationAction;
   target?: string;
   onPress?: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
@@ -32,7 +35,7 @@ type Props<ParamList extends ReactNavigation.RootParamList> = {
  * @param props.action Optional action to use for in-page navigation. By default, the path is parsed to an action based on linking config.
  * @param props.children Child elements to render the content.
  */
-export const Link = React.forwardRef(BaseLink);
+export const Link = React.forwardRef(ExpoRouterLink);
 
 export const resolveHref = (
   href: { pathname?: string; query?: Record<string, any> } | string
@@ -77,37 +80,14 @@ function createQuery(query: Record<string, any>) {
     .join("&");
 }
 
-function useResolvedHref<ParamList extends ReactNavigation.RootParamList>({
-  href,
-  to,
-}: Pick<Props<ParamList>, "href" | "to">) {
-  // TODO: Auto use router's client-side event.
-  return React.useMemo(() => {
-    if (href) {
-      return resolveHref(href);
-    }
-
-    if (to == null) {
-      throw new Error(
-        `You must specify either 'href' or 'to' prop in a <Link />.`
-      );
-    }
-    if (typeof to === "string" && !to.startsWith("/")) {
-      // TODO: Auto delegate out external links
-      return "/";
-    }
-    return to;
-  }, [href, to]);
-}
-
-function BaseLink<ParamList extends ReactNavigation.RootParamList>(
-  { to, href, action, asChild, ...rest }: Props<ParamList>,
+function ExpoRouterLink(
+  { href, replace, asChild, ...rest }: Props,
   ref: React.ForwardedRef<Text>
 ) {
   // TODO: Auto use router's client-side event.
-  const resolvedTo = useResolvedHref({ href, to });
+  const resolvedHref = React.useMemo(() => resolveHref(href), [href]);
 
-  const props = useLinkProps<ParamList>({ to: resolvedTo, action });
+  const props = useLinkToPathProps({ href: resolvedHref, replace });
 
   const onPress = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
