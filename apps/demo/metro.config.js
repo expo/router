@@ -1,5 +1,5 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
-const { getDefaultConfig } = require("expo-router/metro-config");
+const { getDefaultConfig } = require("expo/metro-config");
 const path = require("path");
 
 // Find the project and workspace directories
@@ -18,5 +18,10 @@ config.resolver.nodeModulesPaths = [
 ];
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true;
+
+// 4. `require.context` support
+config.transformer = {
+  unstable_allowRequireContext: true,
+};
 
 module.exports = config;

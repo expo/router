@@ -1,4 +1,4 @@
-import { Link, useLink, NativeStack, Tabs } from "expo-router";
+import { Link, useLink, Tabs } from "expo-router";
 import { StatusBar, StyleSheet, Text, View } from "react-native";
 
 export default function Page() {
@@ -7,7 +7,7 @@ export default function Page() {
     <View style={styles.container}>
       <Tabs.Screen options={{ title: "Home" }} />
       <Link
-        href={{ pathname: "/settings/[home]", query: { home: "baconbrix" } }}
+        href={"/modal"}
         style={{ fontSize: 24, fontWeight: "bold" }}
       >
         Open Modal

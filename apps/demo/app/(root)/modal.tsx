@@ -6,21 +6,24 @@ export default function App({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Link href="../" style={{ fontSize: 24, fontWeight: "bold" }}>
+      <Link to="../" style={{ fontSize: 24, fontWeight: "bold" }}>
         Dismiss
       </Link>
       <Text
         onPress={() => {
-          link.back();
+            link.push({
+                pathname: "/settings/[home]",
+                query: { home: "baconbrix" },
+            });
         }}
       >
         Open settings dynamic
       </Text>
       <StatusBar barStyle="light-content" />
       {navigation.canGoBack() ? (
-        <span>Can go back</span>
+        <Text>Can go back</Text>
       ) : (
-        <span>Can't go back</span>
+        <Text>Can't go back</Text>
       )}
     </View>
   );
