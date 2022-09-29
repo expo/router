@@ -1,8 +1,8 @@
 import Constants, { ExecutionEnvironment } from "expo-constants";
 import * as Linking from "expo-linking";
 
-import getPathFromState from "./fork/getPathFromState";
-import getStateFromPath from "./fork/getStateFromPath";
+import getPathFromState from "../fork/getPathFromState";
+import getStateFromPath from "../fork/getStateFromPath";
 
 // A custom getInitialURL is used on native to ensure the app always starts at
 // the root path if it's launched from something other than a deep link.

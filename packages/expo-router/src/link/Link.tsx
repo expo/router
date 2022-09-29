@@ -5,23 +5,20 @@ import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
-import useLinkToPathProps from "../fork/useLinkToPathProps";
-
-export type Href = string | { pathname?: string; query?: Record<string, any> };
+import { Href, resolveHref } from "./href";
+import useLinkToPathProps from "./useLinkToPathProps";
 
 type Props = {
   /** Add a property which is familiar to  */
   href: Href;
 
+  // TODO(EvanBacon): This may need to be extracted for React Native style support.
   /** Forward props to child component. Useful for custom buttons. */
   asChild?: boolean;
 
   /** Should replace the current screen without adding to the history. */
   replace?: boolean;
 
-  // to?: To<ParamList>;
-  // action?: NavigationAction;
-  target?: string;
   onPress?: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => void;
@@ -32,53 +29,10 @@ type Props = {
  * Uses an anchor tag on the web.
  *
  * @param props.href Absolute path to screen (e.g. `/feeds/hot`).
- * @param props.action Optional action to use for in-page navigation. By default, the path is parsed to an action based on linking config.
+ * @param props.asChild Forward props to child component. Useful for custom buttons.
  * @param props.children Child elements to render the content.
  */
 export const Link = React.forwardRef(ExpoRouterLink);
-
-export const resolveHref = (
-  href: { pathname?: string; query?: Record<string, any> } | string
-): string => {
-  if (typeof href === "string") {
-    return href ?? "";
-  }
-  const path = href.pathname ?? "";
-  if (!href?.query) {
-    return path;
-  }
-  const { pathname, query } = createQualifiedPathname(path, { ...href.query });
-  return pathname + (Object.keys(query).length ? `?${createQuery(query)}` : "");
-};
-
-function createQualifiedPathname(pathname: string, query: Record<string, any>) {
-  for (const [key, value = ""] of Object.entries(query)) {
-    const dynamicKey = `[${key}]`;
-    const deepDynamicKey = `[...${key}]`;
-    if (pathname.includes(dynamicKey)) {
-      pathname = pathname.replace(
-        dynamicKey,
-        Array.isArray(value) ? value.join("/") : value
-      );
-    } else if (pathname.includes(deepDynamicKey)) {
-      pathname = pathname.replace(
-        deepDynamicKey,
-        Array.isArray(value) ? value.join("/") : value
-      );
-    } else {
-      continue;
-    }
-
-    delete query[key];
-  }
-  return { pathname, query };
-}
-
-function createQuery(query: Record<string, any>) {
-  return Object.keys(query)
-    .map((key) => `${key}=${query[key]}`)
-    .join("&");
-}
 
 function ExpoRouterLink(
   { href, replace, asChild, ...rest }: Props,

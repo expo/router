@@ -10,7 +10,7 @@ import {
   getRootURL,
   getPathFromState,
   getStateFromPath,
-} from "./linking";
+} from "./link/linking";
 import {
   matchDeepDynamicRouteName,
   matchDynamicName,
