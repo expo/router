@@ -1,13 +1,12 @@
 {
   "name": "expo-router",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "main": "build/index.js",
   "files": [
     "entry.js",
     "build",
     "babel.js",
-    "assets",
-    "metro-config.js"
+    "assets"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",
