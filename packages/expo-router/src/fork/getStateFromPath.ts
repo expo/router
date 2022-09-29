@@ -1,3 +1,8 @@
+import {
+  PathConfigMap,
+  findFocusedRoute,
+  validatePathConfig,
+} from "@react-navigation/core";
 import type {
   InitialState,
   NavigationState,
@@ -6,17 +11,11 @@ import type {
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
-import {
-  PathConfigMap,
-  findFocusedRoute,
-  validatePathConfig,
-} from "@react-navigation/core";
-
 //   import findFocusedRoute from './findFocusedRoute';
 //   import type { PathConfigMap } from './types';
 //   import validatePathConfig from './validatePathConfig';
 
-type Options<ParamList extends {}> = {
+type Options<ParamList extends object> = {
   initialRouteName?: string;
   screens: PathConfigMap<ParamList>;
 };
@@ -70,7 +69,7 @@ type ParsedRoute = {
  * @param path Path string to parse and convert, e.g. /foo/bar?count=42.
  * @param options Extra options to fine-tune how to parse the path.
  */
-export default function getStateFromPath<ParamList extends {}>(
+export default function getStateFromPath<ParamList extends object>(
   path: string,
   options?: Options<ParamList>
 ): ResultState | undefined {
@@ -78,7 +77,7 @@ export default function getStateFromPath<ParamList extends {}>(
     validatePathConfig(options);
   }
 
-  let initialRoutes: InitialRouteConfig[] = [];
+  const initialRoutes: InitialRouteConfig[] = [];
 
   if (options?.initialRouteName) {
     initialRoutes.push({
@@ -587,7 +586,6 @@ const createNestedStateObject = (
   initialRoutes: InitialRouteConfig[],
   flatConfig?: RouteConfig[]
 ) => {
-  let state: InitialState;
   let route = routes.shift() as ParsedRoute;
   const parentScreens: string[] = [];
 
@@ -595,7 +593,11 @@ const createNestedStateObject = (
 
   parentScreens.push(route.name);
 
-  state = createStateObject(initialRoute, route, routes.length === 0);
+  const state: InitialState = createStateObject(
+    initialRoute,
+    route,
+    routes.length === 0
+  );
 
   if (routes.length > 0) {
     let nestedState = state;

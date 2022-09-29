@@ -1,10 +1,10 @@
+import { PickPartial, RouteNode } from "./Route";
 import {
   getNameFromFilePath,
   matchDeepDynamicRouteName,
   matchDynamicName,
   matchFragmentName,
 } from "./matchers";
-import { PickPartial, RouteNode } from "./Route";
 import { RequireContext } from "./types";
 import { DefaultLayout } from "./views/Layout";
 

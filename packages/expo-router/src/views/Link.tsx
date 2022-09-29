@@ -1,12 +1,11 @@
 // Fork of @react-navigation/native Link.tsx
 import { Text, TextProps } from "@bacons/react-views";
 import { Slot } from "@radix-ui/react-slot";
+import type { NavigationAction } from "@react-navigation/core";
 import { useLinkProps } from "@react-navigation/native";
+import type { To } from "@react-navigation/native/src/useLinkTo";
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
-
-import type { NavigationAction } from "@react-navigation/core";
-import type { To } from "@react-navigation/native/src/useLinkTo";
 
 export type Href = string | { pathname?: string; query?: Record<string, any> };
 

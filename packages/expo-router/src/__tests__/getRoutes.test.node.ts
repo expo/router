@@ -1,9 +1,9 @@
+import { RouteNode } from "../Route";
 import {
   getRoutes,
   createRouteNode,
   getUserDefinedDeepDynamicRoute,
 } from "../getRoutes";
-import { RouteNode } from "../Route";
 import { RequireContext } from "../types";
 
 function createMockContextModule(
@@ -124,7 +124,7 @@ describe(getRoutes, () => {
     expect(
       getRoutes(
         createMockContextModule({
-          "./some/nested/value.tsx": { default: function () {} },
+          "./some/nested/value.tsx": { default() {} },
         })
       )
     ).toEqual([
@@ -165,8 +165,8 @@ describe(getRoutes, () => {
     expect(
       getRoutes(
         createMockContextModule({
-          "./[dynamic].tsx": { default: function () {} },
-          "./[...deep].tsx": { default: function () {} },
+          "./[dynamic].tsx": { default() {} },
+          "./[...deep].tsx": { default() {} },
         })
       )
     ).toEqual([
@@ -201,18 +201,18 @@ describe(getRoutes, () => {
     expect(
       getRoutes(
         createMockContextModule({
-          "./(stack).tsx": { default: function () {} },
-          "./(stack)/home.tsx": { default: function () {} },
-          "./(stack)/settings.tsx": { default: function () {} },
-          "./(stack)/user/(default)/posts.tsx": { default: function () {} },
-          "./(stack)/user/(default).tsx": { default: function () {} },
-          "./(stack)/user/profile.tsx": { default: function () {} },
-          "./(stack)/user/[profile].tsx": { default: function () {} },
-          "./(stack)/user/settings.tsx": { default: function () {} },
-          "./(stack)/user/settings/info.tsx": { default: function () {} },
-          "./(stack)/user/settings/[...other].tsx": { default: function () {} },
-          "./another.tsx": { default: function () {} },
-          "./some/nested/value.tsx": { default: function () {} },
+          "./(stack).tsx": { default() {} },
+          "./(stack)/home.tsx": { default() {} },
+          "./(stack)/settings.tsx": { default() {} },
+          "./(stack)/user/(default)/posts.tsx": { default() {} },
+          "./(stack)/user/(default).tsx": { default() {} },
+          "./(stack)/user/profile.tsx": { default() {} },
+          "./(stack)/user/[profile].tsx": { default() {} },
+          "./(stack)/user/settings.tsx": { default() {} },
+          "./(stack)/user/settings/info.tsx": { default() {} },
+          "./(stack)/user/settings/[...other].tsx": { default() {} },
+          "./another.tsx": { default() {} },
+          "./some/nested/value.tsx": { default() {} },
         })
       )
     ).toEqual([

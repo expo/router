@@ -104,7 +104,7 @@ export function Children(props: Omit<LayoutProps, "children">) {
     );
   }
 
-  return useChild();
+  return <TrustedChildren />;
 }
 
 export function TrustedChildren() {

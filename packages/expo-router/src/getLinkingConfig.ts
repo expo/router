@@ -1,14 +1,9 @@
 import { LinkingOptions, PathConfigMap } from "@react-navigation/native";
 import { useMemo } from "react";
 
-import { getAllWebRedirects } from "./aasa";
-
-import {
-  matchDeepDynamicRouteName,
-  matchDynamicName,
-  matchFragmentName,
-} from "./matchers";
 import { RouteNode } from "./Route";
+import { getAllWebRedirects } from "./aasa";
+import { useRoutesContext } from "./context";
 import {
   addEventListener,
   getInitialURL,
@@ -16,7 +11,11 @@ import {
   getPathFromState,
   getStateFromPath,
 } from "./linking";
-import { useRoutesContext } from "./context";
+import {
+  matchDeepDynamicRouteName,
+  matchDynamicName,
+  matchFragmentName,
+} from "./matchers";
 
 // `[page]` -> `:page`
 // `page` -> `page`
@@ -40,7 +39,7 @@ function convertDynamicRouteToReactNavigation(name: string) {
 export function treeToReactNavigationLinkingRoutes(
   nodes: RouteNode[],
   parents: string[] = []
-): PathConfigMap<{}> {
+): PathConfigMap<object> {
   // TODO: Intercept errors, strip invalid routes, and warn instead.
   // Our warnings can be more helpful than upstream since we know the associated file name.
   const firstPass = nodes
@@ -58,7 +57,7 @@ export function treeToReactNavigationLinkingRoutes(
 
       return [node.route, { path, screens }] as const;
     })
-    .reduce<PathConfigMap<{}>>((acc, [route, current]) => {
+    .reduce<PathConfigMap<object>>((acc, [route, current]) => {
       acc[route] = current;
       return acc;
     }, {});
@@ -66,7 +65,7 @@ export function treeToReactNavigationLinkingRoutes(
   return firstPass;
 }
 
-export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<{}> {
+export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<object> {
   return {
     prefixes: [
       /* your linking prefixes */
@@ -84,14 +83,14 @@ export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<{}> {
     // This helps keep the native functionality working like the web functionality.
     // For example, if you had a root navigator where the first screen was `/settings` and the second was `/index`
     // then `/index` would be used on web and `/settings` would be used on native.
-    getInitialURL: getInitialURL,
+    getInitialURL,
     subscribe: addEventListener,
     getStateFromPath,
     getPathFromState,
   };
 }
 
-export function useLinkingConfig(): LinkingOptions<{}> {
+export function useLinkingConfig(): LinkingOptions<object> {
   const routes = useRoutesContext();
   return useMemo(() => getLinkingConfig(routes), [routes]);
 }
