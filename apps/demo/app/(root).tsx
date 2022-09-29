@@ -1,20 +1,15 @@
-import { NativeStack } from "expo-router";
+import { Children, Layout, NativeStack } from "expo-router";
 
-export default function Layout() {
+export default function Root() {
   return (
-    <NativeStack>
-      <NativeStack.Screen
-        name="(tab)"
-        options={{
-          headerShown: false,
-        }}
-      />
-      <NativeStack.Screen
-        name="modal"
-        options={{
-          presentation: "modal",
-        }}
-      />
-    </NativeStack>
+    <Layout>
+      <Inner />
+    </Layout>
   );
+}
+function Inner() {
+  const { pathname, statePath } = Layout.useContext();
+
+  console.log("pathname", pathname, statePath);
+  return <Children />;
 }
