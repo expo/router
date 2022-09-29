@@ -12,8 +12,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RouteNode } from "../Route";
 import { useRoutesContext } from "../context";
-import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
 import { Link } from "../link/Link";
+import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
 
 const INDENT = 18;
 
