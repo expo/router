@@ -20,6 +20,7 @@ export type ScreenProps<
 > = {
   /** Name is required when used inside a Layout component. */
   name?: string;
+  hidden?: boolean;
   initialParams?: { [key: string]: any };
   options?: TOptions;
 };
@@ -34,7 +35,7 @@ function getSortedChildren(
   const entries = [...children];
 
   const ordered = order
-    .map(({ name, initialParams, options }) => {
+    .map(({ name, hidden, initialParams, options }) => {
       if (!entries.length) {
         console.warn(
           `[Layout children]: Too many screens defined. Route "${name}" is extraneous.`
@@ -52,6 +53,10 @@ function getSortedChildren(
         // Get match and remove from entries
         const match = entries[matchIndex];
         entries.splice(matchIndex, 1);
+
+        if (hidden) {
+          return null;
+        }
 
         return { route: match, props: { initialParams, options } };
       }

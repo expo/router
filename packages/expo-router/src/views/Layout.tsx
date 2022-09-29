@@ -5,8 +5,10 @@ import {
 } from "@react-navigation/native";
 import * as React from "react";
 
+import { useFilterScreenChildren } from "../layouts/withLayoutContext";
 import { useContextKey } from "../Route";
-import { useScreens } from "../useScreens";
+import { useSortedScreens } from "../useScreens";
+import { Screen } from "./Screen";
 
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
 export const LayoutContext = React.createContext<{
@@ -39,11 +41,17 @@ export function Layout({
   router = StackRouter,
 }: LayoutProps) {
   const contextKey = useContextKey();
-  const screens = useScreens();
+
+  const { screens, children: otherChildren } = useFilterScreenChildren(
+    children,
+    { isCustomNavigator: true }
+  );
+
+  const sorted = useSortedScreens(screens ?? []);
 
   const { state, navigation, descriptors, NavigationContent } =
     useNavigationBuilder(router, {
-      children: screens,
+      children: sorted,
       screenOptions,
       initialRouteName,
     });
@@ -61,7 +69,7 @@ export function Layout({
         router,
       }}
     >
-      <NavigationContent>{children}</NavigationContent>
+      <NavigationContent>{otherChildren}</NavigationContent>
     </LayoutContext.Provider>
   );
 }
@@ -121,3 +129,4 @@ export function DefaultLayout() {
 
 Layout.Children = Children;
 Layout.useContext = useLayoutContext;
+Layout.Screen = Screen;
