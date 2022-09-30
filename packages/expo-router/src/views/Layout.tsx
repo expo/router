@@ -42,6 +42,7 @@ export function Layout({
 }: LayoutProps) {
   const contextKey = useContextKey();
 
+  // Allows adding Screen components as children to configure routes.
   const { screens, children: otherChildren } = useFilterScreenChildren(
     children,
     { isCustomNavigator: true }
@@ -129,4 +130,6 @@ export function DefaultLayout() {
 
 Layout.Children = Children;
 Layout.useContext = useLayoutContext;
+
+/** Used to configure route settings. */
 Layout.Screen = Screen;

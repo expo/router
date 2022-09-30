@@ -1,44 +1,35 @@
-import { NativeStack, Layout, withLayoutContext } from "expo-router";
-import { Text } from "react-native";
+import { Layout } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
+
+import { GoogleAuth } from "../etc/auth/google";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function Root() {
-  const auth = false;
+  return (
+    <GoogleAuth.Provider>
+      <RootLayout />
+    </GoogleAuth.Provider>
+  );
+}
+
+function RootLayout() {
+  const [token] = GoogleAuth.useToken();
 
   return (
     <Layout>
       <Layout.Screen
-        name="(tab)"
-        hidden
+        name="(app)"
+        forbidden={!token.isLoading && token.value === null}
         options={{
-          // hidden: true,
           headerShown: false,
         }}
       />
       <Layout.Screen
-        name="modal"
-        options={{
-          presentation: "modal",
-        }}
+        name="sign-in"
+        forbidden={!token.isLoading && token.value !== null}
       />
-
       <Layout.Children />
     </Layout>
-  );
-  return (
-    <NativeStack>
-      <NativeStack.Screen
-        name="(tab)"
-        options={{
-          hidden: true,
-          headerShown: false,
-        }}
-      />
-      <NativeStack.Screen
-        name="modal"
-        options={{
-          presentation: "modal",
-        }}
-      />
-    </NativeStack>
   );
 }

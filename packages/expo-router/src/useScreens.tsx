@@ -20,7 +20,12 @@ export type ScreenProps<
 > = {
   /** Name is required when used inside a Layout component. */
   name?: string;
-  hidden?: boolean;
+  /**
+   * Prevent the route from being accessed, effectively emulating a server [403 Forbidden](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403) response.
+   * If the route is accessed, the user will be redirected to the first sibling route that is not forbidden.
+   * If all children are forbidden, the layout will render `null` as there are no children to render.
+   */
+  forbidden?: boolean;
   initialParams?: { [key: string]: any };
   options?: TOptions;
 };
@@ -35,7 +40,7 @@ function getSortedChildren(
   const entries = [...children];
 
   const ordered = order
-    .map(({ name, hidden, initialParams, options }) => {
+    .map(({ name, forbidden, initialParams, options }) => {
       if (!entries.length) {
         console.warn(
           `[Layout children]: Too many screens defined. Route "${name}" is extraneous.`
@@ -54,7 +59,8 @@ function getSortedChildren(
         const match = entries[matchIndex];
         entries.splice(matchIndex, 1);
 
-        if (hidden) {
+        // Ensure to return null after removing from entries.
+        if (forbidden) {
           return null;
         }
 

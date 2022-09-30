@@ -1,17 +1,9 @@
 import React from "react";
 
-import { useSortedScreens } from "../useScreens";
+import { useSortedScreens, ScreenProps } from "../useScreens";
 import { Screen } from "../views/Screen";
 
 type PickPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
-type ScreenProps<TOptions extends Record<string, any> = Record<string, any>> = {
-  /** Name is required when used inside a Layout component. */
-  name?: string;
-  hidden?: boolean;
-  initialParams?: { [key: string]: any };
-  options?: TOptions;
-};
 
 export function useFilterScreenChildren(
   children: React.ReactNode,

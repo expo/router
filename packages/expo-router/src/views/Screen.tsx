@@ -4,9 +4,11 @@ import React from "react";
 /** Component for setting the current screen's options dynamically. */
 export function Screen<TOptions extends object = object>({
   name,
+  forbidden,
   options,
 }: {
   name?: string;
+  forbidden?: boolean;
   initialParams?: Record<string, any>;
   options?: TOptions;
 }) {
@@ -22,10 +24,15 @@ export function Screen<TOptions extends object = object>({
     React.useEffect(() => {
       if (name != null) {
         throw new Error(
-          "Screen components should only use the name prop when nested directly inside a Layout. When a Screen is used for dynamic options it uses the nearest navigation context."
+          "Screen components should only use the `name` prop when nested directly inside a Layout component. When a Screen is used for dynamic options it uses the nearest navigation context."
         );
       }
-    }, [name]);
+      if (forbidden != null) {
+        throw new Error(
+          "Screen components should only use the `forbidden` prop when nested directly inside a Layout component."
+        );
+      }
+    }, [name, forbidden]);
   }
 
   return null;
