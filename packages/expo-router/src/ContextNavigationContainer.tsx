@@ -1,14 +1,15 @@
 import {
+  createNavigationContainerRef,
   findFocusedRoute,
   NavigationContainer,
-  NavigationContainerRef,
-  ParamListBase,
 } from "@react-navigation/native";
 import React, { useCallback } from "react";
 
 import { useLinkingConfig } from "./getLinkingConfig";
 import SplashModule from "./splash";
 import { VirtualRouteContext } from "./useCurrentRoute";
+
+const navigationRef = createNavigationContainerRef()
 
 type NavigationContainerProps = React.ComponentProps<
   typeof NavigationContainer
@@ -32,8 +33,7 @@ export function useNavigationContainerContext() {
 }
 
 /** react-navigation `NavigationContainer` with automatic `linking` prop generated from the routes context. */
-export const ContextNavigationContainer = React.forwardRef(
-  (props: NavigationContainerProps, ref: NavigationContainerProps["ref"]) => {
+export function ContextNavigationContainer(props: NavigationContainerProps) {
     const [state, setState] = React.useState<Partial<NavigationContainerProps>>(
       {}
     );
@@ -52,11 +52,10 @@ export const ContextNavigationContainer = React.forwardRef(
           setState,
         ]}
       >
-        <InternalContextNavigationContainer ref={ref} />
+        <InternalContextNavigationContainer />
       </NavigationContainerContext.Provider>
     );
   }
-);
 
 function trimQuery(pathname: string): string {
   const queryIndex = pathname.indexOf("?");
@@ -66,8 +65,7 @@ function trimQuery(pathname: string): string {
   return pathname;
 }
 
-const InternalContextNavigationContainer = React.forwardRef(
-  (props: object, ref: NavigationContainerProps["ref"]) => {
+function InternalContextNavigationContainer(props: object) {
     const [contextProps] = useNavigationContainerContext();
     const [state, setState] = React.useState<{
       pathname: string | null;
@@ -86,13 +84,6 @@ const InternalContextNavigationContainer = React.forwardRef(
       },
       [setState]
     );
-
-    const navigationRef =
-      React.useRef<NavigationContainerRef<ParamListBase>>(null);
-
-    React.useImperativeHandle(ref, () => navigationRef.current!, [
-      navigationRef,
-    ]);
 
     return (
       <VirtualRouteContext.Provider value={state}>
@@ -152,4 +143,9 @@ export function RootContainer({
   ]);
 
   return null;
+}
+
+/** Get the root navigation container ref. */
+RootContainer.getRef = () => {
+  return navigationRef;
 }
