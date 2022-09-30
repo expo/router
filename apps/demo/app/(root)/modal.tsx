@@ -6,7 +6,7 @@ export default function App({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Link to="../" style={{ fontSize: 24, fontWeight: "bold" }}>
+      <Link href="../" style={{ fontSize: 24, fontWeight: "bold" }}>
         Dismiss
       </Link>
       <Text
