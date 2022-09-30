@@ -11,16 +11,19 @@ export default function App({ navigation }) {
       </Link>
       <Text
         onPress={() => {
-          link.back();
+            link.push({
+                pathname: "/settings/[home]",
+                query: { home: "baconbrix" },
+            });
         }}
       >
         Open settings dynamic
       </Text>
       <StatusBar barStyle="light-content" />
       {navigation.canGoBack() ? (
-        <span>Can go back</span>
+        <Text>Can go back</Text>
       ) : (
-        <span>Can't go back</span>
+        <Text>Can't go back</Text>
       )}
     </View>
   );
