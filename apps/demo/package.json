@@ -22,7 +22,8 @@
     "@babel/core": "^7.12.9",
     "@types/react": "~18.0.0",
     "@types/react-native": "~0.69.1",
-    "@welldone-software/why-did-you-render": "^7.0.1"
+    "@welldone-software/why-did-you-render": "^7.0.1",
+    "babel-plugin-transform-imports": "^2.0.0"
   },
   "private": true
 }
