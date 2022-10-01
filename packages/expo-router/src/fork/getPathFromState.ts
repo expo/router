@@ -35,8 +35,30 @@ const getActiveRoute = (state: State): { name: string; params?: object } => {
     return getActiveRoute(route.state);
   }
 
+  if (route && isInvalidParams(route.params)) {
+    return getActiveRoute(createFakeState(route.params));
+  }
+
   return route;
 };
+
+function createFakeState(params: StateAsParams) {
+  return {
+    stale: false,
+    type: "UNKNOWN",
+    key: "UNKNOWN",
+    index: 0,
+    routeNames: [],
+    routes: [
+      {
+        key: "UNKNOWN",
+        name: params.screen,
+        params: params.params,
+        path: params.path,
+      },
+    ],
+  };
+}
 
 /**
  * Utility to serialize a navigation state object to a path string.
@@ -102,7 +124,6 @@ export default function getPathFromState<ParamList extends object>(
     let focusedParams: Record<string, any> | undefined;
     const focusedRoute = getActiveRoute(state);
     let currentOptions = configs;
-
     // Keep all the route names that appeared during going deeper in config in case the pattern is resolved to undefined
     const nestedRouteNames = [];
 
@@ -115,37 +136,43 @@ export default function getPathFromState<ParamList extends object>(
       nestedRouteNames.push(route.name);
 
       if (route.params) {
-        const stringify = currentOptions[route.name]?.stringify;
+        // NOTE(EvanBacon): Fill in current route using state that was passed as params.
+        if (!route.state && isInvalidParams(route.params)) {
+          current = createFakeState(route.params);
+          continue;
+        } else {
+          const stringify = currentOptions[route.name]?.stringify;
 
-        const currentParams = Object.fromEntries(
-          Object.entries(route.params).map(([key, value]) => [
-            key,
-            stringify?.[key] ? stringify[key](value) : String(value),
-          ])
-        );
+          const currentParams = Object.fromEntries(
+            Object.entries(route.params).map(([key, value]) => [
+              key,
+              stringify?.[key] ? stringify[key](value) : String(value),
+            ])
+          );
 
-        if (pattern) {
-          Object.assign(allParams, currentParams);
-        }
+          if (pattern) {
+            Object.assign(allParams, currentParams);
+          }
 
-        if (focusedRoute === route) {
-          // If this is the focused route, keep the params for later use
-          // We save it here since it's been stringified already
-          focusedParams = { ...currentParams };
+          if (focusedRoute === route) {
+            // If this is the focused route, keep the params for later use
+            // We save it here since it's been stringified already
+            focusedParams = { ...currentParams };
 
-          pattern
-            ?.split("/")
-            .filter((p) => p.startsWith(":") || p === "*")
-            // eslint-disable-next-line no-loop-func
-            .forEach((p) => {
-              const name = getParamName(p);
+            pattern
+              ?.split("/")
+              .filter((p) => p.startsWith(":") || p === "*")
+              // eslint-disable-next-line no-loop-func
+              .forEach((p) => {
+                const name = getParamName(p);
 
-              // Remove the params present in the pattern since we'll only use the rest for query string
-              if (focusedParams) {
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                delete focusedParams[name];
-              }
-            });
+                // Remove the params present in the pattern since we'll only use the rest for query string
+                if (focusedParams) {
+                  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                  delete focusedParams[name];
+                }
+              });
+          }
         }
       }
 
@@ -237,6 +264,29 @@ export default function getPathFromState<ParamList extends object>(
   path = path.length > 1 ? path.replace(/\/$/, "") : path;
 
   return path;
+}
+
+type StateAsParams = {
+  initial: boolean;
+  path: string;
+  screen: string;
+  params: Record<string, any>;
+};
+
+// TODO: Make StackRouter not do this...
+// Detect if the params came from StackRouter using `params` to pass around internal state.
+function isInvalidParams(
+  params?: Record<string, any>
+): params is StateAsParams {
+  return (
+    !!params &&
+    "initial" in params &&
+    "path" in params &&
+    "screen" in params &&
+    "params" in params &&
+    typeof params.params === "object" &&
+    !!params.params
+  );
 }
 
 const getParamName = (pattern: string) =>
