@@ -118,6 +118,10 @@ export default function getPathFromState<ParamList extends object>(
     let route = current.routes[index] as Route<string> & {
       state?: State;
     };
+    // NOTE(EvanBacon): Fill in current route using state that was passed as params.
+    if (!route.state && isInvalidParams(route.params)) {
+      route.state = createFakeState(route.params);
+    }
 
     let pattern: string | undefined;
 
@@ -139,40 +143,39 @@ export default function getPathFromState<ParamList extends object>(
         // NOTE(EvanBacon): Fill in current route using state that was passed as params.
         if (!route.state && isInvalidParams(route.params)) {
           current = createFakeState(route.params);
-          continue;
-        } else {
-          const stringify = currentOptions[route.name]?.stringify;
+        }
 
-          const currentParams = Object.fromEntries(
-            Object.entries(route.params).map(([key, value]) => [
-              key,
-              stringify?.[key] ? stringify[key](value) : String(value),
-            ])
-          );
+        const stringify = currentOptions[route.name]?.stringify;
 
-          if (pattern) {
-            Object.assign(allParams, currentParams);
-          }
+        const currentParams = Object.fromEntries(
+          Object.entries(route.params).map(([key, value]) => [
+            key,
+            stringify?.[key] ? stringify[key](value) : String(value),
+          ])
+        );
 
-          if (focusedRoute === route) {
-            // If this is the focused route, keep the params for later use
-            // We save it here since it's been stringified already
-            focusedParams = { ...currentParams };
+        if (pattern) {
+          Object.assign(allParams, currentParams);
+        }
 
-            pattern
-              ?.split("/")
-              .filter((p) => p.startsWith(":") || p === "*")
-              // eslint-disable-next-line no-loop-func
-              .forEach((p) => {
-                const name = getParamName(p);
+        if (focusedRoute === route) {
+          // If this is the focused route, keep the params for later use
+          // We save it here since it's been stringified already
+          focusedParams = { ...currentParams };
 
-                // Remove the params present in the pattern since we'll only use the rest for query string
-                if (focusedParams) {
-                  // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                  delete focusedParams[name];
-                }
-              });
-          }
+          pattern
+            ?.split("/")
+            .filter((p) => p.startsWith(":") || p === "*")
+            // eslint-disable-next-line no-loop-func
+            .forEach((p) => {
+              const name = getParamName(p);
+
+              // Remove the params present in the pattern since we'll only use the rest for query string
+              if (focusedParams) {
+                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                delete focusedParams[name];
+              }
+            });
         }
       }
 
