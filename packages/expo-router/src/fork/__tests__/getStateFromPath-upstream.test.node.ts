@@ -1,6 +1,7 @@
+import { findFocusedRoute } from "@react-navigation/native";
 import type { InitialState } from "@react-navigation/routers";
 import produce from "immer";
-import { findFocusedRoute } from "@react-navigation/native";
+
 import getPathFromState from "../getPathFromState";
 import getStateFromPath from "../getStateFromPath";
 
