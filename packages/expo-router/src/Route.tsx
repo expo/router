@@ -77,22 +77,49 @@ function useRoutesAtPath(filename: string): RouteNode[] {
   const keys = React.useMemo(() => routes.keys(), [routes]);
 
   const family = React.useMemo(() => {
-    let children: RouteNode[] = routes;
+    function getChildrenForRoute(normalName: string) {
+      let children: RouteNode[] = routes;
 
-    // Skip root directory
-    if (normalName) {
-      // split and search
-      const parts = normalName.split("/");
-      for (const part of parts) {
-        const next = children.find(({ route }) => route === part);
+      // Skip root directory
+      if (normalName) {
+        // split and search
+        const parts = normalName.split("/");
+        for (const part of parts) {
+          const next = children.find(({ route }) => route === part);
 
-        if (!next?.children) {
-          return [];
+          if (!next?.children) {
+            return [];
+          }
+
+          children = next?.children;
         }
 
-        children = next?.children;
+        for (const child of children) {
+          if (child.generated && child.children.length) {
+            // remove child
+            const nextChildren = getChildrenForRoute(
+              getNameFromFilePath(child.contextKey)
+            );
+            console.log("generated: children", nextChildren);
+            if (nextChildren.length) {
+              children = children.filter((c) => c !== child);
+
+              children.push(
+                ...nextChildren.map((nextChild) => {
+                  nextChild.route = child.route + "/" + nextChild.route;
+                  return nextChild;
+                })
+              );
+            }
+          }
+        }
       }
+      console.log("children", children);
+
+      return children;
     }
+
+    const children = getChildrenForRoute(normalName);
 
     return children.sort(sortRoutes);
   }, [normalName, keys]);
