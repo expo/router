@@ -20,12 +20,12 @@ import {
 // `[page]` -> `:page`
 // `page` -> `page`
 function convertDynamicRouteToReactNavigation(name: string) {
-  if (matchDeepDynamicRouteName(name)) {
+  if (matchDeepDynamicRouteName(name) != null) {
     return "*";
   }
   const dynamicName = matchDynamicName(name);
 
-  if (dynamicName) {
+  if (dynamicName != null) {
     return `:${dynamicName}`;
   }
 
@@ -48,14 +48,18 @@ export function treeToReactNavigationLinkingRoutes(
         const path = convertDynamicRouteToReactNavigation(node.route);
 
         if (!node.children.length) {
-          const name = [...parents, path].filter(Boolean).join("/");
+          const name = [
+            ...parents.map(convertDynamicRouteToReactNavigation),
+            path,
+          ]
+            .filter(Boolean)
+            .join("/");
           const key = [...parents, node.route].filter(Boolean).join("/");
-          return { key, name };
+          return { key, name: { path: name } };
         }
 
         if (node.generated) {
-          const screens = collectAll(node.children, [...parents, path]);
-          return screens;
+          return collectAll(node.children, [...parents, node.route]);
         }
         const screens = treeToReactNavigationLinkingRoutes(node.children);
 

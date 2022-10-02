@@ -7,7 +7,7 @@ export default function App() {
   const k = useContextKey();
   return (
     <>
-      <Stack.Screen options={{ headerShown: true, title: "works" }} />
+      <Stack.Screen options={{ headerShown: true, title: "can" }} />
       <Text>{k}</Text>
     </>
   );

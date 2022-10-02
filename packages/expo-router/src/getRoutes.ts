@@ -76,10 +76,12 @@ export function generateDynamic(name: string) {
   return dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null;
 }
 
-function treeNodeToRouteNode(
-  { name, node, parents, children }: TreeNode,
-  isOrphan?: boolean
-): RouteNode | null {
+function treeNodeToRouteNode({
+  name,
+  node,
+  parents,
+  children,
+}: TreeNode): RouteNode | null {
   const dynamic = generateDynamic(name);
 
   if (node) {

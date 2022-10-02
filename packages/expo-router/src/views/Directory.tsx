@@ -167,50 +167,52 @@ function FileItem({
 
   return (
     <>
-      <Link
-        href={href}
-        onPress={() => {
-          if (Platform.OS !== "web") {
-            // Ensure the modal pops
-            navigation.goBack();
-          }
-        }}
-        // @ts-expect-error: disabled not on type
-        disabled={disabled}
-        asChild
-      >
-        <Pressable>
-          {({ pressed, hovered }) => (
-            <View
-              style={[
-                styles.itemPressable,
-                {
-                  paddingLeft: INDENT + level * INDENT,
-                  backgroundColor: hovered
-                    ? "rgba(255,255,255,0.1)"
-                    : "transparent",
-                },
-                pressed && { backgroundColor: "#323232" },
-                disabled && { opacity: 0.4 },
-              ]}
-            >
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                {route.children.length ? <PkgIcon /> : <FileIcon />}
-                <Text style={styles.filename}>{route.contextKey}</Text>
-              </View>
+      {!route.generated && (
+        <Link
+          href={href}
+          onPress={() => {
+            if (Platform.OS !== "web") {
+              // Ensure the modal pops
+              navigation.goBack();
+            }
+          }}
+          // @ts-expect-error: disabled not on type
+          disabled={disabled}
+          asChild
+        >
+          <Pressable>
+            {({ pressed, hovered }) => (
+              <View
+                style={[
+                  styles.itemPressable,
+                  {
+                    paddingLeft: INDENT + level * INDENT,
+                    backgroundColor: hovered
+                      ? "rgba(255,255,255,0.1)"
+                      : "transparent",
+                  },
+                  pressed && { backgroundColor: "#323232" },
+                  disabled && { opacity: 0.4 },
+                ]}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  {route.children.length ? <PkgIcon /> : <FileIcon />}
+                  <Text style={styles.filename}>{route.contextKey}</Text>
+                </View>
 
-              {!disabled && <ForwardIcon />}
-              {route.generated && <Text style={styles.virtual}>Virtual</Text>}
-            </View>
-          )}
-        </Pressable>
-      </Link>
+                {!disabled && <ForwardIcon />}
+                {route.generated && <Text style={styles.virtual}>Virtual</Text>}
+              </View>
+            )}
+          </Pressable>
+        </Link>
+      )}
       {route.children.map((child, index) => (
         <FileItem
           key={child.contextKey}
           route={child}
           parents={[...parents, route.route]}
-          level={level + 1}
+          level={level + (route.generated ? 0 : 1)}
         />
       ))}
     </>

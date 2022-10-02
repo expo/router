@@ -9,6 +9,7 @@ import type {
   Route,
 } from "@react-navigation/routers";
 import * as queryString from "query-string";
+import { matchFragmentName } from "../matchers";
 
 type Options<ParamList extends object> = {
   initialRouteName?: string;
@@ -86,6 +87,7 @@ export default function getPathFromState<ParamList extends object>(
     ? createNormalizedConfigs(options?.screens)
     : {};
 
+  console.log("configs", configs);
   let path = "/";
   let current: State | undefined = state;
 
@@ -96,6 +98,7 @@ export default function getPathFromState<ParamList extends object>(
     let route = current.routes[index] as Route<string> & {
       state?: State;
     };
+    console.log("out.1", path, current, route);
 
     let pattern: string | undefined;
 
@@ -175,6 +178,12 @@ export default function getPathFromState<ParamList extends object>(
     if (pattern === undefined) {
       pattern = nestedRouteNames.join("/");
     }
+    console.log(
+      "nestedRouteNames",
+      currentOptions,
+      route.name,
+      nestedRouteNames
+    );
 
     if (currentOptions[route.name] !== undefined) {
       path += pattern
@@ -205,7 +214,14 @@ export default function getPathFromState<ParamList extends object>(
         })
         .join("/");
     } else {
-      path += encodeURIComponent(route.name);
+      // TODO: Probably fragment routes shouldn't get this far
+      path += encodeURIComponent(
+        matchFragmentName(route.name)
+          ? ""
+          : route.name === "index"
+          ? ""
+          : route.name
+      );
     }
 
     if (!focusedParams) {

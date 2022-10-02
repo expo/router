@@ -100,7 +100,6 @@ function useRoutesAtPath(filename: string): RouteNode[] {
             const nextChildren = getChildrenForRoute(
               getNameFromFilePath(child.contextKey)
             );
-            console.log("generated: children", nextChildren);
             if (nextChildren.length) {
               children = children.filter((c) => c !== child);
 
@@ -114,16 +113,13 @@ function useRoutesAtPath(filename: string): RouteNode[] {
           }
         }
       }
-      console.log("children", children);
-
       return children;
     }
 
-    const children = getChildrenForRoute(normalName);
-
-    return children.sort(sortRoutes);
+    return getChildrenForRoute(normalName).sort(sortRoutes);
   }, [normalName, keys]);
 
+  console.log("family", family);
   return family;
 }
 
