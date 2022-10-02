@@ -140,11 +140,6 @@ export default function getPathFromState<ParamList extends object>(
       nestedRouteNames.push(route.name);
 
       if (route.params) {
-        // NOTE(EvanBacon): Fill in current route using state that was passed as params.
-        if (!route.state && isInvalidParams(route.params)) {
-          current = createFakeState(route.params);
-        }
-
         const stringify = currentOptions[route.name]?.stringify;
 
         const currentParams = Object.fromEntries(
