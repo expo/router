@@ -70,8 +70,8 @@ app/
       index.js # Matches: 𝝠.com/home/
 ```
 
-- If a route is named `./index.js`, it will add both `index` and `/` to the route, effectively acting as a [fragment route](#fragment-routes).
-- Directories cannot be named `/index/`. The filename `/index.js` is reserved for [leaf routes](#leaf-routes).
+- If a route is named `./index.js`, it will add both `index` and `/` to the route, effectively acting as a [fragment route](/router/docs/features/layout-routes/#fragment-routes).
+- Directories cannot be named `/index/`. The filename `/index.js` is reserved for leaf routes.
 
 <details>
   <summary>Interoperability</summary>
