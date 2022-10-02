@@ -1,15 +1,13 @@
-import { Link, useLink, Tabs } from "expo-router";
+import { Link, Tabs } from "expo-router";
+import { useEffect } from "react";
 import { StatusBar, StyleSheet, Text, View } from "react-native";
 
 export default function Page() {
-  const link = useLink();
   return (
     <View style={styles.container}>
+      <Link href="/modal" onMount />
       <Tabs.Screen options={{ title: "Home" }} />
-      <Link
-        href={"/modal"}
-        style={{ fontSize: 24, fontWeight: "bold" }}
-      >
+      <Link href={"/modal"} style={{ fontSize: 24, fontWeight: "bold" }}>
         Open Modal
       </Link>
       <Text

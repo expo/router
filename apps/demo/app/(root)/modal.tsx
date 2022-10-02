@@ -6,15 +6,15 @@ export default function App({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Link href="../" style={{ fontSize: 24, fontWeight: "bold" }}>
+      <Link href="/" style={{ fontSize: 24, fontWeight: "bold" }}>
         Dismiss
       </Link>
       <Text
         onPress={() => {
-            link.push({
-                pathname: "/settings/[home]",
-                query: { home: "baconbrix" },
-            });
+          link.push({
+            pathname: "/settings/[home]",
+            query: { home: "baconbrix" },
+          });
         }}
       >
         Open settings dynamic

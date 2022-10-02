@@ -20,14 +20,17 @@ export default function Page() {
 }
 ```
 
-Access the [`<NavigationContainer />`](https://reactnavigation.org/docs/navigation-container/) ref with the `RootContainer.getRef()` function.
+Access the [`<NavigationContainer />`](https://reactnavigation.org/docs/navigation-container/) ref with the `RootContainer.useRef()` function.
 
 ```tsx title=app/home.tsx
 function Page() {
-  const navigationRef = RootContainer.getRef();
+  // Returns null when the container has not finished mounting.
+  const navigationRef = RootContainer.useRef();
   return <>...</>;
 }
 ```
+
+`RootContainer.useRef()` can be used to determine if the container has finished loading.
 
 > Avoid setting `children` or `linking` as these will break all automatic assumptions made by the router.
 
