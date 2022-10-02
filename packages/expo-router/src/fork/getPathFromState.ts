@@ -209,15 +209,25 @@ export default function getPathFromState<ParamList extends object>(
     if (currentOptions[route.name] !== undefined) {
       path += pattern
         .split("/")
-        .map((p) => {
+        .map((p, i) => {
           const name = getParamName(p);
 
           // We don't know what to show for wildcard patterns
           // Showing the route name seems ok, though whatever we show here will be incorrect
           // Since the page doesn't actually exist
           if (p === "*") {
-            // This can occur when a wildcard matches all routes and the given path was `/`.
-            return route.path ?? "";
+            if (i === 0) {
+              // This can occur when a wildcard matches all routes and the given path was `/`.
+              return route.path ?? "";
+            }
+            // remove existing segments from route.path and return it
+            // this is used for nested wildcard routes. Without this, the path would add
+            // all nested segments to the beginning of the wildcard route.
+            const path = route.path
+              ?.split("/")
+              .slice(i + 1)
+              .join("/");
+            return path ?? "";
           }
 
           // If the path has a pattern for a param, put the param in the path

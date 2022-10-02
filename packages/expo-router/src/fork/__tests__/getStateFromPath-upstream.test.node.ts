@@ -2292,6 +2292,7 @@ it("matches wildcard patterns at root", () => {
 
 it("matches wildcard patterns at nested level", () => {
   const path = "/bar/42/whatever/baz/initt";
+
   const config = {
     screens: {
       "(foo)": {

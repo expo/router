@@ -1585,7 +1585,7 @@ it("matches wildcard patterns at nested level", () => {
       getStateFromPath<object>(path, config) as State,
       config
     )
-  ).toBe("/bar/42/bar/42/whatever/baz/initt");
+  ).toBe(path);
 });
 
 it("matches wildcard patterns at nested level with exact", () => {
