@@ -26,7 +26,7 @@ export function useNavigation(
     const normalized = getNameFromFilePath(parent);
 
     if (parent.startsWith(".")) {
-      return relativePaths(contextKey, parent);
+      return relativePaths(contextKey, "../" + parent);
     }
     return normalized;
   }, [contextKey, parent]);
