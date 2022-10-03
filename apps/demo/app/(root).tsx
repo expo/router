@@ -1,15 +1,35 @@
-import { Children, Layout, NativeStack } from "expo-router";
+import { Layout } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
+
+import { GoogleAuth } from "../etc/auth/google";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function Root() {
   return (
-    <Layout>
-      <Inner />
-    </Layout>
+    <GoogleAuth.Provider>
+      <RootLayout />
+    </GoogleAuth.Provider>
   );
 }
-function Inner() {
-  const { pathname, statePath } = Layout.useContext();
 
-  console.log("pathname", pathname, statePath);
-  return <Children />;
+function RootLayout() {
+  const [token] = GoogleAuth.useToken();
+
+  return (
+    <Layout>
+      <Layout.Screen
+        name="(app)"
+        redirect={!token.isLoading && token.value === null}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Layout.Screen
+        name="sign-in"
+        redirect={!token.isLoading && token.value !== null}
+      />
+      <Layout.Children />
+    </Layout>
+  );
 }

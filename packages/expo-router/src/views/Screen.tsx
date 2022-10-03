@@ -13,6 +13,10 @@ export type ScreenProps<
    * @example `/(root)` maps to a layout route `/app/(root).tsx`.
    */
   parent?: string;
+
+  /** Should redirect away from this screen. */
+  redirect?: boolean;
+
   initialParams?: { [key: string]: any };
   options?: TOptions;
 };
@@ -20,8 +24,9 @@ export type ScreenProps<
 /** Component for setting the current screen's options dynamically. */
 export function Screen<TOptions extends object = object>({
   name,
-  options,
   parent,
+  redirect,
+  options,
 }: ScreenProps<TOptions>) {
   // TODO: Maybe disable all this hook stuff when name is defined.
   const navigation = useNavigation(parent);
@@ -35,10 +40,15 @@ export function Screen<TOptions extends object = object>({
     React.useEffect(() => {
       if (name != null) {
         throw new Error(
-          "Screen components should only use the name prop when nested directly inside a Layout. When a Screen is used for dynamic options it uses the nearest navigation context."
+          "Screen components should only use the `name` prop when nested directly inside a Layout component. When a Screen is used for dynamic options it uses the nearest navigation context."
         );
       }
-    }, [name]);
+      if (redirect != null) {
+        throw new Error(
+          "Screen components should only use the `redirect` prop when nested directly inside a Layout component."
+        );
+      }
+    }, [name, redirect]);
   }
 
   return null;
