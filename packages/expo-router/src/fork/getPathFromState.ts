@@ -35,8 +35,30 @@ const getActiveRoute = (state: State): { name: string; params?: object } => {
     return getActiveRoute(route.state);
   }
 
+  if (route && isInvalidParams(route.params)) {
+    return getActiveRoute(createFakeState(route.params));
+  }
+
   return route;
 };
+
+function createFakeState(params: StateAsParams) {
+  return {
+    stale: false,
+    type: "UNKNOWN",
+    key: "UNKNOWN",
+    index: 0,
+    routeNames: [],
+    routes: [
+      {
+        key: "UNKNOWN",
+        name: params.screen,
+        params: params.params,
+        path: params.path,
+      },
+    ],
+  };
+}
 
 /**
  * Utility to serialize a navigation state object to a path string.
@@ -96,13 +118,16 @@ export default function getPathFromState<ParamList extends object>(
     let route = current.routes[index] as Route<string> & {
       state?: State;
     };
+    // NOTE(EvanBacon): Fill in current route using state that was passed as params.
+    if (!route.state && isInvalidParams(route.params)) {
+      route.state = createFakeState(route.params);
+    }
 
     let pattern: string | undefined;
 
     let focusedParams: Record<string, any> | undefined;
     const focusedRoute = getActiveRoute(state);
     let currentOptions = configs;
-
     // Keep all the route names that appeared during going deeper in config in case the pattern is resolved to undefined
     const nestedRouteNames = [];
 
@@ -179,15 +204,25 @@ export default function getPathFromState<ParamList extends object>(
     if (currentOptions[route.name] !== undefined) {
       path += pattern
         .split("/")
-        .map((p) => {
+        .map((p, i) => {
           const name = getParamName(p);
 
           // We don't know what to show for wildcard patterns
           // Showing the route name seems ok, though whatever we show here will be incorrect
           // Since the page doesn't actually exist
           if (p === "*") {
-            // This can occur when a wildcard matches all routes and the given path was `/`.
-            return route.path ?? "";
+            if (i === 0) {
+              // This can occur when a wildcard matches all routes and the given path was `/`.
+              return route.path ?? "";
+            }
+            // remove existing segments from route.path and return it
+            // this is used for nested wildcard routes. Without this, the path would add
+            // all nested segments to the beginning of the wildcard route.
+            const path = route.path
+              ?.split("/")
+              .slice(i + 1)
+              .join("/");
+            return path ?? "";
           }
 
           // If the path has a pattern for a param, put the param in the path
@@ -237,6 +272,29 @@ export default function getPathFromState<ParamList extends object>(
   path = path.length > 1 ? path.replace(/\/$/, "") : path;
 
   return path;
+}
+
+type StateAsParams = {
+  initial: boolean;
+  path: string;
+  screen: string;
+  params: Record<string, any>;
+};
+
+// TODO: Make StackRouter not do this...
+// Detect if the params came from StackRouter using `params` to pass around internal state.
+function isInvalidParams(
+  params?: Record<string, any>
+): params is StateAsParams {
+  return (
+    !!params &&
+    "initial" in params &&
+    "path" in params &&
+    "screen" in params &&
+    "params" in params &&
+    typeof params.params === "object" &&
+    !!params.params
+  );
 }
 
 const getParamName = (pattern: string) =>
