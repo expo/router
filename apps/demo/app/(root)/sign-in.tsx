@@ -11,7 +11,7 @@ export default function App() {
         style={{ padding: 20, borderWidth: 2, borderColor: "black" }}
         onPress={() => signIn()}
       >
-        Sign in with Google
+        Sign in
       </Text>
     </View>
   );

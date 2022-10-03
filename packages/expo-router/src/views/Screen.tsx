@@ -4,11 +4,11 @@ import React from "react";
 /** Component for setting the current screen's options dynamically. */
 export function Screen<TOptions extends object = object>({
   name,
-  forbidden,
+  redirect,
   options,
 }: {
   name?: string;
-  forbidden?: boolean;
+  redirect?: boolean | string;
   initialParams?: Record<string, any>;
   options?: TOptions;
 }) {
@@ -27,12 +27,12 @@ export function Screen<TOptions extends object = object>({
           "Screen components should only use the `name` prop when nested directly inside a Layout component. When a Screen is used for dynamic options it uses the nearest navigation context."
         );
       }
-      if (forbidden != null) {
+      if (redirect != null) {
         throw new Error(
-          "Screen components should only use the `forbidden` prop when nested directly inside a Layout component."
+          "Screen components should only use the `redirect` prop when nested directly inside a Layout component."
         );
       }
-    }, [name, forbidden]);
+    }, [name, redirect]);
   }
 
   return null;

@@ -58,12 +58,14 @@ export function createAuthSessionContextProvider<
         return null;
       }
       let success = true;
-      if (discovery.revocationEndpoint) {
-        success = await AuthSession.revokeAsync(
-          { ...config, token: token.value!.accessToken },
-          discovery
-        );
-      }
+      // NOTE(EvanBacon): Disabled this to create a fake authentication flow.
+
+      // if (discovery.revocationEndpoint) {
+      //   success = await AuthSession.revokeAsync(
+      //     { ...config, token: token.value!.accessToken },
+      //     discovery
+      //   );
+      // }
       if (success) setToken(null);
       return success;
     }, [setToken, token.value?.accessToken, config]);

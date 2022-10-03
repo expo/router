@@ -8,7 +8,7 @@ Qualified layouts, like the ones found in `expo-router` (Stack, Tabs, NativeStac
 All `Screen` components are the same and render `null`, but they have different types for convenience. The common props are:
 
 - **name**: _string_ The name of the route to configure. This can only be used when the `Screen` is a child of a layout component.
-- **forbidden**: _boolean | undefined_ Prevents the route from be accessible and redirects the request to the nearest sibling route in a layout. This is useful for authentication or other conditional routing.
+- **redirect**: _true | string | undefined_ When `true`, redirects the request to the nearest sibling route in a layout. When a `string` matching the name of a sibling is used, the redirect will go to the provided sibling.
 - **options**: _T | undefined_ The options to pass to the route. The type varies depending on the layout. Options can be used for `Screen` components rendered anywhere.
 
 ## Dynamic options
