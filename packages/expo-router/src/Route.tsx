@@ -43,7 +43,7 @@ export function useRoutes(): RouteNode[] {
 
 export function useContextKey(): string {
   const filename = useContext(CurrentRoutePathContext);
-  if (!filename) {
+  if (filename == null) {
     throw new Error("No filename found. This is likely a bug in expo-router.");
   }
   return filename;
@@ -57,10 +57,21 @@ export function Route({
   filename: string;
   children: ReactNode;
 }) {
-  const routes = useRoutesAtPath(filename);
+  const normalName = React.useMemo(
+    () => getNameFromFilePath(filename),
+    [filename]
+  );
+
+  const routes = useRoutesAtPath(normalName);
 
   return (
-    <CurrentRoutePathContext.Provider value={filename}>
+    <CurrentRoutePathContext.Provider
+      value={
+        // The root path is `` (empty string) so always prepend `/` to ensure
+        // there is some value.
+        "/" + normalName
+      }
+    >
       <CurrentRouteContext.Provider value={routes}>
         {children}
       </CurrentRouteContext.Provider>
@@ -68,11 +79,7 @@ export function Route({
   );
 }
 
-function useRoutesAtPath(filename: string): RouteNode[] {
-  const normalName = React.useMemo(
-    () => getNameFromFilePath(filename),
-    [filename]
-  );
+function useRoutesAtPath(normalName: string): RouteNode[] {
   const routes = useContext(RoutesContext);
   const keys = React.useMemo(() => routes.keys(), [routes]);
 

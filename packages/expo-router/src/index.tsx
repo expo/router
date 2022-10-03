@@ -17,5 +17,6 @@ export { Layout, Children } from "./views/Layout";
 export { Link } from "./link/Link";
 export { useLink } from "./link/useLink";
 export { RootContainer } from "./ContextNavigationContainer";
+export { useNavigation } from "./useNavigation";
 
 export * as Linking from "./link/linking";

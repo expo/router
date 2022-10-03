@@ -1,17 +1,30 @@
-import { useNavigation } from "@react-navigation/native";
 import React from "react";
+
+import { useNavigation } from "../useNavigation";
+
+export type ScreenProps<
+  TOptions extends Record<string, any> = Record<string, any>
+> = {
+  /** Name is required when used inside a Layout component. */
+  name?: string;
+  /**
+   * An absolute path like `/(root)` to the parent route or a relative path like `../../` to the parent route.
+   * This should not be used inside of a Layout component.
+   * @example `/(root)` maps to a layout route `/app/(root).tsx`.
+   */
+  parent?: string;
+  initialParams?: { [key: string]: any };
+  options?: TOptions;
+};
 
 /** Component for setting the current screen's options dynamically. */
 export function Screen<TOptions extends object = object>({
   name,
   options,
-}: {
-  name?: string;
-  initialParams?: Record<string, any>;
-  options?: TOptions;
-}) {
+  parent,
+}: ScreenProps<TOptions>) {
   // TODO: Maybe disable all this hook stuff when name is defined.
-  const navigation = useNavigation();
+  const navigation = useNavigation(parent);
 
   React.useLayoutEffect(() => {
     navigation.setOptions(options ?? {});

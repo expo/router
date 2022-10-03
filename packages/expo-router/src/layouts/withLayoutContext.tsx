@@ -1,16 +1,10 @@
 import React from "react";
+import { useContextKey } from "../Route";
 
 import { useSortedScreens } from "../useScreens";
-import { Screen } from "../views/Screen";
+import { Screen, ScreenProps } from "../views/Screen";
 
 type PickPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
-type ScreenProps<TOptions extends Record<string, any> = Record<string, any>> = {
-  /** Name is required when used inside a Layout component. */
-  name?: string;
-  initialParams?: { [key: string]: any };
-  options?: TOptions;
-};
 
 /** Return a navigator that automatically injects matched routes and renders nothing when there are no children. Return type with children prop optional */
 export function withLayoutContext<
@@ -32,6 +26,8 @@ export function withLayoutContext<
       }: PickPartial<React.ComponentProps<T>, "children">,
       ref
     ) => {
+      const contextKey = useContextKey();
+
       const userDefinedOptions = React.useMemo(() => {
         const screens = React.Children.map(userDefinedChildren, (child) => {
           if (React.isValidElement(child) && child && child.type === Screen) {
@@ -42,12 +38,12 @@ export function withLayoutContext<
             }
             if (process.env.NODE_ENV !== "production") {
               if (
-                ["children", "component", "getComponent"].some(
+                ["children", "parent", "component", "getComponent"].some(
                   (key) => key in child.props
                 )
               ) {
                 throw new Error(
-                  "Screen must not have a children, component, or getComponent prop when used as a child of a Layout"
+                  "Screen must not have a children, parent, component, or getComponent prop when used as a child of a Layout"
                 );
               }
             }
@@ -78,7 +74,7 @@ export function withLayoutContext<
       }
 
       // @ts-expect-error
-      return <Nav {...props} ref={ref} children={sorted} />;
+      return <Nav id={contextKey} {...props} ref={ref} children={sorted} />;
     }
   );
 
