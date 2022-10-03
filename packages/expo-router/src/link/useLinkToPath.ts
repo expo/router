@@ -19,6 +19,11 @@ export function useLinkToPath() {
         );
       }
 
+      if (to === "../") {
+        navigation.goBack();
+        return;
+      }
+
       if (!to.startsWith("/")) {
         if (/:\/\//.test(to)) {
           // Open external link

@@ -35,6 +35,20 @@ function convertDynamicRouteToReactNavigation(name: string) {
 
   return name;
 }
+function getInitialRouteNameFromNode(node) {
+  const regex = new RegExp('\\n\\s*initialRouteName:\\s"([^"]+)",\\n', "m");
+  const found = node.getComponent().toString().match(regex);
+  if (found) {
+    return found[1];
+  }
+  if (node.children?.length) {
+    if (node.children.find((item) => item.route === "index")) {
+      return "index";
+    }
+    return node.children[0].route;
+  }
+  return null;
+}
 
 export function treeToReactNavigationLinkingRoutes(
   nodes: RouteNode[],
@@ -55,7 +69,9 @@ export function treeToReactNavigationLinkingRoutes(
         path,
       ]);
 
-      return [node.route, { path, screens }] as const;
+      const initialRouteName = getInitialRouteNameFromNode(node);
+
+      return [node.route, { path, screens, initialRouteName }] as const;
     })
     .reduce<PathConfigMap<object>>((acc, [route, current]) => {
       acc[route] = current;

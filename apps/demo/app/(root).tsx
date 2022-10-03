@@ -1,15 +1,9 @@
-import { Children, Layout, NativeStack } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function Root() {
   return (
-    <Layout>
-      <Inner />
-    </Layout>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name={"modal"} options={{ presentation: "modal" }} />
+    </Stack>
   );
-}
-function Inner() {
-  const { pathname, statePath } = Layout.useContext();
-
-  console.log("pathname", pathname, statePath);
-  return <Children />;
 }
