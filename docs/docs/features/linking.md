@@ -70,7 +70,7 @@ The `Href` type is a union of the following types:
 You can also use the [`navigation` prop](https://reactnavigation.org/docs/navigation-prop) from React Navigation to imperatively navigate using screen names:
 
 ```js
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation } from "expo-router";
 
 export default function Route() {
   const navigation = useNavigation();
