@@ -1,14 +1,15 @@
 import {
+  createNavigationContainerRef,
   findFocusedRoute,
   NavigationContainer,
-  NavigationContainerRef,
-  ParamListBase,
 } from "@react-navigation/native";
 import React, { useCallback } from "react";
 
 import { useLinkingConfig } from "./getLinkingConfig";
 import SplashModule from "./splash";
 import { VirtualRouteContext } from "./useCurrentRoute";
+
+const navigationRef = createNavigationContainerRef();
 
 type NavigationContainerProps = React.ComponentProps<
   typeof NavigationContainer
@@ -32,31 +33,29 @@ export function useNavigationContainerContext() {
 }
 
 /** react-navigation `NavigationContainer` with automatic `linking` prop generated from the routes context. */
-export const ContextNavigationContainer = React.forwardRef(
-  (props: NavigationContainerProps, ref: NavigationContainerProps["ref"]) => {
-    const [state, setState] = React.useState<Partial<NavigationContainerProps>>(
-      {}
-    );
+export function ContextNavigationContainer(props: NavigationContainerProps) {
+  const [state, setState] = React.useState<Partial<NavigationContainerProps>>(
+    {}
+  );
 
-    const linking = useLinkingConfig();
-    console.log("linking", linking);
+  const linking = useLinkingConfig();
+  console.log("linking", linking);
 
-    return (
-      <NavigationContainerContext.Provider
-        value={[
-          {
-            ...props,
-            linking,
-            ...state,
-          },
-          setState,
-        ]}
-      >
-        <InternalContextNavigationContainer ref={ref} />
-      </NavigationContainerContext.Provider>
-    );
-  }
-);
+  return (
+    <NavigationContainerContext.Provider
+      value={[
+        {
+          ...props,
+          linking,
+          ...state,
+        },
+        setState,
+      ]}
+    >
+      <InternalContextNavigationContainer />
+    </NavigationContainerContext.Provider>
+  );
+}
 
 function trimQuery(pathname: string): string {
   const queryIndex = pathname.indexOf("?");
@@ -66,56 +65,47 @@ function trimQuery(pathname: string): string {
   return pathname;
 }
 
-const InternalContextNavigationContainer = React.forwardRef(
-  (props: object, ref: NavigationContainerProps["ref"]) => {
-    const [contextProps] = useNavigationContainerContext();
-    const [state, setState] = React.useState<{
-      pathname: string | null;
-      query: Record<string, any>;
-    }>({ pathname: null, query: {} });
+function InternalContextNavigationContainer(props: object) {
+  const [contextProps] = useNavigationContainerContext();
+  const [state, setState] = React.useState<{
+    pathname: string | null;
+    query: Record<string, any>;
+  }>({ pathname: null, query: {} });
 
-    const onStateChange = useCallback(
-      (state) => {
-        if (state) {
-          const currentRoute = findFocusedRoute(state);
-          setState({
-            pathname: trimQuery(currentRoute?.path ?? "/"),
-            query: currentRoute?.params ?? {},
-          });
-        }
-      },
-      [setState]
-    );
+  const onStateChange = useCallback(
+    (state) => {
+      if (state) {
+        const currentRoute = findFocusedRoute(state);
+        setState({
+          pathname: trimQuery(currentRoute?.path ?? "/"),
+          query: currentRoute?.params ?? {},
+        });
+      }
+    },
+    [setState]
+  );
 
-    const navigationRef =
-      React.useRef<NavigationContainerRef<ParamListBase>>(null);
-
-    React.useImperativeHandle(ref, () => navigationRef.current!, [
-      navigationRef,
-    ]);
-
-    return (
-      <VirtualRouteContext.Provider value={state}>
-        {/* @ts-expect-error: children are required */}
-        <NavigationContainer
-          {...props}
-          {...contextProps}
-          ref={navigationRef}
-          onReady={() => {
-            contextProps.onReady?.();
-            SplashModule?.hideAsync();
-            const initialState = navigationRef.current?.getRootState();
-            onStateChange(initialState);
-          }}
-          onStateChange={(state) => {
-            contextProps.onStateChange?.(state);
-            onStateChange(state);
-          }}
-        />
-      </VirtualRouteContext.Provider>
-    );
-  }
-);
+  return (
+    <VirtualRouteContext.Provider value={state}>
+      {/* @ts-expect-error: children are required */}
+      <NavigationContainer
+        {...props}
+        {...contextProps}
+        ref={navigationRef}
+        onReady={() => {
+          contextProps.onReady?.();
+          SplashModule?.hideAsync();
+          const initialState = navigationRef.current?.getRootState();
+          onStateChange(initialState);
+        }}
+        onStateChange={(state) => {
+          contextProps.onStateChange?.(state);
+          onStateChange(state);
+        }}
+      />
+    </VirtualRouteContext.Provider>
+  );
+}
 
 export function RootContainer({
   documentTitle,
@@ -153,3 +143,8 @@ export function RootContainer({
 
   return null;
 }
+
+/** Get the root navigation container ref. */
+RootContainer.getRef = () => {
+  return navigationRef;
+};

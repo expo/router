@@ -376,11 +376,15 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
         {}
       );
 
+      const hasCombinedParams = Object.keys(combinedParams).length > 0;
+
       // Combine all params so a route `[foo]/[bar]/other.js` has access to `{ foo, bar }`
-      routes = routes.map((r) => ({
-        ...r,
-        params: combinedParams,
-      }));
+      routes = routes.map((r) => {
+        if (hasCombinedParams) {
+          r.params = combinedParams;
+        }
+        return r;
+      });
 
       remainingPath = remainingPath.replace(match[1], "");
 
@@ -632,7 +636,12 @@ const createNestedStateObject = (
   );
 
   if (params) {
-    route.params = { ...route.params, ...params };
+    const resolvedParams = { ...route.params, ...params };
+    if (Object.keys(resolvedParams).length > 0) {
+      route.params = resolvedParams;
+    } else {
+      delete route.params;
+    }
   }
 
   return state;
