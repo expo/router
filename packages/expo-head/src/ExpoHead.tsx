@@ -1,9 +1,7 @@
 import React from "react";
 import * as App from "expo-application";
 import ExpoHead from "./ExpoHeadModule";
-// import { EventEmitter } from "expo-modules-core";
 
-// const emitter = new EventEmitter(ExpoHead);
 // Import the native module. On web, it will be resolved to ExpoHead.web.ts
 // and on native platforms to ExpoHead.ts
 // Get the native constant value.
@@ -36,16 +34,9 @@ type UserActivity = {
   expirationDate?: Date;
 };
 
-export function flushActivity() {
-  console.log("got launch activity:", ExpoHead.getLaunchActivity());
-}
-
-flushActivity();
-
 // isEligibleForPrediction
 // https://developer.apple.com/documentation/foundation/nsuseractivity/2980674-iseligibleforprediction
 
-// suggestedInvocationPhrase -- `expo:spoken-phrase`
 // suggestedInvocationPhrase -- `expo:spoken-phrase`
 
 function getStaticUrlFromExpoRouter(href: string) {
