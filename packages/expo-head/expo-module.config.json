@@ -1,9 +1,11 @@
 {
   "platforms": ["ios", "android", "web"],
   "ios": {
-    "modules": ["ExpoHeadModule"]
+    "modules": ["ExpoHeadModule"],
+    "appDelegateSubscribers": ["ExpoHeadAppDelegateSubscriber"]
   },
   "android": {
     "modules": ["expo.modules.head.ExpoHeadModule"]
   }
 }
+

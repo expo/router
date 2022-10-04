@@ -20,14 +20,14 @@ function RootLayout() {
     <Layout>
       <Layout.Screen
         name="(app)"
-        redirect={!token.isLoading && token.value === null}
+        // redirect={!token.isLoading && token.value === null}
         options={{
           headerShown: false,
         }}
       />
       <Layout.Screen
         name="sign-in"
-        redirect={!token.isLoading && token.value !== null}
+        // redirect={!token.isLoading && token.value !== null}
       />
       <Layout.Children />
     </Layout>

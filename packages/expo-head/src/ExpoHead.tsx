@@ -1,13 +1,16 @@
 import React from "react";
 
 import ExpoHead from "./ExpoHeadModule";
+import { EventEmitter } from "expo-modules-core";
 
+const emitter = new EventEmitter(ExpoHead);
 // Import the native module. On web, it will be resolved to ExpoHead.web.ts
 // and on native platforms to ExpoHead.ts
 // Get the native constant value.
 export const PI = ExpoHead.PI;
 
 type UserActivity = {
+  id?: string;
   /**
    * The activity title should be clear and concise. This text describes the content of the link, like “Photo taken on July 27, 2020” or “Conversation with Maria”. Use nouns for activity titles.
    */
@@ -19,7 +22,24 @@ type UserActivity = {
   activityType: string;
   // TODO: Maybe something like robots.txt?
   eligibleForSearch?: boolean;
+
+  thumbnailURL?: string;
+
+  userInfo?: Record<string, string>;
+
+  imageData?: any;
+
+  imageUrl?: string;
+  darkImageUrl?: string;
+  dateModified?: Date;
+  expirationDate?: Date;
 };
+
+export function flushActivity() {
+  console.log("got launch activity:", ExpoHead.getLaunchActivity());
+}
+
+flushActivity();
 
 // isEligibleForPrediction
 // https://developer.apple.com/documentation/foundation/nsuseractivity/2980674-iseligibleforprediction
@@ -27,19 +47,42 @@ type UserActivity = {
 // suggestedInvocationPhrase -- `expo:spoken-phrase`
 // suggestedInvocationPhrase -- `expo:spoken-phrase`
 
-function getStaticUrlFromExpoRouter() {
+function getStaticUrlFromExpoRouter(href: string) {
   // Wherever the user hosted their website + base URL.
   const host = "https://expo.io";
   // Append the URL we'd find in context
-  return host + "/foobar";
+  return host + "/" + href;
+}
+
+function urlToId(url: string) {
+  return url.replace(/[^a-zA-Z0-9]/g, "-");
 }
 
 // Maybe use geo from structured data -- https://developers.google.com/search/docs/appearance/structured-data/local-business
 
+import { useLink } from "expo-router";
+import { useContextKey } from "expo-router/build/Route";
+import { AppState, Linking } from "react-native";
 export function Head({ children }: { children?: React.ReactNode }) {
+  const link = useLink();
+
+  React.useEffect(() => {
+    const event = emitter.addListener("onActivityChanged", flushActivity);
+
+    // const appEvent = AppState.addEventListener("change", flushActivity);
+
+    return () => {
+      event.remove();
+      // appEvent.remove();
+    };
+  }, []);
+
+  console.log("head module:", ExpoHead);
+  flushActivity();
+
   React.useEffect(() => {
     const userActivity: UserActivity = {
-      activityType: "...",
+      activityType: ExpoHead.activities.INDEXED_ROUTE,
     };
 
     React.Children.forEach(children, (child) => {
@@ -51,7 +94,7 @@ export function Head({ children }: { children?: React.ReactNode }) {
       }
       // Child is meta tag
       if (child.type === "meta") {
-        const { property, name, content } = child.props;
+        const { property, name, media, content } = child.props;
 
         // <meta name="title" content="Hello world" />
         if (property === "og:title" || name === "title") {
@@ -66,7 +109,15 @@ export function Head({ children }: { children?: React.ReactNode }) {
         if ("og:url" === property || "url" === name) {
           userActivity.webpageURL = content;
         } else {
-          userActivity.webpageURL = getStaticUrlFromExpoRouter();
+          userActivity.webpageURL = getStaticUrlFromExpoRouter(link.href);
+        }
+
+        if (property === "og:image") {
+          if (media === "(prefers-color-scheme: dark)") {
+            userActivity.darkImageUrl = content;
+          } else {
+            userActivity.imageUrl = content;
+          }
         }
 
         // <meta name="keywords" content="foo,bar,baz" />
@@ -78,15 +129,29 @@ export function Head({ children }: { children?: React.ReactNode }) {
       }
     });
 
-    ExpoHead.createActivity(userActivity);
-  }, [children]);
+    if (userActivity.title) {
+      const resolved: UserActivity = {
+        webpageURL: getStaticUrlFromExpoRouter(link.href),
+        ...userActivity,
+        userInfo: {
+          href: link.location,
+        },
+      };
 
-  React.useEffect(() => {
-    return () => {
-      // https://developer.apple.com/documentation/foundation/nsuseractivity/1409596-resigncurrent
-      ExpoHead.suspendActivity("[TODO-SOME-PAGE-ID]");
-    };
-  }, []);
+      if (!resolved.id) {
+        resolved.id = urlToId(resolved.webpageURL!);
+      }
+
+      ExpoHead.createActivity(resolved);
+    }
+  }, [children, link.href]);
+
+  // React.useEffect(() => {
+  //   return () => {
+  //     // https://developer.apple.com/documentation/foundation/nsuseractivity/1409596-resigncurrent
+  //     ExpoHead.suspendActivity("[TODO-SOME-PAGE-ID]");
+  //   };
+  // }, []);
 
   return null;
 }

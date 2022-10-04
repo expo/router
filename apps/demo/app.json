@@ -3,8 +3,12 @@
     "name": "Router Demo",
     "slug": "expo-router",
     "scheme": "bacontext",
+    "icon": "https://icogen.vercel.app/api/icon?icon=2795&color_hex=1e90ff",
     "web": {
       "bundler": "metro"
+    },
+    "ios": {
+      "bundleIdentifier": "com.bacon.expo-router"
     }
   }
 }
