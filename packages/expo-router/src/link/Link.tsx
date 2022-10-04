@@ -21,14 +21,12 @@ type Props = {
   /** Should replace the current screen without adding to the history. */
   replace?: boolean;
 
-  /** Redirects to the href as soon as the component is mounted. */
-  onMount?: boolean;
-
   onPress?: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => void;
 } & (TextProps & { children: React.ReactNode });
 
+/** Redirects to the href as soon as the component is mounted. */
 export function Redirect({ href }: { href: Href }) {
   const link = useLink();
   useFocusEffect(() => {
@@ -48,7 +46,7 @@ export function Redirect({ href }: { href: Href }) {
 export const Link = React.forwardRef(ExpoRouterLink);
 
 function ExpoRouterLink(
-  { href, replace, onMount, asChild, ...rest }: Props,
+  { href, replace, asChild, ...rest }: Props,
   ref: React.ForwardedRef<Text>
 ) {
   // TODO: Auto use router's client-side event.
@@ -64,10 +62,6 @@ function ExpoRouterLink(
     }
     props.onPress(e);
   };
-
-  if (onMount) {
-    return <Redirect href={href} />;
-  }
 
   return React.createElement(
     // @ts-expect-error: slot is not type-safe

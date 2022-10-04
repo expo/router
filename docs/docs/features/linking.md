@@ -93,10 +93,10 @@ The navigation prop is useful for layout-specific functionality like `navigation
 
 ## Redirect
 
-You can immediately redirect from a particular screen by using the `onMount` prop of the `Link` component:
+You can immediately redirect from a particular screen by using the `Redirect` component:
 
 ```tsx
-import { Link } from "expo-router";
+import { Redirect } from "expo-router";
 
 export default function Page() {
   // Some logic to determine if the user is logged in.
@@ -104,7 +104,7 @@ export default function Page() {
 
   if (!user) {
     // Redirect to the login screen if the user is not authenticated.
-    return <Link href="/login" onMount />;
+    return <Redirect href="/login" />;
   }
 
   return (
