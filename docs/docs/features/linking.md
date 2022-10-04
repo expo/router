@@ -89,7 +89,7 @@ export default function Route() {
 }
 ```
 
-The navigation prop is useful for layout-specific functionality like `navigation.openDrawer()` in a Drawer layout. [Learn more](https://reactnavigation.org/docs/navigation-prop#navigator-dependent-functions).
+The navigation prop is useful for layout-specific functionality like `navigation.openDrawer()` in a Drawer layout. [Learn more](https://reactnavigation.org/docs/navigation-prop/#navigator-dependent-functions).
 
 ## Redirect
 
