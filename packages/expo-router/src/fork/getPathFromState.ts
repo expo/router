@@ -10,6 +10,8 @@ import type {
 } from "@react-navigation/routers";
 import * as queryString from "query-string";
 
+import { matchDeepDynamicRouteName } from "../matchers";
+
 type Options<ParamList extends object> = {
   initialRouteName?: string;
   screens: PathConfigMap<ParamList>;
@@ -163,7 +165,13 @@ export default function getPathFromState<ParamList extends object>(
             .filter((p) => p.startsWith(":") || p === "*")
             // eslint-disable-next-line no-loop-func
             .forEach((p) => {
-              const name = getParamName(p);
+              let name: string;
+              if (p === "*") {
+                // NOTE(EvanBacon): Drop the param name matching the wildcard route name -- this is specific to Expo Router.
+                name = matchDeepDynamicRouteName(route.name) ?? route.name;
+              } else {
+                name = getParamName(p);
+              }
 
               // Remove the params present in the pattern since we'll only use the rest for query string
               if (focusedParams) {
