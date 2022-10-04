@@ -1186,6 +1186,13 @@
     "@babel/helper-validator-identifier" "^7.18.6"
     to-fast-properties "^2.0.0"
 
+"@bacons/expo-metro-runtime@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@bacons/expo-metro-runtime/-/expo-metro-runtime-1.2.0.tgz#a0ba0c96af060b4d80c05b44076c1160453bdda6"
+  integrity sha512-HgdvEc9SOi1Sc2qcZhn4fWisQtOTkZuAv9Lou+sxC1S2/icmMbQePUo9if9WV3dts+AZloBUplzh/9NNm1191A==
+  dependencies:
+    qs "^6.10.3"
+
 "@bacons/expo-metro-runtime@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@bacons/expo-metro-runtime/-/expo-metro-runtime-2.0.1.tgz#96e85e4649638f182eff0b44310102e90444582f"
@@ -7529,7 +7536,7 @@ expo-linking@^3.2.2, expo-linking@~3.2.0:
     qs "^6.9.1"
     url-parse "^1.5.9"
 
-expo-module-scripts@^2.0.0:
+expo-module-scripts@^2.0.0, expo-module-scripts@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/expo-module-scripts/-/expo-module-scripts-2.1.1.tgz#ab448959be461a57845868c1b0610f3cdf918b0c"
   integrity sha512-qkGvk3yxrAciQuOx58r4s8Yeczb/AzCT9SBj7SHrxaqXaWG/Vu6Qk/J0JVJEJlPD3A95yIxs2swUmh76BOsjdA==
@@ -7565,6 +7572,14 @@ expo-modules-core@0.11.5:
   version "0.11.5"
   resolved "https://registry.yarnpkg.com/expo-modules-core/-/expo-modules-core-0.11.5.tgz#19d30e9b24b0b98ea614df3cb474293133a08bd4"
   integrity sha512-KmTHtaL21M1AzKOmu3YM5K8ddCbbr6wgooG4uCb+o+7zZXe+BPP4jAPs5LLez1Et34OQcyjopxUpJ8r43HImvQ==
+  dependencies:
+    compare-versions "^3.4.0"
+    invariant "^2.2.4"
+
+expo-modules-core@^0.11.4:
+  version "0.11.6"
+  resolved "https://registry.yarnpkg.com/expo-modules-core/-/expo-modules-core-0.11.6.tgz#0fb166ce6c18def4bfef7a617d4ba8b20cd87d9f"
+  integrity sha512-Z3DSfyLCag5JxMas+rdPbb8PzhN0F7v0GGx2VuaiC3QvIITrybdRS5lJaXlsfqrJZ36j80p3ZKzfMjMX/RF9kA==
   dependencies:
     compare-versions "^3.4.0"
     invariant "^2.2.4"

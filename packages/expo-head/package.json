@@ -1,0 +1,39 @@
+{
+  "name": "expo-head",
+  "version": "0.1.0",
+  "description": "static page definitions for universal SEO",
+  "main": "build/ExpoHead.js",
+  "types": "build/ExpoHead.d.ts",
+  "scripts": {
+    "build": "expo-module build",
+    "clean": "expo-module clean",
+    "lint": "expo-module lint",
+    "test": "expo-module test",
+    "prepare": "expo-module prepare",
+    "prepublishOnly": "expo-module prepublishOnly",
+    "expo-module": "expo-module"
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "expo-head",
+    "ExpoHead"
+  ],
+  "repository": "https://github.com/EvanBacon/expo-head",
+  "bugs": {
+    "url": "https://github.com/EvanBacon/expo-head/issues"
+  },
+  "author": "evanbacon <bacon@expo.io> (https://github.com/EvanBacon)",
+  "license": "MIT",
+  "homepage": "https://github.com/EvanBacon/expo-head#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "expo-module-scripts": "^2.1.1",
+    "expo-modules-core": "^0.11.4"
+  },
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": "*"
+  }
+}
