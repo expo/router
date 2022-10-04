@@ -1,4 +1,4 @@
-import { Head } from "expo-head";
+import { Head } from "expo-head/build/ExpoHead.ios";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function App() {
@@ -8,7 +8,6 @@ export default function App() {
         <title>Beta | Bacon App 🥓</title>
         <meta name="description" content="Do beta stuff" />
         <meta name="keywords" content="bacon,food,app" />
-        {/* <meta name="robots" content="noindex" /> */}
         <meta
           property="og:image"
           content={"https://icogen.vercel.app/api/icon?color=white&icon=1f953"}
@@ -17,10 +16,6 @@ export default function App() {
           property="og:image"
           media="(prefers-color-scheme: dark)"
           content={"https://icogen.vercel.app/api/icon?color=black&icon=1f953"}
-        />
-        <meta
-          property="expo:spoken-phrase"
-          content={"Show me the cyberpunk bacon"}
         />
       </Head>
       <View style={styles.container}>
