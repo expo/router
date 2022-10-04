@@ -1,20 +1,20 @@
+import { NavigationContainerRefWithCurrent } from "@react-navigation/native";
 import React from "react";
 
-export const VirtualRouteContext = React.createContext<{
-  pathname: string | null;
-  query: Record<string, any>;
-}>({ pathname: null, query: {} });
+export const RootNavigationRef = React.createContext<{
+  ref: NavigationContainerRefWithCurrent<ReactNavigation.RootParamList> | null;
+}>({ ref: null });
 
 if (process.env.NODE_ENV !== "production") {
-  VirtualRouteContext.displayName = "VirtualRouteContext";
+  RootNavigationRef.displayName = "RootNavigationRef";
 }
 
-export function useCurrentRoute() {
-  const context = React.useContext(VirtualRouteContext);
+export function useRootNavigation() {
+  const context = React.useContext(RootNavigationRef);
   if (!context) {
     throw new Error(
-      "useCurrentRoute must be used within a NavigationContainerContext"
+      "useRootNavigation must be used within a NavigationContainerContext"
     );
   }
-  return context;
+  return context.ref;
 }

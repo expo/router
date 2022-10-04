@@ -61,10 +61,13 @@ The `Href` type is a union of the following types:
 
 ## Navigation prop
 
-You can also use the [`navigation` object](https://reactnavigation.org/docs/navigation-prop) from React Navigation to imperatively navigate using screen names:
+You can also use the [`navigation` prop](https://reactnavigation.org/docs/navigation-prop) from React Navigation to imperatively navigate using screen names:
 
 ```js
-export default function Route({ navigation }) {
+import { useNavigation } from "expo-router";
+
+export default function Route() {
+  const navigation = useNavigation();
   return (
     <View>
       <Text
@@ -80,19 +83,50 @@ export default function Route({ navigation }) {
 }
 ```
 
-Alternatively, you can access the `navigation` prop from any component using the hook:
+The navigation prop is useful for layout-specific functionality like `navigation.openDrawer()` in a Drawer layout. [Learn more](https://reactnavigation.org/docs/navigation-prop/#navigator-dependent-functions).
 
-```js
-import { useNavigation } from "@react-navigation/native";
+## Redirect
 
-function MyBackButton() {
-  const navigation = useNavigation();
+You can immediately redirect from a particular screen by using the `Redirect` component:
 
-  return <Button title="Go back" onPress={() => navigation.goBack()} />;
+```tsx
+import { Redirect } from "expo-router";
+
+export default function Page() {
+  // Some logic to determine if the user is logged in.
+  const { user } = useAuth();
+
+  if (!user) {
+    // Redirect to the login screen if the user is not authenticated.
+    return <Redirect href="/login" />;
+  }
+
+  return (
+    <View>
+      <Text>Welcome Back!</Text>
+    </View>
+  );
 }
 ```
 
-The navigation prop is useful for layout-specific functionality like `navigation.openDrawer()` in a Drawer layout. [Learn more](https://reactnavigation.org/docs/navigation-prop#navigator-dependent-functions).
+You can also redirect imperatively using the `useLink` hook:
+
+```js
+import { useLink, useFocusEffect } from "expo-router";
+
+function MyScreen() {
+  const link = useLink();
+
+  useFocusEffect(() => {
+    // Call the replace method to redirect to a new route without adding to the history.
+    // We do this in a useFocusEffect to ensure the redirect happens every time the screen
+    // is focused.
+    link.replace("/profile/settings");
+  });
+
+  return <Text>My Screen</Text>;
+}
+```
 
 ## Testing
 
