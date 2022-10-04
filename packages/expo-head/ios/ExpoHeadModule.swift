@@ -42,28 +42,12 @@ let INDEXED_ROUTE = Bundle.main.bundleIdentifier! + ".expo.index_route"
 
 var launchedActivity: NSUserActivity?
 
-let onActivityChanged = "onActivityChanged"
-
-
-
 public class ExpoHeadModule: Module {
   private var activities = Set<NSUserActivity>()
 
-  static var _sendEvent: ((_ eventName: String, _ body: [String: Any?]) -> Void)?
-
-  public static func sendEvent(_ eventName: String, _ body: [String: Any?] = [:]) {
-    ExpoHeadModule._sendEvent?(eventName, body)
-  }
-
   public required init(appContext: AppContext) {
     super.init(appContext: appContext)
-    ExpoHeadModule._sendEvent = sendEvent
   }
-
-//  @objc
-//  func onActivityChangedFunc() {
-//     sendEvent(onActivityChanged, [:])
-//   }
 
 
   // Each module class must implement the definition function. The definition consists of components
@@ -80,24 +64,6 @@ public class ExpoHeadModule: Module {
         "INDEXED_ROUTE": INDEXED_ROUTE
       ]
     ])
-
-    Events(onActivityChanged)
-
-
-    OnStartObserving {
-//         NotificationCenter.default.removeObserver(self, name: UIPasteboard.changedNotification, object: nil)
-//         NotificationCenter.default.addObserver(
-//           self,
-//           selector: #selector(self.clipboardChangedListener),
-//           name: UIPasteboard.changedNotification,
-//           object: nil
-//         )
-       }
-
-       OnStopObserving {
-//         NotificationCenter.default.removeObserver(self, name: UIPasteboard.changedNotification, object: nil)
-       }
-
 
     Function("getLaunchActivity") { () -> [String: Any]? in
       if let activity = launchedActivity {
@@ -185,18 +151,5 @@ public class ExpoHeadModule: Module {
         self.activities.remove(activity)
       }
     }
-
-//    OnAppEntersForeground {
-//         if !self.activities.isEmpty {
-//           setActivated(true)
-//         }
-//       }
-//
-//       OnAppEntersBackground {
-//         if !self.activeTags.isEmpty {
-//           setActivated(false)
-//         }
-//       }
-
   }
 }
