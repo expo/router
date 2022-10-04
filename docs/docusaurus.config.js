@@ -49,13 +49,23 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      announcementBar: {
+        id: "beta_notice_1",
+        content:
+          'This project is in <b>beta</b>, API is subject to breaking changes. <a target="_blank" rel="noopener noreferrer" href="https://github.com/expo/router/discussions/1">Join the discussion</a>.',
+        backgroundColor: "#242526",
+        textColor: "#fff",
+        isCloseable: true,
+      },
       image: "img/og-image.png",
       navbar: {
         title: "Expo Router",
         logo: {
           alt: "Expo logo",
-          src: "img/logo.svg",
+          srcDark: "img/logo.dark.svg",
+          src: "img/logo.light.svg",
         },
+
         items: [
           {
             type: "doc",
