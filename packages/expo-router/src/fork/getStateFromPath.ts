@@ -10,6 +10,7 @@ import type {
 } from "@react-navigation/routers";
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
+
 import { matchDeepDynamicRouteName } from "../matchers";
 
 //   import findFocusedRoute from './findFocusedRoute';
@@ -355,7 +356,7 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
         const config = configs.find((c) => c.screen === name);
         const params = config?.path
           ?.split("/")
-          .filter((p) => p.startsWith(":") || "*" === p)
+          .filter((p) => p.startsWith(":") || p === "*")
           .reduce<Record<string, any>>((acc, p) => {
             const paramName = p;
             const value = matchedParams[paramName];

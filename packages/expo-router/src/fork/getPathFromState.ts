@@ -9,6 +9,7 @@ import type {
   Route,
 } from "@react-navigation/routers";
 import * as queryString from "query-string";
+
 import { matchDeepDynamicRouteName } from "../matchers";
 
 type Options<ParamList extends object> = {
