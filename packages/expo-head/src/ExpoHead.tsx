@@ -1,9 +1,9 @@
 import React from "react";
-
+import * as App from "expo-application";
 import ExpoHead from "./ExpoHeadModule";
-import { EventEmitter } from "expo-modules-core";
+// import { EventEmitter } from "expo-modules-core";
 
-const emitter = new EventEmitter(ExpoHead);
+// const emitter = new EventEmitter(ExpoHead);
 // Import the native module. On web, it will be resolved to ExpoHead.web.ts
 // and on native platforms to ExpoHead.ts
 // Get the native constant value.
@@ -22,6 +22,7 @@ type UserActivity = {
   activityType: string;
   // TODO: Maybe something like robots.txt?
   eligibleForSearch?: boolean;
+  phrase?: string;
 
   thumbnailURL?: string;
 
@@ -61,24 +62,10 @@ function urlToId(url: string) {
 // Maybe use geo from structured data -- https://developers.google.com/search/docs/appearance/structured-data/local-business
 
 import { useLink } from "expo-router";
-import { useContextKey } from "expo-router/build/Route";
-import { AppState, Linking } from "react-native";
+// import { useContextKey } from "expo-router/build/Route";
+// import { AppState, Linking } from "react-native";
 export function Head({ children }: { children?: React.ReactNode }) {
   const link = useLink();
-
-  React.useEffect(() => {
-    const event = emitter.addListener("onActivityChanged", flushActivity);
-
-    // const appEvent = AppState.addEventListener("change", flushActivity);
-
-    return () => {
-      event.remove();
-      // appEvent.remove();
-    };
-  }, []);
-
-  console.log("head module:", ExpoHead);
-  flushActivity();
 
   React.useEffect(() => {
     const userActivity: UserActivity = {
@@ -104,18 +91,21 @@ export function Head({ children }: { children?: React.ReactNode }) {
         if (property === "og:description" || name === "description") {
           userActivity.description = content;
         }
+        // if (property === "expo:spoken-phrase") {
+        //   userActivity.phrase = content;
+        // }
 
         // <meta property="og:url" content="https://expo.io/foobar" />
         if ("og:url" === property || "url" === name) {
           userActivity.webpageURL = content;
-        } else {
-          userActivity.webpageURL = getStaticUrlFromExpoRouter(link.href);
         }
 
         if (property === "og:image") {
           if (media === "(prefers-color-scheme: dark)") {
+            console.log("SETTING DARK IMAGE URL", content);
             userActivity.darkImageUrl = content;
           } else {
+            console.log("SETTING IMAGE URL", content);
             userActivity.imageUrl = content;
           }
         }
@@ -132,16 +122,24 @@ export function Head({ children }: { children?: React.ReactNode }) {
     if (userActivity.title) {
       const resolved: UserActivity = {
         webpageURL: getStaticUrlFromExpoRouter(link.href),
+        eligibleForSearch: true,
+        keywords: [],
         ...userActivity,
+        // dateModified: new Date().toISOString(),
         userInfo: {
           href: link.location,
         },
       };
 
+      if (App.applicationName) {
+        resolved.keywords?.push(App.applicationName);
+      }
+
       if (!resolved.id) {
         resolved.id = urlToId(resolved.webpageURL!);
       }
 
+      console.log("create:", resolved);
       ExpoHead.createActivity(resolved);
     }
   }, [children, link.href]);

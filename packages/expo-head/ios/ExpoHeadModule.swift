@@ -2,7 +2,7 @@ import ExpoModulesCore
 import CoreSpotlight
 import MobileCoreServices
 // https://developer.apple.com/documentation/foundation/nsuseractivity/3552239-shortcutavailability
-import Intents
+//import Intents
 
 struct MetadataOptions: Record {
   @Field
@@ -29,6 +29,13 @@ struct MetadataOptions: Record {
   var expirationDate: Date?
   @Field
   var userInfo: [String: AnyHashable]?
+  @Field
+  var description: String?
+
+  @Field
+  var phrase: String?
+
+
 }
 
 let INDEXED_ROUTE = Bundle.main.bundleIdentifier! + ".expo.index_route"
@@ -37,20 +44,6 @@ var launchedActivity: NSUserActivity?
 
 let onActivityChanged = "onActivityChanged"
 
-extension UIApplication {
-    var icon: UIImage? {
-        guard let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? NSDictionary,
-            let primaryIconsDictionary = iconsDictionary["CFBundlePrimaryIcon"] as? NSDictionary,
-            let iconFiles = primaryIconsDictionary["CFBundleIconFiles"] as? NSArray,
-            // First will be smallest for the device class, last will be the largest for device class
-            let lastIcon = iconFiles.lastObject as? String,
-            let icon = UIImage(named: lastIcon) else {
-                return nil
-        }
-
-        return icon
-    }
-}
 
 
 public class ExpoHeadModule: Module {
@@ -112,7 +105,8 @@ public class ExpoHeadModule: Module {
 
 
         return [
-          "activityType": activity.activityType, 
+          "activityType": activity.activityType,
+          "description": activity.contentAttributeSet?.contentDescription,
           "id": activity.persistentIdentifier, 
           "eligibleForSearch": activity.isEligibleForSearch, 
           "title": activity.title, 
@@ -123,7 +117,8 @@ public class ExpoHeadModule: Module {
           "keywords": activity.keywords, 
           "dateModified": activity.contentAttributeSet?.metadataModificationDate, 
           "expirationDate": activity.expirationDate, 
-          "userInfo": activity.userInfo
+          "userInfo": activity.userInfo,
+          "phrase": activity.suggestedInvocationPhrase,
         ]
       }
       return nil
@@ -132,8 +127,11 @@ public class ExpoHeadModule: Module {
     // Defines a JavaScript function that always returns a Promise and whose native code
     // is by default dispatched on the different thread than the JavaScript runtime runs on.
     AsyncFunction("createActivity") { (value: MetadataOptions) in
+
+      let activity = self.activities.first(where: { $0.persistentIdentifier == value.id }) ?? NSUserActivity(activityType: value.activityType)
+
     // TODO: https://gist.github.com/alexruperez/ea81aa3e371f7d0d7ea5e594d7e9ad08
-         let activity = NSUserActivity(activityType: value.activityType)
+//         let activity = NSUserActivity(activityType: value.activityType)
           activity.persistentIdentifier = value.id
          activity.isEligibleForHandoff = true
          activity.isEligibleForPublicIndexing = true
@@ -142,26 +140,24 @@ public class ExpoHeadModule: Module {
 
       activity.userInfo = value.userInfo
 
+//      let att = CSSearchableItemAttributeSet(
+//           itemContentType: kUTTypeText as String)
       let att = CSSearchableItemAttributeSet(
-           itemContentType: kUTTypeText as String)
+           itemContentType: kUTTypeContent as String)
+//      kUTTypeItem
       activity.contentAttributeSet = att;
       activity.contentAttributeSet?.metadataModificationDate = value.dateModified
 
-      if (value.imageData == nil && value.imageUrl == nil) {
-
-        // Default to using the app icon as the thumbnail
-        att.thumbnailData = UIApplication.shared.icon?.pngData()
-      }
-      
         activity.contentAttributeSet?.thumbnailData = value.imageData
         activity.contentAttributeSet?.thumbnailURL = value.imageUrl
         activity.contentAttributeSet?.darkThumbnailURL = value.darkImageUrl
+
+      activity.contentAttributeSet?.contentDescription = value.description
 
       activity.title = value.title
       activity.contentAttributeSet?.title = value.title
 
       activity.expirationDate = value.expirationDate
-      
 
       if (value.webpageURL != nil) {
         activity.webpageURL = value.webpageURL
