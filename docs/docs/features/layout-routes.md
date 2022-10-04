@@ -3,12 +3,6 @@ title: Layout Routes
 sidebar_position: 3
 ---
 
-:::warning Beta Release
-
-Expo Router is in the earliest stage of development. The API is subject to breaking changes. The documentation is incomplete and may be inaccurate. The project is not yet ready for production use. Please [contribute to the discussion](https://github.com/expo/router/discussions/1) if you have any ideas or suggestions on how we can improve the convention.
-
-:::
-
 To render shared navigation elements like a header, tab bar, or drawer, you can use a **layout route**.
 If a **route** has a sibling directory by the same name, it will be used as the layout component for all the files in the respective directory.
 

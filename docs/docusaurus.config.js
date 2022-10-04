@@ -33,12 +33,13 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          // routeBasePath: "/", // Serve the docs at the site's root
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          // editUrl:
-          //   "https://github.com/expo/router/tree/main/packages/create-docusaurus/templates/shared/",
+          editUrl: "https://github.com/expo/router/tree/main/docs/",
         },
+        blog: false, // Optional: disable the blog plugin
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
         },
@@ -64,15 +65,10 @@ const config = {
           alt: "Expo logo",
           srcDark: "img/logo.dark.svg",
           src: "img/logo.light.svg",
+          href: "/docs",
         },
 
         items: [
-          {
-            type: "doc",
-            docId: "intro",
-            position: "left",
-            label: "Tutorial",
-          },
           {
             to: "/docs/category/features",
             label: "Features",
