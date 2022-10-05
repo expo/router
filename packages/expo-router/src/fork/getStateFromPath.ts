@@ -11,6 +11,8 @@ import type {
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
+import { matchDeepDynamicRouteName } from "../matchers";
+
 //   import findFocusedRoute from './findFocusedRoute';
 //   import type { PathConfigMap } from './types';
 //   import validatePathConfig from './validatePathConfig';
@@ -336,30 +338,46 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
       // TODO: Add support for wildcard routes
       const matchedParams = config.pattern
         ?.split("/")
-        .filter((p) => p.startsWith(":"))
-        .reduce<Record<string, any>>(
-          (acc, p, i) =>
-            Object.assign(acc, {
-              // The param segments appear every second item starting from 2 in the regex match result
-              [p]: match![(i + 1) * 2].replace(/\//, ""),
-            }),
-          {}
-        );
+        .filter((p) => p.startsWith(":") || p === "*")
+        .reduce<Record<string, any>>((acc, p, i) => {
+          if (p === "*") {
+            return {
+              ...acc,
+              [p]: match[i],
+            };
+          }
+          return Object.assign(acc, {
+            // The param segments appear every second item starting from 2 in the regex match result
+            [p]: match![(i + 1) * 2].replace(/\//, ""),
+          });
+        }, {});
 
       routes = config.routeNames.map((name) => {
         const config = configs.find((c) => c.screen === name);
         const params = config?.path
           ?.split("/")
-          .filter((p) => p.startsWith(":"))
+          .filter((p) => p.startsWith(":") || p === "*")
           .reduce<Record<string, any>>((acc, p) => {
             const paramName = p;
             const value = matchedParams[paramName];
-
-            if (value) {
-              const key = paramName.replace(/^:/, "").replace(/\?$/, "");
-              acc[key] = config.parse?.[key] ? config.parse[key](value) : value;
+            if (p.startsWith(":")) {
+              if (value) {
+                const key = paramName.replace(/^:/, "").replace(/\?$/, "");
+                acc[key] = config.parse?.[key]
+                  ? config.parse[key](value)
+                  : value;
+              }
+            } else {
+              // Get the expo-router-specific wildcard param name.
+              const key = matchDeepDynamicRouteName(name);
+              if (key) {
+                // Convert to an array before providing as a route.
+                const parsed = value.split("/").filter(Boolean);
+                acc[key] = config.parse?.[key]
+                  ? config.parse[key](parsed)
+                  : parsed;
+              }
             }
-
             return acc;
           }, {});
 
@@ -376,11 +394,15 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
         {}
       );
 
+      const hasCombinedParams = Object.keys(combinedParams).length > 0;
+
       // Combine all params so a route `[foo]/[bar]/other.js` has access to `{ foo, bar }`
-      routes = routes.map((r) => ({
-        ...r,
-        params: combinedParams,
-      }));
+      routes = routes.map((r) => {
+        if (hasCombinedParams) {
+          r.params = combinedParams;
+        }
+        return r;
+      });
 
       remainingPath = remainingPath.replace(match[1], "");
 
@@ -632,7 +654,12 @@ const createNestedStateObject = (
   );
 
   if (params) {
-    route.params = { ...route.params, ...params };
+    const resolvedParams = { ...route.params, ...params };
+    if (Object.keys(resolvedParams).length > 0) {
+      route.params = resolvedParams;
+    } else {
+      delete route.params;
+    }
   }
 
   return state;

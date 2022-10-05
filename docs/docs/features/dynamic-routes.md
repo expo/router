@@ -3,12 +3,6 @@ title: Dynamic Routes
 sidebar_position: 5
 ---
 
-:::warning Beta Release
-
-Expo Router is in the earliest stage of development. The API is subject to breaking changes. The documentation is incomplete and may be inaccurate. The project is not yet ready for production use. Please [contribute to the discussion](https://github.com/expo/router/discussions/1) if you have any ideas or suggestions on how we can improve the convention.
-
-:::
-
 ![](./assets/dynamic-routes.png)
 
 ```bash title="File System"
@@ -96,9 +90,3 @@ app/
     [dynamic].js # Matches: 𝝠.com/blog/123
     [...deep].js # Matches: 𝝠.com/blog/123/456
 ```
-
-:::warning Beta Release
-
-Nested priority may contain bugs. Please report broken configurations to the [expo/router](https://github.com/expo/router/issues) repo.
-
-:::

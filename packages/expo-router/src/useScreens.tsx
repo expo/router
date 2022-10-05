@@ -20,6 +20,11 @@ export type ScreenProps<
 > = {
   /** Name is required when used inside a Layout component. */
   name?: string;
+  /**
+   * Redirect to the nearest or provided sibling route.
+   * If all children are redirect={true}, the layout will render `null` as there are no children to render.
+   */
+  redirect?: boolean | string;
   initialParams?: { [key: string]: any };
   options?: TOptions;
 };
@@ -34,7 +39,7 @@ function getSortedChildren(
   const entries = [...children];
 
   const ordered = order
-    .map(({ name, initialParams, options }) => {
+    .map(({ name, redirect, initialParams, options }) => {
       if (!entries.length) {
         console.warn(
           `[Layout children]: Too many screens defined. Route "${name}" is extraneous.`
@@ -52,6 +57,16 @@ function getSortedChildren(
         // Get match and remove from entries
         const match = entries[matchIndex];
         entries.splice(matchIndex, 1);
+
+        // Ensure to return null after removing from entries.
+        if (redirect) {
+          if (typeof redirect === "string") {
+            throw new Error(
+              `Redirecting to a specific route is not supported yet.`
+            );
+          }
+          return null;
+        }
 
         return { route: match, props: { initialParams, options } };
       }
