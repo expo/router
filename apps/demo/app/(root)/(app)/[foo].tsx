@@ -18,9 +18,9 @@ export default function App({ navigation }) {
       </Text>
       <StatusBar barStyle="light-content" />
       {navigation.canGoBack() ? (
-        <span>Can go back</span>
+        <Text>Can go back</Text>
       ) : (
-        <span>Can't go back</span>
+        <Text>Can't go back</Text>
       )}
     </View>
   );
@@ -32,5 +32,6 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
     alignItems: "center",
+    justifyContent: "center"
   },
 });

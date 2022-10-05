@@ -42,3 +42,14 @@ function createQuery(query: Record<string, any>) {
     .map((key) => `${key}=${query[key]}`)
     .join("&");
 }
+export function normalizePath(path: string): string {
+  const result: string[] = [];
+  const parts = path.split("/");
+  parts.forEach((part: string) => {
+    if (part === "") return;
+    if (part === ".") return;
+    if (part === "..") return result.pop();
+    return result.push(part);
+  });
+  return ["", ...result].join("/");
+}

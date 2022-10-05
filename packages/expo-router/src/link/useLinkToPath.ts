@@ -7,9 +7,13 @@ import { LinkingContext } from "@react-navigation/native";
 import * as React from "react";
 import { Linking } from "react-native";
 
+import { useCurrentRoute } from "../useCurrentRoute";
+import { normalizePath } from "./href";
+
 export function useLinkToPath() {
   const navigation = React.useContext(NavigationContainerRefContext);
   const linking = React.useContext(LinkingContext);
+  const current = useCurrentRoute();
 
   const linkTo = React.useCallback(
     (to: string, event?: string) => {
@@ -25,9 +29,12 @@ export function useLinkToPath() {
           Linking.openURL(to);
           return;
         } else {
-          throw new Error(
-            `The href must start with '/' (${to}) or be a fully qualified URL.`
-          );
+          // if relative, need append to current
+          if (to.startsWith("../") || to.startsWith("./")) {
+            to = current + "/" + to;
+          }
+          // normalize path, e.g. `/aaa/bbb/././//../ccc/` -> `/aaa/ccc/`
+          to = normalizePath(to);
         }
       }
 
