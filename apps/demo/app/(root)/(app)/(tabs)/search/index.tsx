@@ -3,6 +3,8 @@ import { NativeStack } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { useMemo } from "react";
+import * as Linking from "expo-linking";
+
 export default function App() {
   const route = useRoute<any>();
   const def = useMemo(
@@ -17,13 +19,24 @@ export default function App() {
         <meta name="keywords" content="bacon,food,app" /> */}
         <meta
           property="og:image"
-          content={"https://icogen.vercel.app/api/icon?color=white&icon=1f50d"}
+          content="https://icogen.vercel.app/api/icon?color=white&icon=1f50d"
         />
-        <meta
-          property="og:image"
-          media="(prefers-color-scheme: dark)"
-          content={"https://icogen.vercel.app/api/icon?color=black&icon=1f50d"}
-        />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            url: Linking.createURL("/"),
+            potentialAction: {
+              "@type": "SearchAction",
+              target: Linking.createURL("/search", {
+                queryParams: {
+                  q: "{search_term_string}",
+                },
+              }),
+              "query-input": "required name=search_term_string",
+            },
+          })}
+        </script>
       </Head>
       <NativeStack.Screen
         options={{
