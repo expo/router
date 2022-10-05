@@ -16,8 +16,6 @@ struct MetadataOptions: Record {
   @Field
   var webpageURL: URL?
   @Field
-  var imageData: Data?
-  @Field
   var imageUrl: URL?
   @Field
   var darkImageUrl: URL?
@@ -77,7 +75,7 @@ public class ExpoHeadModule: Module {
           "eligibleForSearch": activity.isEligibleForSearch, 
           "title": activity.title, 
           "webpageURL": activity.webpageURL, 
-          "imageData": activity.contentAttributeSet?.thumbnailData, 
+//          "imageData": activity.contentAttributeSet?.thumbnailData,
           "imageUrl": activity.contentAttributeSet?.thumbnailURL, 
           "darkImageUrl": activity.contentAttributeSet?.darkThumbnailURL, 
           "keywords": activity.keywords, 
@@ -103,6 +101,8 @@ public class ExpoHeadModule: Module {
          activity.isEligibleForPublicIndexing = true
          activity.isEligibleForSearch = value.eligibleForSearch
          activity.isEligibleForPrediction = true;
+      // Make all indexed routes deletable
+      activity.contentAttributeSet?.domainIdentifier = INDEXED_ROUTE
 
       activity.userInfo = value.userInfo
 
@@ -114,8 +114,17 @@ public class ExpoHeadModule: Module {
       activity.contentAttributeSet = att;
       activity.contentAttributeSet?.metadataModificationDate = value.dateModified
 
-        activity.contentAttributeSet?.thumbnailData = value.imageData
-        activity.contentAttributeSet?.thumbnailURL = value.imageUrl
+      // Required for handling incoming requests
+      activity.requiredUserInfoKeys = ["href"]
+
+//        activity.contentAttributeSet?.thumbnailURL = value.imageUrl
+      if let localUrl = value.imageUrl?.path {
+        let img = UIImage(contentsOfFile: localUrl)
+        if let data = img?.pngData() {
+          activity.contentAttributeSet?.thumbnailData = data
+        }
+      }
+
         activity.contentAttributeSet?.darkThumbnailURL = value.darkImageUrl
 
       activity.contentAttributeSet?.contentDescription = value.description
@@ -139,17 +148,39 @@ public class ExpoHeadModule: Module {
         // TODO: Fallback on using app icon as thumbnail image.
 
     }
+
+    AsyncFunction("clearActivities") { (ids: [String], promise: Promise) in
+
+      ids.forEach { id in
+        self.revokeActivity(id: id)
+      }
+
+      CSSearchableIndex.default().deleteSearchableItems(withIdentifiers: ids, completionHandler: { error in
+        if (error != nil) {
+          promise.reject(error as! Exception)
+        } else {
+          promise.resolve()
+        }
+      })
+    }
+
     AsyncFunction("suspendActivity") { (id: String) in
       let activity = self.activities.first(where: { $0.persistentIdentifier == id })
       activity?.resignCurrent()
     }
 
     AsyncFunction("revokeActivity") { (id: String) in
-      let activity = self.activities.first(where: { $0.persistentIdentifier == id })
-      activity?.invalidate()
-      if let activity = activity {
-        self.activities.remove(activity)
-      }
+      self.revokeActivity(id: id)
     }
+  }
+
+  @discardableResult
+  func revokeActivity(id: String) -> NSUserActivity? {
+    let activity = self.activities.first(where: { $0.persistentIdentifier == id })
+    activity?.invalidate()
+    if let activity = activity {
+      self.activities.remove(activity)
+    }
+    return activity
   }
 }

@@ -23,8 +23,7 @@ type UserActivity = {
 
   userInfo?: Record<string, string>;
 
-  imageData?: any;
-
+  /** Local file path for an image */
   imageUrl?: string;
   darkImageUrl?: string;
   dateModified?: Date;
@@ -54,7 +53,7 @@ function urlToId(url: string) {
 export function Head({ children }: { children?: React.ReactNode }) {
   const link = useLink();
 
-  React.useEffect(() => {
+  const activity = React.useMemo(() => {
     const userActivity: UserActivity = {
       activityType: ExpoHead.activities.INDEXED_ROUTE,
     };
@@ -127,9 +126,18 @@ export function Head({ children }: { children?: React.ReactNode }) {
       }
 
       console.log("create:", resolved);
-      ExpoHead.createActivity(resolved);
+      return resolved;
     }
+    return null;
   }, [children, link.href]);
+
+  React.useEffect(() => {
+    if (activity) {
+      ExpoHead.createActivity(activity);
+    } else {
+      // ExpoHead.revokeActivity();
+    }
+  }, [activity]);
 
   // React.useEffect(() => {
   //   return () => {

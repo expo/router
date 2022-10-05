@@ -5,21 +5,29 @@ import { useRoute } from "@react-navigation/native";
 import { useMemo } from "react";
 import * as Linking from "expo-linking";
 
+import { useAssets } from "expo-asset";
 export default function App() {
   const route = useRoute<any>();
   const def = useMemo(
     () => (route.params?.q ? decodeURIComponent(route.params?.q) : ""),
     [route.params?.q]
   );
+
+  const [assets] = useAssets([require("../../../../../bacon.png")]);
+
   return (
     <>
       <Head>
-        <title>Search | Bacon App 🥓</title>
+        <title>Search it | Bacon App 🥓</title>
         {/* <meta name="description" content="Do beta stuff" />
         <meta name="keywords" content="bacon,food,app" /> */}
+        {assets?.[0].localUri && (
+          <meta property="og:image" content={assets?.[0].localUri} />
+        )}
         <meta
           property="og:image"
-          content="https://icogen.vercel.app/api/icon?color=white&icon=1f50d"
+          media="(prefers-color-scheme: dark)"
+          content={"https://icogen.vercel.app/api/icon?color=black&icon=1f953"}
         />
         <script type="application/ld+json">
           {JSON.stringify({
