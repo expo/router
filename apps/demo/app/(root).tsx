@@ -25,7 +25,6 @@ function RootLayout() {
         }}
       />
       <Layout.Screen name="sign-in" />
-      <Layout.Children />
     </Tabs>
   );
 }

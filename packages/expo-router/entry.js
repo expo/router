@@ -3,6 +3,7 @@ import { ExpoRoot } from "expo-router";
 import { View, Platform } from "react-native";
 
 import SplashModule from "expo-router/build/splash";
+import ErrorOverlay from "@bacons/expo-metro-runtime/error-overlay";
 
 // Must be exported or Fast Refresh won't update the context >:[
 export function App() {
@@ -14,7 +15,11 @@ export function App() {
     /.*/,
     "lazy"
   );
-  return <ExpoRoot context={ctx} />;
+  return (
+    <ErrorOverlay>
+      <ExpoRoot context={ctx} />
+    </ErrorOverlay>
+  );
 }
 
 function isBaseObject(obj) {
