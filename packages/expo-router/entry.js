@@ -8,7 +8,12 @@ import SplashModule from "expo-router/build/splash";
 export function App() {
   // Babel + Expo CLI: process.env.EXPO_ROUTER_APP_ROOT -> '../../apps/demo/app'
   //   console.log("output", process.env.EXPO_ROUTER_APP_ROOT);
-  const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT);
+  const ctx = require.context(
+    process.env.EXPO_ROUTER_APP_ROOT,
+    true,
+    /.*/,
+    "lazy"
+  );
   return <ExpoRoot context={ctx} />;
 }
 

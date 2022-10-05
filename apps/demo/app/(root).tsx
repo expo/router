@@ -1,4 +1,4 @@
-import { Layout } from "expo-router";
+import { Layout, Tabs } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 
 import { GoogleAuth } from "../etc/auth/google";
@@ -17,19 +17,15 @@ function RootLayout() {
   const [token] = GoogleAuth.useToken();
 
   return (
-    <Layout>
+    <Tabs>
       <Layout.Screen
         name="(app)"
-        redirect={!token.isLoading && token.value === null}
         options={{
           headerShown: false,
         }}
       />
-      <Layout.Screen
-        name="sign-in"
-        redirect={!token.isLoading && token.value !== null}
-      />
+      <Layout.Screen name="sign-in" />
       <Layout.Children />
-    </Layout>
+    </Tabs>
   );
 }

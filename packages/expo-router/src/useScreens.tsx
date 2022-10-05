@@ -1,5 +1,5 @@
 import React from "react";
-
+import { ActivityIndicator } from "react-native";
 import { Route, RouteNode, sortRoutes, useRoutes } from "./Route";
 import { Screen } from "./primitives";
 import { Try } from "./views/Try";
@@ -106,31 +106,48 @@ function getQualifiedRouteComponent(value: RouteNode) {
     return qualifiedStore.get(value)!;
   }
 
-  const Component = value.getComponent();
+  const Component = React.lazy(async () => {
+    const res = value.getComponent();
+    if (res instanceof Promise) {
+      return value.getComponent().then((component) => ({ default: component }));
+    }
+    return { default: res };
+  });
 
-  const { ErrorBoundary } = value.getExtras();
+  // const { ErrorBoundary } = value.getExtras();
 
   const QualifiedRoute = React.forwardRef(
     (props: { route: any; navigation: any }, ref: any) => {
-      // Surface dynamic name as props to the view
-      const children = React.createElement(Component, {
-        ...props,
-        ref,
-      });
-
-      const errorBoundary = ErrorBoundary ? (
-        <Try catch={ErrorBoundary}>{children}</Try>
-      ) : (
-        children
+      const loadable = (
+        <React.Suspense fallback={<ActivityIndicator />}>
+          {
+            <Component
+              {...{
+                ...props,
+                ref,
+              }}
+            />
+          }
+        </React.Suspense>
       );
+      // Surface dynamic name as props to the view
+      // const children = React.createElement(Component, {
+      //   ...props,
+      //   ref,
+      // });
 
-      return <Route filename={value.contextKey}>{errorBoundary}</Route>;
+      // const errorBoundary = ErrorBoundary ? (
+      //   <Try catch={ErrorBoundary}>{children}</Try>
+      // ) : (
+      //   children
+      // );
+
+      return <Route filename={value.contextKey}>{loadable}</Route>;
     }
   );
 
-  QualifiedRoute.displayName = `Route(${
-    Component.displayName || Component.name || value.route
-  })`;
+  QualifiedRoute.displayName = `Route(${value.route})`;
+
   qualifiedStore.set(value, QualifiedRoute);
   return QualifiedRoute;
 }

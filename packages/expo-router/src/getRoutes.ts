@@ -118,24 +118,34 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
   const nodes = contextModule.keys().map((key) => {
     // In development, check if the file exports a default component
     // this helps keep things snappy when creating files. In production we load all screens lazily.
-    try {
-      if (!contextModule(key)?.default) {
-        return null;
-      }
-    } catch (error) {
-      // Probably this won't stop metro from freaking out but it's worth a try.
-      console.warn('Error loading route "' + key + '"', error);
-      return null;
-    }
+    // try {
+    //   if (!contextModule(key)?.default) {
+    //     return null;
+    //   }
+    // } catch (error) {
+    //   // Probably this won't stop metro from freaking out but it's worth a try.
+    //   console.warn('Error loading route "' + key + '"', error);
+    //   return null;
+    // }
 
     const node: FileNode = {
       normalizedName: getNameFromFilePath(key),
       getComponent() {
-        return contextModule(key).default;
+        const mod = contextModule(key);
+        if (mod instanceof Promise) {
+          return mod.then((m) => m.default);
+        }
+        return mod.default;
       },
       contextKey: key,
       getExtras() {
-        const { default: mod, ...extras } = contextModule(key);
+        const mod = contextModule(key);
+
+        if (mod instanceof Promise) {
+          return mod.then(({ default: _, ...extras }) => extras ?? {});
+        }
+
+        const { default: _, ...extras } = mod;
         return extras;
       },
     };

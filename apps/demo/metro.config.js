@@ -9,6 +9,13 @@ const workspaceRoot = path.resolve(projectRoot, "../..");
 
 const config = getDefaultConfig(__dirname);
 
+config.transformer = {
+  asyncRequireModulePath: require.resolve(
+    "@bacons/expo-metro-runtime/asyncRequire"
+  ),
+  experimentalImportBundleSupport: true,
+};
+
 // 1. Watch all files within the monorepo
 config.watchFolders = [workspaceRoot];
 // 2. Let Metro know where to resolve packages and in what order
