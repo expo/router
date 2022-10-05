@@ -90,14 +90,24 @@ describe(treeToReactNavigationLinkingRoutes, () => {
     ).toEqual({
       "(fragment)": {
         path: "",
+        initialRouteName: "[...deep]",
         screens: { "[...deep]": "*", "[dynamic]": ":dynamic", index: "" },
       },
-      "(second-fragment)": { path: "", screens: { people: "people" } },
+      "(second-fragment)": {
+        initialRouteName: "people",
+        path: "",
+        screens: { people: "people" },
+      },
       __index: "__index",
       other: {
+        initialRouteName: "nested",
         path: "other",
         screens: {
-          nested: { path: "nested", screens: { "[...screen]": "*" } },
+          nested: {
+            initialRouteName: "[...screen]",
+            path: "nested",
+            screens: { "[...screen]": "*" },
+          },
         },
       },
     });
