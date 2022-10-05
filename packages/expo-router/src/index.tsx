@@ -1,6 +1,7 @@
 // export { useRoutes } from "./Route";
 // export { useScreens } from "./useScreens";
 
+export { SplashScreen } from "./views/Splash";
 export { useFocusEffect } from "@react-navigation/native";
 export { ErrorBoundaryProps } from "./views/Try";
 
