@@ -84,7 +84,7 @@ public class ExpoHeadModule: Module {
           "dateModified": activity.contentAttributeSet?.metadataModificationDate, 
           "expirationDate": activity.expirationDate, 
           "userInfo": activity.userInfo,
-          "phrase": activity.suggestedInvocationPhrase,
+//          "phrase": activity.suggestedInvocationPhrase,
         ]
       }
       return nil

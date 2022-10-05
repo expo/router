@@ -8,7 +8,10 @@
       "bundler": "metro"
     },
     "ios": {
-      "bundleIdentifier": "com.bacon.expo-router"
+      "bundleIdentifier": "com.bacon.expo-router",
+      "infoPlist": {
+        "CoreSpotlightContinuation": true
+      }
     }
   }
 }
