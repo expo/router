@@ -55,7 +55,10 @@ export function treeToReactNavigationLinkingRoutes(
         path,
       ]);
 
-      return [node.route, { path, screens, initialRouteName: node.children[0].route }] as const;
+      return [
+        node.route,
+        { path, screens, initialRouteName: node.children[0].route },
+      ] as const;
     })
     .reduce<PathConfigMap<object>>((acc, [route, current]) => {
       acc[route] = current;
