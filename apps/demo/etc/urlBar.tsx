@@ -1,11 +1,9 @@
 import { Text, View } from "@bacons/react-views";
-import {} from "expo-router/build/link/virtualLocation";
 import { useLink } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export function UrlBar() {
   const location = useLink();
-  console.log("URL:", location);
   const { bottom } = useSafeAreaInsets();
   return (
     <View
@@ -23,7 +21,6 @@ export function UrlBar() {
     >
       <Text
         style={{
-          //   fontWeight: "bold",
           color: "#8697A7",
           fontSize: 16,
         }}
