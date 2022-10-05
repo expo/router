@@ -1,23 +1,27 @@
-import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Link, useLink } from "expo-router";
+import { StatusBar, StyleSheet, Text, View } from "react-native";
 
-import { GoogleAuth } from "../../../etc/auth/google";
-import { UrlBar } from "../../../etc/urlBar";
+export default function App({ navigation }) {
+  const link = useLink();
 
-export default function App() {
   return (
     <View style={styles.container}>
+      <Link href="../" style={{ fontSize: 24, fontWeight: "bold" }}>
+        Dismiss
+      </Link>
       <Text
-        style={{
-          fontWeight: "bold",
-          color: "white",
-          marginBottom: 24,
-          fontSize: 64,
+        onPress={() => {
+          link.back();
         }}
       >
-        Secondary
+        Open settings dynamic
       </Text>
-      <UrlBar />
+      <StatusBar barStyle="light-content" />
+      {navigation.canGoBack() ? (
+        <span>Can go back</span>
+      ) : (
+        <span>Can't go back</span>
+      )}
     </View>
   );
 }
@@ -26,8 +30,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#000",
-    justifyContent: "center",
+    backgroundColor: "#fff",
     alignItems: "center",
   },
 });

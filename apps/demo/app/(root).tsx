@@ -1,7 +1,6 @@
-import { Layout, RootContainer } from "expo-router";
+import { Layout } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 
-import { DarkTheme } from "@react-navigation/native";
 import { GoogleAuth } from "../etc/auth/google";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -10,7 +9,6 @@ export default function Root() {
   return (
     <GoogleAuth.Provider>
       <RootLayout />
-      <RootContainer theme={DarkTheme} />
     </GoogleAuth.Provider>
   );
 }
