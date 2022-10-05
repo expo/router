@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { Href, resolveHref } from "./href";
 import { useLinkToPath } from "./useLinkToPath";
 import { useLoadedNavigation } from "./useLoadedNavigation";
+import { useRouteInfo } from "./useRouteInfo";
 
 // Wraps useLinkTo to provide an API which is similar to the Link component.
 export function useLink(): {
@@ -10,9 +11,15 @@ export function useLink(): {
   replace: (href: Href) => void;
   back: () => void;
   parse: typeof resolveHref;
+
+  asPath: string;
+  pathname: string;
+  query: Record<string, string>;
 } {
   const pending = useLoadedNavigation();
   const linkTo = useLinkToPath();
+
+  const routeInfo = useRouteInfo();
 
   const push = useCallback(
     (url: Href) => pending(() => linkTo(resolveHref(url))),
@@ -30,6 +37,7 @@ export function useLink(): {
   );
 
   return {
+    ...routeInfo,
     push,
     back,
     replace,
