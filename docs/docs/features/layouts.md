@@ -128,3 +128,24 @@ function Header() {
 ```
 
 > In `expo-router`, you currently need all layout routes to be a navigator. This is because we don't have a way to render a route without a parent navigator.
+
+## Converting Navigators to Layouts
+
+You can make a React Navigation navigator into a layout by using the `withLayoutContext` function. Consider this example which makes a drawer navigator from `@react-navigation/drawer` into a layout:
+
+```js
+import {
+  createDrawerNavigator,
+  DrawerNavigationOptions,
+} from "@react-navigation/drawer";
+
+import { withLayoutContext } from "./withLayoutContext";
+
+const { Navigator } = createDrawerNavigator();
+
+// Drawer is a layout component that can be automatically populated with routes.
+export const Drawer = withLayoutContext<
+  DrawerNavigationOptions,
+  typeof Navigator
+>(Navigator);
+```
