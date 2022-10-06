@@ -20,15 +20,11 @@ export function useRootNavigation() {
 }
 
 export function useCurrentRoute() {
-  const context = React.useContext(RootNavigationRef);
-  if (!context) {
-    throw new Error(
-      "useCurrentRoute must be used within a NavigationContainerContext"
-    );
-  }
   const root = useRootNavigation();
   let path = root?.getCurrentRoute()?.path;
-  if (!path?.startsWith("/")) {
+  if (path === undefined) return null;
+
+  if (!path.startsWith("/")) {
     path = "/" + path;
   }
   return path;

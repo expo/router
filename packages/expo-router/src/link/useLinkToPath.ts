@@ -17,26 +17,23 @@ export function useLinkToPath() {
 
   const linkTo = React.useCallback(
     (to: string, event?: string) => {
+      if (current === null && event !== "REPLACE") return;
       if (navigation === undefined) {
         throw new Error(
           "Couldn't find a navigation object. Is your component inside NavigationContainer?"
         );
       }
 
-      if (!to.startsWith("/")) {
-        if (/:\/\//.test(to)) {
-          // Open external link
-          Linking.openURL(to);
-          return;
-        } else {
-          // if relative, need append to current
-          if (to.startsWith("../") || to.startsWith("./")) {
-            to = current + "/" + to;
-          }
-          // normalize path, e.g. `/aaa/bbb/././//../ccc/` -> `/aaa/ccc/`
-          to = normalizePath(to);
-        }
+      // if external -- go away ;(
+      if (/:\/\//.test(to)) return Linking.openURL(to);
+
+      // if relative, need append to current
+      if (to.startsWith("../") || to.startsWith("./")) {
+        to = current + "/" + to;
       }
+
+      // normalize path, e.g. `/aaa/bbb/././//../ccc/` -> `/aaa/ccc/`
+      to = normalizePath(to);
 
       const { options } = linking;
 
@@ -60,7 +57,7 @@ export function useLinkToPath() {
         throw new Error("Failed to parse the path to a navigation state.");
       }
     },
-    [linking, navigation]
+    [linking, navigation, current]
   );
 
   return linkTo;

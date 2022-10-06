@@ -1,9 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 import { GoogleAuth } from "../../../etc/auth/google";
-import { Link } from "expo-router";
+import {Link, useLink} from "expo-router";
 
 export default function App() {
   const signOut = GoogleAuth.useSignOut();
+  const link = useLink();
 
   return (
     <View style={styles.container}>
@@ -15,12 +16,13 @@ export default function App() {
         Sign out
       </Text>
 
-      <Link
+      <Text
         style={{ marginTop: 20, padding: 20, borderWidth: 2, borderColor: "black" }}
-        href={"/test"}
+        /*href={"/test"}*/
+        onPress={() => link.replace('/test/ololo')}
       >
         GoTo Foo
-      </Link>
+      </Text>
     </View>
   );
 }
