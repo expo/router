@@ -19,7 +19,7 @@ module.exports = function (api) {
             skipDefaultConversion: true,
             // Redirect Drawer import to build/layouts/Drawer
             transform: (importName) => {
-              if (["Drawer", "Stack", "Tabs"].includes(importName)) {
+              if (["Stack", "Tabs"].includes(importName)) {
                 return `expo-router/build/layouts/${importName}`;
               }
               return "expo-router/build/exports";

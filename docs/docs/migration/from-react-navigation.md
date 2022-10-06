@@ -24,14 +24,15 @@ If you were passing complex options through the navigator, you should move to us
 
 ### Navigators
 
-| React Navigation             | Expo Router                      |
-| ---------------------------- | -------------------------------- |
-| `createNativeStackNavigator` | `Stack`                          |
-| `createBottomTabNavigator`   | `Tabs`                           |
-| `createDrawerNavigator`      | `Drawer`                         |
-| `createStackNavigator`       | [Create a custom layout][custom] |
+| React Navigation             | Expo Router                         |
+| ---------------------------- | ----------------------------------- |
+| `createNativeStackNavigator` | `Stack`                             |
+| `createBottomTabNavigator`   | `Tabs`                              |
+| `createDrawerNavigator`      | [`Drawer`][drawer] (setup required) |
+| `createStackNavigator`       | [Create a custom layout][custom]    |
 
 [custom]: /router/docs/features/layouts#converting-navigators-to-layouts
+[drawer]: /router/docs/guides/drawer
 
 Expo Router wraps React Navigation APIs and re-exports them with light-weight context-aware wrappers.
 
