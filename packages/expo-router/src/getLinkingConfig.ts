@@ -55,7 +55,7 @@ export function treeToReactNavigationLinkingRoutes(
             .filter(Boolean)
             .join("/");
           const key = [...parents, node.route].filter(Boolean).join("/");
-          return { key, name: { path: name } };
+          return { key, name: name };
         }
 
         if (node.generated) {
