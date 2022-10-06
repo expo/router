@@ -4,7 +4,6 @@ import React from "react";
 import { RootContainer } from "../ContextNavigationContainer";
 import getPathFromState, { State } from "../fork/getPathFromState";
 
-// These values are based on Next.js router
 type RouteInfo = {
   /** Path representing the selected route `/[id]` */
   pathname: string;
