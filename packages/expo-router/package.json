@@ -50,7 +50,6 @@
     "@react-navigation/drawer": "^6.4.4",
     "@react-navigation/native": "^6.0.12",
     "@react-navigation/native-stack": "^6.8.0",
-    "@react-navigation/stack": "^6.2.3",
     "expo-constants": "~13.2.4",
     "expo-linking": "^3.2.2",
     "expo-splash-screen": "^0.16.2",
