@@ -14,12 +14,9 @@ function getGestureHandlerRootView() {
   }
 }
 
-export function ExpoRoot({ context }: { context: RequireContext }) {
-  const GestureHandlerRootView = React.useMemo(
-    () => getGestureHandlerRootView(),
-    []
-  );
+const GestureHandlerRootView = getGestureHandlerRootView();
 
+export function ExpoRoot({ context }: { context: RequireContext }) {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>

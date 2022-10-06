@@ -11,8 +11,6 @@
     "drawer.d.js",
     "stack.js",
     "stack.d.js",
-    "native-stack.js",
-    "native-stack.d.js",
     "tabs.js",
     "tabs.d.js"
   ],
