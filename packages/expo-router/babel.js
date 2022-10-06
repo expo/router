@@ -29,9 +29,6 @@ module.exports = function (api) {
   const getRelPath = (state) =>
     "./" + nodePath.relative(state.file.opts.root, state.filename);
 
-  // push a new babel-plugin-transform-imports plugin
-  // to the plugins array
-
   return {
     name: "expo-router",
     visitor: {
