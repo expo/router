@@ -141,3 +141,24 @@ export default function Layout() {
 ```
 
 Behind the scenes, this API uses the `react-native-screens` native module.
+
+## Converting Navigators to Layouts
+
+You can make a React Navigation navigator into a layout by using the `withLayoutContext` function. Consider this example which makes a drawer navigator from `@react-navigation/drawer` into a layout:
+
+```js
+import {
+  createDrawerNavigator,
+  DrawerNavigationOptions,
+} from "@react-navigation/drawer";
+
+import { withLayoutContext } from "./withLayoutContext";
+
+const { Navigator } = createDrawerNavigator();
+
+// Drawer is a layout component that can be automatically populated with routes.
+export const Drawer = withLayoutContext<
+  DrawerNavigationOptions,
+  typeof Navigator
+>(Navigator);
+```
