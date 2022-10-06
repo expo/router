@@ -16,6 +16,8 @@ export function useLinkToPath() {
   const current = useCurrentRoute();
 
   const linkTo = React.useCallback(
+    // @ts-ignore
+    // it is for sugar like `return Linking.openURL(to);`
     (to: string, event?: string) => {
       if (current === null && event !== "REPLACE") return;
       if (navigation === undefined) {
