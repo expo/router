@@ -1,4 +1,11 @@
-export type Href = string | { pathname?: string; query?: Record<string, any> };
+export type Href =
+  | string
+  | {
+      /** Path representing the selected route `/[id]` */
+      pathname?: string;
+      /** Query parameters for the path. */
+      query?: Record<string, any>;
+    };
 
 export const resolveHref = (
   href: { pathname?: string; query?: Record<string, any> } | string

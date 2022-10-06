@@ -23,12 +23,12 @@ export function useRootNavigation() {
 
 export function useRootNavigationState(): State | undefined {
   const navigation = useRootNavigation();
-  const [state, setPath] = React.useState(navigation?.getRootState());
+  const [state, setState] = React.useState(navigation?.getRootState());
   React.useEffect(() => {
     if (navigation) {
-      setPath(navigation.getRootState());
+      setState(navigation.getRootState());
       const unsubscribe = navigation.addListener("state", ({ data }) => {
-        setPath(
+        setState(
           // @ts-expect-error: idk
           data.state
         );

@@ -1,9 +1,9 @@
 import { Text, View } from "@bacons/react-views";
-import { useLink } from "expo-router";
+import { useHref } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export function UrlBar() {
-  const location = useLink();
+  const location = useHref();
   const { bottom } = useSafeAreaInsets();
   return (
     <View
@@ -25,7 +25,7 @@ export function UrlBar() {
           fontSize: 16,
         }}
       >
-        {location.asPath}
+        {location.href}
       </Text>
     </View>
   );

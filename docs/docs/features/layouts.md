@@ -87,7 +87,7 @@ Custom layouts have an internal context that is ignored when using the `<Childre
 import { View } from "react-native";
 import { TabRouter } from "@react-navigation/native";
 
-import { Layout, useLink, Children, Link } from "expo-router";
+import { Layout, useHref, Children, Link } from "expo-router";
 
 export default function App() {
   return (
@@ -102,7 +102,7 @@ export default function App() {
 function Header() {
   const { navigation, state, descriptors, router } = Layout.useContext();
 
-  const { pathname } = useLink();
+  const { pathname } = useHref();
 
   return (
     <View>

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { GoogleAuth } from "../../etc/auth/google";
+import { UrlBar } from "../../etc/urlBar";
 
 export default function App() {
   const signIn = GoogleAuth.useSignIn();
@@ -13,6 +14,7 @@ export default function App() {
       >
         Sign in
       </Text>
+      <UrlBar />
     </View>
   );
 }
