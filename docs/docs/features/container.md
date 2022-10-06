@@ -20,6 +20,18 @@ export default function Page() {
 }
 ```
 
+Access the [`<NavigationContainer />`](https://reactnavigation.org/docs/navigation-container/) ref with the `RootContainer.useRef()` function.
+
+```tsx title=app/home.tsx
+function Page() {
+  // Returns null when the container has not finished mounting.
+  const navigationRef = RootContainer.useRef();
+  return <>...</>;
+}
+```
+
+`RootContainer.useRef()` can be used to determine if the container has finished loading.
+
 > Avoid setting `children` or `linking` as these will break all automatic assumptions made by the router.
 
 - Avoid using [`initialState`](https://reactnavigation.org/docs/navigation-container/#initialstate) as this is automatically handled by deep links (which Expo Router enables by default).

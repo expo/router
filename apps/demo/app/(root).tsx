@@ -1,20 +1,35 @@
-import { NativeStack } from "expo-router";
+import { Layout } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 
-export default function Layout() {
+import { GoogleAuth } from "../etc/auth/google";
+
+WebBrowser.maybeCompleteAuthSession();
+
+export default function Root() {
   return (
-    <NativeStack>
-      <NativeStack.Screen
-        name="(tab)"
+    <GoogleAuth.Provider>
+      <RootLayout />
+    </GoogleAuth.Provider>
+  );
+}
+
+function RootLayout() {
+  const [token] = GoogleAuth.useToken();
+
+  return (
+    <Layout>
+      <Layout.Screen
+        name="(app)"
+        redirect={!token.isLoading && token.value === null}
         options={{
           headerShown: false,
         }}
       />
-      <NativeStack.Screen
-        name="modal"
-        options={{
-          presentation: "modal",
-        }}
+      <Layout.Screen
+        name="sign-in"
+        redirect={!token.isLoading && token.value !== null}
       />
-    </NativeStack>
+      <Layout.Children />
+    </Layout>
   );
 }
