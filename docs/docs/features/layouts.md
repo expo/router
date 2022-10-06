@@ -54,10 +54,9 @@ export default function App() {
 
 For that native feel, we have a few native navigators that you can use. These are **React Navigation** core navigators that have been wrapped to automatically use nested screens.
 
-- `Stack` - A stack navigator that renders a screen from a stack. `@react-navigation/stack`
+- `Stack` - A stack navigator that renders a screen from a stack. This is a native stack navigator that uses native animations and gestures. `@react-navigation/native-stack`
 - `Tabs` - A tab navigator that renders a screen from a tab. `@react-navigation/bottom-tabs`
 - `Drawer` - A drawer navigator that renders a screen from a drawer. `@react-navigation/drawer`
-- `NativeStack` - A stack navigator that renders a screen from a stack. This is a native stack navigator that uses native animations and gestures. `@react-navigation/native-stack`
 
 ```tsx
 // highlight-next-line
@@ -78,6 +77,8 @@ import { Tabs } from "expo-router";
 
 export default Tabs;
 ```
+
+> `@react-navigation/stack` is not supported by default, you can use it by creating a custom layout.
 
 ## Custom
 
@@ -127,20 +128,6 @@ function Header() {
 ```
 
 > In `expo-router`, you currently need all layout routes to be a navigator. This is because we don't have a way to render a route without a parent navigator.
-
-## Pure Native
-
-Expo Router exports the `NativeStack` component which provides access to the underlying native navigation primitives like `UINavigationController` on iOS and `Fragment` on Android. This is a drop-in replacement for `createNativeStackNavigator` from React Navigation.
-
-```tsx title=app/(stack).tsx
-import { NativeStack } from "expo-router";
-
-export default function Layout() {
-  return <NativeStack />;
-}
-```
-
-Behind the scenes, this API uses the `react-native-screens` native module.
 
 ## Converting Navigators to Layouts
 
