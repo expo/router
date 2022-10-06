@@ -1,4 +1,5 @@
 import React from "react";
+
 import { SplashScreen } from "./Splash";
 
 /** Props passed to a page's `ErrorBoundary` export. */
