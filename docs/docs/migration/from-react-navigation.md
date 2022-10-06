@@ -31,7 +31,7 @@ If you were passing complex options through the navigator, you should move to us
 | `createDrawerNavigator`      | `Drawer`                         |
 | `createStackNavigator`       | [Create a custom layout][custom] |
 
-[custom]: cite-needed
+[custom]: /router/docs/features/layouts#converting-navigators-to-layouts
 
 Expo Router wraps React Navigation APIs and re-exports them with light-weight context-aware wrappers.
 
