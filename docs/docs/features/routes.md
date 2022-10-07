@@ -55,7 +55,7 @@ export default function Page() {
 }
 ```
 
-- You can use extensions: `js`, `tsx`, `ts`, `tsx`. In a future iteration we will add support for any extension in the Metro config [`resolver.sourceExts`](https://facebook.github.io/metro/docs/configuration#sourceexts).
+- You can use extensions: `js`, `jsx`, `ts`, `tsx`. In a future iteration we will add support for any extension in the Metro config [`resolver.sourceExts`](https://facebook.github.io/metro/docs/configuration#sourceexts).
 - Any path in the `app/` directory can be used as a root path. There are no global root paths.
 - Platform extensions like `.ios.js` or `.native.ts` are not currently supported in the `app/` directory.
 
