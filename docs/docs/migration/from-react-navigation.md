@@ -37,7 +37,7 @@ Expo Router wraps React Navigation APIs and re-exports them with light-weight co
 
 ```tsx
 // No: This is a React Navigation API.
-import { createStackNavigator } from "@react-navigation/natove-stack";
+import { createStackNavigator } from "@react-navigation/native-stack";
 
 const Stack = createStackNavigator();
 
