@@ -17,7 +17,7 @@ export default function Layout() {
 Now create a **child route** in `app/(stack)/index.js` which will be rendered inside the stack navigator.
 
 ```js title=app/(stack)/index.js
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { Link, Stack } from "expo-router";
 
 export default function Home() {
