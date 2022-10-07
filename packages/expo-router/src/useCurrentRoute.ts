@@ -18,3 +18,14 @@ export function useRootNavigation() {
   }
   return context.ref;
 }
+
+export function useCurrentRoute() {
+  const root = useRootNavigation();
+  let path = root?.getCurrentRoute()?.path;
+  if (path === undefined) return null;
+
+  if (!path.startsWith("/")) {
+    path = "/" + path;
+  }
+  return path;
+}
