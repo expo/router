@@ -5,7 +5,11 @@ import {
 import React from "react";
 
 import { useLinkingConfig } from "./getLinkingConfig";
-import { RootNavigationRef, useRootNavigation } from "./useCurrentRoute";
+import {
+  RootNavigationRef,
+  useRootNavigation,
+  useRootNavigationState,
+} from "./useRootNavigation";
 import { SplashScreen } from "./views/Splash";
 
 const navigationRef = createNavigationContainerRef();
@@ -117,6 +121,7 @@ export function RootContainer({
 }
 
 RootContainer.useRef = useRootNavigation;
+RootContainer.useState = useRootNavigationState;
 
 /** Get the root navigation container ref. */
 RootContainer.getRef = () => {
