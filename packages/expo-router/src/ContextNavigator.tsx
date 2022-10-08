@@ -4,7 +4,7 @@ import { ContextNavigationContainer } from "./ContextNavigationContainer";
 import { Route } from "./Route";
 import { RoutesContext } from "./context";
 import { getRoutes } from "./getRoutes";
-import { NativeStack } from "./layouts/NativeStack";
+import { Stack } from "./layouts/Stack";
 import { RequireContext } from "./types";
 
 function useContextModuleAsRoutes(context: RequireContext) {
@@ -75,9 +75,7 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
       <Route filename="./">
         <ContextNavigationContainer>
           {/* Using a switch navigator at the root to host all pages. */}
-          <NativeStack
-            screenOptions={{ animation: "none", headerShown: false }}
-          />
+          <Stack screenOptions={{ animation: "none", headerShown: false }} />
         </ContextNavigationContainer>
       </Route>
     </RoutesContextProvider>

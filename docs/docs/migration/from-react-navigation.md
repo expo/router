@@ -24,18 +24,20 @@ If you were passing complex options through the navigator, you should move to us
 
 ### Navigators
 
-| React Navigation             | Expo Router   |
-| ---------------------------- | ------------- |
-| `createStackNavigator`       | `Stack`       |
-| `createBottomTabNavigator`   | `Tabs`        |
-| `createDrawerNavigator`      | `Drawer`      |
-| `createNativeStackNavigator` | `NativeStack` |
+| React Navigation             | Expo Router                      |
+| ---------------------------- | -------------------------------- |
+| `createNativeStackNavigator` | `Stack`                          |
+| `createBottomTabNavigator`   | `Tabs`                           |
+| `createDrawerNavigator`      | `Drawer`                         |
+| `createStackNavigator`       | [Create a custom layout][custom] |
+
+[custom]: /router/docs/features/layouts#converting-navigators-to-layouts
 
 Expo Router wraps React Navigation APIs and re-exports them with light-weight context-aware wrappers.
 
 ```tsx
 // No: This is a React Navigation API.
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator } from "@react-navigation/native-stack";
 
 const Stack = createStackNavigator();
 

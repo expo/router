@@ -3,6 +3,10 @@
     "name": "Router Demo",
     "slug": "expo-router",
     "scheme": "bacontext",
+    "splash": {
+      "image": "./splash.png",
+      "backgroundColor": "#1c2026"
+    },
     "web": {
       "bundler": "metro"
     }

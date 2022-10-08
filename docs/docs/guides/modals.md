@@ -19,26 +19,26 @@ app/
 First we'll move all of our routes into a new top-level layout route called `(root)`. The layout route has the ability to present components as modals. We'll also add a new route called `modal` that we'll use to render modals.
 
 ```js title=app/(root).js
-import { NativeStack } from "expo-router";
+import { Stack } from "expo-router";
 
 export default function Layout() {
   return (
-    <NativeStack>
-      <NativeStack.Screen
+    <Stack>
+      <Stack.Screen
         name="home"
         options={{
           // Hide the header for all other routes.
           headerShown: false,
         }}
       />
-      <NativeStack.Screen
+      <Stack.Screen
         name="modal"
         options={{
           // Set the presentation mode to modal for our modal route.
           presentation: "modal",
         }}
       />
-    </NativeStack>
+    </Stack>
   );
 }
 ```
