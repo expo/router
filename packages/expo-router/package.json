@@ -32,7 +32,7 @@
   "peerDependencies": {
     "expo": "^46.0.2",
     "expo-splash-screen": "^0.16.2",
-    "metro": "~0.72.3",
+    "metro": "~0.73.1",
     "react-native-gesture-handler": "~2.5.0"
   },
   "devDependencies": {
