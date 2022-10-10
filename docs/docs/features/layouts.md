@@ -87,7 +87,7 @@ Custom layouts have an internal context that is ignored when using the `<Childre
 import { View } from "react-native";
 import { TabRouter } from "@react-navigation/native";
 
-import { Layout, Children, Link } from "expo-router";
+import { Layout, useHref, Children, Link } from "expo-router";
 
 export default function App() {
   return (
@@ -100,14 +100,9 @@ export default function App() {
 }
 
 function Header() {
-  const {
-    // Access the internal state of the navigator.
-    pathname,
-    navigation,
-    state,
-    descriptors,
-    router,
-  } = Layout.useContext();
+  const { navigation, state, descriptors, router } = Layout.useContext();
+
+  const { pathname } = useHref();
 
   return (
     <View>
@@ -116,7 +111,7 @@ function Header() {
         href="/profile"
         // Use `pathname` to determine if the link is active.
         // highlight-next-line
-        style={[pathname === "profile" && { color: "blue" }]}
+        style={[pathname === "/profile" && { color: "blue" }]}
       >
         Profile
       </Link>

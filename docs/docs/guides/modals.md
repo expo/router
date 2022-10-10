@@ -44,7 +44,7 @@ export default function Layout() {
 ```
 
 ```js title=app/(root)/home.js
-import { View, Text, Button } from "react-native";
+import { View, Text } from "react-native";
 import { Link } from "expo-router";
 
 export default function Home() {
@@ -60,8 +60,9 @@ export default function Home() {
 Now we'll create a modal which adds a back button when the modal has lost its previous context and must be presented as a standalone page.
 
 ```js title=app/(root)/modal.js
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { Link } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 export default function Modal({ navigation }) {
   // If the page was reloaded or navigated to directly, then the modal should be presented as

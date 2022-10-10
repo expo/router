@@ -7,6 +7,10 @@ describe(resolveHref, () => {
     expect(resolveHref("/foo/[...bar]")).toBe("/foo/[...bar]");
     expect(resolveHref("Tot4lly Wr0n9")).toBe("Tot4lly Wr0n9");
   });
+  it(`strips fragments`, () => {
+    expect(resolveHref("/(somn)/foobar")).toBe("/foobar");
+    expect(resolveHref("/(somn)/other/(remove)/foobar")).toBe("/other/foobar");
+  });
   it(`adds dynamic query parameters`, () => {
     expect(resolveHref({ pathname: "/[some]", query: { some: "value" } })).toBe(
       "/value"

@@ -1,6 +1,6 @@
 {
   "name": "expo-router",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "main": "build/index.js",
   "files": [
     "entry.js",
@@ -38,7 +38,7 @@
   "peerDependencies": {
     "expo": "^46.0.2",
     "expo-splash-screen": "^0.16.2",
-    "metro": "~0.72.3",
+    "metro": "~0.73.1",
     "react-native-gesture-handler": "~2.5.0",
     "react-native-reanimated": "~2.9.1",
     "@react-navigation/drawer": "^6.4.4",
