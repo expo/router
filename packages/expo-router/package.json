@@ -1,6 +1,6 @@
 {
   "name": "expo-router",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "main": "build/index.js",
   "files": [
     "entry.js",
@@ -8,11 +8,11 @@
     "babel.js",
     "assets",
     "drawer.js",
-    "drawer.d.js",
+    "drawer.d.ts",
     "stack.js",
-    "stack.d.js",
+    "stack.d.ts",
     "tabs.js",
-    "tabs.d.js"
+    "tabs.d.ts"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",
