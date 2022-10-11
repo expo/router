@@ -1,4 +1,4 @@
-import { Link, Tabs } from "expo-router";
+import { Tabs } from "expo-router";
 import { GoogleAuth } from "../../etc/auth/google";
 
 export default function AppLayout() {
