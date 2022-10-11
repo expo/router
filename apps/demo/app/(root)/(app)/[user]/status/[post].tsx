@@ -2,8 +2,8 @@ import { StyleSheet, Text, View } from "react-native";
 import { UrlBar } from "../../../../../etc/urlBar";
 
 export { ErrorBoundary } from "expo-router";
+
 export default function Post({ route }) {
-  console.log("route", route);
   return (
     <View style={styles.container}>
       <Text style={{ fontSize: 24 }}>

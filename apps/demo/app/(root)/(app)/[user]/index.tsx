@@ -5,10 +5,11 @@ import { UrlBar } from "../../../../etc/urlBar";
 export { ErrorBoundary } from "expo-router";
 export default function App({ route }) {
   const signOut = GoogleAuth.useSignOut();
-  console.log("route", route);
   return (
     <View style={styles.container}>
-      <Text style={{ fontSize: 24 }}>Welcome @{route.params.user}</Text>
+      <Text style={{ fontSize: 24 }}>
+        Welcome @{route.params?.user || "ERR"}
+      </Text>
       <Text
         style={{ padding: 20, borderWidth: 2, borderColor: "black" }}
         onPress={() => signOut()}
