@@ -11,3 +11,5 @@ export const Stack = withLayoutContext<
   NativeStackNavigationOptions,
   typeof NativeStackNavigator
 >(NativeStackNavigator);
+
+export default Stack;

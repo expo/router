@@ -52,7 +52,7 @@ npx expo install expo-router
 Install peer dependencies:
 
 ```
-npx expo install react-native-safe-area-context react-native-screens react-native-reanimated react-native-gesture-handler
+npx expo install react-native-safe-area-context react-native-screens
 ```
 
 Then delete the entry point in your `package.json`, or replace it with `index.js` to be explicit:
@@ -115,13 +115,14 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: [
-      "react-native-reanimated/plugin",
       // NOTE: `expo-router/babel` is a temporary extension to `babel-preset-expo`.
       require.resolve("expo-router/babel"),
     ],
   };
 };
 ```
+
+> Additional setup is required for the Drawer navigator. See [the Drawer documentation](/router/docs/guides/drawer) for more information.
 
 ## Troubleshooting
 

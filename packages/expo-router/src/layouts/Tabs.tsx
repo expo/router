@@ -12,3 +12,5 @@ export const Tabs = withLayoutContext<
   BottomTabNavigationOptions,
   typeof BottomTabNavigator
 >(BottomTabNavigator);
+
+export default Tabs;

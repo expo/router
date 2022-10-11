@@ -56,17 +56,16 @@ For that native feel, we have a few native navigators that you can use. These ar
 
 - `Stack` - A stack navigator that renders a screen from a stack. This is a native stack navigator that uses native animations and gestures. `@react-navigation/native-stack`
 - `Tabs` - A tab navigator that renders a screen from a tab. `@react-navigation/bottom-tabs`
-- `Drawer` - A drawer navigator that renders a screen from a drawer. `@react-navigation/drawer`
 
 ```tsx
 // highlight-next-line
-import { Drawer } from 'expo-router';
+import { Tabs } from 'expo-router';
 
 export default function Page() {
-  // Accepts the same props as the React Navigation Drawer Navigator.
+  // Accepts the same props as the React Navigation bottom tabs navigator.
   // The most common props are `screenOptions` and `initialRouteName`.
   // highlight-next-line
-  return <Drawer { ... } />
+  return <Tabs { ... } />
 }
 ```
 
