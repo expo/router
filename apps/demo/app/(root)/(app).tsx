@@ -9,7 +9,7 @@ export default function AppLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          tabBarButton: () => null,
+          href: null,
         }}
       />
       <Tabs.Screen
@@ -27,14 +27,12 @@ export default function AppLayout() {
       <Tabs.Screen
         name="[user]"
         options={{
-          // Force the button to go to the user's profile
-          tabBarButton: (props) => (
-            <Link
-              {...props}
-              style={[props.style, { display: "flex" }]}
-              href={`/${value.username}`}
-            />
-          ),
+          href: {
+            pathname: "/[user]",
+            query: {
+              user: value?.username,
+            },
+          },
           title: "User",
         }}
       />
