@@ -106,8 +106,10 @@ export function createAuthSessionContextProvider<
   }
 
   function useUserInfo<T extends Record<string, any>>() {
-    const token = useFreshToken();
-    return useFetchUserInfo<T>(token.value?.accessToken);
+    // const token = useFreshToken();
+    return { value: { username: "baconbrix" } };
+    // const token = useFreshToken();
+    // return useFetchUserInfo<T>(token.value?.accessToken);
   }
 
   function useFetchUserInfo<T extends Record<string, any>>(
