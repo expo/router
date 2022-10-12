@@ -117,15 +117,15 @@ public class ExpoHeadModule: Module {
       // Required for handling incoming requests
       activity.requiredUserInfoKeys = ["href"]
 
-//        activity.contentAttributeSet?.thumbnailURL = value.imageUrl
       if let localUrl = value.imageUrl?.path {
-        let img = UIImage(contentsOfFile: localUrl)
-        if let data = img?.pngData() {
-          activity.contentAttributeSet?.thumbnailData = data
-        }
+       activity.contentAttributeSet?.thumbnailURL = value.imageUrl
+        // let img = UIImage(contentsOfFile: localUrl)
+        // if let data = img?.pngData() {
+        //   activity.contentAttributeSet?.thumbnailData = data
+        // }
       }
 
-        activity.contentAttributeSet?.darkThumbnailURL = value.darkImageUrl
+      activity.contentAttributeSet?.darkThumbnailURL = value.darkImageUrl
 
       activity.contentAttributeSet?.contentDescription = value.description
 
