@@ -21,12 +21,12 @@ export function useFilterScreenChildren(
         }
         if (process.env.NODE_ENV !== "production") {
           if (
-            ["children", "parent", "component", "getComponent"].some(
+            ["children", "component", "getComponent"].some(
               (key) => key in child.props
             )
           ) {
             throw new Error(
-              "Screen must not have a children, parent, component, or getComponent prop when used as a child of a Layout"
+              "Screen must not have a children, component, or getComponent prop when used as a child of a Layout"
             );
           }
         }
