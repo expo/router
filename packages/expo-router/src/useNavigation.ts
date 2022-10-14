@@ -26,7 +26,7 @@ export function useNavigation(
     const normalized = getNameFromFilePath(parent);
 
     if (parent.startsWith(".")) {
-      return relativePaths(contextKey, "../" + parent);
+      return relativePaths(contextKey, parent);
     }
     return normalized;
   }, [contextKey, parent]);
@@ -34,9 +34,14 @@ export function useNavigation(
   if (normalizedParent != null) {
     const parentNavigation = navigation.getParent(normalizedParent);
 
+    // TODO: Maybe print a list of parents...
+
     if (!parentNavigation) {
       throw new Error(
-        `Could not find parent navigation with route "${parent}" (normalized: ${normalizedParent}).`
+        `Could not find parent navigation with route "${parent}".` +
+          (normalizedParent !== parent
+            ? ` (normalized: ${normalizedParent})`
+            : "")
       );
     }
     return parentNavigation;

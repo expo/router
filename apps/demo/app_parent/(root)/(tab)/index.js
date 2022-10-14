@@ -5,12 +5,9 @@ export default function Page() {
   const rootNavigation = useNavigation("/");
   return (
     <View style={styles.container}>
+      <Tabs.Screen name="../" options={{ headerShown: true, title: "Home" }} />
       <Tabs.Screen
-        parent="../"
-        options={{ headerShown: true, title: "Home" }}
-      />
-      <Tabs.Screen
-        parent="../../"
+        name="../../"
         options={{ headerShown: true, title: "Parent of Home" }}
       />
       <Text>Configuring parents</Text>

@@ -19,3 +19,4 @@ export * as Linking from "./link/linking";
 
 export { SplashScreen } from "./views/Splash";
 export { useHref } from "./link/useHref";
+export { useNavigation } from "./useNavigation";

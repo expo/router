@@ -110,7 +110,7 @@ export default function Page() {
 }
 ```
 
-The same effect can be achieved by using the `parent` prop of the Screen component.
+The same effect can be achieved by using the `name` prop of the Screen component.
 
 ```tsx title=app/(root)/tabs/page.tsx
 import { NativeStack, Tabs } from "expo-router";
@@ -118,8 +118,8 @@ import { NativeStack, Tabs } from "expo-router";
 export default function Page() {
   return (
     <>
-      <NativeStack.Screen parent="../../" options={{ ... }} />
-      <Tabs.Screen parent="/(root)/tabs.js" options={{ ... }} />
+      <NativeStack.Screen name="../../" options={{ ... }} />
+      <Tabs.Screen name="/(root)/tabs.js" options={{ ... }} />
     </>
   );
 }
