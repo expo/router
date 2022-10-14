@@ -2314,13 +2314,21 @@ it("matches wildcard patterns at nested level", () => {
     routes: [
       {
         name: "(foo)",
+        params: { "404": ["bar", "42", "whatever", "baz", "initt"] },
         state: {
           routes: [
             {
               name: "bar",
+              params: { "404": ["bar", "42", "whatever", "baz", "initt"] },
               state: {
                 routes: [
-                  { name: "[...404]", path: "/bar/42/whatever/baz/initt" },
+                  {
+                    name: "[...404]",
+                    params: {
+                      "404": ["bar", "42", "whatever", "baz", "initt"],
+                    },
+                    path: "/bar/42/whatever/baz/initt",
+                  },
                 ],
               },
             },

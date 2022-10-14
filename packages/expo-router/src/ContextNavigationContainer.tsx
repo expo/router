@@ -1,13 +1,16 @@
 import {
   createNavigationContainerRef,
-  findFocusedRoute,
   NavigationContainer,
 } from "@react-navigation/native";
-import React, { useCallback } from "react";
+import React from "react";
 
 import { useLinkingConfig } from "./getLinkingConfig";
-import SplashModule from "./splash";
-import { VirtualRouteContext } from "./useCurrentRoute";
+import {
+  RootNavigationRef,
+  useRootNavigation,
+  useRootNavigationState,
+} from "./useRootNavigation";
+import { SplashScreen } from "./views/Splash";
 
 const navigationRef = createNavigationContainerRef();
 
@@ -57,36 +60,15 @@ export function ContextNavigationContainer(props: NavigationContainerProps) {
   );
 }
 
-function trimQuery(pathname: string): string {
-  const queryIndex = pathname.indexOf("?");
-  if (queryIndex !== -1) {
-    return pathname.substring(0, queryIndex);
-  }
-  return pathname;
-}
-
 function InternalContextNavigationContainer(props: object) {
   const [contextProps] = useNavigationContainerContext();
-  const [state, setState] = React.useState<{
-    pathname: string | null;
-    query: Record<string, any>;
-  }>({ pathname: null, query: {} });
+  const [isReady, setReady] = React.useState(false);
 
-  const onStateChange = useCallback(
-    (state) => {
-      if (state) {
-        const currentRoute = findFocusedRoute(state);
-        setState({
-          pathname: trimQuery(currentRoute?.path ?? "/"),
-          query: currentRoute?.params ?? {},
-        });
-      }
-    },
-    [setState]
-  );
+  const ref = React.useMemo(() => (isReady ? navigationRef : null), [isReady]);
 
   return (
-    <VirtualRouteContext.Provider value={state}>
+    <RootNavigationRef.Provider value={{ ref }}>
+      {!isReady && <SplashScreen />}
       {/* @ts-expect-error: children are required */}
       <NavigationContainer
         {...props}
@@ -94,16 +76,10 @@ function InternalContextNavigationContainer(props: object) {
         ref={navigationRef}
         onReady={() => {
           contextProps.onReady?.();
-          SplashModule?.hideAsync();
-          const initialState = navigationRef.current?.getRootState();
-          onStateChange(initialState);
-        }}
-        onStateChange={(state) => {
-          contextProps.onStateChange?.(state);
-          onStateChange(state);
+          setReady(true);
         }}
       />
-    </VirtualRouteContext.Provider>
+    </RootNavigationRef.Provider>
   );
 }
 
@@ -143,6 +119,9 @@ export function RootContainer({
 
   return null;
 }
+
+RootContainer.useRef = useRootNavigation;
+RootContainer.useState = useRootNavigationState;
 
 /** Get the root navigation container ref. */
 RootContainer.getRef = () => {

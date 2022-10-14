@@ -2,10 +2,12 @@
 // `to` / `action` support removed.
 import { Text, TextProps } from "@bacons/react-views";
 import { Slot } from "@radix-ui/react-slot";
+import { useFocusEffect } from "@react-navigation/native";
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
 import { Href, resolveHref } from "./href";
+import { useLink } from "./useLink";
 import useLinkToPathProps from "./useLinkToPathProps";
 
 type Props = {
@@ -16,7 +18,7 @@ type Props = {
   /** Forward props to child component. Useful for custom buttons. */
   asChild?: boolean;
 
-  /** Should replace the current screen without adding to the history. */
+  /** Should replace the current route without adding to the history. */
   replace?: boolean;
 
   onPress?: (
@@ -24,11 +26,21 @@ type Props = {
   ) => void;
 } & (TextProps & { children: React.ReactNode });
 
+/** Redirects to the href as soon as the component is mounted. */
+export function Redirect({ href }: { href: Href }) {
+  const link = useLink();
+  useFocusEffect(() => {
+    link.replace(href);
+  });
+  return null;
+}
+
 /**
- * Component to render link to another screen using a path.
+ * Component to render link to another route using a path.
  * Uses an anchor tag on the web.
  *
- * @param props.href Absolute path to screen (e.g. `/feeds/hot`).
+ * @param props.href Absolute path to route (e.g. `/feeds/hot`).
+ * @param props.replace Should replace the current route without adding to the history.
  * @param props.asChild Forward props to child component. Useful for custom buttons.
  * @param props.children Child elements to render the content.
  */

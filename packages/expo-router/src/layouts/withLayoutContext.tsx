@@ -63,7 +63,8 @@ export function withLayoutContext<
   TOptions extends object,
   T extends React.ComponentType<any>
 >(
-  Nav: T
+  Nav: T,
+  processor?: (options: ScreenProps<TOptions>[]) => ScreenProps<TOptions>[]
 ): React.ForwardRefExoticComponent<
   React.PropsWithoutRef<PickPartial<React.ComponentProps<T>, "children">> &
     React.RefAttributes<unknown>
@@ -82,7 +83,9 @@ export function withLayoutContext<
 
       const { screens } = useFilterScreenChildren(userDefinedChildren);
 
-      const sorted = useSortedScreens(screens ?? []);
+      const processed = processor ? processor(screens ?? []) : screens;
+
+      const sorted = useSortedScreens(processed ?? []);
 
       // Prevent throwing an error when there are no screens.
       if (!sorted.length) {
