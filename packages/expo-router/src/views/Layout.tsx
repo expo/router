@@ -51,6 +51,8 @@ export function Layout({
 
   const { state, navigation, descriptors, NavigationContent } =
     useNavigationBuilder(router, {
+      // Used for getting the parent with navigation.getParent('/normalized/path')
+      id: contextKey,
       children: sorted,
       screenOptions,
       initialRouteName,

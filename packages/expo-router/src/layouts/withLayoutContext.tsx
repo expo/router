@@ -1,5 +1,6 @@
 import React from "react";
 
+import { useContextKey } from "../Route";
 import { useSortedScreens, ScreenProps } from "../useScreens";
 import { Screen } from "../views/Screen";
 
@@ -20,12 +21,12 @@ export function useFilterScreenChildren(
         }
         if (process.env.NODE_ENV !== "production") {
           if (
-            ["children", "component", "getComponent"].some(
+            ["children", "parent", "component", "getComponent"].some(
               (key) => key in child.props
             )
           ) {
             throw new Error(
-              "Screen must not have a children, component, or getComponent prop when used as a child of a Layout"
+              "Screen must not have a children, parent, component, or getComponent prop when used as a child of a Layout"
             );
           }
         }
@@ -78,6 +79,8 @@ export function withLayoutContext<
       }: PickPartial<React.ComponentProps<T>, "children">,
       ref
     ) => {
+      const contextKey = useContextKey();
+
       const { screens } = useFilterScreenChildren(userDefinedChildren);
 
       const processed = processor ? processor(screens ?? []) : screens;
@@ -91,7 +94,7 @@ export function withLayoutContext<
 
       return (
         // @ts-expect-error
-        <Nav {...props} ref={ref} children={sorted} />
+        <Nav {...props} id={contextKey} ref={ref} children={sorted} />
       );
     }
   );

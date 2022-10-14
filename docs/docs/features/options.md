@@ -77,3 +77,50 @@ export default function Layout() {
   );
 }
 ```
+
+## Parent Options
+
+You can access any parent `navigation` prop by using the [`navigation.getParent()`](https://reactnavigation.org/docs/navigation-prop/#getparent) function. Each layout automatically indexes itself using the normalized path.
+
+The format for the normalized path is `/folder/file` where the string always starts with a `/` and there is no file extension or trailing slash.
+
+Consider the following structure:
+
+```bash title="File System"
+app/
+  (root).js
+  (root)/
+    tabs.js
+    tabs/
+      page.js
+```
+
+```tsx title=app/(root)/tabs/page.tsx
+import { useNavigation } from "expo-router";
+
+export default function Page() {
+  // This navigation prop controls the direct parent `/(root)/tabs.js`.
+  const navigation = useNavigation();
+  // This navigation prop controls the direct parent `/`.
+  const rootNavigation = useNavigation("/");
+  // This navigation prop controls the direct parent `/(root).js`.
+  const rootNavigation = useNavigation("../../");
+
+  // ...
+}
+```
+
+The same effect can be achieved by using the `name` prop of the Screen component.
+
+```tsx title=app/(root)/tabs/page.tsx
+import { NativeStack, Tabs } from "expo-router";
+
+export default function Page() {
+  return (
+    <>
+      <NativeStack.Screen name="../../" options={{ ... }} />
+      <Tabs.Screen name="/(root)/tabs.js" options={{ ... }} />
+    </>
+  );
+}
+```
