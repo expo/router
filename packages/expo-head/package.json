@@ -1,5 +1,5 @@
 {
-  "name": "expo-head",
+  "name": "@bacons/head",
   "version": "0.1.0",
   "description": "static page definitions for universal SEO",
   "main": "build/index",
@@ -16,17 +16,19 @@
   "keywords": [
     "react-native",
     "expo",
-    "expo-head",
-    "ExpoHead"
+    "@bacons/head",
+    "seo"
   ],
-  "repository": "https://github.com/EvanBacon/expo-head",
+  "repository": "https://github.com/EvanBacon/@bacons/head",
   "bugs": {
-    "url": "https://github.com/EvanBacon/expo-head/issues"
+    "url": "https://github.com/EvanBacon/@bacons/head/issues"
   },
   "author": "evanbacon <bacon@expo.io> (https://github.com/EvanBacon)",
   "license": "MIT",
-  "homepage": "https://github.com/EvanBacon/expo-head#readme",
-  "dependencies": {},
+  "homepage": "https://github.com/EvanBacon/@bacons/head#readme",
+  "dependencies": {
+    "react-helmet": "6.1.0"
+  },
   "devDependencies": {
     "expo-module-scripts": "^2.1.1",
     "expo-modules-core": "^0.11.4"

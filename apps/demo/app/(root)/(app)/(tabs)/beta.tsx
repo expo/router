@@ -1,4 +1,4 @@
-import { Head } from "expo-head/build/ExpoHead.ios";
+import { Head } from "@bacons/head";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function App() {

@@ -1,4 +1,4 @@
-import { Head } from "expo-head";
+import { Head } from "@bacons/head";
 import { StyleSheet, Text, View } from "react-native";
 import { GoogleAuth } from "../../../../etc/auth/google";
 

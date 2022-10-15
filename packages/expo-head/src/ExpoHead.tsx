@@ -1,5 +1,3 @@
-import React from "react";
+export { default as Head } from "react-helmet";
 
-export function Head(props: { children?: React.ReactNode }) {
-  return null;
-}
+export function setWebUrl(url: string) {}

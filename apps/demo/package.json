@@ -13,7 +13,7 @@
     "@react-native-async-storage/async-storage": "~1.17.3",
     "expo": "~46.0.13",
     "expo-auth-session": "~3.7.1",
-    "expo-head": "*",
+    "@bacons/head": "*",
     "expo-random": "~12.3.0",
     "expo-router": "*",
     "expo-secure-store": "~11.3.0",

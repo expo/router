@@ -1,5 +1,6 @@
 import * as App from "expo-application";
-import { useLink } from "expo-router";
+import { createURL } from "expo-linking";
+import { useHref } from "expo-router";
 import React from "react";
 
 import ExpoHead from "./ExpoHeadModule.native";
@@ -35,11 +36,17 @@ type UserActivity = {
 
 // suggestedInvocationPhrase -- `expo:spoken-phrase`
 
-function getStaticUrlFromExpoRouter(href: string) {
+let webUrl: string = "";
+
+export function setWebUrl(url: string) {
   // Wherever the user hosted their website + base URL.
-  const host = "https://expo.io";
+  webUrl = url.replace(/\/$/, "");
+}
+
+function getStaticUrlFromExpoRouter(href: string) {
+  // const host = "https://expo.io";
   // Append the URL we'd find in context
-  return host + "/" + href;
+  return webUrl + "/" + href;
 }
 
 function urlToId(url: string) {
@@ -51,7 +58,7 @@ function urlToId(url: string) {
 // import { useContextKey } from "expo-router/build/Route";
 // import { AppState, Linking } from "react-native";
 export function Head({ children }: { children?: React.ReactNode }) {
-  const link = useLink();
+  const link = useHref();
 
   const activity = React.useMemo(() => {
     const userActivity: UserActivity = {
@@ -88,10 +95,10 @@ export function Head({ children }: { children?: React.ReactNode }) {
 
         if (property === "og:image") {
           if (media === "(prefers-color-scheme: dark)") {
-            console.log("SETTING DARK IMAGE URL", content);
+            // console.log("SETTING DARK IMAGE URL", content);
             userActivity.darkImageUrl = content;
           } else {
-            console.log("SETTING IMAGE URL", content);
+            // console.log("SETTING IMAGE URL", content);
             userActivity.imageUrl = content;
           }
         }
@@ -113,7 +120,7 @@ export function Head({ children }: { children?: React.ReactNode }) {
         ...userActivity,
         // dateModified: new Date().toISOString(),
         userInfo: {
-          href: link.location,
+          href: createURL(link.href),
         },
       };
 
@@ -125,7 +132,7 @@ export function Head({ children }: { children?: React.ReactNode }) {
         resolved.id = urlToId(resolved.webpageURL!);
       }
 
-      console.log("create:", resolved);
+      // console.log("create:", resolved);
       return resolved;
     }
     return null;

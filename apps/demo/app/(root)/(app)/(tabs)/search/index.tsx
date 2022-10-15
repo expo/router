@@ -1,4 +1,4 @@
-import { Head } from "expo-head";
+import { Head } from "@bacons/head";
 import { NativeStack } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { useRoute } from "@react-navigation/native";
