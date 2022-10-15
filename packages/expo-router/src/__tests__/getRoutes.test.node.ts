@@ -3,6 +3,8 @@ import {
   getRoutes,
   createRouteNode,
   getUserDefinedDeepDynamicRoute,
+  getRecursiveTree,
+  FileNode,
 } from "../getRoutes";
 import { RequireContext } from "../types";
 
@@ -39,6 +41,20 @@ const ROUTE_DIRECTORY = {
   route: "__index",
 };
 
+const asFileNode = (route: Partial<FileNode>): FileNode => ({
+  getComponent(): any {
+    return function () {
+      return null;
+    };
+  },
+  getExtras(): any {
+    return {};
+  },
+  normalizedName: "INVALID_TEST_VALUE",
+  contextKey: "INVALID_TEST_VALUE",
+  ...route,
+});
+
 const asRouteNode = (route: Partial<RouteNode>) =>
   createRouteNode({
     getComponent(): any {
@@ -53,6 +69,35 @@ const asRouteNode = (route: Partial<RouteNode>) =>
     contextKey: "INVALID_TEST_VALUE",
     ...route,
   });
+
+describe(getRecursiveTree, () => {
+  it(`should return a layout route`, () => {
+    const routes = ["(app)", "(app)/index"].map((normalizedName) =>
+      asFileNode({
+        normalizedName,
+      })
+    );
+    expect(getRecursiveTree(routes).children).toEqual([
+      {
+        children: [
+          {
+            children: [],
+            name: "index",
+            node: expect.objectContaining({
+              normalizedName: "(app)/index",
+            }),
+            parents: ["", "(app)"],
+          },
+        ],
+        name: "(app)",
+        node: expect.objectContaining({
+          normalizedName: "(app)",
+        }),
+        parents: [""],
+      },
+    ]);
+  });
+});
 
 describe(getUserDefinedDeepDynamicRoute, () => {
   it(`should return a basic deep dynamic route`, () => {

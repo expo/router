@@ -18,7 +18,10 @@ export function createRouteNode(
   };
 }
 
-type FileNode = Pick<RouteNode, "contextKey" | "getComponent" | "getExtras"> & {
+export type FileNode = Pick<
+  RouteNode,
+  "contextKey" | "getComponent" | "getExtras"
+> & {
   /** Like `(tab)/index` */
   normalizedName: string;
 };
@@ -32,7 +35,7 @@ type TreeNode = {
 };
 
 /** Convert a flat map of file nodes into a nested tree of files. */
-function getRecursiveTree(files: FileNode[]): TreeNode {
+export function getRecursiveTree(files: FileNode[]): TreeNode {
   const tree = {
     name: "",
     children: [],
