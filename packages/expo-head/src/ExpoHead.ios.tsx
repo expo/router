@@ -53,6 +53,12 @@ function urlToId(url: string) {
   return url.replace(/[^a-zA-Z0-9]/g, "-");
 }
 
+function getLastSegment(path: string) {
+  // Remove the extension
+  const lastSegment = path.split("/").pop() ?? "";
+  return lastSegment.replace(/\.[^/.]+$/, "");
+}
+
 // Maybe use geo from structured data -- https://developers.google.com/search/docs/appearance/structured-data/local-business
 
 // import { useContextKey } from "expo-router/build/Route";
@@ -115,6 +121,7 @@ export function Head({ children }: { children?: React.ReactNode }) {
     if (userActivity.title) {
       const resolved: UserActivity = {
         webpageURL: getStaticUrlFromExpoRouter(link.href),
+        title: getLastSegment(link.href),
         eligibleForSearch: true,
         keywords: [],
         ...userActivity,

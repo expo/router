@@ -96,11 +96,11 @@ public class ExpoHeadModule: Module {
 
     // TODO: https://gist.github.com/alexruperez/ea81aa3e371f7d0d7ea5e594d7e9ad08
 //         let activity = NSUserActivity(activityType: value.activityType)
-          activity.persistentIdentifier = value.id
-         activity.isEligibleForHandoff = true
-         activity.isEligibleForPublicIndexing = true
-         activity.isEligibleForSearch = value.eligibleForSearch
-         activity.isEligibleForPrediction = true;
+        activity.persistentIdentifier = value.id
+        activity.isEligibleForHandoff = true
+        activity.isEligibleForPublicIndexing = true
+        activity.isEligibleForSearch = value.eligibleForSearch
+        activity.isEligibleForPrediction = true;
       // Make all indexed routes deletable
       activity.contentAttributeSet?.domainIdentifier = INDEXED_ROUTE
 
@@ -135,7 +135,11 @@ public class ExpoHeadModule: Module {
       activity.expirationDate = value.expirationDate
 
       if (value.webpageURL != nil) {
+        // If you’re using all three APIs, it works well to use the URL of the relevant webpage as the value for uniqueIdentifier, relatedUniqueIdentifier, and webpageURL.
+        // https://developer.apple.com/library/archive/documentation/General/Conceptual/AppSearch/CombiningAPIs.html#//apple_ref/doc/uid/TP40016308-CH10-SW1
         activity.webpageURL = value.webpageURL
+        activity.uniqueIdentifier = value.webpageURL?.absoluteString
+        activity.relatedUniqueIdentifier = value.webpageURL?.absoluteString
       }
       self.activities.insert(activity)
 
