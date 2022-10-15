@@ -36,6 +36,46 @@ type UserActivity = {
 
 // suggestedInvocationPhrase -- `expo:spoken-phrase`
 
+import Constants from "expo-constants";
+
+function getWebUrlsFromManifest() {
+  // TODO: Replace this with the source of truth native manifest
+  // Then do a check to warn the user if the config doesn't match the native manifest.
+  // TODO: Warn if the applinks have `https://` in them.
+  const domains = Constants.expoConfig?.ios?.associatedDomains || [];
+  // [applinks:explore-api.netlify.app/] -> [explore-api.netlify.app]
+  const applinks = domains
+    .filter((domain) => domain.startsWith("applinks:"))
+    .map((domain) => {
+      const clean = domain.replace(/^applinks:/, "");
+      return clean.endsWith("/") ? clean.slice(0, -1) : clean;
+    });
+
+  const withoutCustom = applinks.filter(
+    (domain) =>
+      !domain.match(
+        /\?mode=(developer|managed|developer\+managed|managed\+developer)$/
+      )
+  );
+
+  return withoutCustom;
+}
+
+function setDefaultWebUrl() {
+  const webUrls = getWebUrlsFromManifest();
+  if (!webUrls.length) {
+    throw new Error(
+      `No web URL found in the native manifest. Please add a web URL to the native manifest.`
+    );
+  }
+  if (webUrls.length > 1) {
+    console.warn(
+      `Multiple web URLs found in the native manifest associatedDomains. Using the first one found: ${webUrls[0]}`
+    );
+  }
+  return "https://" + webUrls[0].replace(/\/$/, "");
+}
+
 let webUrl: string = "";
 
 export function setWebUrl(url: string) {
@@ -46,7 +86,14 @@ export function setWebUrl(url: string) {
 function getStaticUrlFromExpoRouter(href: string) {
   // const host = "https://expo.io";
   // Append the URL we'd find in context
-  return webUrl + "/" + href;
+  return getWebUrl() + href;
+}
+
+function getWebUrl() {
+  if (!webUrl) {
+    webUrl = setDefaultWebUrl();
+  }
+  return webUrl;
 }
 
 function urlToId(url: string) {
@@ -56,7 +103,7 @@ function urlToId(url: string) {
 function getLastSegment(path: string) {
   // Remove the extension
   const lastSegment = path.split("/").pop() ?? "";
-  return lastSegment.replace(/\.[^/.]+$/, "");
+  return lastSegment.replace(/\.[^/.]+$/, "").split("?")[0];
 }
 
 // Maybe use geo from structured data -- https://developers.google.com/search/docs/appearance/structured-data/local-business
@@ -68,6 +115,7 @@ export function Head({ children }: { children?: React.ReactNode }) {
 
   const activity = React.useMemo(() => {
     const userActivity: UserActivity = {
+      title: getLastSegment(link.href),
       activityType: ExpoHead.activities.INDEXED_ROUTE,
     };
 
@@ -100,13 +148,13 @@ export function Head({ children }: { children?: React.ReactNode }) {
         }
 
         if (property === "og:image") {
-          if (media === "(prefers-color-scheme: dark)") {
-            // console.log("SETTING DARK IMAGE URL", content);
-            userActivity.darkImageUrl = content;
-          } else {
-            // console.log("SETTING IMAGE URL", content);
-            userActivity.imageUrl = content;
-          }
+          // if (media === "(prefers-color-scheme: dark)") {
+          // console.log("SETTING DARK IMAGE URL", content);
+          userActivity.darkImageUrl = content;
+          // } else {
+          //   // console.log("SETTING IMAGE URL", content);
+          //   userActivity.imageUrl = content;
+          // }
         }
 
         // <meta name="keywords" content="foo,bar,baz" />
@@ -118,31 +166,26 @@ export function Head({ children }: { children?: React.ReactNode }) {
       }
     });
 
-    if (userActivity.title) {
-      const resolved: UserActivity = {
-        webpageURL: getStaticUrlFromExpoRouter(link.href),
-        title: getLastSegment(link.href),
-        eligibleForSearch: true,
-        keywords: [],
-        ...userActivity,
-        // dateModified: new Date().toISOString(),
-        userInfo: {
-          href: createURL(link.href),
-        },
-      };
+    const resolved: UserActivity = {
+      webpageURL: getStaticUrlFromExpoRouter(link.href),
+      eligibleForSearch: true,
+      keywords: [userActivity.title!],
+      ...userActivity,
+      // dateModified: new Date().toISOString(),
+      userInfo: {
+        href: createURL(link.href),
+      },
+    };
 
-      if (App.applicationName) {
-        resolved.keywords?.push(App.applicationName);
-      }
-
-      if (!resolved.id) {
-        resolved.id = urlToId(resolved.webpageURL!);
-      }
-
-      // console.log("create:", resolved);
-      return resolved;
+    if (App.applicationName) {
+      resolved.keywords?.push(App.applicationName);
     }
-    return null;
+
+    if (!resolved.id) {
+      resolved.id = urlToId(resolved.webpageURL!);
+    }
+
+    return resolved;
   }, [children, link.href]);
 
   React.useEffect(() => {

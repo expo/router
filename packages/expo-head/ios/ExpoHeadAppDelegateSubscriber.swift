@@ -27,7 +27,56 @@ public struct InfoPlist
     }
 }
 
+func encoded(_ value: String) -> String {
+  return value.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? value
+}
+
+func userInfoToQueryString(_ userInfo: [String : NSSecureCoding]?) -> String {
+  guard let userInfo = userInfo else {
+    return ""
+  }
+  var queryString = ""
+  for (key, value) in userInfo {
+    if let value = value as? String {
+      if key != "href" {
+        queryString += "&\(encoded(key))=\(encoded(value))"
+      }
+    }
+  }
+  return queryString
+}
+
 public class ExpoHeadAppDelegateSubscriber: ExpoAppDelegateSubscriber {
+
+  public func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+    let schemes = InfoPlist.bundleURLSchemes()
+    // TODO: Allow user to define the scheme using structured data or something.
+    // opensearch = Chrome. spotlight = custom thing we're using to identify iOS
+    var url = "\(schemes[0]):/"
+
+    if let wellKnownHref = shortcutItem.userInfo?["href"] as? String {
+      url += wellKnownHref
+    } else {
+      url += "/"
+    }
+
+    url += "?title=\(encoded(shortcutItem.localizedTitle ))&id=\(encoded(shortcutItem.type))"
+
+    url += userInfoToQueryString(shortcutItem.userInfo)
+
+    if let subtitle = shortcutItem.localizedSubtitle {
+      url += "&subtitle=\(encoded(subtitle))"
+    }
+
+    url += "&ref=shortcut"
+
+    // https://github.com/search?q=
+    NotificationCenter.default.post(
+      name: NSNotification.Name(rawValue: "RCTOpenURLNotification"),
+      object: self,
+      userInfo: ["url": url]);
+  }
+
   public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
     launchedActivity = userActivity
 
@@ -43,7 +92,8 @@ public class ExpoHeadAppDelegateSubscriber: ExpoAppDelegateSubscriber {
         let schemes = InfoPlist.bundleURLSchemes()
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? query
         // TODO: Allow user to define the scheme using structured data or something.
-        let url = "\(schemes[0])://search?q=\(encodedQuery)&ref=opensearch"
+        // opensearch = Chrome. spotlight = custom thing we're using to identify iOS
+        let url = "\(schemes[0])://search?q=\(encodedQuery)&ref=spotlight"
 
         // https://github.com/search?q=
         NotificationCenter.default.post(

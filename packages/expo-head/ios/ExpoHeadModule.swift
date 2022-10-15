@@ -4,6 +4,21 @@ import MobileCoreServices
 // https://developer.apple.com/documentation/foundation/nsuseractivity/3552239-shortcutavailability
 //import Intents
 
+struct ShortcutOptions: Record {
+
+  @Field
+  var id: String!
+  @Field
+  var title: String!
+  @Field
+  var subtitle: String?
+  @Field
+  var info: [String: NSSecureCoding]?
+  @Field
+  var icon: String?
+}
+
+
 struct MetadataOptions: Record {
   @Field
   var activityType: String!
@@ -39,6 +54,83 @@ struct MetadataOptions: Record {
 let INDEXED_ROUTE = Bundle.main.bundleIdentifier! + ".expo.index_route"
 
 var launchedActivity: NSUserActivity?
+
+func stringToUIApplicationShortcutIcon(_ str: String?) -> UIApplicationShortcutIcon? {
+  guard let stringType = str else {
+    return nil
+  }
+  if let type = stringToUIApplicationShortcutIconType(stringType) {
+    return UIApplicationShortcutIcon(type: type)
+  }
+  return nil
+
+}
+
+func stringToUIApplicationShortcutIconType(_ str: String) -> UIApplicationShortcutIcon.IconType? {
+  switch str {
+  case "compose":
+    return .compose
+  case "play":
+    return .play
+  case "pause":
+    return .pause
+  case "add":
+    return .add
+  case "location":
+    return .location
+  case "search":
+    return .search
+  case "share":
+    return .share
+  case "prohibit":
+    return .prohibit
+  case "contact":
+    return .contact
+  case "home":
+    return .home
+  case "markLocation":
+    return .markLocation
+  case "favorite":
+    return .favorite
+  case "love":
+    return .love
+  case "cloud":
+    return .cloud
+  case "invitation":
+    return .invitation
+  case "confirmation":
+    return .confirmation
+  case "mail":
+    return .mail
+  case "message":
+    return .message
+  case "date":
+    return .date
+  case "time":
+    return .time
+  case "capturePhoto":
+    return .capturePhoto
+  case "captureVideo":
+    return .captureVideo
+  case "task":
+    return .task
+  case "taskCompleted":
+    return .taskCompleted
+  case "alarm":
+    return .alarm
+  case "bookmark":
+    return .bookmark
+  case "shuffle":
+    return .shuffle
+  case "audio":
+    return .audio
+  case "update":
+    return .update
+  default:
+    return nil
+  }
+}
+
 
 public class ExpoHeadModule: Module {
   private var activities = Set<NSUserActivity>()
@@ -88,69 +180,83 @@ public class ExpoHeadModule: Module {
       return nil
     }
 
+    AsyncFunction("defineShortcuts") { (items: [ShortcutOptions]) in
+
+      var shortcuts: [UIApplicationShortcutItem] = []
+      for value in items {
+        shortcuts.append(UIApplicationShortcutItem(
+          type: value.id,
+          localizedTitle: value.title,
+          localizedSubtitle: value.subtitle,
+          icon: stringToUIApplicationShortcutIcon(value.icon),
+          userInfo: value.info
+        ))
+      }
+
+      DispatchQueue.main.async {
+        UIApplication.shared.shortcutItems = shortcuts
+      }
+    }
+
+
     // Defines a JavaScript function that always returns a Promise and whose native code
     // is by default dispatched on the different thread than the JavaScript runtime runs on.
     AsyncFunction("createActivity") { (value: MetadataOptions) in
-
+      let att = CSSearchableItemAttributeSet(itemContentType: kUTTypeText as String)
       let activity = self.activities.first(where: { $0.persistentIdentifier == value.id }) ?? NSUserActivity(activityType: value.activityType)
 
     // TODO: https://gist.github.com/alexruperez/ea81aa3e371f7d0d7ea5e594d7e9ad08
 //         let activity = NSUserActivity(activityType: value.activityType)
-        activity.persistentIdentifier = value.id
-        activity.isEligibleForHandoff = true
-        activity.isEligibleForPublicIndexing = true
-        activity.isEligibleForSearch = value.eligibleForSearch
-        activity.isEligibleForPrediction = true;
-      // Make all indexed routes deletable
-      activity.contentAttributeSet?.domainIdentifier = INDEXED_ROUTE
+      activity.persistentIdentifier = value.id
+      activity.isEligibleForHandoff = true
+      activity.isEligibleForPublicIndexing = true
+      activity.isEligibleForSearch = value.eligibleForSearch
+      activity.isEligibleForPrediction = true;
+      activity.title = value.title
 
-      activity.userInfo = value.userInfo
-
-//      let att = CSSearchableItemAttributeSet(
-//           itemContentType: kUTTypeText as String)
-      let att = CSSearchableItemAttributeSet(
-           itemContentType: kUTTypeContent as String)
-//      kUTTypeItem
-      activity.contentAttributeSet = att;
-      activity.contentAttributeSet?.metadataModificationDate = value.dateModified
-
-      // Required for handling incoming requests
-      activity.requiredUserInfoKeys = ["href"]
-
-      if let localUrl = value.imageUrl?.path {
-       activity.contentAttributeSet?.thumbnailURL = value.imageUrl
-        // let img = UIImage(contentsOfFile: localUrl)
-        // if let data = img?.pngData() {
-        //   activity.contentAttributeSet?.thumbnailData = data
-        // }
+      if let keywords = value.keywords {
+        activity.keywords = Set(keywords)
       }
 
-      activity.contentAttributeSet?.darkThumbnailURL = value.darkImageUrl
-
-      activity.contentAttributeSet?.contentDescription = value.description
-
-      activity.title = value.title
-      activity.contentAttributeSet?.title = value.title
-
+      activity.userInfo = value.userInfo
+      // Required for handling incoming requests
+      activity.requiredUserInfoKeys = ["href"]
       activity.expirationDate = value.expirationDate
 
       if (value.webpageURL != nil) {
         // If you’re using all three APIs, it works well to use the URL of the relevant webpage as the value for uniqueIdentifier, relatedUniqueIdentifier, and webpageURL.
         // https://developer.apple.com/library/archive/documentation/General/Conceptual/AppSearch/CombiningAPIs.html#//apple_ref/doc/uid/TP40016308-CH10-SW1
         activity.webpageURL = value.webpageURL
-        activity.uniqueIdentifier = value.webpageURL?.absoluteString
-        activity.relatedUniqueIdentifier = value.webpageURL?.absoluteString
+        // activity.uniqueIdentifier = value.webpageURL?.absoluteString
+//        att.relatedUniqueIdentifier = value.webpageURL?.absoluteString
       }
+
+      att.title = value.title
+      att.metadataModificationDate = value.dateModified
+      // Make all indexed routes deletable
+      att.domainIdentifier = INDEXED_ROUTE
+
+      if let localUrl = value.imageUrl?.path {
+        att.thumbnailURL = value.imageUrl
+        // let img = UIImage(contentsOfFile: localUrl)
+        // if let data = img?.pngData() {
+        //   activity.contentAttributeSet?.thumbnailData = data
+        // }
+      }
+      if let darkImageUrl = value.darkImageUrl {
+        att.darkThumbnailURL = darkImageUrl
+      }
+
+      if let description = value.description {
+        att.contentDescription = description
+      }
+
+      activity.contentAttributeSet = att;
+
       self.activities.insert(activity)
 
-       // activity.userInfo = [self.userActivityType.userInfoKey: self.userActivityUniqueIdentifier]
-       // activity.keywords = UserActivityType.keywords
-       // activity.contentAttributeSet = attributeSet
-//         activity.needsSave = true
-         activity.becomeCurrent()
-
+      activity.becomeCurrent()
         // TODO: Fallback on using app icon as thumbnail image.
-
     }
 
     AsyncFunction("clearActivities") { (ids: [String], promise: Promise) in
