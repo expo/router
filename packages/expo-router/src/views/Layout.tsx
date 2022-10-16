@@ -1,5 +1,4 @@
 import {
-  LinkingContext,
   RouterFactory,
   StackRouter,
   useNavigationBuilder,
@@ -7,20 +6,13 @@ import {
 import * as React from "react";
 
 import { useContextKey } from "../Route";
-import getPathFromState from "../fork/getPathFromState";
 import { useFilterScreenChildren } from "../layouts/withLayoutContext";
-import { resolveHref } from "../link/href";
-import { matchFragmentName } from "../matchers";
 import { useSortedScreens } from "../useScreens";
 import { Screen } from "./Screen";
 
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
 export const LayoutContext = React.createContext<{
   contextKey: string;
-  /** Normalized path representing the selected route `/[id]?id=normal` -> `/normal` */
-  pathname: string;
-  /** Normalized string representing the selected state `/(group)/any/[id]` */
-  statePath: string;
   state: any;
   navigation: any;
   descriptors: any;
@@ -56,24 +48,19 @@ export function Layout({
   );
 
   const sorted = useSortedScreens(screens ?? []);
-  const linking = React.useContext(LinkingContext);
 
   const { state, navigation, descriptors, NavigationContent } =
     useNavigationBuilder(router, {
+      // Used for getting the parent with navigation.getParent('/normalized/path')
+      id: contextKey,
       children: sorted,
       screenOptions,
       initialRouteName,
     });
 
-  const statePath = linking.options?.getPathFromState
-    ? linking.options.getPathFromState(state)
-    : getPathFromState(state);
-
   return (
     <LayoutContext.Provider
       value={{
-        pathname: pathnameFromStatePath(statePath),
-        statePath: getNormalizedStatePath(statePath),
         contextKey,
         state,
         navigation,
@@ -84,56 +71,6 @@ export function Layout({
       <NavigationContent>{otherChildren}</NavigationContent>
     </LayoutContext.Provider>
   );
-}
-
-function getNormalizedStatePath(statePath: string) {
-  const pathname =
-    "/" +
-    (statePath
-      .split("/")
-      .map((value) => decodeURIComponent(value))
-      .filter(Boolean)
-      .join("/") || "");
-
-  return pathname.split("?")![0];
-}
-
-function pathnameFromStatePath(statePath: string) {
-  const pathname =
-    "/" +
-    (statePath
-      .split("/")
-      .map((value) => {
-        const segment = decodeURIComponent(value);
-        if (matchFragmentName(segment) != null || segment === "index") {
-          return null;
-        }
-        return segment;
-      })
-      .filter(Boolean)
-      .join("/") || "");
-
-  const components = pathname.split("?");
-
-  return resolveHref({
-    pathname: components[0],
-    // TODO: This is not efficient, we should generate based on the state instead
-    // of converting to string then back to object
-    query: parseQueryString(components[1] ?? ""),
-  });
-}
-
-function parseQueryString(val: string) {
-  if (!val) {
-    return {};
-  }
-  const query = {};
-  const a = val.split("&");
-  for (let i = 0; i < a.length; i++) {
-    const b = a[i].split("=");
-    query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || "");
-  }
-  return query;
 }
 
 export function useLayoutContext() {

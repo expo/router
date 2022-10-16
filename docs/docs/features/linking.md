@@ -59,6 +59,24 @@ The `Href` type is a union of the following types:
 - **string**: A full path like `/profile/settings` or a relative path like `../settings`.
 - **object**: An object with a `pathname` and optional `query` object. The `pathname` can be a full path like `/profile/settings` or a relative path like `../settings`. The `query` can be an object of key/value pairs.
 
+## `useHref` API
+
+The `useHref` hook provides the current location information for a route.
+
+- **href**: _`string`_ The relative normalized path that would show up in the URL bar.
+- **pathname**: _`string`_ The relative template path reflecting the current route. e.g. `/profile/[id]`.
+- **query**: _`Record<string, any>`_ Query parameters for the current route. e.g. `{ id: '123' }`.
+
+Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `/profile/123`, the results of `useHref` would be as follows:
+
+```js
+{
+  href: "/profile/123",
+  pathname: "/profile/[id]",
+  query: { id: "123" },
+}
+```
+
 ## Navigation prop
 
 You can also use the [`navigation` prop](https://reactnavigation.org/docs/navigation-prop) from React Navigation to imperatively navigate using screen names:

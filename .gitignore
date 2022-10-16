@@ -59,6 +59,7 @@ packages/@*/*/build/**
 
 # App native folders
 
+apps/*/dist/*
 apps/*/ios/*
 apps/*/android/*
 apps/*/web-build/*

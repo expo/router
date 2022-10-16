@@ -5,8 +5,12 @@ import {
 import React from "react";
 
 import { useLinkingConfig } from "./getLinkingConfig";
-import SplashModule from "./splash";
-import { RootNavigationRef, useRootNavigation } from "./useCurrentRoute";
+import {
+  RootNavigationRef,
+  useRootNavigation,
+  useRootNavigationState,
+} from "./useRootNavigation";
+import { SplashScreen } from "./views/Splash";
 
 const navigationRef = createNavigationContainerRef();
 
@@ -64,6 +68,7 @@ function InternalContextNavigationContainer(props: object) {
 
   return (
     <RootNavigationRef.Provider value={{ ref }}>
+      {!isReady && <SplashScreen />}
       {/* @ts-expect-error: children are required */}
       <NavigationContainer
         {...props}
@@ -71,7 +76,6 @@ function InternalContextNavigationContainer(props: object) {
         ref={navigationRef}
         onReady={() => {
           contextProps.onReady?.();
-          SplashModule?.hideAsync();
           setReady(true);
         }}
       />
@@ -117,6 +121,7 @@ export function RootContainer({
 }
 
 RootContainer.useRef = useRootNavigation;
+RootContainer.useState = useRootNavigationState;
 
 /** Get the root navigation container ref. */
 RootContainer.getRef = () => {

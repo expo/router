@@ -1,8 +1,6 @@
 import { registerRootComponent } from "expo";
-import { ExpoRoot } from "expo-router";
+import { ExpoRoot, SplashScreen } from "expo-router";
 import { View, Platform } from "react-native";
-
-import SplashModule from "expo-router/build/splash";
 
 // Must be exported or Fast Refresh won't update the context >:[
 export function App() {
@@ -56,16 +54,12 @@ function convertError(error) {
 
 (() => {
   try {
-    if (SplashModule) {
-      SplashModule.preventAutoHideAsync();
-    }
+    SplashScreen.preventAutoHideAsync();
 
     registerRootComponent(App);
   } catch (e) {
     // Hide the splash screen if there was an error so the user can see it.
-    if (SplashModule) {
-      SplashModule.hideAsync();
-    }
+    SplashScreen.hideAsync();
 
     const error = convertError(e);
     // Prevent the app from throwing confusing:

@@ -52,7 +52,7 @@ npx expo install expo-router
 Install peer dependencies:
 
 ```
-npx expo install react-native-safe-area-context react-native-screens react-native-reanimated react-native-gesture-handler
+npx expo install react-native-safe-area-context react-native-screens
 ```
 
 Then delete the entry point in your `package.json`, or replace it with `index.js` to be explicit:
@@ -85,14 +85,14 @@ The following beta setup steps are required for now, but will not be necessary w
 
 ### Override the Metro version
 
-Ensure you're using at least `metro@0.72.3` by setting a Yarn resolution or npm override (this step goes away in Expo SDK 47).
+Ensure you're using at least `metro@0.73.1` by setting a Yarn resolution or npm override (this step goes away in Expo SDK 47).
 
 If you use Yarn:
 
 ```json title=package.json
 {
   "resolutions": {
-    "metro": "0.72.3"
+    "metro": "0.73.1"
   }
 }
 ```
@@ -102,7 +102,7 @@ If you use npm, this requires npm 8.3.0 or higher. You can install this with `np
 ```json title=package.json
 {
   "overrides": {
-    "metro": "0.72.3"
+    "metro": "0.73.1"
   }
 }
 ```
@@ -115,13 +115,14 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: [
-      "react-native-reanimated/plugin",
       // NOTE: `expo-router/babel` is a temporary extension to `babel-preset-expo`.
       require.resolve("expo-router/babel"),
     ],
   };
 };
 ```
+
+> Additional setup is required for the Drawer navigator. See [the Drawer documentation](/router/docs/guides/drawer) for more information.
 
 ## Troubleshooting
 

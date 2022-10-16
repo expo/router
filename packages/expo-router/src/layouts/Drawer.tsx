@@ -11,3 +11,5 @@ export const Drawer = withLayoutContext<
   DrawerNavigationOptions,
   typeof DrawerNavigator
 >(DrawerNavigator);
+
+export default Drawer;

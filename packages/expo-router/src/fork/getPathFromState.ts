@@ -17,7 +17,9 @@ type Options<ParamList extends object> = {
   screens: PathConfigMap<ParamList>;
 };
 
-type State = NavigationState | Omit<PartialState<NavigationState>, "stale">;
+export type State =
+  | NavigationState
+  | Omit<PartialState<NavigationState>, "stale">;
 
 type StringifyConfig = Record<string, (value: any) => string>;
 
