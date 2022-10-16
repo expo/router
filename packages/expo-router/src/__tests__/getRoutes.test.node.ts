@@ -71,13 +71,17 @@ const asRouteNode = (route: Partial<RouteNode>) =>
   });
 
 describe(getRecursiveTree, () => {
-  it(`should return a layout route`, () => {
-    const routes = ["(app)", "(app)/index"].map((normalizedName) =>
+  function getTreeForKeys(keys: string[]) {
+    const routes = keys.map((normalizedName) =>
       asFileNode({
         normalizedName,
       })
     );
-    expect(getRecursiveTree(routes).children).toEqual([
+    return getRecursiveTree(routes).children;
+  }
+
+  it(`should return a layout route`, () => {
+    expect(getTreeForKeys(["(app)", "(app)/index"])).toEqual([
       {
         children: [
           {
@@ -92,6 +96,28 @@ describe(getRecursiveTree, () => {
         name: "(app)",
         node: expect.objectContaining({
           normalizedName: "(app)",
+        }),
+        parents: [""],
+      },
+    ]);
+  });
+
+  it(`should return a layout route using alternative format`, () => {
+    expect(getTreeForKeys(["(app)/_layout", "(app)/index"])).toEqual([
+      {
+        children: [
+          {
+            children: [],
+            name: "index",
+            node: expect.objectContaining({
+              normalizedName: "(app)/index",
+            }),
+            parents: ["", "(app)"],
+          },
+        ],
+        name: "(app)",
+        node: expect.objectContaining({
+          normalizedName: "(app)/_layout",
         }),
         parents: [""],
       },

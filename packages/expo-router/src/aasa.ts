@@ -9,11 +9,15 @@ function getWebUrlsFromManifest() {
   const applinks = domains
     .filter((domain) => domain.startsWith("applinks:"))
     .map((domain) => {
-      const clean = domain.replace(/^applinks:/, "");
-      return clean.endsWith("/") ? clean.slice(0, -1) : clean;
+      let clean = domain.replace(/^applinks:/, "");
+      clean = clean.endsWith("/") ? clean.slice(0, -1) : clean;
+      return clean.replace(
+        /\?mode=(developer|managed|developer\+managed|managed\+developer)$/,
+        ""
+      );
     });
 
-  return applinks;
+  return [...new Set(applinks)];
 }
 
 export function getAllWebRedirects(

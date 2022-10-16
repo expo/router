@@ -65,7 +65,7 @@ export function treeToReactNavigationLinkingRoutes(
   return firstPass;
 }
 
-export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<object> {
+export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
   return {
     prefixes: [
       /* your linking prefixes */
@@ -76,7 +76,7 @@ export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<object> {
       ...getAllWebRedirects(),
     ],
     config: {
-      screens: treeToReactNavigationLinkingRoutes(routes),
+      screens: treeToReactNavigationLinkingRoutes(routes.children),
     },
     // A custom getInitialURL is used on native to ensure the app always starts at
     // the root path if it's launched from something other than a deep link.

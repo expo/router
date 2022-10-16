@@ -61,35 +61,60 @@ export function Route({
     () => getNameFromFilePath(filename),
     [filename]
   );
-
-  const routes = useRoutesAtPath(normalName);
+  const layoutName = React.useMemo(() => {
+    if (!normalName.endsWith("_layout")) {
+      return null;
+    }
+    return normalName.replace(/\/?_layout$/, "");
+  }, [normalName]);
 
   return (
     <CurrentRoutePathContext.Provider
       value={
         // The root path is `` (empty string) so always prepend `/` to ensure
         // there is some value.
-        "/" + normalName
+        "/" + (layoutName ?? normalName)
       }
     >
-      <CurrentRouteContext.Provider value={routes}>
-        {children}
-      </CurrentRouteContext.Provider>
+      {layoutName != null ? (
+        <LayoutRoute filename={layoutName}>{children}</LayoutRoute>
+      ) : (
+        children
+      )}
     </CurrentRoutePathContext.Provider>
   );
 }
 
-function useRoutesAtPath(normalName: string): RouteNode[] {
+export function LayoutRoute({
+  filename,
+  children,
+}: {
+  filename: string;
+  children: ReactNode;
+}) {
+  const routes = useRoutesAtPath(filename);
+  return (
+    <CurrentRouteContext.Provider value={routes}>
+      {children}
+    </CurrentRouteContext.Provider>
+  );
+}
+
+export function useRootRoute(): RouteNode | null {
+  return useContext(RoutesContext);
+}
+
+function useRoutesAtPath(normalName: string | null): RouteNode[] {
   const routes = useContext(RoutesContext);
-  const keys = React.useMemo(() => routes.keys(), [routes]);
 
   const family = React.useMemo(() => {
-    let children: RouteNode[] = routes;
+    let children: RouteNode[] = routes?.children ?? [];
 
     // Skip root directory
     if (normalName) {
       // split and search
       const parts = normalName.split("/");
+
       for (const part of parts) {
         const next = children.find(({ route }) => route === part);
 
@@ -102,7 +127,7 @@ function useRoutesAtPath(normalName: string): RouteNode[] {
     }
 
     return children.sort(sortRoutes);
-  }, [normalName, keys]);
+  }, [normalName, routes]);
 
   return family;
 }

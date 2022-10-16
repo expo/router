@@ -1,11 +1,10 @@
 import React, { useMemo } from "react";
 
 import { ContextNavigationContainer } from "./ContextNavigationContainer";
-import { Route } from "./Route";
-import { RoutesContext } from "./context";
+import { RoutesContext, useRoutesContext } from "./context";
 import { getRoutes } from "./getRoutes";
-import { Stack } from "./layouts/Stack";
 import { RequireContext } from "./types";
+import { getQualifiedRouteComponent } from "./useScreens";
 
 function useContextModuleAsRoutes(context: RequireContext) {
   // TODO: Is this an optimal hook dependency?
@@ -72,12 +71,21 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
 
   return (
     <RoutesContextProvider context={context}>
-      <Route filename="./">
-        <ContextNavigationContainer>
-          {/* Using a switch navigator at the root to host all pages. */}
-          <Stack screenOptions={{ animation: "none", headerShown: false }} />
-        </ContextNavigationContainer>
-      </Route>
+      <ContextNavigationContainer>
+        <RootRoute />
+      </ContextNavigationContainer>
     </RoutesContextProvider>
   );
+}
+
+function RootRoute() {
+  const root = useRoutesContext();
+
+  if (!root) {
+    return null;
+  }
+
+  const Component = getQualifiedRouteComponent(root);
+  // @ts-expect-error: TODO: Drop navigation and route props
+  return <Component />;
 }

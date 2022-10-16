@@ -47,7 +47,19 @@ export function getRecursiveTree(files: FileNode[]): TreeNode {
     // ['(tab)', 'settings', '[...another]']
     const parts = file.normalizedName.split("/");
     let currentNode: TreeNode = tree;
-    for (const part of parts) {
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+
+      if (i === parts.length - 1 && part === "_layout") {
+        if (currentNode.node) {
+          const overwritten = currentNode.node.contextKey;
+          throw new Error(
+            `Higher priority Layout Route "${file.contextKey}" overriding redundant Layout Route "${overwritten}". Remove the Layout Route "${overwritten}" to fix this.`
+          );
+        }
+        continue;
+      }
+
       const existing = currentNode.children.find((item) => item.name === part);
       if (existing) {
         currentNode = existing;
@@ -65,7 +77,27 @@ export function getRecursiveTree(files: FileNode[]): TreeNode {
     currentNode.node = file;
   }
 
+  if (process.env.NODE_ENV !== "production") {
+    assertDeprecatedFormat(tree);
+  }
+
   return tree;
+}
+
+function assertDeprecatedFormat(tree: TreeNode) {
+  for (const child of tree.children) {
+    if (
+      child.node &&
+      child.children.length &&
+      !child.node.normalizedName.endsWith("_layout")
+    ) {
+      const ext = child.node.contextKey.split(".").pop();
+      throw new Error(
+        `Using deprecated Layout Route format: Move \`./app/${child.node.normalizedName}.${ext}\` to \`./app/${child.node.normalizedName}/_layout.${ext}\``
+      );
+    }
+    assertDeprecatedFormat(child);
+  }
 }
 
 function getTreeNodesAsRouteNodes(nodes: TreeNode[]): RouteNode[] {
@@ -111,7 +143,9 @@ function treeNodeToRouteNode({
     getExtras: () => ({}),
     getComponent: () => DefaultLayout,
     // Generate a fake file name for the directory
-    contextKey: [".", ...parents, name + ".tsx"].filter(Boolean).join("/"),
+    contextKey: [".", ...parents, name, "_layout.tsx"]
+      .filter(Boolean)
+      .join("/"),
     children: getTreeNodesAsRouteNodes(children),
     dynamic,
   });
@@ -150,17 +184,17 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
 }
 
 /** Given a Metro context module, return an array of nested routes. */
-export function getRoutes(contextModule: RequireContext): RouteNode[] {
+export function getRoutes(contextModule: RequireContext): RouteNode {
   const files = contextModuleToFileNodes(contextModule);
-  const treeNodes = getRecursiveTree(files).children;
-  const routes = getTreeNodesAsRouteNodes(treeNodes);
+  const treeNodes = getRecursiveTree(files);
+  const routes = treeNodeToRouteNode(treeNodes)!;
 
   if (process.env.NODE_ENV !== "production") {
-    appendDirectoryRoute(routes);
+    appendDirectoryRoute(routes.children);
   }
 
   // Auto add not found route if it doesn't exist
-  appendUnmatchedRoute(routes);
+  appendUnmatchedRoute(routes.children);
 
   return routes;
 }

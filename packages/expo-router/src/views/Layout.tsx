@@ -37,7 +37,7 @@ export function Layout({
   initialRouteName,
   screenOptions,
   children,
-  router = StackRouter,
+  router,
 }: LayoutProps) {
   const contextKey = useContextKey();
 
@@ -49,11 +49,37 @@ export function Layout({
 
   const sorted = useSortedScreens(screens ?? []);
 
+  if (!sorted.length) {
+    console.warn(`Layout at "${contextKey}" has no children.`);
+    return null;
+  }
+
+  return (
+    <QualifiedLayout
+      initialRouteName={initialRouteName}
+      screenOptions={screenOptions}
+      screens={sorted}
+      contextKey={contextKey}
+      router={router}
+    >
+      {otherChildren}
+    </QualifiedLayout>
+  );
+}
+
+function QualifiedLayout({
+  initialRouteName,
+  screenOptions,
+  children,
+  screens,
+  contextKey,
+  router = StackRouter,
+}: LayoutProps & { contextKey: string; screens: React.ReactNode[] }) {
   const { state, navigation, descriptors, NavigationContent } =
     useNavigationBuilder(router, {
       // Used for getting the parent with navigation.getParent('/normalized/path')
       id: contextKey,
-      children: sorted,
+      children: screens,
       screenOptions,
       initialRouteName,
     });
@@ -68,7 +94,7 @@ export function Layout({
         router,
       }}
     >
-      <NavigationContent>{otherChildren}</NavigationContent>
+      <NavigationContent>{children}</NavigationContent>
     </LayoutContext.Provider>
   );
 }

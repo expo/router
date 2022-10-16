@@ -3,7 +3,7 @@ import { createContext, useContext } from "react";
 import { RouteNode } from "./Route";
 
 // Routes context
-export const RoutesContext = createContext<RouteNode[]>([]);
+export const RoutesContext = createContext<RouteNode | null>(null);
 
 if (process.env.NODE_ENV !== "production") {
   RoutesContext.displayName = "RoutesContext";
