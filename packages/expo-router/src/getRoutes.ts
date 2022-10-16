@@ -190,21 +190,21 @@ export function getRoutes(contextModule: RequireContext): RouteNode {
   const routes = treeNodeToRouteNode(treeNodes)!;
 
   if (process.env.NODE_ENV !== "production") {
-    appendDirectoryRoute(routes.children);
+    appendDirectoryRoute(routes);
   }
 
   // Auto add not found route if it doesn't exist
-  appendUnmatchedRoute(routes.children);
+  appendUnmatchedRoute(routes);
 
   return routes;
 }
 
-function appendDirectoryRoute(routes: RouteNode[]) {
-  if (!routes.length) {
+function appendDirectoryRoute(routes: RouteNode) {
+  if (!routes.children.length) {
     return routes;
   }
   const { Directory, getNavOptions } = require("./views/Directory");
-  routes.push(
+  routes.children.push(
     createRouteNode({
       getComponent() {
         return Directory;
@@ -221,11 +221,11 @@ function appendDirectoryRoute(routes: RouteNode[]) {
   return routes;
 }
 
-function appendUnmatchedRoute(routes: RouteNode[]) {
+function appendUnmatchedRoute(routes: RouteNode) {
   // Auto add not found route if it doesn't exist
   const userDefinedDynamicRoute = getUserDefinedDeepDynamicRoute(routes);
   if (!userDefinedDynamicRoute) {
-    routes.push(
+    routes.children.push(
       createRouteNode({
         getComponent() {
           return require("./views/Unmatched").Unmatched;
@@ -249,17 +249,17 @@ function appendUnmatchedRoute(routes: RouteNode[]) {
  * @returns a top-level deep dynamic route if it exists, otherwise null.
  */
 export function getUserDefinedDeepDynamicRoute(
-  routes: RouteNode[]
+  routes: RouteNode
 ): RouteNode | null {
   // Auto add not found route if it doesn't exist
-  for (const route of routes) {
+  for (const route of routes.children) {
     const isDeepDynamic = matchDeepDynamicRouteName(route.route);
     if (isDeepDynamic) {
       return route;
     }
     // Recurse through fragment routes
     if (matchFragmentName(route.route)) {
-      const child = getUserDefinedDeepDynamicRoute(route.children);
+      const child = getUserDefinedDeepDynamicRoute(route);
       if (child) {
         return child;
       }
