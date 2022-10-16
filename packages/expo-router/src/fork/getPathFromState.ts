@@ -112,7 +112,6 @@ export default function getPathFromState<ParamList extends object>(
     ? createNormalizedConfigs(options?.screens)
     : {};
 
-  console.log("configs", configs);
   let path = "/";
   let current: State | undefined = state;
 
@@ -211,12 +210,6 @@ export default function getPathFromState<ParamList extends object>(
     if (pattern === undefined) {
       pattern = nestedRouteNames.join("/");
     }
-    console.log(
-      "nestedRouteNames",
-      currentOptions,
-      route.name,
-      nestedRouteNames
-    );
 
     if (currentOptions[route.name] !== undefined) {
       path += pattern

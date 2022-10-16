@@ -126,7 +126,6 @@ function useRoutesAtPath(normalName: string): RouteNode[] {
     return getChildrenForRoute(normalName).sort(sortRoutes);
   }, [normalName, keys]);
 
-  console.log("family", family);
   return family;
 }
 
