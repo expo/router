@@ -8,7 +8,7 @@ import { ErrorBoundaryProps } from "./Try";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
-    <View accessibilityRole="main" style={[styles.container]}>
+    <View style={[styles.container]}>
       <SafeAreaView
         style={{ flex: 1, maxWidth: 720, marginHorizontal: "auto" }}
       >
