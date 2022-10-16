@@ -184,19 +184,23 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
 }
 
 /** Given a Metro context module, return an array of nested routes. */
-export function getRoutes(contextModule: RequireContext): RouteNode {
+export function getRoutes(contextModule: RequireContext): RouteNode | null {
   const files = contextModuleToFileNodes(contextModule);
   const treeNodes = getRecursiveTree(files);
-  const routes = treeNodeToRouteNode(treeNodes)!;
+  const route = treeNodeToRouteNode(treeNodes);
+
+  if (!route) {
+    return null;
+  }
 
   if (process.env.NODE_ENV !== "production") {
-    appendDirectoryRoute(routes);
+    appendDirectoryRoute(route);
   }
 
   // Auto add not found route if it doesn't exist
-  appendUnmatchedRoute(routes);
+  appendUnmatchedRoute(route);
 
-  return routes;
+  return route;
 }
 
 function appendDirectoryRoute(routes: RouteNode) {
@@ -252,7 +256,7 @@ export function getUserDefinedDeepDynamicRoute(
   routes: RouteNode
 ): RouteNode | null {
   // Auto add not found route if it doesn't exist
-  for (const route of routes.children) {
+  for (const route of routes.children ?? []) {
     const isDeepDynamic = matchDeepDynamicRouteName(route.route);
     if (isDeepDynamic) {
       return route;
