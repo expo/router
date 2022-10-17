@@ -139,28 +139,24 @@ function routeToScreen(
   route: RouteNode,
   { options, ...props }: Partial<ScreenProps> = {}
 ) {
-  const staticOptions = route.getExtras()?.getNavOptions;
   return (
     <Screen
       {...props}
       name={route.route}
       key={route.route}
-      options={
-        options
-          ? (args) => {
-              const staticResult =
-                typeof staticOptions === "function"
-                  ? staticOptions(args)
-                  : staticOptions;
-              const dynamicResult =
-                typeof options === "function" ? options?.(args) : options;
-              return {
-                ...staticResult,
-                ...dynamicResult,
-              };
-            }
-          : staticOptions
-      }
+      options={(args) => {
+        const staticOptions = route.getExtras()?.getNavOptions;
+        const staticResult =
+          typeof staticOptions === "function"
+            ? staticOptions(args)
+            : staticOptions;
+        const dynamicResult =
+          typeof options === "function" ? options?.(args) : options;
+        return {
+          ...staticResult,
+          ...dynamicResult,
+        };
+      }}
       getComponent={() => getQualifiedRouteComponent(route)}
     />
   );

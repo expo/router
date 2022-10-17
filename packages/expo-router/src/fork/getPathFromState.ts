@@ -1,7 +1,7 @@
 import {
-  validatePathConfig,
   PathConfig,
   PathConfigMap,
+  validatePathConfig,
 } from "@react-navigation/core";
 import type {
   NavigationState,
@@ -10,7 +10,7 @@ import type {
 } from "@react-navigation/routers";
 import * as queryString from "query-string";
 
-import { matchDeepDynamicRouteName } from "../matchers";
+import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
 
 type Options<ParamList extends object> = {
   initialRouteName?: string;
@@ -250,7 +250,14 @@ export default function getPathFromState<ParamList extends object>(
         })
         .join("/");
     } else {
-      path += encodeURIComponent(route.name);
+      // TODO: Probably fragment routes shouldn't get this far
+      path += encodeURIComponent(
+        matchFragmentName(route.name)
+          ? ""
+          : route.name === "index"
+          ? ""
+          : route.name
+      );
     }
 
     if (!focusedParams) {
