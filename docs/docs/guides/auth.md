@@ -8,16 +8,15 @@ Consider the following project:
 
 ```bash title="File System"
 app/
-  (root).js
-  (root)/
-    sign-in.js
-    (app)/
-      index.js
+  _layout.js
+  sign-in.js
+  (app)/
+    index.js
 ```
 
 We can configure the `/(app)` routes to be redirect when the user is not authenticated:
 
-```tsx title=app/(root).js
+```tsx title=app/_layout.js
 import { Layout } from "expo-router";
 
 // Some generic authentication system...
@@ -40,7 +39,7 @@ function RootLayout() {
     // Create a basic custom layout to render some children routes.
     <Layout>
       <Layout.Screen
-        name="(app)"
+        name="(app)/index"
         // When the auth is unavailable (no user signed in), restrict access to all the routes in the `(app)` directory.
         redirect={!auth}
       />

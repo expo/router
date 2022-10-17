@@ -17,7 +17,7 @@ In React Navigation, you often use `screenOptions` to configure layout options. 
 
 Consider the following stack layout:
 
-```tsx title=app/(stack).tsx
+```tsx title=app/_layout.tsx
 // highlight-next-line
 import { Stack } from "expo-router";
 
@@ -29,7 +29,7 @@ export default function Layout() {
 
 We can configure the title of the stack per-screen using the `<Stack.Screen />` component:
 
-```tsx title=app/(stack)/index.tsx
+```tsx title=app/index.tsx
 import { View } from "react-native";
 import { Stack } from "expo-router";
 
@@ -49,7 +49,7 @@ The `options` are the same as the [`screenOptions` prop in React Navigation](htt
 
 Sometimes you want static options to live outside the route component, this is useful for things like tabs or drawer items which should be configured before the route loads. You can use the `<Screen />` option directly in the layout component with the `name` prop set to the route name (file name without the extension):
 
-```tsx title=app/(tabs).tsx
+```tsx title=app/_layout.tsx
 import { Tabs } from "expo-router";
 
 export default function Layout() {
@@ -64,7 +64,7 @@ export default function Layout() {
 
 You can use this system to the order of screens and tabs in a layout. For example, if you want to change the order of screens in a stack, you can use the `name` prop to specify the order:
 
-```tsx title=app/(tabs).tsx
+```tsx title=app/_layout.tsx
 import { Tabs } from "expo-router";
 
 export default function Layout() {
@@ -88,23 +88,20 @@ Consider the following structure:
 
 ```bash title="File System"
 app/
-  (root).js
-  (root)/
-    tabs.js
-    tabs/
-      page.js
+  _layout.js
+  tabs/
+    _layout.js
+    page.js
 ```
 
-```tsx title=app/(root)/tabs/page.tsx
+```tsx title=app/tabs/page.tsx
 import { useNavigation } from "expo-router";
 
 export default function Page() {
-  // This navigation prop controls the direct parent `/(root)/tabs.js`.
+  // This navigation prop controls the direct parent `/tabs/_layout.js`.
   const navigation = useNavigation();
-  // This navigation prop controls the direct parent `/`.
+  // This navigation prop controls the direct parent `/_layout.js`.
   const rootNavigation = useNavigation("/");
-  // This navigation prop controls the direct parent `/(root).js`.
-  const rootNavigation = useNavigation("../../");
 
   // ...
 }
@@ -112,14 +109,14 @@ export default function Page() {
 
 The same effect can be achieved by using the `name` prop of the Screen component.
 
-```tsx title=app/(root)/tabs/page.tsx
+```tsx title=app/tabs/page.tsx
 import { NativeStack, Tabs } from "expo-router";
 
 export default function Page() {
   return (
     <>
       <NativeStack.Screen name="../../" options={{ ... }} />
-      <Tabs.Screen name="/(root)/tabs.js" options={{ ... }} />
+      <Tabs.Screen name="/_layout.js" options={{ ... }} />
     </>
   );
 }

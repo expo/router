@@ -10,15 +10,14 @@ You can implement a modal by creating a root layout route that renders certain r
 
 ```bash title="File System"
 app/
-  (root).js
-  (root)/
-    home.js
-    modal.js
+  _layout.js
+  home.js
+  modal.js
 ```
 
-First we'll move all of our routes into a new top-level layout route called `(root)`. The layout route has the ability to present components as modals. We'll also add a new route called `modal` that we'll use to render modals.
+The layout route `app/_layout.js` has the ability to present components as modals. We'll also add a new route called `modal` that we'll use to render modals.
 
-```js title=app/(root).js
+```js title=app/_layout.js
 import { Stack } from "expo-router";
 
 export default function Layout() {
@@ -43,7 +42,7 @@ export default function Layout() {
 }
 ```
 
-```js title=app/(root)/home.js
+```js title=app/home.js
 import { View, Text } from "react-native";
 import { Link } from "expo-router";
 
@@ -59,7 +58,7 @@ export default function Home() {
 
 Now we'll create a modal which adds a back button when the modal has lost its previous context and must be presented as a standalone page.
 
-```js title=app/(root)/modal.js
+```js title=app/modal.js
 import { View } from "react-native";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";

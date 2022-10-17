@@ -7,13 +7,12 @@ Ports the guide [React Navigation: Navigating](https://reactnavigation.org/docs/
 
 ```bash title="File System"
 app/
-  (stack).js
-  (stack)/
-    home.js
-    details.js
+  _layout.js
+  home.js
+  details.js
 ```
 
-```js title=app/(stack).js
+```js title=app/_layout.js
 import { Stack } from "expo-router";
 
 export default function Layout() {
@@ -21,7 +20,7 @@ export default function Layout() {
 }
 ```
 
-```js title=app/(stack)/home.js
+```js title=app/home.js
 import { View, Text, Button } from "react-native";
 import { Link } from "expo-router";
 
@@ -35,7 +34,7 @@ export default function Home() {
 }
 ```
 
-```js title=app/(stack)/details.js
+```js title=app/details.js
 import { View, Text, Button } from "react-native";
 import { Link } from "expo-router";
 

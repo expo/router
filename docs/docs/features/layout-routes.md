@@ -3,36 +3,34 @@ title: Layout Routes
 sidebar_position: 3
 ---
 
-To render shared navigation elements like a header, tab bar, or drawer, you can use a **layout route**.
-If a **route** has a sibling directory by the same name, it will be used as the layout component for all the files in the respective directory.
+To render shared navigation elements like a header, tab bar, or drawer, you can use a **Layout Route**.
+If a **directory** contains a file named `_layout.js`, it will be used as the layout component for all the sibling files in the directory.
 
 ```bash title="File System"
 app/
-# highlight-next-line
-  stack.js # Layout route. This is where a header bar would go
   # highlight-next-line
-  stack/ # Children of stack.js
-    home.js # A child route of stack.js
+  _layout.js # A Layout Route for the sibling routes.
+  home.js # A child route of `_layout.js`
 ```
 
-If a nested route does not have a layout route then a virtual, unstyled navigator will be generated in-memory to accommodate the child route:
+If a nested route does not have a Layout Route then the **Child Route** name will include the directories leading up to it:
 
 ```bash title="File System"
 app/
-  stack/ # Unpaired layout route
-    home.js # Child route of a virtual navigator
-
-# highlight-next-line
-  stack.tsx # This file exists in-memory to render the `stack/home.js` route. Creating this file will override the in-memory route.
+  stack/ # Contains no `_layout.js`
+    # highlight-next-line
+    home.js # Name is "stack/home"
 ```
 
-The virtual route system exists to accommodate native navigation which requires a parent navigator to render a child route.
+The `Screen` options will also be applied to the nearest Layout Route.
 
-<iframe src="https://universal-routing.netlify.app/" style={{width: 
-"100%", height: 500, border:0, borderRadius: 4, overflow:"hidden" }}
-     title="expo-router"
-     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"></iframe>
-     
+<details>
+  <summary>Deprecated</summary>
+
+During the Beta, Layout Routes were defined by creating a file outside the directory with the same name as the directory. This is no longer supported.
+
+</details>
+
 <details>
   <summary>Interoperability</summary>
 
@@ -47,19 +45,16 @@ Layout routes are also similar to `pages/_app.js` in Next.js.
 
 ![](./assets/fragment-routes.png)
 
-Fragment routes add nested layout without appending any path segments. Think of them like `index.js` but as a layout. These are most commonly used for adding navigators like tab, stack, drawer, etc... The format is `(name).js` and `/(name)`, the `name` is purely cosmetic and not provided to the route component.
+Fragment routes add nested layout without appending any path segments. Think of them like `index.js` but as a layout. These are most commonly used for adding navigators like tab, stack, drawer, etc... The format is `/(name)`, the `name` is purely cosmetic and not provided to the route component.
 
 ```bash title="File System"
 app/
-  layout.js # Layout route
-  layout/
-    home.js # 𝝠.com/layout/home
+  stack/
+    home.js # 𝝠.com/stack/home
 
 app/
-# highlight-next-line
-  (layout).js # Fragment route
   # highlight-next-line
-  (layout)/
+  (stack)/
     home.js # 𝝠.com/home
 ```
 
@@ -67,9 +62,9 @@ Both of these will render:
 
 ```xml
 <App>
-  <Layout>
+  <Stack>
     <Home />
-  </Layout>
+  </Stack>
 </App>
 ```
 
@@ -79,7 +74,6 @@ Be careful when using parallel fragment routes as they can create conflicting ma
 app/
 # highlight-next-line
   profile.js # Matches /profile
-  (layout).js
   (layout)/
   # highlight-next-line
     profile.js # Matches /profile (conflict)
