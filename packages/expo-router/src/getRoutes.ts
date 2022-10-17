@@ -6,7 +6,6 @@ import {
   matchFragmentName,
 } from "./matchers";
 import { RequireContext } from "./types";
-import { DefaultLayout } from "./views/Layout";
 
 export function createRouteNode(
   route: PickPartial<RouteNode, "dynamic" | "children">
