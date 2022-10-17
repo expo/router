@@ -104,7 +104,7 @@ export function useRootRoute(): RouteNode | null {
   return useContext(RoutesContext);
 }
 
-function useRoutesAtPath(normalName: string | null): RouteNode[] {
+function useRoutesAtPath(normalName: string): RouteNode[] {
   const routes = useContext(RoutesContext);
 
   const family = React.useMemo(() => {
