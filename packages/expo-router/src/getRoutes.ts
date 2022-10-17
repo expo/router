@@ -104,7 +104,6 @@ export function generateDynamic(name: string) {
 function treeNodeToRouteNode({
   name,
   node,
-  parents,
   children,
 }: TreeNode): RouteNode[] | null {
   const dynamic = generateDynamic(name);
@@ -171,30 +170,43 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
   return nodes.filter(Boolean) as FileNode[];
 }
 
+function hasCustomRootLayoutNode(routes: RouteNode[]) {
+  if (routes.length !== 1) {
+    return false;
+  }
+  // This could either be the root _layout or an app with a single file.
+  const route = routes[0];
+
+  if (
+    route.route === "" &&
+    route.contextKey.match(/^\.\/_layout\.([jt]sx?)$/)
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
   const routes = treeNodeToRouteNode(treeNode);
 
   if (!routes?.length) {
     return null;
   }
-  const route =
-    routes.length === 1
-      ? routes[0]
-      : {
-          route: "",
-          generated: true,
-          getExtras: () => ({}),
-          getComponent: () => DefaultLayout,
-          // Generate a fake file name for the directory
-          contextKey: "./_layout.tsx",
-          children: routes,
-          dynamic: null,
-        };
 
-  if (!route) {
-    return null;
+  if (hasCustomRootLayoutNode(routes)) {
+    return routes[0];
   }
-  return route;
+
+  return {
+    // Generate a fake file name for the directory
+    contextKey: "./_layout.tsx",
+    route: "",
+    generated: true,
+    dynamic: null,
+    getExtras: () => ({}),
+    getComponent: () => DefaultLayout,
+    children: routes,
+  };
 }
 
 /** Given a Metro context module, return an array of nested routes. */

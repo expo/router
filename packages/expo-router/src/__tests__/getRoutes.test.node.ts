@@ -208,12 +208,13 @@ describe(getUserDefinedDeepDynamicRoute, () => {
 });
 
 describe(getRoutes, () => {
-  it(`should add missing layouts for nested routes`, () => {
+  // NOTE(EvanBacon): This tests when all you have is a root layout.
+  it(`should allow a custom root _layout route`, () => {
     expect(
       dropFunctions(
         getRoutes(
           createMockContextModule({
-            "./some/nested/value.tsx": { default() {} },
+            "./_layout.tsx": { default() {} },
           })
         )!
       )
@@ -227,12 +228,32 @@ describe(getRoutes, () => {
           internal: true,
           route: "[...404]",
         },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      route: "",
+    });
+  });
+
+  it(`should support a single nested route without layouts`, () => {
+    expect(
+      dropFunctions(
+        getRoutes(
+          createMockContextModule({
+            "./some/nested/value.tsx": { default() {} },
+          })
+        )!
+      )
+    ).toEqual({
+      children: [
         {
           children: [],
           contextKey: "./some/nested/value.tsx",
           dynamic: null,
           route: "some/nested/value",
         },
+        ROUTE_DIRECTORY,
+        ROUTE_404,
       ],
       contextKey: "./_layout.tsx",
       dynamic: null,
