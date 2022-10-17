@@ -15,7 +15,6 @@ import { getNameFromFilePath } from "./matchers";
 export function useNavigation(
   parent?: string
 ): NavigationProp<ReactNavigation.RootParamList> {
-  // TODO: Maybe disable all this hook stuff when name is defined.
   const navigation = useUpstreamNavigation<any>();
 
   const contextKey = useContextKey();

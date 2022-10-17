@@ -1,21 +1,15 @@
 import { StyleSheet, Text, View } from "react-native";
-import { GoogleAuth } from "../../../../etc/auth/google";
 import { UrlBar } from "../../../../etc/urlBar";
 
 export { ErrorBoundary } from "expo-router";
-export default function App({ route }) {
-  const signOut = GoogleAuth.useSignOut();
+
+export default function Post({ route }) {
   return (
     <View style={styles.container}>
       <Text style={{ fontSize: 24 }}>
-        Welcome @{route.params?.user || "ERR"}
+        Post @{route.params.user} - {route.params.post}
       </Text>
-      <Text
-        style={{ padding: 20, borderWidth: 2, borderColor: "black" }}
-        onPress={() => signOut()}
-      >
-        Sign out
-      </Text>
+
       <UrlBar />
     </View>
   );
