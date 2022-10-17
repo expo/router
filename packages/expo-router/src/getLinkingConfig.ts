@@ -20,6 +20,9 @@ import {
 // `[page]` -> `:page`
 // `page` -> `page`
 function convertDynamicRouteToReactNavigation(name: string) {
+  if (name === "index" || matchFragmentName(name) != null) {
+    return "";
+  }
   if (matchDeepDynamicRouteName(name) != null) {
     return "*";
   }
@@ -27,10 +30,6 @@ function convertDynamicRouteToReactNavigation(name: string) {
 
   if (dynamicName != null) {
     return `:${dynamicName}`;
-  }
-
-  if (name === "index" || matchFragmentName(name)) {
-    return "";
   }
 
   return name;
@@ -45,16 +44,18 @@ export function treeToReactNavigationLinkingRoutes(
   ): { key: string; name: any }[] {
     return nodes
       .map((node) => {
-        const path = convertDynamicRouteToReactNavigation(node.route);
-
         if (!node.children.length) {
-          const name = [
-            ...parents.map(convertDynamicRouteToReactNavigation),
-            path,
-          ]
+          // NOTE(EvanBacon): When there are nested routes without layouts
+          // the node.route will be something like `app/home/index`
+          // this needs to be split to ensure each segment is parsed correctly.
+          const components = [...parents, node.route]
+            .map((value) => value.split("/"))
+            .flat();
+          const name = components
+            .map(convertDynamicRouteToReactNavigation)
             .filter(Boolean)
             .join("/");
-          const key = [...parents, node.route].filter(Boolean).join("/");
+          const key = components.filter(Boolean).join("/");
           return { key, name };
         }
 
@@ -62,6 +63,7 @@ export function treeToReactNavigationLinkingRoutes(
           return collectAll(node.children, [...parents, node.route]);
         }
         const screens = treeToReactNavigationLinkingRoutes(node.children);
+        const path = convertDynamicRouteToReactNavigation(node.route);
 
         return { key: node.route, name: { path, screens } } as const;
       })
