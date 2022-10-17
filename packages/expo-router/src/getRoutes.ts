@@ -6,6 +6,7 @@ import {
   matchFragmentName,
 } from "./matchers";
 import { RequireContext } from "./types";
+import { DefaultLayout } from "./views/Layout";
 
 export type FileNode = Pick<
   RouteNode,
@@ -90,7 +91,7 @@ function assertDeprecatedFormat(tree: TreeNode) {
 }
 
 function getTreeNodesAsRouteNodes(nodes: TreeNode[]): RouteNode[] {
-  return nodes.map(treeNodeToRouteNode).filter(Boolean) as RouteNode[];
+  return nodes.map(treeNodeToRouteNode).flat().filter(Boolean) as RouteNode[];
 }
 
 export function generateDynamic(name: string) {
@@ -100,27 +101,25 @@ export function generateDynamic(name: string) {
   return dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null;
 }
 
-function Organization({ children }) {
-  return children;
-}
-
 function treeNodeToRouteNode({
   name,
   node,
   parents,
   children,
-}: TreeNode): RouteNode | null {
+}: TreeNode): RouteNode[] | null {
   const dynamic = generateDynamic(name);
 
   if (node) {
-    return {
-      route: name,
-      getExtras: node.getExtras,
-      getComponent: node.getComponent,
-      contextKey: node.contextKey,
-      children: getTreeNodesAsRouteNodes(children),
-      dynamic,
-    };
+    return [
+      {
+        route: name,
+        getExtras: node.getExtras,
+        getComponent: node.getComponent,
+        contextKey: node.contextKey,
+        children: getTreeNodesAsRouteNodes(children),
+        dynamic,
+      },
+    ];
   }
 
   // Empty folder, skip it.
@@ -130,18 +129,14 @@ function treeNodeToRouteNode({
 
   // When there's a directory, but no sibling file with the same name, the directory won't work.
   // This ensures that we have a file for every directory (containing valid children).
-  return {
-    route: name,
-    generated: true,
-    getExtras: () => ({}),
-    getComponent: () => Organization,
-    // Generate a fake file name for the directory
-    contextKey: [".", ...parents, name, "_layout.tsx"]
-      .filter(Boolean)
-      .join("/"),
-    children: getTreeNodesAsRouteNodes(children),
-    dynamic,
-  };
+  return getTreeNodesAsRouteNodes(
+    children.map((child) => {
+      return {
+        ...child,
+        name: [name, child.name].filter(Boolean).join("/"),
+      };
+    })
+  );
 }
 
 function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
@@ -176,11 +171,37 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
   return nodes.filter(Boolean) as FileNode[];
 }
 
+function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
+  const routes = treeNodeToRouteNode(treeNode);
+
+  if (!routes?.length) {
+    return null;
+  }
+  const route =
+    routes.length === 1
+      ? routes[0]
+      : {
+          route: "",
+          generated: true,
+          getExtras: () => ({}),
+          getComponent: () => DefaultLayout,
+          // Generate a fake file name for the directory
+          contextKey: "./_layout.tsx",
+          children: routes,
+          dynamic: null,
+        };
+
+  if (!route) {
+    return null;
+  }
+  return route;
+}
+
 /** Given a Metro context module, return an array of nested routes. */
 export function getRoutes(contextModule: RequireContext): RouteNode | null {
   const files = contextModuleToFileNodes(contextModule);
   const treeNodes = getRecursiveTree(files);
-  const route = treeNodeToRouteNode(treeNodes);
+  const route = treeNodesToRootRoute(treeNodes);
 
   if (!route) {
     return null;

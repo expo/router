@@ -14,6 +14,7 @@ export default function App() {
       title: "bean",
     });
   }, []);
+
   return (
     <>
       {/* <Stack.Screen options={{ headerShown: true, title: "works!!" }} /> */}
