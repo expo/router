@@ -27,6 +27,7 @@ const ROUTE_404 = {
   internal: true,
   route: "[...404]",
 };
+
 const ROUTE_DIRECTORY = {
   children: [],
   contextKey: "./__index.tsx",
