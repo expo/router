@@ -76,6 +76,10 @@ export function generateDynamic(name: string) {
   return dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null;
 }
 
+function Organization({ children }) {
+  return children;
+}
+
 function treeNodeToRouteNode({
   name,
   node,
@@ -106,7 +110,7 @@ function treeNodeToRouteNode({
     route: name,
     generated: true,
     getExtras: () => ({}),
-    getComponent: () => DefaultLayout,
+    getComponent: () => Organization,
     // Generate a fake file name for the directory
     contextKey: [".", ...parents, name + ".tsx"].filter(Boolean).join("/"),
     children: getTreeNodesAsRouteNodes(children),
