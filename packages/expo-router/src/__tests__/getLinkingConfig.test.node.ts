@@ -94,12 +94,7 @@ describe(treeToReactNavigationLinkingRoutes, () => {
       },
       "(second-fragment)": { path: "", screens: { people: "people" } },
       __index: "__index",
-      other: {
-        path: "other",
-        screens: {
-          nested: { path: "nested", screens: { "[...screen]": "*" } },
-        },
-      },
+      "other/nested/[...screen]": "other/nested/*",
     });
   });
 });

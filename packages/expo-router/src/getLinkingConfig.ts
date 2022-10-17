@@ -20,12 +20,12 @@ import {
 // `[page]` -> `:page`
 // `page` -> `page`
 function convertDynamicRouteToReactNavigation(name: string) {
-  if (matchDeepDynamicRouteName(name)) {
+  if (matchDeepDynamicRouteName(name) != null) {
     return "*";
   }
   const dynamicName = matchDynamicName(name);
 
-  if (dynamicName) {
+  if (dynamicName != null) {
     return `:${dynamicName}`;
   }
 
@@ -37,32 +37,46 @@ function convertDynamicRouteToReactNavigation(name: string) {
 }
 
 export function treeToReactNavigationLinkingRoutes(
-  nodes: RouteNode[],
-  parents: string[] = []
+  nodes: RouteNode[]
 ): PathConfigMap<object> {
+  function collectAll(
+    nodes: RouteNode[],
+    parents: string[] = []
+  ): { key: string; name: any }[] {
+    return nodes
+      .map((node) => {
+        const path = convertDynamicRouteToReactNavigation(node.route);
+
+        if (!node.children.length) {
+          const name = [
+            ...parents.map(convertDynamicRouteToReactNavigation),
+            path,
+          ]
+            .filter(Boolean)
+            .join("/");
+          const key = [...parents, node.route].filter(Boolean).join("/");
+          return { key, name };
+        }
+
+        if (node.generated) {
+          return collectAll(node.children, [...parents, node.route]);
+        }
+        const screens = treeToReactNavigationLinkingRoutes(node.children);
+
+        return { key: node.route, name: { path, screens } } as const;
+      })
+      .flat() as { key: string; name: any }[];
+  }
+
   // TODO: Intercept errors, strip invalid routes, and warn instead.
   // Our warnings can be more helpful than upstream since we know the associated file name.
-  const firstPass = nodes
-    .map((node) => {
-      const path = convertDynamicRouteToReactNavigation(node.route);
-
-      if (!node.children.length) {
-        return [node.route, path];
-      }
-
-      const screens = treeToReactNavigationLinkingRoutes(node.children, [
-        ...parents,
-        path,
-      ]);
-
-      return [node.route, { path, screens }] as const;
-    })
-    .reduce<PathConfigMap<object>>((acc, [route, current]) => {
+  return collectAll(nodes).reduce<PathConfigMap<object>>(
+    (acc, { key: route, name: current }) => {
       acc[route] = current;
       return acc;
-    }, {});
-
-  return firstPass;
+    },
+    {}
+  );
 }
 
 export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
