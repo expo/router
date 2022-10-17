@@ -1,7 +1,6 @@
 import { RouteNode } from "../Route";
 import {
   getRoutes,
-  createRouteNode,
   getUserDefinedDeepDynamicRoute,
   getRecursiveTree,
   FileNode,
@@ -55,20 +54,21 @@ const asFileNode = (route: Partial<FileNode>): FileNode => ({
   ...route,
 });
 
-const asRouteNode = (route: Partial<RouteNode>) =>
-  createRouteNode({
-    getComponent(): any {
-      return function () {
-        return null;
-      };
-    },
-    getExtras(): any {
-      return {};
-    },
-    route: "INVALID_TEST_VALUE",
-    contextKey: "INVALID_TEST_VALUE",
-    ...route,
-  });
+const asRouteNode = (route: Partial<RouteNode>) => ({
+  getComponent(): any {
+    return function () {
+      return null;
+    };
+  },
+  getExtras(): any {
+    return {};
+  },
+  children: [],
+  dynamic: null,
+  route: "INVALID_TEST_VALUE",
+  contextKey: "INVALID_TEST_VALUE",
+  ...route,
+});
 
 describe(getRecursiveTree, () => {
   function getTreeForKeys(keys: string[]) {
