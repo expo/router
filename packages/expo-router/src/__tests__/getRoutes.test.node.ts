@@ -24,8 +24,6 @@ const ROUTE_404 = {
   contextKey: "./[...404].tsx",
   dynamic: { deep: true, name: "404" },
   generated: true,
-  getComponent: expect.any(Function),
-  getExtras: expect.any(Function),
   internal: true,
   route: "[...404]",
 };
@@ -34,8 +32,6 @@ const ROUTE_DIRECTORY = {
   contextKey: "./__index.tsx",
   dynamic: null,
   generated: true,
-  getComponent: expect.any(Function),
-  getExtras: expect.any(Function),
   internal: true,
   route: "__index",
 };
@@ -213,56 +209,46 @@ describe(getUserDefinedDeepDynamicRoute, () => {
 describe(getRoutes, () => {
   it(`should add missing layouts for nested routes`, () => {
     expect(
-      getRoutes(
-        createMockContextModule({
-          "./some/nested/value.tsx": { default() {} },
-        })
+      dropFunctions(
+        getRoutes(
+          createMockContextModule({
+            "./some/nested/value.tsx": { default() {} },
+          })
+        )!
       )
-    ).toEqual(
-      expect.objectContaining({
-        children: [
-          {
-            children: [
-              {
-                children: [
-                  {
-                    children: [],
-                    contextKey: "./some/nested/value.tsx",
-                    dynamic: null,
-                    getComponent: expect.any(Function),
-                    getExtras: expect.any(Function),
-                    route: "value",
-                  },
-                ],
-                contextKey: "./some/nested/_layout.tsx",
-                dynamic: null,
-                generated: true,
-                getComponent: expect.any(Function),
-                getExtras: expect.any(Function),
-                route: "nested",
-              },
-            ],
-            contextKey: "./some/_layout.tsx",
-            dynamic: null,
-            generated: true,
-            getComponent: expect.any(Function),
-            getExtras: expect.any(Function),
-            route: "some",
-          },
-          ROUTE_DIRECTORY,
-          ROUTE_404,
-        ],
-      })
-    );
+    ).toEqual({
+      children: [
+        {
+          children: [],
+          contextKey: "./[...404].tsx",
+          dynamic: { deep: true, name: "404" },
+          generated: true,
+          internal: true,
+          route: "[...404]",
+        },
+        {
+          children: [],
+          contextKey: "./some/nested/value.tsx",
+          dynamic: null,
+          route: "some/nested/value",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      route: "",
+    });
   });
 
   it(`get dynamic routes`, () => {
     expect(
-      getRoutes(
-        createMockContextModule({
-          "./[dynamic].tsx": { default() {} },
-          "./[...deep].tsx": { default() {} },
-        })
+      dropFunctions(
+        getRoutes(
+          createMockContextModule({
+            "./[dynamic].tsx": { default() {} },
+            "./[...deep].tsx": { default() {} },
+          })
+        )!
       )
     ).toEqual(
       expect.objectContaining({
@@ -275,8 +261,7 @@ describe(getRoutes, () => {
               deep: false,
               name: "dynamic",
             },
-            getComponent: expect.any(Function),
-            getExtras: expect.any(Function),
+
             route: "[dynamic]",
           },
           {
@@ -286,8 +271,7 @@ describe(getRoutes, () => {
               deep: true,
               name: "deep",
             },
-            getComponent: expect.any(Function),
-            getExtras: expect.any(Function),
+
             route: "[...deep]",
           },
           ROUTE_DIRECTORY,
@@ -297,126 +281,120 @@ describe(getRoutes, () => {
     );
   });
 
+  function dropFunctions({ getComponent, getExtras, ...node }: RouteNode) {
+    return {
+      ...node,
+      children: node.children.map(dropFunctions),
+    };
+  }
+
   it(`should convert a complex context module routes`, () => {
     expect(
-      getRoutes(
-        createMockContextModule({
-          "./(stack)/_layout.tsx": { default() {} },
-          "./(stack)/home.tsx": { default() {} },
-          "./(stack)/settings.tsx": { default() {} },
-          "./(stack)/user/(default)/_layout.tsx": { default() {} },
-          "./(stack)/user/(default)/posts.tsx": { default() {} },
-          "./(stack)/user/profile.tsx": { default() {} },
-          "./(stack)/user/[profile].tsx": { default() {} },
-          "./(stack)/user/settings/_layout.tsx": { default() {} },
-          "./(stack)/user/settings/info.tsx": { default() {} },
-          "./(stack)/user/settings/[...other].tsx": { default() {} },
-          "./another.tsx": { default() {} },
-          "./some/nested/value.tsx": { default() {} },
-        })
+      dropFunctions(
+        getRoutes(
+          createMockContextModule({
+            "./(stack)/_layout.tsx": { default() {} },
+            "./(stack)/home.tsx": { default() {} },
+            "./(stack)/settings.tsx": { default() {} },
+            "./(stack)/user/(default)/_layout.tsx": { default() {} },
+            "./(stack)/user/(default)/posts.tsx": { default() {} },
+            "./(stack)/user/profile.tsx": { default() {} },
+            "./(stack)/user/[profile].tsx": { default() {} },
+            "./(stack)/user/settings/_layout.tsx": { default() {} },
+            "./(stack)/user/settings/info.tsx": { default() {} },
+            "./(stack)/user/settings/[...other].tsx": { default() {} },
+            "./another.tsx": { default() {} },
+            "./some/nested/value.tsx": { default() {} },
+          })
+        )!
       )
-    ).toEqual(
-      expect.objectContaining({
-        children: [
-          mockRoute({
-            children: [
-              mockRoute({
-                contextKey: "./(stack)/home.tsx",
-                route: "home",
-              }),
-              mockRoute({
-                contextKey: "./(stack)/settings.tsx",
-                route: "settings",
-              }),
-              mockRoute({
-                children: [
-                  mockRoute({
-                    children: [
-                      mockRoute({
-                        contextKey: "./(stack)/user/(default)/posts.tsx",
-                        route: "posts",
-                      }),
-                    ],
-                    contextKey: "./(stack)/user/(default)/_layout.tsx",
-                    route: "(default)",
-                  }),
-                  mockRoute({
-                    contextKey: "./(stack)/user/profile.tsx",
-                    route: "profile",
-                  }),
-                  mockRoute({
-                    contextKey: "./(stack)/user/[profile].tsx",
-                    dynamic: {
-                      deep: false,
-                      name: "profile",
-                    },
-                    route: "[profile]",
-                  }),
-                  mockRoute({
-                    children: [
-                      mockRoute({
-                        contextKey: "./(stack)/user/settings/info.tsx",
-                        route: "info",
-                      }),
-                      mockRoute({
-                        contextKey: "./(stack)/user/settings/[...other].tsx",
-                        dynamic: {
-                          deep: true,
-                          name: "other",
-                        },
-                        route: "[...other]",
-                      }),
-                    ],
-                    contextKey: "./(stack)/user/settings/_layout.tsx",
-                    route: "settings",
-                  }),
-                ],
-                contextKey: "./(stack)/user/_layout.tsx",
-                generated: true,
-                route: "user",
-              }),
-            ],
-            contextKey: "./(stack)/_layout.tsx",
-            route: "(stack)",
-          }),
-          mockRoute({
-            contextKey: "./another.tsx",
-            route: "another",
-          }),
-          mockRoute({
-            children: [
-              mockRoute({
-                children: [
-                  mockRoute({
-                    contextKey: "./some/nested/value.tsx",
-                    route: "value",
-                  }),
-                ],
-                contextKey: "./some/nested/_layout.tsx",
-                generated: true,
-                route: "nested",
-              }),
-            ],
-            contextKey: "./some/_layout.tsx",
-            generated: true,
-            route: "some",
-          }),
-          ROUTE_DIRECTORY,
-          ROUTE_404,
-        ],
-      })
-    );
+    ).toEqual({
+      children: [
+        {
+          children: [
+            {
+              children: [],
+              contextKey: "./(stack)/home.tsx",
+              dynamic: null,
+              route: "home",
+            },
+            {
+              children: [],
+              contextKey: "./(stack)/settings.tsx",
+              dynamic: null,
+              route: "settings",
+            },
+            {
+              children: [
+                {
+                  children: [],
+                  contextKey: "./(stack)/user/(default)/posts.tsx",
+                  dynamic: null,
+                  route: "posts",
+                },
+              ],
+              contextKey: "./(stack)/user/(default)/_layout.tsx",
+              dynamic: null,
+              route: "user/(default)",
+            },
+            {
+              children: [],
+              contextKey: "./(stack)/user/profile.tsx",
+              dynamic: null,
+              route: "user/profile",
+            },
+            {
+              children: [],
+              contextKey: "./(stack)/user/[profile].tsx",
+              dynamic: null,
+              route: "user/[profile]",
+            },
+            {
+              children: [
+                {
+                  children: [],
+                  contextKey: "./(stack)/user/settings/info.tsx",
+                  dynamic: null,
+                  route: "info",
+                },
+                {
+                  children: [],
+                  contextKey: "./(stack)/user/settings/[...other].tsx",
+                  dynamic: { deep: true, name: "other" },
+                  route: "[...other]",
+                },
+              ],
+              contextKey: "./(stack)/user/settings/_layout.tsx",
+              dynamic: null,
+              route: "user/settings",
+            },
+          ],
+          contextKey: "./(stack)/_layout.tsx",
+          dynamic: null,
+          route: "(stack)",
+        },
+        {
+          children: [],
+          contextKey: "./another.tsx",
+          dynamic: null,
+          route: "another",
+        },
+        {
+          children: [],
+          contextKey: "./some/nested/value.tsx",
+          dynamic: null,
+          route: "some/nested/value",
+        },
+        ROUTE_DIRECTORY,
+        ROUTE_404,
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      route: "",
+    });
   });
   it(`should convert an empty context module to routes`, () => {
     expect(getRoutes(createMockContextModule({}))).toEqual(null);
   });
 });
-
-const mockRoute = (route: Partial<RouteNode>) =>
-  ({
-    children: [],
-    dynamic: null,
-    getComponent: expect.any(Function),
-    getExtras: expect.any(Function),
-    ...route,
-  } as unknown as RouteNode);
