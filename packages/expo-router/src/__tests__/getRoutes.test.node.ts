@@ -1,9 +1,5 @@
 import { RouteNode } from "../Route";
-import {
-  getRoutes,
-  createRouteNode,
-  getUserDefinedDeepDynamicRoute,
-} from "../getRoutes";
+import { getRoutes, getUserDefinedDeepDynamicRoute } from "../getRoutes";
 import { RequireContext } from "../types";
 
 function createMockContextModule(
@@ -39,20 +35,21 @@ const ROUTE_DIRECTORY = {
   route: "__index",
 };
 
-const asRouteNode = (route: Partial<RouteNode>) =>
-  createRouteNode({
-    getComponent(): any {
-      return function () {
-        return null;
-      };
-    },
-    getExtras(): any {
-      return {};
-    },
-    route: "INVALID_TEST_VALUE",
-    contextKey: "INVALID_TEST_VALUE",
-    ...route,
-  });
+const asRouteNode = (route: Partial<RouteNode>) => ({
+  getComponent(): any {
+    return function () {
+      return null;
+    };
+  },
+  getExtras(): any {
+    return {};
+  },
+  dynamic: null,
+  children: [],
+  route: "INVALID_TEST_VALUE",
+  contextKey: "INVALID_TEST_VALUE",
+  ...route,
+});
 
 describe(getUserDefinedDeepDynamicRoute, () => {
   it(`should return a basic deep dynamic route`, () => {
