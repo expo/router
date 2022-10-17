@@ -1,4 +1,4 @@
-import { PickPartial, RouteNode } from "./Route";
+import { RouteNode } from "./Route";
 import {
   getNameFromFilePath,
   matchDeepDynamicRouteName,
@@ -6,17 +6,6 @@ import {
   matchFragmentName,
 } from "./matchers";
 import { RequireContext } from "./types";
-import { DefaultLayout } from "./views/Layout";
-
-export function createRouteNode(
-  route: PickPartial<RouteNode, "dynamic" | "children">
-): RouteNode {
-  return {
-    children: [],
-    dynamic: null,
-    ...route,
-  };
-}
 
 type FileNode = Pick<RouteNode, "contextKey" | "getComponent" | "getExtras"> & {
   /** Like `(tab)/index` */
@@ -76,6 +65,10 @@ export function generateDynamic(name: string) {
   return dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null;
 }
 
+function Organization({ children }) {
+  return children;
+}
+
 function treeNodeToRouteNode({
   name,
   node,
@@ -85,14 +78,14 @@ function treeNodeToRouteNode({
   const dynamic = generateDynamic(name);
 
   if (node) {
-    return createRouteNode({
+    return {
       route: name,
       getExtras: node.getExtras,
       getComponent: node.getComponent,
       contextKey: node.contextKey,
       children: getTreeNodesAsRouteNodes(children),
       dynamic,
-    });
+    };
   }
 
   // Empty folder, skip it.
@@ -102,16 +95,16 @@ function treeNodeToRouteNode({
 
   // When there's a directory, but no sibling file with the same name, the directory won't work.
   // This ensures that we have a file for every directory (containing valid children).
-  return createRouteNode({
+  return {
     route: name,
     generated: true,
     getExtras: () => ({}),
-    getComponent: () => DefaultLayout,
+    getComponent: () => Organization,
     // Generate a fake file name for the directory
     contextKey: [".", ...parents, name + ".tsx"].filter(Boolean).join("/"),
     children: getTreeNodesAsRouteNodes(children),
     dynamic,
-  });
+  };
 }
 
 function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
@@ -167,20 +160,20 @@ function appendDirectoryRoute(routes: RouteNode[]) {
     return routes;
   }
   const { Directory, getNavOptions } = require("./views/Directory");
-  routes.push(
-    createRouteNode({
-      getComponent() {
-        return Directory;
-      },
-      getExtras() {
-        return { getNavOptions };
-      },
-      route: "__index",
-      contextKey: "./__index.tsx",
-      generated: true,
-      internal: true,
-    })
-  );
+  routes.push({
+    getComponent() {
+      return Directory;
+    },
+    getExtras() {
+      return { getNavOptions };
+    },
+    route: "__index",
+    contextKey: "./__index.tsx",
+    generated: true,
+    dynamic: null,
+    children: [],
+    internal: true,
+  });
   return routes;
 }
 
@@ -188,21 +181,20 @@ function appendUnmatchedRoute(routes: RouteNode[]) {
   // Auto add not found route if it doesn't exist
   const userDefinedDynamicRoute = getUserDefinedDeepDynamicRoute(routes);
   if (!userDefinedDynamicRoute) {
-    routes.push(
-      createRouteNode({
-        getComponent() {
-          return require("./views/Unmatched").Unmatched;
-        },
-        getExtras() {
-          return {};
-        },
-        route: "[...404]",
-        contextKey: "./[...404].tsx",
-        dynamic: { name: "404", deep: true },
-        generated: true,
-        internal: true,
-      })
-    );
+    routes.push({
+      getComponent() {
+        return require("./views/Unmatched").Unmatched;
+      },
+      getExtras() {
+        return {};
+      },
+      route: "[...404]",
+      contextKey: "./[...404].tsx",
+      dynamic: { name: "404", deep: true },
+      children: [],
+      generated: true,
+      internal: true,
+    });
   }
   return routes;
 }
