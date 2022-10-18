@@ -63,7 +63,10 @@ export function treeToReactNavigationLinkingRoutes(
           return collectAll(node.children, [...parents, node.route]);
         }
         const screens = treeToReactNavigationLinkingRoutes(node.children);
-        const path = convertDynamicRouteToReactNavigation(node.route);
+        const path = node.route
+          .split("/")
+          .map(convertDynamicRouteToReactNavigation)
+          .join("/");
 
         return { key: node.route, name: { path, screens } } as const;
       })
