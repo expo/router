@@ -29,15 +29,15 @@ export type RouteNode = {
 
 const CurrentRoutePathContext = React.createContext<string | null>(null);
 
-const CurrentRouteContext = React.createContext<RouteNode[]>([]);
+const CurrentRouteContext = React.createContext<RouteNode | null>(null);
 
 if (process.env.NODE_ENV !== "production") {
   CurrentRoutePathContext.displayName = "RoutePath";
   CurrentRouteContext.displayName = "Route";
 }
 
-/** Return all the routes for the current boundary. */
-export function useRoutes(): RouteNode[] {
+/** Return the RouteNode at the current contextual boundary. */
+export function useRouteNode(): RouteNode | null {
   return useContext(CurrentRouteContext);
 }
 
@@ -51,53 +51,28 @@ export function useContextKey(): string {
 
 /** Provides the matching routes and filename to the children. */
 export function Route({
-  filename,
   children,
   node,
 }: {
-  filename: string;
   children: ReactNode;
   node: RouteNode;
 }) {
-  const normalName = React.useMemo(
-    () => getNameFromFilePath(filename),
-    [filename]
-  );
-  const layoutName = React.useMemo(() => {
-    if (!normalName.endsWith("_layout")) {
-      return null;
+  const normalName = React.useMemo(() => {
+    // The root path is `` (empty string) so always prepend `/` to ensure
+    // there is some value.
+    const normal = "/" + getNameFromFilePath(node.contextKey);
+    if (!normal.endsWith("_layout")) {
+      return normal;
     }
-    return normalName.replace(/\/?_layout$/, "");
-  }, [normalName]);
+    return normal.replace(/\/?_layout$/, "");
+  }, [node.contextKey]);
 
   return (
-    <CurrentRoutePathContext.Provider
-      value={
-        // The root path is `` (empty string) so always prepend `/` to ensure
-        // there is some value.
-        "/" + (layoutName ?? normalName)
-      }
-    >
-      {layoutName != null ? (
-        <LayoutRoute node={node}>{children}</LayoutRoute>
-      ) : (
-        children
-      )}
+    <CurrentRoutePathContext.Provider value={normalName}>
+      <CurrentRouteContext.Provider value={node}>
+        {children}
+      </CurrentRouteContext.Provider>
     </CurrentRoutePathContext.Provider>
-  );
-}
-
-export function LayoutRoute({
-  node,
-  children,
-}: {
-  node: RouteNode;
-  children: ReactNode;
-}) {
-  return (
-    <CurrentRouteContext.Provider value={node.children}>
-      {children}
-    </CurrentRouteContext.Provider>
   );
 }
 

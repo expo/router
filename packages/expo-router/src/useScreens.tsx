@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Route, RouteNode, sortRoutes, useRoutes } from "./Route";
+import { Route, RouteNode, sortRoutes, useRouteNode } from "./Route";
 import { Screen } from "./primitives";
 import { Try } from "./views/Try";
 
@@ -77,8 +77,11 @@ function getSortedChildren(
  * @returns React Navigation screens sorted by the `route` property.
  */
 export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
-  const children = useRoutes();
-  const sorted = getSortedChildren(children, order);
+  const node = useRouteNode();
+
+  const sorted = node?.children?.length
+    ? getSortedChildren(node.children, order)
+    : [];
   return React.useMemo(
     () => sorted.map((value) => routeToScreen(value.route, value.props)),
     [sorted]
@@ -113,11 +116,7 @@ export function getQualifiedRouteComponent(value: RouteNode) {
         children
       );
 
-      return (
-        <Route filename={value.contextKey} node={value}>
-          {errorBoundary}
-        </Route>
-      );
+      return <Route node={value}>{errorBoundary}</Route>;
     }
   );
 

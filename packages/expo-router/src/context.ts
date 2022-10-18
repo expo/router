@@ -13,7 +13,7 @@ export function useRoutesContext() {
   const routes = useContext(RoutesContext);
   if (!routes) {
     throw new Error(
-      "useRoutes is being used outside of RoutesContext.Provider"
+      "useRoutesContext is being used outside of RoutesContext.Provider"
     );
   }
   return routes;
