@@ -38,9 +38,9 @@ export default function Home({ navigation, route }) {
       <Text>Home Screen</Text>
       <Link
         href={{
-          screen: "details",
-          /* 1. Navigate to the details route with query params */
-          params: { itemId: 86, otherParam: "anything you want here" },
+          pathname: "details",
+          // /* 1. Navigate to the details route with query params */
+          query: { itemId: 86, otherParam: "anything you want here" },
         }}
       >
         Go to Details
