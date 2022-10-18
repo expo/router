@@ -68,13 +68,6 @@ function reformatRouteNodesAsScreens(
         return { key, name };
       }
 
-      if (node.generated) {
-        console.log("called", node);
-        return reformatRouteNodesAsScreens(node.children, [
-          ...parents,
-          node.route,
-        ]);
-      }
       const screens = getReactNavigationScreensConfig(node.children);
       const path = parseRouteSegments([node.route]);
 
