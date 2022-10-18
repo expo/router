@@ -46,9 +46,9 @@ Prefer the `useLink` hook to `useNavigation` from React Navigation as `useLink` 
 
 ## `useLink` API
 
-- **push**: _`(href: Href) => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', query: { id: '123' } }`.
+- **push**: _`(href: Href) => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', params: { id: '123' } }`.
 - **replace**: _`(href: Href) => void`_ Same API as `push` but replaces the current route in the history instead of pushing a new one. This is useful for redirects.
-- **back**: _`() => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', query: { id: '123' } }`.
+- **back**: _`() => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', params: { id: '123' } }`.
 
 > This API is similar to Next.js's `useRouter` hook, but adjusted to work around the state management requirements of native.
 
@@ -57,7 +57,7 @@ Prefer the `useLink` hook to `useNavigation` from React Navigation as `useLink` 
 The `Href` type is a union of the following types:
 
 - **string**: A full path like `/profile/settings` or a relative path like `../settings`.
-- **object**: An object with a `pathname` and optional `query` object. The `pathname` can be a full path like `/profile/settings` or a relative path like `../settings`. The `query` can be an object of key/value pairs.
+- **object**: An object with a `pathname` and optional `params` object. The `pathname` can be a full path like `/profile/settings` or a relative path like `../settings`. The `params` can be an object of key/value pairs.
 
 ## `useHref` API
 
@@ -65,7 +65,7 @@ The `useHref` hook provides the current location information for a route.
 
 - **href**: _`string`_ The relative normalized path that would show up in the URL bar.
 - **pathname**: _`string`_ The relative template path reflecting the current route. e.g. `/profile/[id]`.
-- **query**: _`Record<string, any>`_ Query parameters for the current route. e.g. `{ id: '123' }`.
+- **params**: _`Record<string, any>`_ Query parameters for the current route. e.g. `{ id: '123' }`.
 
 Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `/profile/123`, the results of `useHref` would be as follows:
 
@@ -73,7 +73,7 @@ Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `
 {
   href: "/profile/123",
   pathname: "/profile/[id]",
-  query: { id: "123" },
+  params: { id: "123" },
 }
 ```
 

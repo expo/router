@@ -17,10 +17,12 @@ export const resolveHref = (href: Href): string => {
     return resolveHref({ pathname: href ?? "" });
   }
   const path = stripFragmentRoutes(href.pathname ?? "");
-  if (!href?.query) {
+  if (!href?.params) {
     return path;
   }
-  const { pathname, params } = createQualifiedPathname(path, { ...href.query });
+  const { pathname, params } = createQualifiedPathname(path, {
+    ...href.params,
+  });
   return (
     pathname +
     (Object.keys(params).length ? `?${createQueryParams(params)}` : "")
