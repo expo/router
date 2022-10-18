@@ -111,7 +111,7 @@ export function useRootRoute(): RouteNode | null {
  * @param route A route node.
  * @returns
  */
-function getChildRoutes(
+export function getChildRoutes(
   normalName: string,
   route: RouteNode | null
 ): RouteNode[] {
