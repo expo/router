@@ -113,7 +113,11 @@ export function getQualifiedRouteComponent(value: RouteNode) {
         children
       );
 
-      return <Route filename={value.contextKey}>{errorBoundary}</Route>;
+      return (
+        <Route filename={value.contextKey} node={value}>
+          {errorBoundary}
+        </Route>
+      );
     }
   );
 
