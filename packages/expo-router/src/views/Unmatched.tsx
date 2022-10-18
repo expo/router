@@ -3,10 +3,19 @@ import { createURL } from "expo-linking";
 import React, { forwardRef } from "react";
 
 import { Link } from "../link/Link";
+import { useNavigation } from "../useNavigation";
 
 /** Default screen for unmatched routes. */
 export const Unmatched = forwardRef((props, ref) => {
+  const navigation = useNavigation();
   const url = createURL("");
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Not Found",
+    });
+  }, [navigation]);
+
   return (
     // @ts-ignore
     <View ref={ref} style={styles.container}>
