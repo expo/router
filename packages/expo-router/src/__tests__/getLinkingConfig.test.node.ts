@@ -1,4 +1,4 @@
-import { treeToReactNavigationLinkingRoutes } from "../getLinkingConfig";
+import { getReactNavigationScreensConfig } from "../getLinkingConfig";
 
 const mockRoutes = [
   {
@@ -12,7 +12,7 @@ const mockRoutes = [
     ],
     dynamic: null,
     route: "(second-fragment)",
-    contextKey: "./(second-fragment).tsx",
+    contextKey: "./(second-fragment)/_layout.tsx",
   },
   {
     children: [
@@ -43,32 +43,16 @@ const mockRoutes = [
     ],
     dynamic: null,
     route: "(fragment)",
-    contextKey: "./(fragment).tsx",
+    contextKey: "./(fragment)/_layout.tsx",
   },
   {
-    children: [
-      {
-        children: [
-          {
-            children: [],
-            dynamic: {
-              name: "screen",
-              deep: true,
-            },
-            route: "[...screen]",
-            contextKey: "./other/nested/[...screen].js",
-          },
-        ],
-        dynamic: null,
-        route: "nested",
-        contextKey: "./other/nested.tsx",
-        generated: true,
-      },
-    ],
-    dynamic: null,
-    route: "other",
-    contextKey: "./other.tsx",
-    generated: true,
+    children: [],
+    dynamic: {
+      name: "screen",
+      deep: true,
+    },
+    route: "other/nested/[...screen]",
+    contextKey: "./other/nested/[...screen].js",
   },
   {
     children: [],
@@ -80,10 +64,10 @@ const mockRoutes = [
   },
 ];
 
-describe(treeToReactNavigationLinkingRoutes, () => {
+describe(getReactNavigationScreensConfig, () => {
   it("should return a valid linking config", () => {
     expect(
-      treeToReactNavigationLinkingRoutes(
+      getReactNavigationScreensConfig(
         // @ts-expect-error
         mockRoutes
       )

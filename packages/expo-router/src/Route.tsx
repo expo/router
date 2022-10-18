@@ -1,6 +1,6 @@
 import React, { ReactNode, useContext } from "react";
 
-import { RoutesContext } from "./context";
+import { RootRouteNodeContext } from "./context";
 import { getNameFromFilePath, matchFragmentName } from "./matchers";
 
 /** The list of input keys will become optional, everything else will remain the same. */
@@ -29,15 +29,15 @@ export type RouteNode = {
 
 const CurrentRoutePathContext = React.createContext<string | null>(null);
 
-const CurrentRouteContext = React.createContext<RouteNode[]>([]);
+const CurrentRouteContext = React.createContext<RouteNode | null>(null);
 
 if (process.env.NODE_ENV !== "production") {
   CurrentRoutePathContext.displayName = "RoutePath";
   CurrentRouteContext.displayName = "Route";
 }
 
-/** Return all the routes for the current boundary. */
-export function useRoutes(): RouteNode[] {
+/** Return the RouteNode at the current contextual boundary. */
+export function useRouteNode(): RouteNode | null {
   return useContext(CurrentRouteContext);
 }
 
@@ -51,106 +51,33 @@ export function useContextKey(): string {
 
 /** Provides the matching routes and filename to the children. */
 export function Route({
-  filename,
   children,
+  node,
 }: {
-  filename: string;
   children: ReactNode;
+  node: RouteNode;
 }) {
-  const normalName = React.useMemo(
-    () => getNameFromFilePath(filename),
-    [filename]
-  );
-  const layoutName = React.useMemo(() => {
-    if (!normalName.endsWith("_layout")) {
-      return null;
+  const normalName = React.useMemo(() => {
+    // The root path is `` (empty string) so always prepend `/` to ensure
+    // there is some value.
+    const normal = "/" + getNameFromFilePath(node.contextKey);
+    if (!normal.endsWith("_layout")) {
+      return normal;
     }
-    return normalName.replace(/\/?_layout$/, "");
-  }, [normalName]);
+    return normal.replace(/\/?_layout$/, "");
+  }, [node.contextKey]);
 
   return (
-    <CurrentRoutePathContext.Provider
-      value={
-        // The root path is `` (empty string) so always prepend `/` to ensure
-        // there is some value.
-        "/" + (layoutName ?? normalName)
-      }
-    >
-      {layoutName != null ? (
-        <LayoutRoute filename={layoutName}>{children}</LayoutRoute>
-      ) : (
-        children
-      )}
+    <CurrentRoutePathContext.Provider value={normalName}>
+      <CurrentRouteContext.Provider value={node}>
+        {children}
+      </CurrentRouteContext.Provider>
     </CurrentRoutePathContext.Provider>
   );
 }
 
-export function LayoutRoute({
-  filename,
-  children,
-}: {
-  filename: string;
-  children: ReactNode;
-}) {
-  const routes = useRoutesAtPath(filename);
-  return (
-    <CurrentRouteContext.Provider value={routes}>
-      {children}
-    </CurrentRouteContext.Provider>
-  );
-}
-
 export function useRootRoute(): RouteNode | null {
-  return useContext(RoutesContext);
-}
-
-function useRoutesAtPath(normalName: string): RouteNode[] {
-  const routes = useContext(RoutesContext);
-
-  const family = React.useMemo(() => {
-    function getChildrenForRoute(normalName: string) {
-      let children: RouteNode[] = routes?.children ?? [];
-
-      // Skip root directory
-      if (normalName) {
-        // split and search
-        const parts = normalName.split("/");
-        for (const part of parts) {
-          const next = children.find(({ route }) => route === part);
-
-          if (!next?.children) {
-            return [];
-          }
-
-          children = next?.children;
-        }
-
-        for (const child of children) {
-          if (child.generated && child.children.length) {
-            // remove child
-            const nextChildren = getChildrenForRoute(
-              getNameFromFilePath(child.contextKey)
-            );
-            if (nextChildren.length) {
-              children = children.filter((c) => c !== child);
-
-              children.push(
-                ...nextChildren.map((nextChild) => {
-                  nextChild.route = child.route + "/" + nextChild.route;
-                  return nextChild;
-                })
-              );
-            }
-          }
-        }
-      }
-      return children;
-    }
-
-    return getChildrenForRoute(normalName).sort(sortRoutes);
-  }, [normalName]);
-
-  return family;
+  return useContext(RootRouteNodeContext);
 }
 
 export function sortRoutes(a: RouteNode, b: RouteNode): number {
