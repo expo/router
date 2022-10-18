@@ -101,7 +101,7 @@ export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
 const qualifiedStore = new WeakMap<RouteNode, React.ComponentType<any>>();
 
 /** Wrap the component with various enhancements and add access to child routes. */
-function getQualifiedRouteComponent(value: RouteNode) {
+export function getQualifiedRouteComponent(value: RouteNode) {
   if (qualifiedStore.has(value)) {
     return qualifiedStore.get(value)!;
   }

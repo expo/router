@@ -61,31 +61,55 @@ export function Route({
     () => getNameFromFilePath(filename),
     [filename]
   );
-
-  const routes = useRoutesAtPath(normalName);
+  const layoutName = React.useMemo(() => {
+    if (!normalName.endsWith("_layout")) {
+      return null;
+    }
+    return normalName.replace(/\/?_layout$/, "");
+  }, [normalName]);
 
   return (
     <CurrentRoutePathContext.Provider
       value={
         // The root path is `` (empty string) so always prepend `/` to ensure
         // there is some value.
-        "/" + normalName
+        "/" + (layoutName ?? normalName)
       }
     >
-      <CurrentRouteContext.Provider value={routes}>
-        {children}
-      </CurrentRouteContext.Provider>
+      {layoutName != null ? (
+        <LayoutRoute filename={layoutName}>{children}</LayoutRoute>
+      ) : (
+        children
+      )}
     </CurrentRoutePathContext.Provider>
   );
 }
 
+export function LayoutRoute({
+  filename,
+  children,
+}: {
+  filename: string;
+  children: ReactNode;
+}) {
+  const routes = useRoutesAtPath(filename);
+  return (
+    <CurrentRouteContext.Provider value={routes}>
+      {children}
+    </CurrentRouteContext.Provider>
+  );
+}
+
+export function useRootRoute(): RouteNode | null {
+  return useContext(RoutesContext);
+}
+
 function useRoutesAtPath(normalName: string): RouteNode[] {
   const routes = useContext(RoutesContext);
-  const keys = React.useMemo(() => routes.keys(), [routes]);
 
   const family = React.useMemo(() => {
     function getChildrenForRoute(normalName: string) {
-      let children: RouteNode[] = routes;
+      let children: RouteNode[] = routes?.children ?? [];
 
       // Skip root directory
       if (normalName) {
@@ -124,7 +148,7 @@ function useRoutesAtPath(normalName: string): RouteNode[] {
     }
 
     return getChildrenForRoute(normalName).sort(sortRoutes);
-  }, [normalName, keys]);
+  }, [normalName]);
 
   return family;
 }

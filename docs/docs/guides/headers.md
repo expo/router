@@ -7,15 +7,14 @@ Ports the guide [React Navigation: header buttons](https://reactnavigation.org/d
 
 ```bash title="File System"
 app/
-  (stack).js
-  (stack)/
-    home.js
-    details.js
+  _layout.js
+  home.js
+  details.js
 ```
 
 Use the `screenOptions` prop to configure the header bar.
 
-```js title=app/(stack).js
+```js title=app/_layout.js
 import { Stack } from "expo-router";
 
 export default function Layout() {
@@ -38,7 +37,7 @@ export default function Layout() {
 
 You can use a layout's Screen component to configure the header bar dynamically from within the route. This is good for interactions that change the UI.
 
-```js title=app/(stack)/home.js
+```js title=app/home.js
 import { Link, Stack } from "expo-router";
 import { Image, Text, View } from "react-native";
 
@@ -81,7 +80,7 @@ export default function Home() {
 
 You can use the imperative API `navigation.setParams` to configure the route dynamically.
 
-```js title=app/(stack)/details.tsx
+```js title=app/details.tsx
 import { View, Text } from "react-native";
 import { Stack } from "expo-router";
 

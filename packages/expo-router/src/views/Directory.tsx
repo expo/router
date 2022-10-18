@@ -22,7 +22,7 @@ function useSortedRoutes() {
 
   const routes = React.useMemo(
     () =>
-      ctx
+      ctx.children
         .filter((route) => !route.internal)
         .sort((a, b) => {
           // Emulate vscode's sorting

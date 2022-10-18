@@ -7,7 +7,7 @@ Layouts are parent components that provide a shared UI-driven navigation experie
 
 The simplest layouts (suited for web) are custom navigators that provide a single screen at a time. You can create a custom navigator by using the `<Children />` component.
 
-```js title=app/parent.js
+```js title=app/_layout.js
 // highlight-next-line
 import { Children } from "expo-router";
 
@@ -20,7 +20,7 @@ export default function Page() {
 
 Now create a child route to render inside the parent route:
 
-```js title=app/parent/child.js
+```js title=app/child.js
 export default function Page() {
   return <View />;
 }
@@ -28,7 +28,7 @@ export default function Page() {
 
 You can extend this to create a basic layout like the ones found in most websites:
 
-```js title=app/parent.js
+```js title=app/_layout.js
 import { View } from "react-native";
 // highlight-next-line
 import { Children, Link } from "expo-router";
