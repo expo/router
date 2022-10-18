@@ -39,7 +39,7 @@ export default function AppLayout() {
           // OR you can use the Href object:
           href: {
             pathname: "/[user]",
-            query: {
+            params: {
               user: "evanbacon",
             },
           },

@@ -3,12 +3,9 @@ import React from "react";
 
 import { RootContainer } from "../ContextNavigationContainer";
 import getPathFromState, { State } from "../fork/getPathFromState";
+import { HrefObject } from "./href";
 
-type RouteInfo = {
-  /** Path representing the selected route `/[id]` */
-  pathname: string;
-  /** Query parameters for the path. */
-  query: Record<string, any>;
+type RouteInfo = Omit<Required<HrefObject>, "query"> & {
   /** Normalized path representing the selected route `/[id]?id=normal` -> `/normal` */
   href: string;
 };
@@ -21,7 +18,7 @@ function getRouteInfoFromState(
     return {
       href: "",
       pathname: "",
-      query: {},
+      params: {},
     };
   }
 
@@ -55,7 +52,7 @@ function compareRouteInfo(a: RouteInfo, b: RouteInfo) {
   return (
     a.href === b.href &&
     a.pathname === b.pathname &&
-    compareShallowRecords(a.query, b.query)
+    compareShallowRecords(a.params, b.params)
   );
 }
 
@@ -132,7 +129,7 @@ function getNormalizedStatePath(statePath: string) {
     pathname: components[0],
     // TODO: This is not efficient, we should generate based on the state instead
     // of converting to string then back to object
-    query: parseQueryString(components[1] ?? ""),
+    params: parseQueryString(components[1] ?? ""),
   };
 }
 
@@ -140,11 +137,11 @@ function parseQueryString(val: string) {
   if (!val) {
     return {};
   }
-  const query = {};
+  const params = {};
   const a = val.split("&");
   for (let i = 0; i < a.length; i++) {
     const b = a[i].split("=");
-    query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || "");
+    params[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || "");
   }
-  return query;
+  return params;
 }
