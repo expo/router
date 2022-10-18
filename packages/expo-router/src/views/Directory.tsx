@@ -10,30 +10,18 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { RouteNode } from "../Route";
+import { RouteNode, sortRoutes } from "../Route";
 import { useRootRouteNodeContext } from "../context";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
 
-const INDENT = 18;
+const INDENT = 24;
 
 function useSortedRoutes() {
   const ctx = useRootRouteNodeContext();
 
   const routes = React.useMemo(
-    () =>
-      ctx.children
-        .filter((route) => !route.internal)
-        .sort((a, b) => {
-          // Emulate vscode's sorting
-          if (a.route < b.route) {
-            return -1;
-          }
-          if (a.route > b.route) {
-            return 1;
-          }
-          return 0;
-        }),
+    () => [ctx].filter((route) => !route.internal).sort(sortRoutes),
     [ctx]
   );
   return routes;
@@ -167,7 +155,7 @@ function FileItem({
 
   return (
     <>
-      {!route.generated && (
+      {!route.internal && (
         <Link
           href={href}
           onPress={() => {
@@ -207,7 +195,7 @@ function FileItem({
           </Pressable>
         </Link>
       )}
-      {route.children.map((child, index) => (
+      {route.children.map((child) => (
         <FileItem
           key={child.contextKey}
           route={child}
