@@ -126,8 +126,8 @@ function treeNodeToRouteNode({
     return null;
   }
 
-  // When there's a directory, but no sibling file with the same name, the directory won't work.
-  // This ensures that we have a file for every directory (containing valid children).
+  // When there's a directory, but no layout route file (with valid export), the child routes won't be grouped.
+  // This pushes all children into the nearest layout route.
   return getTreeNodesAsRouteNodes(
     children.map((child) => {
       return {
