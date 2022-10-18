@@ -104,53 +104,80 @@ export function useRootRoute(): RouteNode | null {
   return useContext(RoutesContext);
 }
 
-function useRoutesAtPath(normalName: string): RouteNode[] {
-  const routes = useContext(RoutesContext);
+/**
+ * Given a route and a normalized path, return the matching child routes.
+ *
+ * @param normalName Normalized file path relative to the app directory: `foo/bar`
+ * @param route A route node.
+ * @returns
+ */
+function getChildRoutes(
+  normalName: string,
+  route: RouteNode | null
+): RouteNode[] {
+  let children: RouteNode[] = route?.children ?? [];
 
-  const family = React.useMemo(() => {
-    function getChildrenForRoute(normalName: string) {
-      let children: RouteNode[] = routes?.children ?? [];
+  // Skip root directory
+  if (!normalName) {
+    return children;
+  }
 
-      // Skip root directory
-      if (normalName) {
-        // split and search
-        const parts = normalName.split("/");
-        for (const part of parts) {
-          const next = children.find(({ route }) => route === part);
-
-          if (!next?.children) {
-            return [];
-          }
-
-          children = next?.children;
+  // split and search
+  const parts = normalName.split("/");
+  for (let i = 0; i < parts.length; i++) {
+    let part = parts[i];
+    const getNext = () => {
+      const next = children.find(({ route }) => route === part);
+      if (!next?.children) {
+        if (i < parts.length - 1) {
+          // If no children matched a single segment
+          // then increment and append the next segment
+          // this allows for nested directories without layouts.
+          i++;
+          part += "/" + parts[i];
+          return getNext();
         }
-
-        for (const child of children) {
-          if (child.generated && child.children.length) {
-            // remove child
-            const nextChildren = getChildrenForRoute(
-              getNameFromFilePath(child.contextKey)
-            );
-            if (nextChildren.length) {
-              children = children.filter((c) => c !== child);
-
-              children.push(
-                ...nextChildren.map((nextChild) => {
-                  nextChild.route = child.route + "/" + nextChild.route;
-                  return nextChild;
-                })
-              );
-            }
-          }
-        }
+        return null;
       }
-      return children;
+      return next;
+    };
+    const next = getNext();
+    if (!next?.children) {
+      return [];
     }
+    children = next?.children;
+  }
 
-    return getChildrenForRoute(normalName).sort(sortRoutes);
-  }, [normalName]);
+  for (const child of children) {
+    if (child.generated && child.children.length) {
+      // remove child
+      const nextChildren = getChildRoutes(
+        getNameFromFilePath(child.contextKey),
+        route
+      );
+      if (nextChildren.length) {
+        children = children.filter((c) => c !== child);
 
-  return family;
+        children.push(
+          ...nextChildren.map((nextChild) => {
+            nextChild.route = child.route + "/" + nextChild.route;
+            return nextChild;
+          })
+        );
+      }
+    }
+  }
+
+  return children;
+}
+
+function useRoutesAtPath(normalName: string): RouteNode[] {
+  const route = useContext(RoutesContext);
+
+  return React.useMemo(
+    () => getChildRoutes(normalName, route).sort(sortRoutes),
+    [normalName]
+  );
 }
 
 export function sortRoutes(a: RouteNode, b: RouteNode): number {

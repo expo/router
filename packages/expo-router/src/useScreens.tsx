@@ -4,17 +4,6 @@ import { Route, RouteNode, sortRoutes, useRoutes } from "./Route";
 import { Screen } from "./primitives";
 import { Try } from "./views/Try";
 
-/**
- * @returns React Navigation screens for the route.
- */
-export function useScreens(): React.ReactNode[] {
-  const children = useRoutes();
-  return React.useMemo(
-    () => children.map((value) => routeToScreen(value)),
-    [children]
-  );
-}
-
 export type ScreenProps<
   TOptions extends Record<string, any> = Record<string, any>
 > = {
