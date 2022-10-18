@@ -4,7 +4,8 @@ import {
 } from "@react-navigation/native";
 import React from "react";
 
-import { useLinkingConfig } from "./getLinkingConfig";
+import { useRootRouteNodeContext } from "./context";
+import { getLinkingConfig } from "./getLinkingConfig";
 import {
   RootNavigationRef,
   useRootNavigation,
@@ -41,15 +42,11 @@ export function ContextNavigationContainer(props: NavigationContainerProps) {
     {}
   );
 
-  const linking = useLinkingConfig();
-  console.log("linking", linking);
-
   return (
     <NavigationContainerContext.Provider
       value={[
         {
           ...props,
-          linking,
           ...state,
         },
         setState,
@@ -63,8 +60,15 @@ export function ContextNavigationContainer(props: NavigationContainerProps) {
 function InternalContextNavigationContainer(props: object) {
   const [contextProps] = useNavigationContainerContext();
   const [isReady, setReady] = React.useState(false);
-
   const ref = React.useMemo(() => (isReady ? navigationRef : null), [isReady]);
+
+  const root = useRootRouteNodeContext();
+
+  const linking = React.useMemo(() => {
+    const linking = getLinkingConfig(root);
+    console.log("linking", linking);
+    return linking;
+  }, [root]);
 
   return (
     <RootNavigationRef.Provider value={{ ref }}>
@@ -73,6 +77,7 @@ function InternalContextNavigationContainer(props: object) {
       <NavigationContainer
         {...props}
         {...contextProps}
+        linking={linking}
         ref={navigationRef}
         onReady={() => {
           contextProps.onReady?.();

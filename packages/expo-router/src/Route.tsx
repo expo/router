@@ -1,6 +1,6 @@
 import React, { ReactNode, useContext } from "react";
 
-import { RoutesContext } from "./context";
+import { RootRouteNodeContext } from "./context";
 import { getNameFromFilePath, matchFragmentName } from "./matchers";
 
 /** The list of input keys will become optional, everything else will remain the same. */
@@ -77,7 +77,7 @@ export function Route({
 }
 
 export function useRootRoute(): RouteNode | null {
-  return useContext(RoutesContext);
+  return useContext(RootRouteNodeContext);
 }
 
 export function sortRoutes(a: RouteNode, b: RouteNode): number {

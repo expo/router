@@ -3,17 +3,17 @@ import { createContext, useContext } from "react";
 import { RouteNode } from "./Route";
 
 // Routes context
-export const RoutesContext = createContext<RouteNode | null>(null);
+export const RootRouteNodeContext = createContext<RouteNode | null>(null);
 
 if (process.env.NODE_ENV !== "production") {
-  RoutesContext.displayName = "RoutesContext";
+  RootRouteNodeContext.displayName = "RoutesContext";
 }
 
-export function useRoutesContext() {
-  const routes = useContext(RoutesContext);
+export function useRootRouteNodeContext() {
+  const routes = useContext(RootRouteNodeContext);
   if (!routes) {
     throw new Error(
-      "useRoutesContext is being used outside of RoutesContext.Provider"
+      "useRootRouteNodeContext is being used outside of RootRouteNodeContext.Provider"
     );
   }
   return routes;

@@ -11,14 +11,14 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RouteNode } from "../Route";
-import { useRoutesContext } from "../context";
+import { useRootRouteNodeContext } from "../context";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
 
 const INDENT = 18;
 
 function useSortedRoutes() {
-  const ctx = useRoutesContext();
+  const ctx = useRootRouteNodeContext();
 
   const routes = React.useMemo(
     () =>

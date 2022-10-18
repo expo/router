@@ -1,9 +1,7 @@
 import { LinkingOptions } from "@react-navigation/native";
-import { useMemo } from "react";
 
 import { RouteNode } from "./Route";
 import { getAllWebRedirects } from "./aasa";
-import { useRoutesContext } from "./context";
 import {
   addEventListener,
   getInitialURL,
@@ -98,9 +96,4 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
     getStateFromPath,
     getPathFromState,
   };
-}
-
-export function useLinkingConfig(): LinkingOptions<object> {
-  const routes = useRoutesContext();
-  return useMemo(() => getLinkingConfig(routes), [routes]);
 }
