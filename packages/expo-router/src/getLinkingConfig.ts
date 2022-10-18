@@ -35,47 +35,59 @@ function convertDynamicRouteToReactNavigation(name: string) {
   return name;
 }
 
-export function treeToReactNavigationLinkingRoutes(
+function parseRouteSegments(segments: string[]): string {
+  return (
+    segments
+      // NOTE(EvanBacon): When there are nested routes without layouts
+      // the node.route will be something like `app/home/index`
+      // this needs to be split to ensure each segment is parsed correctly.
+      .map((segment) => segment.split("/"))
+      .flat()
+      // Convert each segment to a React Navigation format.
+      .map(convertDynamicRouteToReactNavigation)
+      // Remove any empty paths from fragments or index routes.
+      .filter(Boolean)
+      // Join to return as a path.
+      .join("/")
+  );
+}
+
+function reformatRouteNodesAsScreens(
+  nodes: RouteNode[],
+  parents: string[] = []
+): { key: string; name: any }[] {
+  return nodes
+    .map((node) => {
+      if (!node.children.length) {
+        // NOTE(EvanBacon): When there are nested routes without layouts
+        // the node.route will be something like `app/home/index`
+        // this needs to be split to ensure each segment is parsed correctly.
+        const components = [...parents, node.route].filter(Boolean);
+        const name = parseRouteSegments(components);
+        const key = components.join("/");
+        return { key, name };
+      }
+
+      if (node.generated) {
+        console.log("called", node);
+        return reformatRouteNodesAsScreens(node.children, [
+          ...parents,
+          node.route,
+        ]);
+      }
+      const screens = getReactNavigationScreensConfig(node.children);
+      const path = parseRouteSegments([node.route]);
+
+      return { key: node.route, name: { path, screens } } as const;
+    })
+    .flat() as { key: string; name: any }[];
+}
+
+export function getReactNavigationScreensConfig(
   nodes: RouteNode[]
 ): PathConfigMap<object> {
-  function collectAll(
-    nodes: RouteNode[],
-    parents: string[] = []
-  ): { key: string; name: any }[] {
-    return nodes
-      .map((node) => {
-        if (!node.children.length) {
-          // NOTE(EvanBacon): When there are nested routes without layouts
-          // the node.route will be something like `app/home/index`
-          // this needs to be split to ensure each segment is parsed correctly.
-          const components = [...parents, node.route]
-            .map((value) => value.split("/"))
-            .flat();
-          const name = components
-            .map(convertDynamicRouteToReactNavigation)
-            .filter(Boolean)
-            .join("/");
-          const key = components.filter(Boolean).join("/");
-          return { key, name };
-        }
-
-        if (node.generated) {
-          return collectAll(node.children, [...parents, node.route]);
-        }
-        const screens = treeToReactNavigationLinkingRoutes(node.children);
-        const path = node.route
-          .split("/")
-          .map(convertDynamicRouteToReactNavigation)
-          .join("/");
-
-        return { key: node.route, name: { path, screens } } as const;
-      })
-      .flat() as { key: string; name: any }[];
-  }
-
-  // TODO: Intercept errors, strip invalid routes, and warn instead.
-  // Our warnings can be more helpful than upstream since we know the associated file name.
-  return collectAll(nodes).reduce<PathConfigMap<object>>(
+  const screens = reformatRouteNodesAsScreens(nodes);
+  return screens.reduce<PathConfigMap<object>>(
     (acc, { key: route, name: current }) => {
       acc[route] = current;
       return acc;
@@ -85,6 +97,7 @@ export function treeToReactNavigationLinkingRoutes(
 }
 
 export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
+  console.log("getLinkingConfig", routes);
   return {
     prefixes: [
       /* your linking prefixes */
@@ -95,7 +108,7 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
       ...getAllWebRedirects(),
     ],
     config: {
-      screens: treeToReactNavigationLinkingRoutes(routes.children),
+      screens: getReactNavigationScreensConfig(routes.children),
     },
     // A custom getInitialURL is used on native to ensure the app always starts at
     // the root path if it's launched from something other than a deep link.
