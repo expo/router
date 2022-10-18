@@ -1,4 +1,4 @@
-import { LinkingOptions, PathConfigMap } from "@react-navigation/native";
+import { LinkingOptions } from "@react-navigation/native";
 import { useMemo } from "react";
 
 import { RouteNode } from "./Route";
@@ -16,6 +16,13 @@ import {
   matchDynamicName,
   matchFragmentName,
 } from "./matchers";
+
+type Screen =
+  | string
+  | {
+      path: string;
+      screens: Record<string, Screen>;
+    };
 
 // `[page]` -> `:page`
 // `page` -> `page`
@@ -35,14 +42,13 @@ function convertDynamicRouteToReactNavigation(name: string) {
   return name;
 }
 
-function parseRouteSegments(segments: string[]): string {
+function parseRouteSegments(segments: string): string {
   return (
+    // NOTE(EvanBacon): When there are nested routes without layouts
+    // the node.route will be something like `app/home/index`
+    // this needs to be split to ensure each segment is parsed correctly.
     segments
-      // NOTE(EvanBacon): When there are nested routes without layouts
-      // the node.route will be something like `app/home/index`
-      // this needs to be split to ensure each segment is parsed correctly.
-      .map((segment) => segment.split("/"))
-      .flat()
+      .split("/")
       // Convert each segment to a React Navigation format.
       .map(convertDynamicRouteToReactNavigation)
       // Remove any empty paths from fragments or index routes.
@@ -52,45 +58,24 @@ function parseRouteSegments(segments: string[]): string {
   );
 }
 
-function reformatRouteNodesAsScreens(
-  nodes: RouteNode[],
-  parents: string[] = []
-): { key: string; name: any }[] {
-  return nodes
-    .map((node) => {
-      if (!node.children.length) {
-        // NOTE(EvanBacon): When there are nested routes without layouts
-        // the node.route will be something like `app/home/index`
-        // this needs to be split to ensure each segment is parsed correctly.
-        const components = [...parents, node.route].filter(Boolean);
-        const name = parseRouteSegments(components);
-        const key = components.join("/");
-        return { key, name };
-      }
-
-      const screens = getReactNavigationScreensConfig(node.children);
-      const path = parseRouteSegments([node.route]);
-
-      return { key: node.route, name: { path, screens } } as const;
-    })
-    .flat() as { key: string; name: any }[];
+function convertRouteNodeToScreen(node: RouteNode): Screen {
+  const path = parseRouteSegments(node.route);
+  if (!node.children.length) {
+    return path;
+  }
+  const screens = getReactNavigationScreensConfig(node.children);
+  return { path, screens };
 }
 
 export function getReactNavigationScreensConfig(
   nodes: RouteNode[]
-): PathConfigMap<object> {
-  const screens = reformatRouteNodesAsScreens(nodes);
-  return screens.reduce<PathConfigMap<object>>(
-    (acc, { key: route, name: current }) => {
-      acc[route] = current;
-      return acc;
-    },
-    {}
+): Record<string, Screen> {
+  return Object.fromEntries(
+    nodes.map((node) => [node.route, convertRouteNodeToScreen(node)] as const)
   );
 }
 
 export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
-  console.log("getLinkingConfig", routes);
   return {
     prefixes: [
       /* your linking prefixes */
