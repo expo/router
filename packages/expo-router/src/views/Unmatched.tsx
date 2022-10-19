@@ -41,11 +41,9 @@ export const Unmatched = forwardRef((props, ref) => {
         {url}
       </Link>
 
-      {process.env.NODE_ENV === "development" && (
-        <Link href="/__index" style={styles.link}>
-          Sitemap
-        </Link>
-      )}
+      <Link href="/_sitemap" style={[styles.link, { marginTop: 8 }]}>
+        Sitemap
+      </Link>
     </View>
   );
 });
