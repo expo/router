@@ -57,8 +57,8 @@ const mockRoutes = [
   {
     children: [],
     dynamic: null,
-    route: "__index",
-    contextKey: "./__index.tsx",
+    route: "_sitemap",
+    contextKey: "./_sitemap.tsx",
     generated: true,
     internal: true,
   },
@@ -77,7 +77,7 @@ describe(getReactNavigationScreensConfig, () => {
         screens: { "[...deep]": "*", "[dynamic]": ":dynamic", index: "" },
       },
       "(second-fragment)": { path: "", screens: { people: "people" } },
-      __index: "__index",
+      _sitemap: "_sitemap",
       "other/nested/[...screen]": "other/nested/*",
     });
   });
