@@ -219,9 +219,7 @@ export function getRoutes(contextModule: RequireContext): RouteNode | null {
     return null;
   }
 
-  if (process.env.NODE_ENV !== "production") {
-    appendDirectoryRoute(route);
-  }
+  appendSitemapRoute(route);
 
   // Auto add not found route if it doesn't exist
   appendUnmatchedRoute(route);
@@ -229,8 +227,12 @@ export function getRoutes(contextModule: RequireContext): RouteNode | null {
   return route;
 }
 
-function appendDirectoryRoute(routes: RouteNode) {
-  if (!routes.children.length) {
+function appendSitemapRoute(routes: RouteNode) {
+  if (
+    !routes.children.length ||
+    // Allow overriding the sitemap route
+    routes.children.some((route) => route.route === "_sitemap")
+  ) {
     return routes;
   }
   const { Directory, getNavOptions } = require("./views/Directory");
@@ -241,8 +243,8 @@ function appendDirectoryRoute(routes: RouteNode) {
     getExtras() {
       return { getNavOptions };
     },
-    route: "__index",
-    contextKey: "./__index.tsx",
+    route: "_sitemap",
+    contextKey: "./_sitemap.tsx",
     generated: true,
     internal: true,
     dynamic: null,

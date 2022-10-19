@@ -30,11 +30,11 @@ const ROUTE_404 = {
 
 const ROUTE_DIRECTORY = {
   children: [],
-  contextKey: "./__index.tsx",
+  contextKey: "./_sitemap.tsx",
   dynamic: null,
   generated: true,
   internal: true,
-  route: "__index",
+  route: "_sitemap",
 };
 
 const asFileNode = (route: Partial<FileNode>): FileNode => ({

@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
   },
   scroll: {
-    padding: 12,
+    paddingHorizontal: 12,
     flex: 1,
     // paddingTop: top + 12,
     alignItems: "stretch",
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
 
 export function getNavOptions(): NativeStackNavigationOptions {
   return {
-    title: "Index",
+    title: "sitemap",
     headerShown: true,
     presentation: "modal",
     animation: "default",
@@ -90,7 +90,7 @@ export function getNavOptions(): NativeStackNavigationOptions {
 
 export function Directory() {
   const routes = useSortedRoutes();
-  const { bottom } = useSafeAreaInsets();
+  const { top, bottom } = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   return (
     <View style={styles.container}>
@@ -104,10 +104,10 @@ export function Directory() {
         ]}
       >
         <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={[
             styles.scroll,
             {
+              paddingTop: top + 12,
               paddingBottom: bottom + 12,
             },
           ]}
