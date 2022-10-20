@@ -2,16 +2,16 @@ import React, { useMemo } from "react";
 
 import { RequireContext } from "../types";
 
-function isFunctionOrReactComponent(
-  Component: any
-): Component is React.ComponentType {
-  return (
-    !!Component &&
-    (typeof Component === "function" ||
-      Component?.prototype?.isReactComponent ||
-      Component.$$typeof === Symbol.for("react.forward_ref"))
-  );
-}
+// function isFunctionOrReactComponent(
+//   Component: any
+// ): Component is React.ComponentType {
+//   return (
+//     !!Component &&
+//     (typeof Component === "function" ||
+//       Component?.prototype?.isReactComponent ||
+//       Component.$$typeof === Symbol.for("react.forward_ref"))
+//   );
+// }
 
 /** Returns the Tutorial component if there are no React components exported as default from any files in the provided context module. */
 export function useTutorial(context: RequireContext) {

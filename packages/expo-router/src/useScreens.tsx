@@ -1,8 +1,9 @@
+import { View } from "@bacons/react-views";
 import React from "react";
 import { ActivityIndicator } from "react-native";
+
 import { Route, RouteNode, sortRoutes, useRouteNode } from "./Route";
 import { Screen } from "./primitives";
-import { View } from "@bacons/react-views";
 
 export type ScreenProps<
   TOptions extends Record<string, any> = Record<string, any>
@@ -117,23 +118,20 @@ export function getQualifiedRouteComponent(value: RouteNode) {
 
   // const { ErrorBoundary } = value.getExtras();
 
+  const getLoadable = (props: any, ref: any) => (
+    <React.Suspense fallback={<Loading />}>
+      <Component
+        {...{
+          ...props,
+          ref,
+        }}
+      />
+    </React.Suspense>
+  );
+
   const QualifiedRoute = React.forwardRef(
     (props: { route: any; navigation: any }, ref: any) => {
-      const loadable = (
-        <React.Suspense fallback={<Loading />}>
-          <Component
-            {...{
-              ...props,
-              ref,
-            }}
-          />
-        </React.Suspense>
-      );
-      // Surface dynamic name as props to the view
-      // const children = React.createElement(Component, {
-      //   ...props,
-      //   ref,
-      // });
+      const loadable = getLoadable(props, ref);
 
       return <Route node={value}>{loadable}</Route>;
     }
@@ -155,7 +153,10 @@ function routeToScreen(
       name={route.route}
       key={route.route}
       options={(args) => {
-        const staticOptions = route.getExtras()?.getNavOptions;
+        // Only eager load generated components
+        const staticOptions = route.generated
+          ? route.getExtras()?.getNavOptions
+          : null;
         const staticResult =
           typeof staticOptions === "function"
             ? staticOptions(args)
