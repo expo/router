@@ -23,14 +23,15 @@ export function useTutorial(context: RequireContext) {
   const keys = useMemo(() => context.keys(), [context]);
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const hasAnyValidComponent = useMemo(() => {
-    for (const key of keys) {
-      // NOTE(EvanBacon): This should only ever occur in development as it breaks lazily loading.
-      const component = context(key)?.default;
-      if (isFunctionOrReactComponent(component)) {
-        return true;
-      }
-    }
-    return false;
+    return !!keys.length;
+    // for (const key of keys) {
+    //   // NOTE(EvanBacon): This should only ever occur in development as it breaks lazily loading.
+    //   const component = context(key)?.default;
+    //   if (isFunctionOrReactComponent(component)) {
+    //     return true;
+    //   }
+    // }
+    // return false;
   }, [keys]);
 
   if (hasAnyValidComponent) {
