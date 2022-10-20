@@ -2,6 +2,7 @@ import React from "react";
 import { ActivityIndicator } from "react-native";
 import { Route, RouteNode, sortRoutes, useRouteNode } from "./Route";
 import { Screen } from "./primitives";
+import { View } from "@bacons/react-views";
 
 export type ScreenProps<
   TOptions extends Record<string, any> = Record<string, any>
@@ -87,6 +88,14 @@ export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
   );
 }
 
+function Loading() {
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator />
+    </View>
+  );
+}
+
 // TODO: Maybe there's a more React-y way to do this?
 // Without this store, the process enters a recursive loop.
 const qualifiedStore = new WeakMap<RouteNode, React.ComponentType<any>>();
@@ -101,7 +110,7 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     const res = value.getComponent();
     if (res instanceof Promise) {
       // TODO: Wrap with error boundary
-      return value.getComponent().then((component) => ({ default: component }));
+      return res.then((component) => ({ default: component }));
     }
     return { default: res };
   });
@@ -111,7 +120,7 @@ export function getQualifiedRouteComponent(value: RouteNode) {
   const QualifiedRoute = React.forwardRef(
     (props: { route: any; navigation: any }, ref: any) => {
       const loadable = (
-        <React.Suspense fallback={<ActivityIndicator />}>
+        <React.Suspense fallback={<Loading />}>
           <Component
             {...{
               ...props,
