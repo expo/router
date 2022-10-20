@@ -6,6 +6,7 @@ import { getRoutes } from "./getRoutes";
 import { useTutorial } from "./onboard/useTutorial";
 import { RequireContext } from "./types";
 import { getQualifiedRouteComponent } from "./useScreens";
+import { SplashScreen } from "./views/Splash";
 
 function useContextModuleAsRoutes(context: RequireContext) {
   // TODO: Is this an optimal hook dependency?
@@ -31,6 +32,7 @@ function RootRouteNodeProvider({
 export function ContextNavigator({ context }: { context: RequireContext }) {
   const Tutorial = useTutorial(context);
   if (Tutorial) {
+    SplashScreen.hideAsync();
     return <Tutorial />;
   }
 
