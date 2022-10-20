@@ -1,9 +1,16 @@
-import { View } from "@bacons/react-views";
+import { Text, View } from "@bacons/react-views";
 import React from "react";
 import { ActivityIndicator } from "react-native";
 
-import { Route, RouteNode, sortRoutes, useRouteNode } from "./Route";
+import {
+  Route,
+  RouteNode,
+  sortRoutes,
+  useContextKey,
+  useRouteNode,
+} from "./Route";
 import { Screen } from "./primitives";
+import { Try } from "./views/Try";
 
 export type ScreenProps<
   TOptions extends Record<string, any> = Record<string, any>
@@ -97,6 +104,25 @@ function Loading() {
   );
 }
 
+function MissingRoute() {
+  const route = useRouteNode();
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "black",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Text style={{ color: "white", fontSize: 24 }}>
+        No <Text style={{ color: "#E37DBB" }}>default export</Text> from route{" "}
+        <Text style={{ color: "#F3F99A" }}>{route?.contextKey}</Text>
+      </Text>
+    </View>
+  );
+}
+
 // TODO: Maybe there's a more React-y way to do this?
 // Without this store, the process enters a recursive loop.
 const qualifiedStore = new WeakMap<RouteNode, React.ComponentType<any>>();
@@ -111,9 +137,22 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     const res = value.getComponent();
     if (res instanceof Promise) {
       // TODO: Wrap with error boundary
-      return res.then((component) => ({ default: component }));
+      return res.then(({ ErrorBoundary, ...component }) => {
+        if (ErrorBoundary) {
+          return React.forwardRef(
+            (props: { route: any; navigation: any }, ref: any) => {
+              const children = React.createElement(component.default, {
+                ...props,
+                ref,
+              });
+              return <Try catch={ErrorBoundary}>{children}</Try>;
+            }
+          );
+        }
+        return { default: component.default || MissingRoute };
+      });
     }
-    return { default: res };
+    return { default: res.default || MissingRoute };
   });
 
   // const { ErrorBoundary } = value.getExtras();

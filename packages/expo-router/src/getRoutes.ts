@@ -157,9 +157,9 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
       getComponent() {
         const mod = contextModule(key);
         if (mod instanceof Promise) {
-          return mod.then((m) => m.default);
+          return mod.then((m) => m);
         }
-        return mod.default;
+        return mod;
       },
       contextKey: key,
       getExtras() {
@@ -214,7 +214,7 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
     generated: true,
     dynamic: null,
     getExtras: () => ({}),
-    getComponent: () => DefaultLayout,
+    getComponent: () => ({ default: DefaultLayout }),
     children: routes,
   };
 }
@@ -248,7 +248,7 @@ function appendSitemapRoute(routes: RouteNode) {
   const { Directory, getNavOptions } = require("./views/Directory");
   routes.children.push({
     getComponent() {
-      return Directory;
+      return { default: Directory };
     },
     getExtras() {
       return { getNavOptions };
@@ -269,7 +269,7 @@ function appendUnmatchedRoute(routes: RouteNode) {
   if (!userDefinedDynamicRoute) {
     routes.children.push({
       getComponent() {
-        return require("./views/Unmatched").Unmatched;
+        return { default: require("./views/Unmatched").Unmatched };
       },
       getExtras() {
         return {};
