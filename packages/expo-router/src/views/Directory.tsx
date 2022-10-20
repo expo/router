@@ -68,10 +68,10 @@ const styles = StyleSheet.create({
 export function getNavOptions(): NativeStackNavigationOptions {
   return {
     title: "sitemap",
-    headerShown: true,
+    headerShown: false,
     presentation: "modal",
     animation: "default",
-    headerLargeTitle: true,
+    headerLargeTitle: false,
     headerTitleStyle: {
       color: "white",
     },
