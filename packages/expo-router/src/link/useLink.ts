@@ -34,7 +34,7 @@ export function useLink(): {
     back,
     replace,
     parse: resolveHref,
-    // TODO(EvanBacon): add `pathname`, `query`, maybe `reload`
+    // TODO(EvanBacon): add `reload`
     // TODO(EvanBacon): add `canGoBack` but maybe more like a `hasContext`
   };
 }

@@ -7,13 +7,12 @@ Ports the guide [React Navigation: Params](https://reactnavigation.org/docs/para
 
 ```bash title="File System"
 app/
-  (stack).js
-  (stack)/
-    index.js
-    details.js
+  _layout.js
+  index.js
+  details.js
 ```
 
-```js title=app/(stack).js
+```js title=app/_layout.js
 import { Stack } from "expo-router";
 
 export default function Layout() {
@@ -21,7 +20,7 @@ export default function Layout() {
 }
 ```
 
-```js title=app/(stack)/index.js
+```js title=app/index.js
 import { useEffect } from "react";
 import { View, Text } from "react-native";
 
@@ -38,9 +37,9 @@ export default function Home({ navigation, route }) {
       <Text>Home Screen</Text>
       <Link
         href={{
-          screen: "details",
-          /* 1. Navigate to the details route with query params */
-          params: { itemId: 86, otherParam: "anything you want here" },
+          pathname: "details",
+          // /* 1. Navigate to the details route with query params */
+          query: { itemId: 86, otherParam: "anything you want here" },
         }}
       >
         Go to Details
@@ -50,7 +49,7 @@ export default function Home({ navigation, route }) {
 }
 ```
 
-```js title=app/(stack)/details.js
+```js title=app/details.js
 import { View, Text } from "react-native";
 
 export default function Details({ navigation, route }) {

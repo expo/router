@@ -1,9 +1,7 @@
-import { LinkingOptions, PathConfigMap } from "@react-navigation/native";
-import { useMemo } from "react";
+import { LinkingOptions } from "@react-navigation/native";
 
 import { RouteNode } from "./Route";
 import { getAllWebRedirects } from "./aasa";
-import { useRoutesContext } from "./context";
 import {
   addEventListener,
   getInitialURL,
@@ -17,55 +15,65 @@ import {
   matchFragmentName,
 } from "./matchers";
 
+type Screen =
+  | string
+  | {
+      path: string;
+      screens: Record<string, Screen>;
+    };
+
 // `[page]` -> `:page`
 // `page` -> `page`
 function convertDynamicRouteToReactNavigation(name: string) {
-  if (matchDeepDynamicRouteName(name)) {
+  if (name === "index" || matchFragmentName(name) != null) {
+    return "";
+  }
+  if (matchDeepDynamicRouteName(name) != null) {
     return "*";
   }
   const dynamicName = matchDynamicName(name);
 
-  if (dynamicName) {
+  if (dynamicName != null) {
     return `:${dynamicName}`;
-  }
-
-  if (name === "index" || matchFragmentName(name)) {
-    return "";
   }
 
   return name;
 }
 
-export function treeToReactNavigationLinkingRoutes(
-  nodes: RouteNode[],
-  parents: string[] = []
-): PathConfigMap<object> {
-  // TODO: Intercept errors, strip invalid routes, and warn instead.
-  // Our warnings can be more helpful than upstream since we know the associated file name.
-  const firstPass = nodes
-    .map((node) => {
-      const path = convertDynamicRouteToReactNavigation(node.route);
-
-      if (!node.children.length) {
-        return [node.route, path];
-      }
-
-      const screens = treeToReactNavigationLinkingRoutes(node.children, [
-        ...parents,
-        path,
-      ]);
-
-      return [node.route, { path, screens }] as const;
-    })
-    .reduce<PathConfigMap<object>>((acc, [route, current]) => {
-      acc[route] = current;
-      return acc;
-    }, {});
-
-  return firstPass;
+function parseRouteSegments(segments: string): string {
+  return (
+    // NOTE(EvanBacon): When there are nested routes without layouts
+    // the node.route will be something like `app/home/index`
+    // this needs to be split to ensure each segment is parsed correctly.
+    segments
+      .split("/")
+      // Convert each segment to a React Navigation format.
+      .map(convertDynamicRouteToReactNavigation)
+      // Remove any empty paths from fragments or index routes.
+      .filter(Boolean)
+      // Join to return as a path.
+      .join("/")
+  );
 }
 
-export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<object> {
+function convertRouteNodeToScreen(node: RouteNode): Screen {
+  const path = parseRouteSegments(node.route);
+  if (!node.children.length) {
+    return path;
+  }
+  const screens = getReactNavigationScreensConfig(node.children);
+  return { path, screens };
+}
+
+export function getReactNavigationScreensConfig(
+  nodes: RouteNode[]
+): Record<string, Screen> {
+  return Object.fromEntries(
+    nodes.map((node) => [node.route, convertRouteNodeToScreen(node)] as const)
+  );
+}
+
+export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
   return {
     prefixes: [
       /* your linking prefixes */
@@ -76,7 +84,7 @@ export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<object> {
       ...getAllWebRedirects(),
     ],
     config: {
-      screens: treeToReactNavigationLinkingRoutes(routes),
+      screens: getReactNavigationScreensConfig(routes.children),
     },
     // A custom getInitialURL is used on native to ensure the app always starts at
     // the root path if it's launched from something other than a deep link.
@@ -88,9 +96,4 @@ export function getLinkingConfig(routes: RouteNode[]): LinkingOptions<object> {
     getStateFromPath,
     getPathFromState,
   };
-}
-
-export function useLinkingConfig(): LinkingOptions<object> {
-  const routes = useRoutesContext();
-  return useMemo(() => getLinkingConfig(routes), [routes]);
 }

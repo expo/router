@@ -7,14 +7,13 @@ Ports the guide [React Navigation: header buttons](https://reactnavigation.org/d
 
 ```bash title="File System"
 app/
-  (stack).js
-  (stack)/
-    home.js
+  _layout.js
+  home.js
 ```
 
 You can use the `<Stack.Screen name={routeName} />` component in the layout component route to statically configure screen options. This is useful for tab bars or drawers which need to have an icon defined ahead of time.
 
-```js title=app/(stack).js
+```js title=app/_layout.js
 import { Stack } from "expo-router";
 
 export default function Layout() {
@@ -43,7 +42,7 @@ export default function Layout() {
 
 Use the `<Stack.Screen />` component in the child route to dynamically configure options.
 
-```js title=app/(stack)/home.js
+```js title=app/home.js
 import { useLayoutEffect } from "react";
 import { View, Button, Text, Image } from "react-native";
 // highlight-next-line

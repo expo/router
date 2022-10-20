@@ -7,21 +7,22 @@ import { RequireContext } from "../types";
 
 function getGestureHandlerRootView() {
   try {
-    return require("react-native-gesture-handler")
-      .GestureHandlerRootView as typeof import("react-native-gesture-handler").GestureHandlerRootView;
+    const { GestureHandlerRootView } =
+      require("react-native-gesture-handler") as typeof import("react-native-gesture-handler");
+
+    return function GestureHandler(props: any) {
+      return <GestureHandlerRootView style={{ flex: 1 }} {...props} />;
+    };
   } catch {
     return React.Fragment;
   }
 }
 
-export function ExpoRoot({ context }: { context: RequireContext }) {
-  const GestureHandlerRootView = React.useMemo(
-    () => getGestureHandlerRootView(),
-    []
-  );
+const GestureHandlerRootView = getGestureHandlerRootView();
 
+export function ExpoRoot({ context }: { context: RequireContext }) {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView>
       <SafeAreaProvider>
         <ContextNavigator context={context} />
         {/* Users can override this by adding another StatusBar element anywhere higher in the component tree. */}

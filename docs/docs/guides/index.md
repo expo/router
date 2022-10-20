@@ -3,9 +3,9 @@ title: Building a layout
 sidebar_position: 1
 ---
 
-First create a **layout route** in `app/stack.js` which uses the pre-built `Stack` component from `expo-router` to render a native stack navigator.
+First create a **layout route** in `app/_layout.js` which uses the pre-built `Stack` component from `expo-router` to render a native stack navigator.
 
-```js title=app/(stack).js
+```js title=app/_layout.js
 import { Stack } from "expo-router";
 
 export default function Layout() {
@@ -14,10 +14,10 @@ export default function Layout() {
 }
 ```
 
-Now create a **child route** in `app/(stack)/index.js` which will be rendered inside the stack navigator.
+Now create a **child route** in `app/index.js` which will be rendered inside the stack navigator.
 
-```js title=app/(stack)/index.js
-import { View, Text } from "react-native";
+```js title=app/index.js
+import { View } from "react-native";
 import { Link, Stack } from "expo-router";
 
 export default function Home() {
@@ -35,7 +35,7 @@ export default function Home() {
 
 Now create a second child route to navigate to:
 
-```js title=app/(stack)/details.js
+```js title=app/details.js
 import { View, Text } from "react-native";
 
 export default function Details({ navigation }) {
@@ -59,10 +59,9 @@ The final **file structure** should look like this:
 
 ```bash title="File System"
 app/
-  (stack).js
-  (stack)
-    index.js
-    details.js
+  _layout.js
+  index.js
+  details.js
 ```
 
 Ports the guide [React Navigation: Hello world](https://reactnavigation.org/docs/hello-react-navigation) to Expo Router.

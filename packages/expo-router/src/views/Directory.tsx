@@ -10,30 +10,18 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { RouteNode } from "../Route";
-import { useRoutesContext } from "../context";
+import { RouteNode, sortRoutes } from "../Route";
+import { useRootRouteNodeContext } from "../context";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
 
-const INDENT = 18;
+const INDENT = 24;
 
 function useSortedRoutes() {
-  const ctx = useRoutesContext();
+  const ctx = useRootRouteNodeContext();
 
   const routes = React.useMemo(
-    () =>
-      ctx
-        .filter((route) => !route.internal)
-        .sort((a, b) => {
-          // Emulate vscode's sorting
-          if (a.route < b.route) {
-            return -1;
-          }
-          if (a.route > b.route) {
-            return 1;
-          }
-          return 0;
-        }),
+    () => [ctx].filter((route) => !route.internal).sort(sortRoutes),
     [ctx]
   );
   return routes;
@@ -52,7 +40,7 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
   },
   scroll: {
-    padding: 12,
+    paddingHorizontal: 12,
     flex: 1,
     // paddingTop: top + 12,
     alignItems: "stretch",
@@ -79,7 +67,7 @@ const styles = StyleSheet.create({
 
 export function getNavOptions(): NativeStackNavigationOptions {
   return {
-    title: "Index",
+    title: "sitemap",
     headerShown: true,
     presentation: "modal",
     animation: "default",
@@ -102,7 +90,7 @@ export function getNavOptions(): NativeStackNavigationOptions {
 
 export function Directory() {
   const routes = useSortedRoutes();
-  const { bottom } = useSafeAreaInsets();
+  const { top, bottom } = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   return (
     <View style={styles.container}>
@@ -116,10 +104,10 @@ export function Directory() {
         ]}
       >
         <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={[
             styles.scroll,
             {
+              paddingTop: top + 12,
               paddingBottom: bottom + 12,
             },
           ]}
@@ -167,50 +155,52 @@ function FileItem({
 
   return (
     <>
-      <Link
-        href={href}
-        onPress={() => {
-          if (Platform.OS !== "web") {
-            // Ensure the modal pops
-            navigation.goBack();
-          }
-        }}
-        // @ts-expect-error: disabled not on type
-        disabled={disabled}
-        asChild
-      >
-        <Pressable>
-          {({ pressed, hovered }) => (
-            <View
-              style={[
-                styles.itemPressable,
-                {
-                  paddingLeft: INDENT + level * INDENT,
-                  backgroundColor: hovered
-                    ? "rgba(255,255,255,0.1)"
-                    : "transparent",
-                },
-                pressed && { backgroundColor: "#323232" },
-                disabled && { opacity: 0.4 },
-              ]}
-            >
-              <View style={{ flexDirection: "row", alignItems: "center" }}>
-                {route.children.length ? <PkgIcon /> : <FileIcon />}
-                <Text style={styles.filename}>{route.contextKey}</Text>
-              </View>
+      {!route.internal && (
+        <Link
+          href={href}
+          onPress={() => {
+            if (Platform.OS !== "web") {
+              // Ensure the modal pops
+              navigation.goBack();
+            }
+          }}
+          // @ts-expect-error: disabled not on type
+          disabled={disabled}
+          asChild
+        >
+          <Pressable>
+            {({ pressed, hovered }) => (
+              <View
+                style={[
+                  styles.itemPressable,
+                  {
+                    paddingLeft: INDENT + level * INDENT,
+                    backgroundColor: hovered
+                      ? "rgba(255,255,255,0.1)"
+                      : "transparent",
+                  },
+                  pressed && { backgroundColor: "#323232" },
+                  disabled && { opacity: 0.4 },
+                ]}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  {route.children.length ? <PkgIcon /> : <FileIcon />}
+                  <Text style={styles.filename}>{route.contextKey}</Text>
+                </View>
 
-              {!disabled && <ForwardIcon />}
-              {route.generated && <Text style={styles.virtual}>Virtual</Text>}
-            </View>
-          )}
-        </Pressable>
-      </Link>
-      {route.children.map((child, index) => (
+                {!disabled && <ForwardIcon />}
+                {route.generated && <Text style={styles.virtual}>Virtual</Text>}
+              </View>
+            )}
+          </Pressable>
+        </Link>
+      )}
+      {route.children.map((child) => (
         <FileItem
           key={child.contextKey}
           route={child}
           parents={[...parents, route.route]}
-          level={level + 1}
+          level={level + (route.generated ? 0 : 1)}
         />
       ))}
     </>

@@ -1,4 +1,4 @@
-import { PickPartial, RouteNode } from "./Route";
+import { RouteNode } from "./Route";
 import {
   getNameFromFilePath,
   matchDeepDynamicRouteName,
@@ -8,17 +8,10 @@ import {
 import { RequireContext } from "./types";
 import { DefaultLayout } from "./views/Layout";
 
-export function createRouteNode(
-  route: PickPartial<RouteNode, "dynamic" | "children">
-): RouteNode {
-  return {
-    children: [],
-    dynamic: null,
-    ...route,
-  };
-}
-
-type FileNode = Pick<RouteNode, "contextKey" | "getComponent" | "getExtras"> & {
+export type FileNode = Pick<
+  RouteNode,
+  "contextKey" | "getComponent" | "getExtras"
+> & {
   /** Like `(tab)/index` */
   normalizedName: string;
 };
@@ -32,7 +25,7 @@ type TreeNode = {
 };
 
 /** Convert a flat map of file nodes into a nested tree of files. */
-function getRecursiveTree(files: FileNode[]): TreeNode {
+export function getRecursiveTree(files: FileNode[]): TreeNode {
   const tree = {
     name: "",
     children: [],
@@ -44,7 +37,19 @@ function getRecursiveTree(files: FileNode[]): TreeNode {
     // ['(tab)', 'settings', '[...another]']
     const parts = file.normalizedName.split("/");
     let currentNode: TreeNode = tree;
-    for (const part of parts) {
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+
+      if (i === parts.length - 1 && part === "_layout") {
+        if (currentNode.node) {
+          const overwritten = currentNode.node.contextKey;
+          throw new Error(
+            `Higher priority Layout Route "${file.contextKey}" overriding redundant Layout Route "${overwritten}". Remove the Layout Route "${overwritten}" to fix this.`
+          );
+        }
+        continue;
+      }
+
       const existing = currentNode.children.find((item) => item.name === part);
       if (existing) {
         currentNode = existing;
@@ -62,11 +67,31 @@ function getRecursiveTree(files: FileNode[]): TreeNode {
     currentNode.node = file;
   }
 
+  if (process.env.NODE_ENV !== "production") {
+    assertDeprecatedFormat(tree);
+  }
+
   return tree;
 }
 
+function assertDeprecatedFormat(tree: TreeNode) {
+  for (const child of tree.children) {
+    if (
+      child.node &&
+      child.children.length &&
+      !child.node.normalizedName.endsWith("_layout")
+    ) {
+      const ext = child.node.contextKey.split(".").pop();
+      throw new Error(
+        `Using deprecated Layout Route format: Move \`./app/${child.node.normalizedName}.${ext}\` to \`./app/${child.node.normalizedName}/_layout.${ext}\``
+      );
+    }
+    assertDeprecatedFormat(child);
+  }
+}
+
 function getTreeNodesAsRouteNodes(nodes: TreeNode[]): RouteNode[] {
-  return nodes.map(treeNodeToRouteNode).filter(Boolean) as RouteNode[];
+  return nodes.map(treeNodeToRouteNode).flat().filter(Boolean) as RouteNode[];
 }
 
 export function generateDynamic(name: string) {
@@ -79,20 +104,21 @@ export function generateDynamic(name: string) {
 function treeNodeToRouteNode({
   name,
   node,
-  parents,
   children,
-}: TreeNode): RouteNode | null {
+}: TreeNode): RouteNode[] | null {
   const dynamic = generateDynamic(name);
 
   if (node) {
-    return createRouteNode({
-      route: name,
-      getExtras: node.getExtras,
-      getComponent: node.getComponent,
-      contextKey: node.contextKey,
-      children: getTreeNodesAsRouteNodes(children),
-      dynamic,
-    });
+    return [
+      {
+        route: name,
+        getExtras: node.getExtras,
+        getComponent: node.getComponent,
+        contextKey: node.contextKey,
+        children: getTreeNodesAsRouteNodes(children),
+        dynamic,
+      },
+    ];
   }
 
   // Empty folder, skip it.
@@ -100,18 +126,16 @@ function treeNodeToRouteNode({
     return null;
   }
 
-  // When there's a directory, but no sibling file with the same name, the directory won't work.
-  // This ensures that we have a file for every directory (containing valid children).
-  return createRouteNode({
-    route: name,
-    generated: true,
-    getExtras: () => ({}),
-    getComponent: () => DefaultLayout,
-    // Generate a fake file name for the directory
-    contextKey: [".", ...parents, name + ".tsx"].filter(Boolean).join("/"),
-    children: getTreeNodesAsRouteNodes(children),
-    dynamic,
-  });
+  // When there's a directory, but no layout route file (with valid export), the child routes won't be grouped.
+  // This pushes all children into the nearest layout route.
+  return getTreeNodesAsRouteNodes(
+    children.map((child) => {
+      return {
+        ...child,
+        name: [name, child.name].filter(Boolean).join("/"),
+      };
+    })
+  );
 }
 
 function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
@@ -156,63 +180,107 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
   return nodes.filter(Boolean) as FileNode[];
 }
 
-/** Given a Metro context module, return an array of nested routes. */
-export function getRoutes(contextModule: RequireContext): RouteNode[] {
-  const files = contextModuleToFileNodes(contextModule);
-  const treeNodes = getRecursiveTree(files).children;
-  const routes = getTreeNodesAsRouteNodes(treeNodes);
-
-  if (process.env.NODE_ENV !== "production") {
-    appendDirectoryRoute(routes);
+function hasCustomRootLayoutNode(routes: RouteNode[]) {
+  if (routes.length !== 1) {
+    return false;
   }
+  // This could either be the root _layout or an app with a single file.
+  const route = routes[0];
 
-  // Auto add not found route if it doesn't exist
-  appendUnmatchedRoute(routes);
-
-  return routes;
+  if (
+    route.route === "" &&
+    route.contextKey.match(/^\.\/_layout\.([jt]sx?)$/)
+  ) {
+    return true;
+  }
+  return false;
 }
 
-function appendDirectoryRoute(routes: RouteNode[]) {
-  if (!routes.length) {
+function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
+  const routes = treeNodeToRouteNode(treeNode);
+
+  if (!routes?.length) {
+    return null;
+  }
+
+  if (hasCustomRootLayoutNode(routes)) {
+    return routes[0];
+  }
+
+  return {
+    // Generate a fake file name for the directory
+    contextKey: "./_layout.tsx",
+    route: "",
+    generated: true,
+    dynamic: null,
+    getExtras: () => ({}),
+    getComponent: () => DefaultLayout,
+    children: routes,
+  };
+}
+
+/** Given a Metro context module, return an array of nested routes. */
+export function getRoutes(contextModule: RequireContext): RouteNode | null {
+  const files = contextModuleToFileNodes(contextModule);
+  const treeNodes = getRecursiveTree(files);
+  const route = treeNodesToRootRoute(treeNodes);
+
+  if (!route) {
+    return null;
+  }
+
+  appendSitemapRoute(route);
+
+  // Auto add not found route if it doesn't exist
+  appendUnmatchedRoute(route);
+
+  return route;
+}
+
+function appendSitemapRoute(routes: RouteNode) {
+  if (
+    !routes.children.length ||
+    // Allow overriding the sitemap route
+    routes.children.some((route) => route.route === "_sitemap")
+  ) {
     return routes;
   }
   const { Directory, getNavOptions } = require("./views/Directory");
-  routes.push(
-    createRouteNode({
-      getComponent() {
-        return Directory;
-      },
-      getExtras() {
-        return { getNavOptions };
-      },
-      route: "__index",
-      contextKey: "./__index.tsx",
-      generated: true,
-      internal: true,
-    })
-  );
+  routes.children.push({
+    getComponent() {
+      return Directory;
+    },
+    getExtras() {
+      return { getNavOptions };
+    },
+    route: "_sitemap",
+    contextKey: "./_sitemap.tsx",
+    generated: true,
+    internal: true,
+    dynamic: null,
+    children: [],
+  });
   return routes;
 }
 
-function appendUnmatchedRoute(routes: RouteNode[]) {
+function appendUnmatchedRoute(routes: RouteNode) {
   // Auto add not found route if it doesn't exist
   const userDefinedDynamicRoute = getUserDefinedDeepDynamicRoute(routes);
   if (!userDefinedDynamicRoute) {
-    routes.push(
-      createRouteNode({
-        getComponent() {
-          return require("./views/Unmatched").Unmatched;
-        },
-        getExtras() {
-          return {};
-        },
-        route: "[...404]",
-        contextKey: "./[...404].tsx",
-        dynamic: { name: "404", deep: true },
-        generated: true,
-        internal: true,
-      })
-    );
+    routes.children.push({
+      getComponent() {
+        return require("./views/Unmatched").Unmatched;
+      },
+      getExtras() {
+        return {};
+      },
+      route: "[...404]",
+      contextKey: "./[...404].tsx",
+      dynamic: { name: "404", deep: true },
+      children: [],
+      generated: true,
+      internal: true,
+    });
   }
   return routes;
 }
@@ -222,17 +290,17 @@ function appendUnmatchedRoute(routes: RouteNode[]) {
  * @returns a top-level deep dynamic route if it exists, otherwise null.
  */
 export function getUserDefinedDeepDynamicRoute(
-  routes: RouteNode[]
+  routes: RouteNode
 ): RouteNode | null {
   // Auto add not found route if it doesn't exist
-  for (const route of routes) {
+  for (const route of routes.children ?? []) {
     const isDeepDynamic = matchDeepDynamicRouteName(route.route);
     if (isDeepDynamic) {
       return route;
     }
     // Recurse through fragment routes
     if (matchFragmentName(route.route)) {
-      const child = getUserDefinedDeepDynamicRoute(route.children);
+      const child = getUserDefinedDeepDynamicRoute(route);
       if (child) {
         return child;
       }

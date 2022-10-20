@@ -1,21 +1,46 @@
-export type Href = string | { pathname?: string; query?: Record<string, any> };
+import { matchFragmentName } from "../matchers";
 
-export const resolveHref = (
-  href: { pathname?: string; query?: Record<string, any> } | string
-): string => {
-  if (typeof href === "string") {
-    return href ?? "";
-  }
-  const path = href.pathname ?? "";
-  if (!href?.query) {
-    return path;
-  }
-  const { pathname, query } = createQualifiedPathname(path, { ...href.query });
-  return pathname + (Object.keys(query).length ? `?${createQuery(query)}` : "");
+export type Href = string | HrefObject;
+
+export type HrefObject = {
+  /** Path representing the selected route `/[id]`. */
+  pathname?: string;
+  /** Query parameters for the path. */
+  params?: Record<string, any>;
+  /** @deprecated use `params` instead. */
+  query?: Record<string, any>;
 };
 
-function createQualifiedPathname(pathname: string, query: Record<string, any>) {
-  for (const [key, value = ""] of Object.entries(query)) {
+/** Resolve an href object into a fully qualified, relative href. */
+export const resolveHref = (href: Href): string => {
+  if (typeof href === "string") {
+    return resolveHref({ pathname: href ?? "" });
+  }
+  const path = stripFragmentRoutes(href.pathname ?? "");
+  if (!href?.params) {
+    return path;
+  }
+  const { pathname, params } = createQualifiedPathname(path, {
+    ...href.params,
+  });
+  return (
+    pathname +
+    (Object.keys(params).length ? `?${createQueryParams(params)}` : "")
+  );
+};
+
+function stripFragmentRoutes(pathname: string): string {
+  return pathname
+    .split("/")
+    .filter((segment) => matchFragmentName(segment) == null)
+    .join("/");
+}
+
+function createQualifiedPathname(
+  pathname: string,
+  params: Record<string, any>
+): Omit<Required<HrefObject>, "query"> {
+  for (const [key, value = ""] of Object.entries(params)) {
     const dynamicKey = `[${key}]`;
     const deepDynamicKey = `[...${key}]`;
     if (pathname.includes(dynamicKey)) {
@@ -32,13 +57,13 @@ function createQualifiedPathname(pathname: string, query: Record<string, any>) {
       continue;
     }
 
-    delete query[key];
+    delete params[key];
   }
-  return { pathname, query };
+  return { pathname, params };
 }
 
-function createQuery(query: Record<string, any>) {
-  return Object.keys(query)
-    .map((key) => `${key}=${query[key]}`)
+function createQueryParams(params: Record<string, any>) {
+  return Object.keys(params)
+    .map((key) => `${key}=${params[key]}`)
     .join("&");
 }

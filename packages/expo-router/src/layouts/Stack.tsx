@@ -1,14 +1,15 @@
 import {
-  createStackNavigator,
-  StackNavigationOptions,
-} from "@react-navigation/stack";
+  createNativeStackNavigator,
+  NativeStackNavigationOptions,
+} from "@react-navigation/native-stack";
 
 import { withLayoutContext } from "./withLayoutContext";
 
-// This is the only way to access the navigator.
-const StackNavigator = createStackNavigator().Navigator;
+const NativeStackNavigator = createNativeStackNavigator().Navigator;
 
 export const Stack = withLayoutContext<
-  StackNavigationOptions,
-  typeof StackNavigator
->(StackNavigator);
+  NativeStackNavigationOptions,
+  typeof NativeStackNavigator
+>(NativeStackNavigator);
+
+export default Stack;

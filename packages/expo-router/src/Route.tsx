@@ -1,6 +1,6 @@
 import React, { ReactNode, useContext } from "react";
 
-import { RoutesContext } from "./context";
+import { RootRouteNodeContext } from "./context";
 import { getNameFromFilePath, matchFragmentName } from "./matchers";
 
 /** The list of input keys will become optional, everything else will remain the same. */
@@ -29,21 +29,21 @@ export type RouteNode = {
 
 const CurrentRoutePathContext = React.createContext<string | null>(null);
 
-const CurrentRouteContext = React.createContext<RouteNode[]>([]);
+const CurrentRouteContext = React.createContext<RouteNode | null>(null);
 
 if (process.env.NODE_ENV !== "production") {
   CurrentRoutePathContext.displayName = "RoutePath";
   CurrentRouteContext.displayName = "Route";
 }
 
-/** Return all the routes for the current boundary. */
-export function useRoutes(): RouteNode[] {
+/** Return the RouteNode at the current contextual boundary. */
+export function useRouteNode(): RouteNode | null {
   return useContext(CurrentRouteContext);
 }
 
 export function useContextKey(): string {
   const filename = useContext(CurrentRoutePathContext);
-  if (!filename) {
+  if (filename == null) {
     throw new Error("No filename found. This is likely a bug in expo-router.");
   }
   return filename;
@@ -51,53 +51,33 @@ export function useContextKey(): string {
 
 /** Provides the matching routes and filename to the children. */
 export function Route({
-  filename,
   children,
+  node,
 }: {
-  filename: string;
   children: ReactNode;
+  node: RouteNode;
 }) {
-  const routes = useRoutesAtPath(filename);
+  const normalName = React.useMemo(() => {
+    // The root path is `` (empty string) so always prepend `/` to ensure
+    // there is some value.
+    const normal = "/" + getNameFromFilePath(node.contextKey);
+    if (!normal.endsWith("_layout")) {
+      return normal;
+    }
+    return normal.replace(/\/?_layout$/, "");
+  }, [node.contextKey]);
 
   return (
-    <CurrentRoutePathContext.Provider value={filename}>
-      <CurrentRouteContext.Provider value={routes}>
+    <CurrentRoutePathContext.Provider value={normalName}>
+      <CurrentRouteContext.Provider value={node}>
         {children}
       </CurrentRouteContext.Provider>
     </CurrentRoutePathContext.Provider>
   );
 }
 
-function useRoutesAtPath(filename: string): RouteNode[] {
-  const normalName = React.useMemo(
-    () => getNameFromFilePath(filename),
-    [filename]
-  );
-  const routes = useContext(RoutesContext);
-  const keys = React.useMemo(() => routes.keys(), [routes]);
-
-  const family = React.useMemo(() => {
-    let children: RouteNode[] = routes;
-
-    // Skip root directory
-    if (normalName) {
-      // split and search
-      const parts = normalName.split("/");
-      for (const part of parts) {
-        const next = children.find(({ route }) => route === part);
-
-        if (!next?.children) {
-          return [];
-        }
-
-        children = next?.children;
-      }
-    }
-
-    return children.sort(sortRoutes);
-  }, [normalName, keys]);
-
-  return family;
+export function useRootRoute(): RouteNode | null {
+  return useContext(RootRouteNodeContext);
 }
 
 export function sortRoutes(a: RouteNode, b: RouteNode): number {

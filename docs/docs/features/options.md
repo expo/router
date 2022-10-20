@@ -3,7 +3,7 @@ title: Screen Options
 sidebar_position: 5
 ---
 
-Qualified layouts, like the ones found in `expo-router` (Stack, Tabs, NativeStack, Drawer, Layout) have a static `Screen` component which can be used to configure the behavior of a route declaratively.
+Qualified layouts, like the ones found in `expo-router` (Stack, Tabs, Layout) have a static `Screen` component which can be used to configure the behavior of a route declaratively.
 
 All `Screen` components are the same and render `null`, but they have different types for convenience. The common props are:
 
@@ -17,7 +17,7 @@ In React Navigation, you often use `screenOptions` to configure layout options. 
 
 Consider the following stack layout:
 
-```tsx title=app/(stack).tsx
+```tsx title=app/_layout.tsx
 // highlight-next-line
 import { Stack } from "expo-router";
 
@@ -29,7 +29,7 @@ export default function Layout() {
 
 We can configure the title of the stack per-screen using the `<Stack.Screen />` component:
 
-```tsx title=app/(stack)/index.tsx
+```tsx title=app/index.tsx
 import { View } from "react-native";
 import { Stack } from "expo-router";
 
@@ -49,7 +49,7 @@ The `options` are the same as the [`screenOptions` prop in React Navigation](htt
 
 Sometimes you want static options to live outside the route component, this is useful for things like tabs or drawer items which should be configured before the route loads. You can use the `<Screen />` option directly in the layout component with the `name` prop set to the route name (file name without the extension):
 
-```tsx title=app/(tabs).tsx
+```tsx title=app/_layout.tsx
 import { Tabs } from "expo-router";
 
 export default function Layout() {
@@ -64,7 +64,7 @@ export default function Layout() {
 
 You can use this system to the order of screens and tabs in a layout. For example, if you want to change the order of screens in a stack, you can use the `name` prop to specify the order:
 
-```tsx title=app/(tabs).tsx
+```tsx title=app/_layout.tsx
 import { Tabs } from "expo-router";
 
 export default function Layout() {
@@ -74,6 +74,50 @@ export default function Layout() {
       <Tabs.Screen name="index" />
       <Tabs.Screen name="settings" />
     </Tabs>
+  );
+}
+```
+
+## Parent Options
+
+You can access any parent `navigation` prop by using the [`navigation.getParent()`](https://reactnavigation.org/docs/navigation-prop/#getparent) function. Each layout automatically indexes itself using the normalized path.
+
+The format for the normalized path is `/folder/file` where the string always starts with a `/` and there is no file extension or trailing slash.
+
+Consider the following structure:
+
+```bash title="File System"
+app/
+  _layout.js
+  tabs/
+    _layout.js
+    page.js
+```
+
+```tsx title=app/tabs/page.tsx
+import { useNavigation } from "expo-router";
+
+export default function Page() {
+  // This navigation prop controls the direct parent `/tabs/_layout.js`.
+  const navigation = useNavigation();
+  // This navigation prop controls the direct parent `/_layout.js`.
+  const rootNavigation = useNavigation("/");
+
+  // ...
+}
+```
+
+The same effect can be achieved by using the `name` prop of the Screen component.
+
+```tsx title=app/tabs/page.tsx
+import { NativeStack, Tabs } from "expo-router";
+
+export default function Page() {
+  return (
+    <>
+      <NativeStack.Screen name="../../" options={{ ... }} />
+      <Tabs.Screen name="/_layout.js" options={{ ... }} />
+    </>
   );
 }
 ```
