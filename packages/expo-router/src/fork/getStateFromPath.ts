@@ -504,20 +504,29 @@ const createConfigItem = (
   // Normalize pattern to remove any leading, trailing slashes, duplicate slashes etc.
   pattern = pattern.split("/").filter(Boolean).join("/");
 
-  const regex = pattern
-    ? new RegExp(
-        `^(${pattern
-          .split("/")
-          .map((it) => {
-            if (it.startsWith(":")) {
-              return `(([^/]+\\/)${it.endsWith("?") ? "?" : ""})`;
-            }
+  const matchableSegments = pattern
+    .split("/")
+    .map((it) => {
+      if (it.startsWith(":")) {
+        return `(([^/]+\\/)${it.endsWith("?") ? "?" : ""})`;
+      }
+      if (!it) {
+        return "";
+      }
 
-            return `${it === "*" ? ".*" : escape(it)}\\/`;
-          })
-          .join("")})`
-      )
-    : undefined;
+      // Allow spaces in file path names.
+      it = it.replace(" ", "%20");
+
+      return `${it === "*" ? ".*" : escape(it)}\\/`;
+    })
+    .join("");
+
+  const isIndex =
+    !hasChildren && (/\/index$/.test(screen) || /^index$/.test(screen));
+  // NOTE(EvanBacon): Add support for matching paths named "index"
+  // as either `/` or `/index`.
+  const matcher = `^(${matchableSegments}${isIndex ? "(?:index\\/)?" : ""})$`;
+  const regex = new RegExp(matcher);
 
   return {
     screen,
