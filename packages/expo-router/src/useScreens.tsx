@@ -160,10 +160,11 @@ function routeToScreen(
 ) {
   return (
     <Screen
+      // Users can override the screen getId function.
+      getId={createGetIdForRoute(route)}
       {...props}
       name={route.route}
       key={route.route}
-      getId={createGetIdForRoute(route)}
       options={(args) => {
         const staticOptions = route.getExtras()?.getNavOptions;
         const staticResult =
