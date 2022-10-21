@@ -35,6 +35,18 @@ describe("index paths", () => {
       ],
     });
   });
+  it(`asserts conflict between index paths and fragments`, () => {
+    expect(() =>
+      getStateFromPath("/index", {
+        screens: {
+          index: "",
+          "(somn)": "",
+        },
+      } as any)
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"The route pattern '/' resolves to both 'index' and '(somn)'. Patterns must be unique and cannot resolve to more than one route."`
+    );
+  });
   it(`matches index paths against nested /index`, () => {
     const config = {
       screens: {

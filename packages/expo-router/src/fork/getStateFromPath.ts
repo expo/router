@@ -11,7 +11,7 @@ import type {
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
-import { matchDeepDynamicRouteName } from "../matchers";
+import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
 
 //   import findFocusedRoute from './findFocusedRoute';
 //   import type { PathConfigMap } from './types';
@@ -521,8 +521,12 @@ const createConfigItem = (
     })
     .join("");
 
-  const isIndex =
-    !hasChildren && (/\/index$/.test(screen) || /^index$/.test(screen));
+  let isIndex = false;
+  if (!hasChildren) {
+    const lastSegment = screen.split("/").pop() ?? screen;
+    // Ensure fragment routes can match index.
+    isIndex = lastSegment === "index" || matchFragmentName(lastSegment) != null;
+  }
   // NOTE(EvanBacon): Add support for matching paths named "index"
   // as either `/` or `/index`.
   const matcher = `^(${matchableSegments}${isIndex ? "(?:index\\/)?" : ""})$`;
