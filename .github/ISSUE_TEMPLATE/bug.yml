@@ -1,0 +1,22 @@
+name: "\U0001F41B Bug Report"
+description: "Report a reproducible bug in Expo Router"
+body:
+  - type: markdown
+    attributes:
+      value: If you have a question or you think your issue might be caused by your application code, post in the [discussions](https://github.com/expo/router/discussions).
+  - type: textarea
+    attributes:
+      label: Summary
+      description: |
+        Clearly describe what the expected behavior is and what instead is actually happening. Be concise and precise in your description.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Minimal reproducible example
+      description: |
+        This should include as little code as possible, and no extraneous dependencies.
+        Without a reproducible demo, the issue cannot be investigated.
+        [Learn more about creating a minimal reproducible example](https://stackoverflow.com/help/mcve).
+    validations:
+      required: true
