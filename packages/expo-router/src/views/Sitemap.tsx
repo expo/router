@@ -124,10 +124,27 @@ function FileItem({
     );
   }, [parents, route.route]);
 
+  const filename = React.useMemo(() => {
+    const segments = route.contextKey.split("/");
+    // join last two segments for layout routes
+    if (route.contextKey.match(/_layout\.[jt]sx?$/)) {
+      return (
+        segments[segments.length - 2] + "/" + segments[segments.length - 1]
+      );
+    }
+
+    const segmentCount = route.route.split("/").length;
+
+    // Join the segment count in reverse order
+    // This presents files without layout routes as children with all relevant segments.
+    return segments.slice(-segmentCount).join("/");
+  }, [route]);
+
   return (
     <>
       {!route.internal && (
         <Link
+          accessibilityLabel={route.contextKey}
           href={href}
           onPress={() => {
             if (Platform.OS !== "web") {
@@ -156,7 +173,7 @@ function FileItem({
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   {route.children.length ? <PkgIcon /> : <FileIcon />}
-                  <Text style={styles.filename}>{route.contextKey}</Text>
+                  <Text style={styles.filename}>{filename}</Text>
                 </View>
 
                 {!disabled && <ForwardIcon />}
