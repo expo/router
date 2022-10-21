@@ -513,6 +513,9 @@ const createConfigItem = (
               return `(([^/]+\\/)${it.endsWith("?") ? "?" : ""})`;
             }
 
+            // Allow spaces in file path names.
+            it = it.replace(" ", "%20");
+
             return `${it === "*" ? ".*" : escape(it)}\\/`;
           })
           .join("")})`
