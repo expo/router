@@ -164,6 +164,8 @@ function FileItem({
               navigation.goBack();
             }
           }}
+          // Ensure we replace the history so you can't go back to this page.
+          replace
           // @ts-expect-error: disabled not on type
           disabled={disabled}
           asChild
