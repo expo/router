@@ -27,44 +27,6 @@ function useSortedRoutes() {
   return routes;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "black",
-    flex: 1,
-    alignItems: "stretch",
-  },
-  main: {
-    marginHorizontal: "auto",
-    flex: 1,
-
-    alignItems: "stretch",
-  },
-  scroll: {
-    paddingHorizontal: 12,
-    flex: 1,
-    // paddingTop: top + 12,
-    alignItems: "stretch",
-  },
-  itemContainer: {
-    borderWidth: 1,
-    borderColor: "#323232",
-    borderRadius: 19,
-    marginBottom: 12,
-    overflow: "hidden",
-  },
-  itemPressable: {
-    paddingHorizontal: INDENT,
-    paddingVertical: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    transitionDuration: "100ms",
-  },
-  filename: { color: "white", fontSize: 20, marginLeft: 12 },
-  virtual: { textAlign: "right", color: "white" },
-  image: { width: 24, height: 24, resizeMode: "contain" },
-});
-
 export function getNavOptions(): NativeStackNavigationOptions {
   return {
     title: "sitemap",
@@ -88,8 +50,7 @@ export function getNavOptions(): NativeStackNavigationOptions {
   };
 }
 
-export function Directory() {
-  const routes = useSortedRoutes();
+export function Sitemap() {
   const { top, bottom } = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   return (
@@ -113,14 +74,24 @@ export function Directory() {
           ]}
           style={{ flex: 1 }}
         >
-          {routes.map((child) => (
-            <View key={child.contextKey} style={styles.itemContainer}>
-              <FileItem route={child} />
-            </View>
-          ))}
+          <FileSystemView />
         </ScrollView>
       </View>
     </View>
+  );
+}
+
+function FileSystemView() {
+  const routes = useSortedRoutes();
+
+  return (
+    <>
+      {routes.map((child) => (
+        <View key={child.contextKey} style={styles.itemContainer}>
+          <FileItem route={child} />
+        </View>
+      ))}
+    </>
   );
 }
 
@@ -233,3 +204,41 @@ function ForwardIcon() {
     />
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "black",
+    flex: 1,
+    alignItems: "stretch",
+  },
+  main: {
+    marginHorizontal: "auto",
+    flex: 1,
+
+    alignItems: "stretch",
+  },
+  scroll: {
+    paddingHorizontal: 12,
+    // flex: 1,
+    // paddingTop: top + 12,
+    alignItems: "stretch",
+  },
+  itemContainer: {
+    borderWidth: 1,
+    borderColor: "#323232",
+    borderRadius: 19,
+    marginBottom: 12,
+    overflow: "hidden",
+  },
+  itemPressable: {
+    paddingHorizontal: INDENT,
+    paddingVertical: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    transitionDuration: "100ms",
+  },
+  filename: { color: "white", fontSize: 20, marginLeft: 12 },
+  virtual: { textAlign: "right", color: "white" },
+  image: { width: 24, height: 24, resizeMode: "contain" },
+});
