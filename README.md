@@ -8,7 +8,19 @@ The repo also acts as an **RFC for the router**. Please open a discussion if you
 - [Example](/apps/demo) - Test app.
 - [RFC](https://github.com/expo/router/discussions/1) - Add your feedback here.
 
-## Demo
+## Running
+
+The easiest way to try **Expo Router** is by creating a new project:
+
+```
+npx create-react-native-app -t with-router
+```
+
+## Contributing
+
+If you want to work against the latest branch for contributions, you can use `apps/demo`.
+
+> `apps/demo` is a basic playground for developing the Expo Router package, please don't open PRs specifically to improve the tester.
 
 - Run `yarn` in the root of the repo to install dependencies.
 - Run `yarn start` in the root to compile the `packages/`
