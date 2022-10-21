@@ -127,6 +127,33 @@ export function getQualifiedRouteComponent(value: RouteNode) {
   return QualifiedRoute;
 }
 
+/** @returns a function which provides a screen id that matches the dynamic route name in params. */
+export function createGetIdForRoute(
+  route: Pick<RouteNode, "dynamic" | "route">
+) {
+  if (!route.dynamic) {
+    return undefined;
+  }
+  const dynamicName = route.dynamic.name;
+  const routeName = route.route;
+  return ({ params }) => {
+    // Params can be undefined when there are no params in the route.
+    const preferredId = params?.[dynamicName];
+    // If the route has a dynamic segment, use the matching parameter
+    // as the screen id. This enables pushing a screen like `/[user]` multiple times
+    // when the user is different.
+    if (preferredId) {
+      // Deep dynamic routes will return as an array, so we'll join them to create a
+      // fully qualified string.
+      return (
+        (Array.isArray(preferredId) ? preferredId.join("/") : preferredId) ||
+        routeName
+      );
+    }
+    return routeName;
+  };
+}
+
 function routeToScreen(
   route: RouteNode,
   { options, ...props }: Partial<ScreenProps> = {}
@@ -136,6 +163,7 @@ function routeToScreen(
       {...props}
       name={route.route}
       key={route.route}
+      getId={createGetIdForRoute(route)}
       options={(args) => {
         const staticOptions = route.getExtras()?.getNavOptions;
         const staticResult =

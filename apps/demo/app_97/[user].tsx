@@ -6,14 +6,45 @@ export default function Page({ route }) {
     <View style={styles.container}>
       <View style={styles.main}>
         <Text style={styles.title}>User: {route.params?.user}</Text>
-        <Text style={styles.subtitle}>This is the first page of your app.</Text>
         <Link
           href={{
-            pathname: "/[user]/posts/all",
+            pathname: "/[...bacon]",
+            params: { bacon: [Date.now(), "other"] },
+          }}
+        >
+          Go to multi-level user
+        </Link>
+        <Link
+          href={{
+            pathname: "/[user]",
             params: { user: route.params.user },
           }}
         >
+          Go to same user
+        </Link>
+        <Link
+          href={{
+            pathname: "/[user]",
+            params: { user: Date.now() },
+          }}
+        >
           Go to posts
+        </Link>
+        <Link
+          replace
+          href={{
+            pathname: "/[user]",
+            params: { user: Date.now() },
+          }}
+        >
+          Go to posts (replace)
+        </Link>
+        <Link
+          href={{
+            pathname: "/other",
+          }}
+        >
+          Go to "other"
         </Link>
       </View>
     </View>
