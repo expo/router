@@ -235,10 +235,10 @@ function appendSitemapRoute(routes: RouteNode) {
   ) {
     return routes;
   }
-  const { Directory, getNavOptions } = require("./views/Directory");
+  const { Sitemap, getNavOptions } = require("./views/Sitemap");
   routes.children.push({
     getComponent() {
-      return Directory;
+      return Sitemap;
     },
     getExtras() {
       return { getNavOptions };
