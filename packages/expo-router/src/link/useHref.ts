@@ -61,7 +61,7 @@ export function useHref(): RouteInfo {
 
   const navigation = RootContainer.getRef();
   const [routeInfo, setRouteInfo] = React.useState<RouteInfo>(
-    getRouteInfoFromState(getPathFromState, null)
+    getRouteInfoFromState(getPathFromState, navigation?.getRootState())
   );
 
   const maybeUpdateRouteInfo = React.useCallback(
