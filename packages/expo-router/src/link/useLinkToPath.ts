@@ -6,6 +6,7 @@ import {
 import { LinkingContext } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 import * as React from "react";
+import { posix } from "./path";
 
 function isRemoteHref(href: string): boolean {
   return /:\/\//.test(href);
@@ -26,6 +27,23 @@ export function useLinkToPath() {
         throw new Error(
           "Couldn't find a navigation object. Is your component inside NavigationContainer?"
         );
+      }
+
+      if (to.startsWith(".")) {
+        let base = linking.options?.getPathFromState(
+          navigation.getRootState(),
+          {
+            ...linking.options!.config,
+            preserveFragments: true,
+          }
+        );
+
+        if (base && !base.endsWith("/")) {
+          base += "/..";
+        }
+        const pre = to;
+        to = posix.resolve(base, to);
+        console.log("to", pre, "->", base, "=", to);
       }
 
       const { options } = linking;

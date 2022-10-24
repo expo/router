@@ -117,7 +117,8 @@ function FileItem({
             return v + "/" + Date.now();
           }
           // groups and index must be erased
-          return !!matchFragmentName(v) || v === "index" ? "" : v;
+          return v === "index" ? "" : v;
+          // return !!matchFragmentName(v) || v === "index" ? "" : v;
         })
         .filter(Boolean)
         .join("/")

@@ -219,7 +219,7 @@ export function getRoutes(contextModule: RequireContext): RouteNode | null {
     return null;
   }
 
-  // appendSitemapRoute(route);
+  appendSitemapRoute(route);
 
   // Auto add not found route if it doesn't exist
   appendUnmatchedRoute(route);

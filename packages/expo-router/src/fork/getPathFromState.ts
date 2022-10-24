@@ -95,7 +95,7 @@ function createFakeState(params: StateAsParams) {
  */
 export default function getPathFromState<ParamList extends object>(
   state: State,
-  options?: Options<ParamList>
+  _options?: Options<ParamList> & { preserveFragments?: boolean }
 ): string {
   if (state == null) {
     throw Error(
@@ -103,7 +103,12 @@ export default function getPathFromState<ParamList extends object>(
     );
   }
 
-  if (options) {
+  // let options: Options<ParamList> | undefined;
+  // let preserveFragments = false;
+  // if
+  const { preserveFragments, ...options } = _options;
+
+  if (_options) {
     validatePathConfig(options);
   }
 
@@ -246,7 +251,10 @@ export default function getPathFromState<ParamList extends object>(
             return value;
           }
 
-          return encodeURIComponent(matchFragmentName(p) != null ? "" : p);
+          if (!preserveFragments && matchFragmentName(p) != null) {
+            return "";
+          }
+          return encodeURIComponent(p);
         })
         .join("/");
     } else {
