@@ -6,11 +6,14 @@ export default function Page() {
     <View style={styles.container}>
       <View style={styles.main}>
         <Text style={styles.title}>Second</Text>
-        <Link href="/(second)/shared">Next</Link>
+        <Link href="./shared">Second -> Shared</Link>
+        <Link href="/shared">Unknown -> Shared</Link>
       </View>
     </View>
   );
 }
+
+// exact
 
 const styles = StyleSheet.create({
   container: {
