@@ -166,7 +166,10 @@ function routeToScreen(
       name={route.route}
       key={route.route}
       options={(args) => {
-        const staticOptions = route.getExtras()?.getNavOptions;
+        // Only eager load generated components
+        const staticOptions = route.generated
+          ? route.getExtras()?.getNavOptions
+          : null;
         const staticResult =
           typeof staticOptions === "function"
             ? staticOptions(args)
