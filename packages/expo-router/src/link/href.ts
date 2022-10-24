@@ -16,7 +16,8 @@ export const resolveHref = (href: Href): string => {
   if (typeof href === "string") {
     return resolveHref({ pathname: href ?? "" });
   }
-  const path = stripFragmentRoutes(href.pathname ?? "");
+  const path = href.pathname ?? "";
+  // const path = stripFragmentRoutes(href.pathname ?? "");
   if (!href?.params) {
     return path;
   }

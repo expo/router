@@ -246,7 +246,7 @@ export default function getPathFromState<ParamList extends object>(
             return value;
           }
 
-          return encodeURIComponent(p);
+          return encodeURIComponent(matchFragmentName(p) != null ? "" : p);
         })
         .join("/");
     } else {

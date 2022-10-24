@@ -215,12 +215,11 @@ export function getRoutes(contextModule: RequireContext): RouteNode | null {
   const treeNodes = getRecursiveTree(files);
   const route = treeNodesToRootRoute(treeNodes);
 
-  console.log("route", route);
   if (!route) {
     return null;
   }
 
-  appendSitemapRoute(route);
+  // appendSitemapRoute(route);
 
   // Auto add not found route if it doesn't exist
   appendUnmatchedRoute(route);

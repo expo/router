@@ -1,10 +1,12 @@
+import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Page() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Not Found!</Text>
+        <Text style={styles.title}>Second</Text>
+        <Link href="/(second)/shared">Next</Link>
       </View>
     </View>
   );

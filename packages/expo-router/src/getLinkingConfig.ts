@@ -25,9 +25,12 @@ type Screen =
 // `[page]` -> `:page`
 // `page` -> `page`
 function convertDynamicRouteToReactNavigation(name: string) {
-  if (name === "index" || matchFragmentName(name) != null) {
+  if (name === "index") {
     return "";
   }
+  // if (name === "index" || matchFragmentName(name) != null) {
+  //   return "";
+  // }
   if (matchDeepDynamicRouteName(name) != null) {
     return "*";
   }

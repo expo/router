@@ -11,7 +11,7 @@ import type {
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
-import { matchDeepDynamicRouteName } from "../matchers";
+import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
 
 //   import findFocusedRoute from './findFocusedRoute';
 //   import type { PathConfigMap } from './types';
@@ -236,13 +236,13 @@ export default function getStateFromPath<ParamList extends object>(
           : last === "*"
           ? "deep dynamic route"
           : "route";
-        throw new Error(
-          `The ${routeType} pattern '${
-            config.pattern || "/"
-          }' resolves to both '${alpha.userReadableName}' and '${
-            config.userReadableName
-          }'. Patterns must be unique and cannot resolve to more than one route.`
-        );
+        // throw new Error(
+        //   `The ${routeType} pattern '${
+        //     config.pattern || "/"
+        //   }' resolves to both '${alpha.userReadableName}' and '${
+        //     config.userReadableName
+        //   }'. Patterns must be unique and cannot resolve to more than one route.`
+        // );
       }
     }
 
@@ -354,6 +354,7 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
 
       routes = config.routeNames.map((name) => {
         const config = configs.find((c) => c.screen === name);
+
         const params = config?.path
           ?.split("/")
           .filter((p) => p.startsWith(":") || p === "*")
@@ -432,7 +433,6 @@ const createNormalizedConfigs = (
   if (typeof config === "string") {
     // If a string is specified as the value of the key(e.g. Foo: '/path'), use it as the pattern
     const pattern = parentPattern ? joinPaths(parentPattern, config) : config;
-
     configs.push(createConfigItem(screen, routeNames, pattern, config, false));
   } else if (typeof config === "object") {
     let pattern: string | undefined;
@@ -515,6 +515,14 @@ const createConfigItem = (
 
             // Allow spaces in file path names.
             it = it.replace(" ", "%20");
+
+            // Strip fragments from the matcher
+            if (matchFragmentName(it) != null) {
+              // Fragments are optional segments
+              // this enables us to match `/bar` and `/(foo)/bar` for the same route
+              const matchable = `(${escape(it)}\\/)?`;
+              return matchable;
+            }
 
             return `${it === "*" ? ".*" : escape(it)}\\/`;
           })
@@ -649,10 +657,16 @@ const createNestedStateObject = (
   }
 
   route = findFocusedRoute(state) as ParsedRoute;
-  route.path = path;
+
+  const parsedPath = path
+    .split("/")
+    .map((v) => (matchFragmentName(v) ? "" : v))
+    .filter(Boolean)
+    .join("/");
+  route.path = parsedPath;
 
   const params = parseQueryParams(
-    path,
+    parsedPath,
     flatConfig ? findParseConfigForRoute(route.name, flatConfig) : undefined
   );
 
