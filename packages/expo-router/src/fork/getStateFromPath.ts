@@ -236,13 +236,13 @@ export default function getStateFromPath<ParamList extends object>(
           : last === "*"
           ? "deep dynamic route"
           : "route";
-        // throw new Error(
-        //   `The ${routeType} pattern '${
-        //     config.pattern || "/"
-        //   }' resolves to both '${alpha.userReadableName}' and '${
-        //     config.userReadableName
-        //   }'. Patterns must be unique and cannot resolve to more than one route.`
-        // );
+        throw new Error(
+          `The ${routeType} pattern '${
+            config.pattern || "/"
+          }' resolves to both '${alpha.userReadableName}' and '${
+            config.userReadableName
+          }'. Patterns must be unique and cannot resolve to more than one route.`
+        );
       }
     }
 
@@ -331,6 +331,7 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
       continue;
     }
 
+    // TODO: Make it possible to select the route when there are multiple matches (parallel routes).
     const match = remainingPath.match(config.regex);
 
     // If our regex matches, we need to extract params from the path

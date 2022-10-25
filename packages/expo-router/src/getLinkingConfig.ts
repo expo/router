@@ -65,7 +65,7 @@ function convertRouteNodeToScreen(node: RouteNode): Screen {
     return path;
   }
   const screens = getReactNavigationScreensConfig(node.children);
-  return { path, screens };
+  return { path, initialRouteName: node.settings?.initialRouteName, screens };
 }
 
 export function getReactNavigationScreensConfig(

@@ -4,7 +4,7 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Shared</Text>
+        <Text style={styles.title}>Shared 2</Text>
       </View>
     </View>
   );

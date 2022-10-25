@@ -8,6 +8,7 @@ export type PickPartial<T, K extends keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
 export type RouteNode = {
+  settings: Record<string, any> | null;
   /** nested routes */
   children: RouteNode[];
   /** Lazily get the React component */

@@ -10,7 +10,7 @@ import { DefaultLayout } from "./views/Layout";
 
 export type FileNode = Pick<
   RouteNode,
-  "contextKey" | "getComponent" | "getExtras"
+  "contextKey" | "getComponent" | "getExtras" | "settings"
 > & {
   /** Like `(tab)/index` */
   normalizedName: string;
@@ -111,6 +111,7 @@ function treeNodeToRouteNode({
   if (node) {
     return [
       {
+        settings: node.settings,
         route: name,
         getExtras: node.getExtras,
         getComponent: node.getComponent,
@@ -153,6 +154,9 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
     }
 
     const node: FileNode = {
+      settings: key.match(/_layout\.[jt]sx?$/)
+        ? contextModule(key).settings
+        : null,
       normalizedName: getNameFromFilePath(key),
       getComponent() {
         return contextModule(key).default;
@@ -198,6 +202,7 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
   }
 
   return {
+    settings: null,
     // Generate a fake file name for the directory
     contextKey: "./_layout.tsx",
     route: "",
