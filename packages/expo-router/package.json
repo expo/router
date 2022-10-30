@@ -61,15 +61,16 @@
   },
   "devDependencies": {
     "@radix-ui/react-slot": "^1.0.0",
+    "@react-navigation/drawer": "^6.4.4",
     "@types/jest": "^26",
     "expo-module-scripts": "^2.0.0",
     "expo-splash-screen": "^0.16.2",
+    "expo-status-bar": "^1.4.0",
     "jest": "^26.6.3",
-    "react-native-safe-area-context": "4.3.1",
-    "react-native-screens": "~3.15.0",
     "react-native-gesture-handler": "~2.5.0",
     "react-native-reanimated": "~2.9.1",
-    "@react-navigation/drawer": "^6.4.4"
+    "react-native-safe-area-context": "4.3.1",
+    "react-native-screens": "~3.15.0"
   },
   "dependencies": {
     "@bacons/expo-metro-runtime": "^2.0.1",
