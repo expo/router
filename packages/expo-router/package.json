@@ -36,14 +36,17 @@
     "preset": "jest-expo"
   },
   "peerDependencies": {
-    "expo": "^46.0.2",
-    "expo-splash-screen": "^0.16.2",
-    "metro": "~0.73.1",
-    "react-native-gesture-handler": "~2.5.0",
-    "react-native-reanimated": "~2.9.1",
     "@react-navigation/drawer": "^6.4.4",
-    "react-native-safe-area-context": "4.3.1",
-    "react-native-screens": "~3.15.0"
+    "expo": "~46.0.2 || ~47.0.0-beta || ~47.0.0",
+    "expo-constants": "*",
+    "expo-linking": "*",
+    "expo-splash-screen": "*",
+    "expo-status-bar": "*",
+    "metro": "~0.73.1",
+    "react-native-gesture-handler": "*",
+    "react-native-reanimated": "*",
+    "react-native-safe-area-context": "*",
+    "react-native-screens": "*"
   },
   "peerDependenciesMeta": {
     "react-native-gesture-handler": {
@@ -54,19 +57,23 @@
     },
     "@react-navigation/drawer": {
       "optional": true
+    },
+    "expo-splash-screen": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@radix-ui/react-slot": "^1.0.0",
+    "@react-navigation/drawer": "^6.4.4",
     "@types/jest": "^26",
     "expo-module-scripts": "^2.0.0",
     "expo-splash-screen": "^0.16.2",
+    "expo-status-bar": "^1.4.0",
     "jest": "^26.6.3",
-    "react-native-safe-area-context": "4.3.1",
-    "react-native-screens": "~3.15.0",
     "react-native-gesture-handler": "~2.5.0",
     "react-native-reanimated": "~2.9.1",
-    "@react-navigation/drawer": "^6.4.4"
+    "react-native-safe-area-context": "4.3.1",
+    "react-native-screens": "~3.15.0"
   },
   "dependencies": {
     "@bacons/expo-metro-runtime": "^2.0.1",
@@ -74,10 +81,6 @@
     "@radix-ui/react-slot": "^1.0.0",
     "@react-navigation/bottom-tabs": "^6.3.3",
     "@react-navigation/native": "^6.0.12",
-    "@react-navigation/native-stack": "^6.8.0",
-    "expo-constants": "~13.2.4",
-    "expo-linking": "^3.2.2",
-    "expo-splash-screen": "^0.16.2",
-    "expo-status-bar": "^1.4.0"
+    "@react-navigation/native-stack": "^6.8.0"
   }
 }
