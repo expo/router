@@ -57,6 +57,9 @@
     },
     "@react-navigation/drawer": {
       "optional": true
+    },
+    "expo-splash-screen": {
+      "optional": true
     }
   },
   "devDependencies": {
