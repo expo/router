@@ -30,3 +30,8 @@ If you want to work against the latest branch for contributions, you can use `ap
 The router demo uses a custom version of Metro, this may cause conflicting version issues that lead to `require.resolve` cannot be found. If this happens, you can run `yarn` in the root of the repo and restart the dev server.
 
 <!-- https://twitter.com/Baconbrix/status/1560353229241831425?s=20&t=oMP-INzqtw8fqrxpzLS-8Q -->
+
+## Examples
+
+- [Example](/apps/demo) - Test app, in this repository
+- [Kind Words App](https://github.com/hola-soy-milk/react-native-expo) - Demo app with `expo-router`, created during a workshop for beginners
