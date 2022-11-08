@@ -1,6 +1,6 @@
 # Expo Router Preview
 
-This is a preview of the new router for React Native apps. It is currently in alpha and is not ready for production use.
+This is a preview of the new router for React Native apps. It is currently in beta and is not ready for production use.
 The repo also acts as an **RFC for the router**. Please open a discussion if you have any questions or feedback.
 
 - [Router](/packages/expo-router) - Current implementation.
