@@ -14,8 +14,6 @@ export type RouteNode = {
   children: RouteNode[];
   /** Is the route a dynamic path */
   dynamic: null | { name: string; deep: boolean };
-  /** All static exports from the file. */
-  getExtras: () => Record<string, any>;
   /** `index`, `error-boundary`, etc. */
   route: string;
   /** require.context key, used for matching children. */

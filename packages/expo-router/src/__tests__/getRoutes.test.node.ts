@@ -45,9 +45,6 @@ const asFileNode = (route: Partial<FileNode>): FileNode => ({
       },
     };
   },
-  getExtras(): any {
-    return {};
-  },
   normalizedName: "INVALID_TEST_VALUE",
   contextKey: "INVALID_TEST_VALUE",
   ...route,
@@ -60,9 +57,6 @@ const asRouteNode = (route: Partial<RouteNode>) => ({
         return null;
       },
     };
-  },
-  getExtras(): any {
-    return {};
   },
   children: [],
   dynamic: null,
@@ -307,7 +301,7 @@ describe(getRoutes, () => {
     );
   });
 
-  function dropFunctions({ loadRoute, getExtras, ...node }: RouteNode) {
+  function dropFunctions({ loadRoute, ...node }: RouteNode) {
     return {
       ...node,
       children: node.children.map(dropFunctions),

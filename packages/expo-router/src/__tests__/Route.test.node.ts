@@ -12,9 +12,6 @@ const asRouteNode = (route: string) =>
         },
       };
     },
-    getExtras(): any {
-      return {};
-    },
     route,
     contextKey: "INVALID_TEST_VALUE",
   } as RouteNode);
