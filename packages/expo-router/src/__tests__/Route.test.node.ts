@@ -5,6 +5,13 @@ const asRouteNode = (route: string) =>
   ({
     children: [],
     dynamic: generateDynamic(route),
+    loadRoute(): any {
+      return {
+        default: function () {
+          return null;
+        },
+      };
+    },
     getComponent(): any {
       return function () {
         return null;
