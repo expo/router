@@ -52,7 +52,7 @@ npx expo install expo-router
 Install peer dependencies:
 
 ```
-npx expo install react-native-safe-area-context react-native-screens
+npx expo install react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
 ```
 
 Then delete the entry point in your `package.json`, or replace it with `index.js` to be explicit:

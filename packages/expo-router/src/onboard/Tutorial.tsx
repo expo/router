@@ -1,6 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "@bacons/react-views";
 import React from "react";
-import { SafeAreaView, StatusBar, Platform } from "react-native";
+import { StatusBar, Platform } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { createEntryFileAsync } from "./createEntryFile";
 
