@@ -10,7 +10,7 @@ import { DefaultLayout } from "./views/Layout";
 
 export type FileNode = Pick<
   RouteNode,
-  "contextKey" | "getComponent" | "getExtras" | "loadRoute"
+  "contextKey" | "getExtras" | "loadRoute"
 > & {
   /** Like `(tab)/index` */
   normalizedName: string;
@@ -114,7 +114,6 @@ function treeNodeToRouteNode({
         loadRoute: node.loadRoute,
         route: name,
         getExtras: node.getExtras,
-        getComponent: node.getComponent,
         contextKey: node.contextKey,
         children: getTreeNodesAsRouteNodes(children),
         dynamic,
@@ -156,9 +155,7 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
     const node: FileNode = {
       loadRoute: () => contextModule(key),
       normalizedName: getNameFromFilePath(key),
-      getComponent() {
-        return contextModule(key).default;
-      },
+
       contextKey: key,
       getExtras() {
         const { default: mod, ...extras } = contextModule(key);
@@ -207,7 +204,6 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
     generated: true,
     dynamic: null,
     getExtras: () => ({}),
-    getComponent: () => DefaultLayout,
     children: routes,
   };
 }
@@ -243,9 +239,7 @@ function appendSitemapRoute(routes: RouteNode) {
     loadRoute() {
       return { default: Sitemap };
     },
-    getComponent() {
-      return Sitemap;
-    },
+
     getExtras() {
       return { getNavOptions };
     },
@@ -267,9 +261,7 @@ function appendUnmatchedRoute(routes: RouteNode) {
       loadRoute() {
         return { default: require("./views/Unmatched").Unmatched };
       },
-      getComponent() {
-        return require("./views/Unmatched").Unmatched;
-      },
+
       getExtras() {
         return {};
       },

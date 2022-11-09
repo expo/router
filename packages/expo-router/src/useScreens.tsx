@@ -98,7 +98,7 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     return qualifiedStore.get(value)!;
   }
 
-  const Component = value.getComponent();
+  const Component = value.loadRoute().default;
 
   const { ErrorBoundary } = value.getExtras();
 

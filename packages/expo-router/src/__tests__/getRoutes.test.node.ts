@@ -38,9 +38,11 @@ const ROUTE_DIRECTORY = {
 };
 
 const asFileNode = (route: Partial<FileNode>): FileNode => ({
-  getComponent(): any {
-    return function () {
-      return null;
+  loadRoute(): any {
+    return {
+      default() {
+        return null;
+      },
     };
   },
   getExtras(): any {
@@ -52,9 +54,11 @@ const asFileNode = (route: Partial<FileNode>): FileNode => ({
 });
 
 const asRouteNode = (route: Partial<RouteNode>) => ({
-  getComponent(): any {
-    return function () {
-      return null;
+  loadRoute(): any {
+    return {
+      default() {
+        return null;
+      },
     };
   },
   getExtras(): any {
@@ -303,7 +307,7 @@ describe(getRoutes, () => {
     );
   });
 
-  function dropFunctions({ getComponent, getExtras, ...node }: RouteNode) {
+  function dropFunctions({ loadRoute, getExtras, ...node }: RouteNode) {
     return {
       ...node,
       children: node.children.map(dropFunctions),

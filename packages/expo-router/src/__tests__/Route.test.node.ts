@@ -7,14 +7,9 @@ const asRouteNode = (route: string) =>
     dynamic: generateDynamic(route),
     loadRoute(): any {
       return {
-        default: function () {
+        default() {
           return null;
         },
-      };
-    },
-    getComponent(): any {
-      return function () {
-        return null;
       };
     },
     getExtras(): any {
