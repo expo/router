@@ -1,6 +1,8 @@
 import { Tabs } from "expo-router";
 
-export const settings = { initialRouteName: "(second)" };
+export const unstable_settings = {
+  initialRouteName: "(second)",
+};
 
 export default function RootLayout() {
   return (
