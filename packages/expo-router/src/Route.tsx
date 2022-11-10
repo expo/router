@@ -8,14 +8,12 @@ export type PickPartial<T, K extends keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
 export type RouteNode = {
+  /** Load a route into memory. Returns the exports from a route. */
+  loadRoute: () => any;
   /** nested routes */
   children: RouteNode[];
-  /** Lazily get the React component */
-  getComponent: () => React.ComponentType<any>;
   /** Is the route a dynamic path */
   dynamic: null | { name: string; deep: boolean };
-  /** All static exports from the file. */
-  getExtras: () => Record<string, any>;
   /** `index`, `error-boundary`, etc. */
   route: string;
   /** require.context key, used for matching children. */

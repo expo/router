@@ -8,10 +8,7 @@ import {
 import { RequireContext } from "./types";
 import { DefaultLayout } from "./views/Layout";
 
-export type FileNode = Pick<
-  RouteNode,
-  "contextKey" | "getComponent" | "getExtras"
-> & {
+export type FileNode = Pick<RouteNode, "contextKey" | "loadRoute"> & {
   /** Like `(tab)/index` */
   normalizedName: string;
 };
@@ -111,9 +108,8 @@ function treeNodeToRouteNode({
   if (node) {
     return [
       {
+        loadRoute: node.loadRoute,
         route: name,
-        getExtras: node.getExtras,
-        getComponent: node.getComponent,
         contextKey: node.contextKey,
         children: getTreeNodesAsRouteNodes(children),
         dynamic,
@@ -153,15 +149,9 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
     }
 
     const node: FileNode = {
+      loadRoute: () => contextModule(key),
       normalizedName: getNameFromFilePath(key),
-      getComponent() {
-        return contextModule(key).default;
-      },
       contextKey: key,
-      getExtras() {
-        const { default: mod, ...extras } = contextModule(key);
-        return extras;
-      },
     };
 
     return node;
@@ -198,13 +188,12 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
   }
 
   return {
+    loadRoute: () => ({ default: DefaultLayout }),
     // Generate a fake file name for the directory
     contextKey: "./_layout.tsx",
     route: "",
     generated: true,
     dynamic: null,
-    getExtras: () => ({}),
-    getComponent: () => DefaultLayout,
     children: routes,
   };
 }
@@ -215,7 +204,6 @@ export function getRoutes(contextModule: RequireContext): RouteNode | null {
   const treeNodes = getRecursiveTree(files);
   const route = treeNodesToRootRoute(treeNodes);
 
-  console.log("route", route);
   if (!route) {
     return null;
   }
@@ -238,11 +226,8 @@ function appendSitemapRoute(routes: RouteNode) {
   }
   const { Sitemap, getNavOptions } = require("./views/Sitemap");
   routes.children.push({
-    getComponent() {
-      return Sitemap;
-    },
-    getExtras() {
-      return { getNavOptions };
+    loadRoute() {
+      return { default: Sitemap, getNavOptions };
     },
     route: "_sitemap",
     contextKey: "./_sitemap.tsx",
@@ -259,11 +244,8 @@ function appendUnmatchedRoute(routes: RouteNode) {
   const userDefinedDynamicRoute = getUserDefinedDeepDynamicRoute(routes);
   if (!userDefinedDynamicRoute) {
     routes.children.push({
-      getComponent() {
-        return require("./views/Unmatched").Unmatched;
-      },
-      getExtras() {
-        return {};
+      loadRoute() {
+        return { default: require("./views/Unmatched").Unmatched };
       },
       route: "[...404]",
       contextKey: "./[...404].tsx",

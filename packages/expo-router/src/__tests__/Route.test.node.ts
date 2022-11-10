@@ -5,13 +5,12 @@ const asRouteNode = (route: string) =>
   ({
     children: [],
     dynamic: generateDynamic(route),
-    getComponent(): any {
-      return function () {
-        return null;
+    loadRoute(): any {
+      return {
+        default() {
+          return null;
+        },
       };
-    },
-    getExtras(): any {
-      return {};
     },
     route,
     contextKey: "INVALID_TEST_VALUE",

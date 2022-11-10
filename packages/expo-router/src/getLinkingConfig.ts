@@ -20,6 +20,7 @@ type Screen =
   | {
       path: string;
       screens: Record<string, Screen>;
+      initialRouteName?: string;
     };
 
 // `[page]` -> `:page`
@@ -62,7 +63,15 @@ function convertRouteNodeToScreen(node: RouteNode): Screen {
     return path;
   }
   const screens = getReactNavigationScreensConfig(node.children);
-  return { path, screens };
+  return {
+    path,
+    screens,
+    // NOTE(EvanBacon): This is bad because it forces all Layout Routes
+    // to be loaded into memory. We should move towards a system where
+    // the initial route name is either loaded asynchronously in the Layout Route
+    // or defined via a file system convention.
+    initialRouteName: node.loadRoute?.().unstable_settings?.initialRouteName,
+  };
 }
 
 export function getReactNavigationScreensConfig(
