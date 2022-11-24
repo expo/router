@@ -78,8 +78,8 @@ export function useHref(): RouteInfo {
   React.useEffect(() => {
     if (navigation) {
       maybeUpdateRouteInfo(navigation.getRootState());
-      const unsubscribe = navigation.addListener("state", ({ data }) => {
-        const navigationState = data.state as unknown as State;
+      const unsubscribe = navigation.addListener("state", () => {
+        const navigationState = navigation.getRootState();
         maybeUpdateRouteInfo(navigationState);
       });
       return unsubscribe;
