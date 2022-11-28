@@ -109,6 +109,9 @@ function treeNodeToRouteNode({
   const dynamic = generateDynamic(name);
 
   if (node) {
+    const allChildren = node.getExtras().unstable_settings?.template
+      ? children.map(node.getExtras().unstable_settings?.template).flat()
+      : children;
     return [
       {
         loadRoute: node.loadRoute,
@@ -116,7 +119,7 @@ function treeNodeToRouteNode({
         getExtras: node.getExtras,
         getComponent: node.getComponent,
         contextKey: node.contextKey,
-        children: getTreeNodesAsRouteNodes(children),
+        children: getTreeNodesAsRouteNodes(allChildren),
         dynamic,
       },
     ];

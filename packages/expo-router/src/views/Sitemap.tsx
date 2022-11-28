@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RouteNode, sortRoutes } from "../Route";
 import { useRootRouteNodeContext } from "../context";
 import { Link } from "../link/Link";
-import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
+import { matchDeepDynamicRouteName } from "../matchers";
 
 const INDENT = 24;
 
