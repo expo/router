@@ -41,7 +41,7 @@
     "expo-constants": "*",
     "expo-linking": "*",
     "expo-status-bar": "*",
-    "metro": "~0.73.1",
+    "metro": "~0.73.3",
     "react-native-gesture-handler": "*",
     "react-native-reanimated": "*",
     "react-native-safe-area-context": "*",
