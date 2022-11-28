@@ -10,6 +10,9 @@ export type PickPartial<T, K extends keyof T> = Omit<T, K> &
 export type RouteNode = {
   /** Load a route into memory. Returns the exports from a route. */
   loadRoute: () => any;
+
+  /** Loaded initial route name. */
+  initialRouteName?: string;
   /** nested routes */
   children: RouteNode[];
   /** Is the route a dynamic path */
