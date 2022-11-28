@@ -6,6 +6,7 @@ import {
 import { LinkingContext } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 import * as React from "react";
+
 import { posix } from "./path";
 
 function isRemoteHref(href: string): boolean {
