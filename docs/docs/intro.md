@@ -92,7 +92,8 @@ If you use Yarn:
 ```json title=package.json
 {
   "resolutions": {
-    "metro": "0.73.1"
+    "metro": "0.73.1",
+    "metro-resolver": "0.73.1"
   }
 }
 ```
@@ -102,7 +103,8 @@ If you use npm, this requires npm 8.3.0 or higher. You can install this with `np
 ```json title=package.json
 {
   "overrides": {
-    "metro": "0.73.1"
+    "metro": "0.73.3",
+    "metro-resolver": "0.73.3"
   }
 }
 ```

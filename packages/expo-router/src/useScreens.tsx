@@ -98,9 +98,7 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     return qualifiedStore.get(value)!;
   }
 
-  const Component = value.getComponent();
-
-  const { ErrorBoundary } = value.getExtras();
+  const { default: Component, ErrorBoundary } = value.loadRoute();
 
   const QualifiedRoute = React.forwardRef(
     (props: { route: any; navigation: any }, ref: any) => {
@@ -168,7 +166,7 @@ function routeToScreen(
       options={(args) => {
         // Only eager load generated components
         const staticOptions = route.generated
-          ? route.getExtras()?.getNavOptions
+          ? route.loadRoute()?.getNavOptions
           : null;
         const staticResult =
           typeof staticOptions === "function"

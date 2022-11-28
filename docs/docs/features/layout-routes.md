@@ -100,3 +100,32 @@ The Fragment convention is similar to:
 - [Route Groups](https://nextjs.org/blog/layouts-rfc#route-groups) in the upcoming Next.js layouts RFC (`(group)`).
 
 </details>
+
+## Unstable Settings
+
+> This feature will be replaced with something that supports React Suspense in the future.
+
+To support defining the `initialRouteName` you can use the `unstable_settings` object export from any Layout Route.
+
+```bash title="File System"
+app/
+  (app)/
+    _layout.js
+    index.js
+    other.js
+```
+
+```js title=app/(app)/_layout.tsx
+import { Stack } from "expo-router";
+
+export const unstable_settings = {
+  // Ensure any route can link back to `/`
+  initialRouteName: "index",
+};
+
+export default function Layout() {
+  return <Stack />;
+}
+```
+
+Now deep linking directly to `/other` or reloading the page will continue to show the back arrow.

@@ -8,10 +8,7 @@ import {
 import { RequireContext } from "./types";
 import { DefaultLayout } from "./views/Layout";
 
-export type FileNode = Pick<
-  RouteNode,
-  "contextKey" | "getComponent" | "getExtras" | "loadRoute"
-> & {
+export type FileNode = Pick<RouteNode, "contextKey" | "loadRoute"> & {
   /** Like `(tab)/index` */
   normalizedName: string;
 };
@@ -109,15 +106,13 @@ function treeNodeToRouteNode({
   const dynamic = generateDynamic(name);
 
   if (node) {
-    const allChildren = node.getExtras().unstable_settings?.template
-      ? children.map(node.getExtras().unstable_settings?.template).flat()
+    const allChildren = node.loadRoute().unstable_settings?.template
+      ? children.map(node.loadRoute().unstable_settings?.template).flat()
       : children;
     return [
       {
         loadRoute: node.loadRoute,
         route: name,
-        getExtras: node.getExtras,
-        getComponent: node.getComponent,
         contextKey: node.contextKey,
         children: getTreeNodesAsRouteNodes(allChildren),
         dynamic,
@@ -159,14 +154,7 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
     const node: FileNode = {
       loadRoute: () => contextModule(key),
       normalizedName: getNameFromFilePath(key),
-      getComponent() {
-        return contextModule(key).default;
-      },
       contextKey: key,
-      getExtras() {
-        const { default: mod, ...extras } = contextModule(key);
-        return extras;
-      },
     };
 
     return node;
@@ -209,8 +197,6 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
     route: "",
     generated: true,
     dynamic: null,
-    getExtras: () => ({}),
-    getComponent: () => DefaultLayout,
     children: routes,
   };
 }
@@ -244,13 +230,7 @@ function appendSitemapRoute(routes: RouteNode) {
   const { Sitemap, getNavOptions } = require("./views/Sitemap");
   routes.children.push({
     loadRoute() {
-      return { default: Sitemap };
-    },
-    getComponent() {
-      return Sitemap;
-    },
-    getExtras() {
-      return { getNavOptions };
+      return { default: Sitemap, getNavOptions };
     },
     route: "_sitemap",
     contextKey: "./_sitemap.tsx",
@@ -269,12 +249,6 @@ function appendUnmatchedRoute(routes: RouteNode) {
     routes.children.push({
       loadRoute() {
         return { default: require("./views/Unmatched").Unmatched };
-      },
-      getComponent() {
-        return require("./views/Unmatched").Unmatched;
-      },
-      getExtras() {
-        return {};
       },
       route: "[...404]",
       contextKey: "./[...404].tsx",
