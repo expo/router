@@ -1,5 +1,4 @@
-import { Children, Tabs } from "expo-router";
-import { RouteNode } from "expo-router/build/Route";
+import { Tabs } from "expo-router";
 
 function sortBy(node, order) {
   let children = [...node.children];
@@ -20,8 +19,7 @@ function cloneRoute(
   {
     name: nextName,
     initialRouteName,
-    order,
-  }: { name: string; initialRouteName: string; order: string[] }
+  }: { name: string; initialRouteName: string }
 ) {
   const prefix = node.parents.join("/");
   const toRemove = prefix + "/" + node.name + "/";
@@ -41,7 +39,7 @@ function cloneRoute(
     node.node.normalizedName.replace(toRemove.substring(1), "");
   return {
     ...node,
-    children: !order?.length ? node.children : sortBy(node, order),
+    children: node.children,
     name: nextName,
     node: {
       ...node.node,
@@ -63,25 +61,22 @@ function cloneRoute(
 
 export const unstable_settings = {
   initialRouteName: "(first)",
-  template: (node) => {
-    if (node.name === "(first)") {
-      const next = cloneRoute(node, {
-        name: "(profile)",
-        initialRouteName: "[user]/index",
-        order: ["[user]/index"],
-      });
-      // console.log("template", node, next);
-      return [
-        node,
+  processChildren: (children) => {
+    const node = children.find((c) => c.name === "(first)");
+    console.log("node", node, children);
+    if (node) {
+      children.push(
+        cloneRoute(node, {
+          name: "(profile)",
+          initialRouteName: "[user]/index",
+        }),
         cloneRoute(node, {
           name: "(search)",
           initialRouteName: "explore/index",
-          order: ["explore/index"],
-        }),
-        next,
-      ];
+        })
+      );
     }
-    return [node];
+    return children;
   },
 };
 
