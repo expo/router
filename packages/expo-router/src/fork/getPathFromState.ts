@@ -95,7 +95,7 @@ function createFakeState(params: StateAsParams) {
  */
 export default function getPathFromState<ParamList extends object>(
   state: State,
-  _options?: Options<ParamList> & { preserveFragments?: boolean }
+  _options?: Options<ParamList> & { preserveFragments?: boolean } = {}
 ): string {
   if (state == null) {
     throw Error(

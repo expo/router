@@ -1,6 +1,20 @@
 import { Children, Tabs } from "expo-router";
 import { RouteNode } from "expo-router/build/Route";
 
+function sortBy(node, order) {
+  let children = [...node.children];
+  return order
+    .reduce((acc: any, name: string) => {
+      const child = children.find((c: any) => c.name === name);
+      if (child) {
+        children = children.filter((c: any) => c.name !== name);
+        acc.push(child);
+      }
+      return acc;
+    }, [])
+    .concat(children);
+}
+
 function cloneRoute(
   node: any,
   {
@@ -25,17 +39,9 @@ function cloneRoute(
     nextName +
     "/" +
     node.node.normalizedName.replace(toRemove.substring(1), "");
-  const third = {
+  return {
     ...node,
-    children: !order?.length
-      ? node.children
-      : order.reduce((acc: any, name: string) => {
-          const child = node.children.find((c: any) => c.name === name);
-          if (child) {
-            acc.push(child);
-          }
-          return acc;
-        }, []),
+    children: !order?.length ? node.children : sortBy(node, order),
     name: nextName,
     node: {
       ...node.node,
@@ -53,21 +59,26 @@ function cloneRoute(
       contextKey: nextContextKey,
     },
   };
-  return third;
 }
 
 export const unstable_settings = {
-  initialRouteName: "(second)",
+  initialRouteName: "(first)",
   template: (node) => {
-    console.log("template", node);
-    if (node.name === "(second)") {
+    if (node.name === "(first)") {
+      const next = cloneRoute(node, {
+        name: "(profile)",
+        initialRouteName: "[user]/index",
+        order: ["[user]/index"],
+      });
+      // console.log("template", node, next);
       return [
         node,
         cloneRoute(node, {
-          name: "(third)",
-          initialRouteName: "shared",
-          order: ["shared", "index"],
+          name: "(search)",
+          initialRouteName: "explore/index",
+          order: ["explore/index"],
         }),
+        next,
       ];
     }
     return [node];
@@ -82,7 +93,7 @@ export default function RootLayout() {
       }}
     >
       <Tabs.Screen name="(first)" />
-      <Tabs.Screen name="(third)" />
+      <Tabs.Screen name="(profile)" />
       <Tabs.Screen name="(second)" options={{}} />
     </Tabs>
   );
