@@ -98,6 +98,34 @@ export function generateDynamic(name: string) {
   return dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null;
 }
 
+function cloneRoute(
+  node: RouteNode,
+  {
+    name: nextName,
+    initialRouteName,
+  }: { name: string; initialRouteName: string }
+): RouteNode {
+  const parts = node.contextKey.split("/");
+  parts[parts.length - 2] = nextName;
+
+  const contextKey = parts.join("/");
+  return {
+    ...node,
+    route: nextName,
+    loadRoute() {
+      const route = node.loadRoute();
+      return {
+        ...route,
+        unstable_settings: {
+          ...route.unstable_settings,
+          initialRouteName,
+        },
+      };
+    },
+    contextKey,
+  };
+}
+
 function treeNodeToRouteNode({
   name,
   node,
@@ -106,16 +134,28 @@ function treeNodeToRouteNode({
   const dynamic = generateDynamic(name);
 
   if (node) {
-    const allChildren =
-      node.loadRoute().unstable_settings?.processChildren?.(children) ??
-      children;
+    const settings = node.loadRoute().unstable_settings;
+
+    const output = {
+      loadRoute: node.loadRoute,
+      route: name,
+      contextKey: node.contextKey,
+      children: getTreeNodesAsRouteNodes(children),
+      dynamic,
+    };
+
+    if (Array.isArray(settings)) {
+      return settings.map((setting) =>
+        cloneRoute({ ...output }, { name, ...setting })
+      );
+    }
 
     return [
       {
         loadRoute: node.loadRoute,
         route: name,
         contextKey: node.contextKey,
-        children: getTreeNodesAsRouteNodes(allChildren),
+        children: getTreeNodesAsRouteNodes(children),
         dynamic,
       },
     ];

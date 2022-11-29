@@ -1,11 +1,11 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Page() {
+export default function Page({ route }) {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Tweet:</Text>
+        <Text style={styles.title}>Tweet: {route.params.tweet}</Text>
 
         <Link href="/shared">Next</Link>
       </View>

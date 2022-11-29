@@ -1,5 +1,19 @@
-import { Stack, useHref } from "expo-router";
+import { Stack } from "expo-router";
 import { useRouteNode } from "expo-router/build/Route";
+
+export const unstable_settings = [
+  {
+    initialRouteName: "home",
+  },
+  {
+    name: "(profile)",
+    initialRouteName: "[user]/index",
+  },
+  {
+    name: "(search)",
+    initialRouteName: "explore/index",
+  },
+];
 
 const firstRoute = {
   "(profile)": "[user]/index",
