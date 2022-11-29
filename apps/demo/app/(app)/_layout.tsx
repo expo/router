@@ -60,23 +60,23 @@ function cloneRoute(
 }
 
 export const unstable_settings = {
-  initialRouteName: "(first)",
+  initialRouteName: "(home)",
   processChildren: (children) => {
-    const node = children.find((c) => c.name === "(first)");
-    console.log("node", node, children);
-    if (node) {
-      children.push(
-        cloneRoute(node, {
-          name: "(profile)",
-          initialRouteName: "[user]/index",
-        }),
-        cloneRoute(node, {
-          name: "(search)",
-          initialRouteName: "explore/index",
-        })
-      );
-    }
-    return children;
+    const node = children[0];
+    return [
+      cloneRoute(node, {
+        name: "(home)",
+        initialRouteName: "home",
+      }),
+      cloneRoute(node, {
+        name: "(profile)",
+        initialRouteName: "[user]/index",
+      }),
+      cloneRoute(node, {
+        name: "(search)",
+        initialRouteName: "explore/index",
+      }),
+    ];
   },
 };
 
@@ -87,9 +87,12 @@ export default function RootLayout() {
         headerShown: false,
       }}
     >
-      <Tabs.Screen name="(first)" />
-      <Tabs.Screen name="(profile)" />
-      <Tabs.Screen name="(second)" options={{}} />
+      <Tabs.Screen name="(home)" options={{ title: "Home" }} />
+      <Tabs.Screen name="(search)" options={{ title: "Search" }} />
+      <Tabs.Screen
+        name="(profile)"
+        options={{ title: "Profile", href: "/baconbrix" }}
+      />
     </Tabs>
   );
 }

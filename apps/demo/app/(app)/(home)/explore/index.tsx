@@ -5,15 +5,13 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Second</Text>
-        <Link href="./shared">Second -> Shared</Link>
-        <Link href="/shared">Unknown -> Shared</Link>
+        <Text style={styles.title}>Explore</Text>
+
+        <Link href="./shared">Next</Link>
       </View>
     </View>
   );
 }
-
-// exact
 
 const styles = StyleSheet.create({
   container: {
