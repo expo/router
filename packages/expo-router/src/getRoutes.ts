@@ -125,15 +125,18 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
     return node;
   }
 
+  // Guess at the initial route based on the fragment name.
+  const initialRouteName = getDefaultInitialRoute(node, fragmentName)?.route;
   return {
     ...node,
+    initialRouteName,
     loadRoute() {
       const { unstable_settings, ...route } = node.loadRoute();
       return {
         ...route,
         unstable_settings: {
-          // Guess at the initial route based on the fragment name.
-          initialRouteName: getDefaultInitialRoute(node, fragmentName)?.route,
+          initialRouteName:
+            unstable_settings?.initialRouteName ?? initialRouteName,
           // Allow overriding the initial route name using the layout settings.
           ...unstable_settings,
         },

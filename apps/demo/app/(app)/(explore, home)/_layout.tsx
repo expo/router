@@ -11,9 +11,8 @@ const firstRoute = {
 };
 
 export default function StackLayout({ segment }) {
-  return (
-    <Stack>
-      <Stack.Screen name={firstRoute[segment]} />
-    </Stack>
-  );
+  const first = firstRoute[segment];
+  return <Stack />;
+  // const first = firstRoute[segment];
+  // return <Stack>{first && <Stack.Screen name={first} />}</Stack>;
 }

@@ -81,6 +81,19 @@ export function useRootRoute(): RouteNode | null {
   return useContext(RootRouteNodeContext);
 }
 
+export function sortRoutesWithInitial(initialRouteName?: string) {
+  return (a: RouteNode, b: RouteNode): number => {
+    if (initialRouteName) {
+      if (a.route === initialRouteName) {
+        return -1;
+      }
+      if (b.route === initialRouteName) {
+        return 1;
+      }
+    }
+    return sortRoutes(a, b);
+  };
+}
 export function sortRoutes(a: RouteNode, b: RouteNode): number {
   if (a.dynamic && !b.dynamic) {
     return 1;
