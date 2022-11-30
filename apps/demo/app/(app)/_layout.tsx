@@ -11,12 +11,12 @@ export default function RootLayout() {
         headerShown: false,
       }}
     >
+      <Tabs.Screen name="(explore)" options={{ title: "Search" }} />
       <Tabs.Screen name="(home)" options={{ title: "Home" }} />
-      <Tabs.Screen name="(search)" options={{ title: "Search" }} />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="(profile)"
         options={{ title: "Profile", href: "/baconbrix" }}
-      />
+      /> */}
     </Tabs>
   );
 }

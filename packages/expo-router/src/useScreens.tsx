@@ -102,10 +102,12 @@ export function getQualifiedRouteComponent(value: RouteNode) {
 
   const QualifiedRoute = React.forwardRef(
     (props: { route: any; navigation: any }, ref: any) => {
-      // Surface dynamic name as props to the view
       const children = React.createElement(Component, {
         ...props,
         ref,
+        // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
+        // the intention is to make it possible to deduce shared routes.
+        segment: value.route,
       });
 
       const errorBoundary = ErrorBoundary ? (
