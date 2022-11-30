@@ -17,7 +17,7 @@ import { useRouteNode } from "expo-router/build/Route";
 
 const firstRoute = {
   "(profile)": "[user]/index",
-  "(search)": "explore/index",
+  "(explore)": "explore/index",
   "(home)": "home",
 };
 
@@ -26,7 +26,7 @@ export default function StackLayout() {
 
   return (
     <Stack>
-      <Stack.Screen />
+      <Stack.Screen name={firstRoute[route]} />
     </Stack>
   );
 }

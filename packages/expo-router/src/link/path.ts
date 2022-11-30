@@ -31,12 +31,12 @@ function assertPath(path) {
 
 // Resolves . and .. elements in a path with directory names
 function normalizeStringPosix(path, allowAboveRoot) {
-  var res = "";
-  var lastSegmentLength = 0;
-  var lastSlash = -1;
-  var dots = 0;
-  var code;
-  for (var i = 0; i <= path.length; ++i) {
+  let res = "";
+  let lastSegmentLength = 0;
+  let lastSlash = -1;
+  let dots = 0;
+  let code;
+  for (let i = 0; i <= path.length; ++i) {
     if (i < path.length) code = path.charCodeAt(i);
     else if (code === 47 /*/*/) break;
     else code = 47 /*/*/;
@@ -51,7 +51,7 @@ function normalizeStringPosix(path, allowAboveRoot) {
           res.charCodeAt(res.length - 2) !== 46 /*.*/
         ) {
           if (res.length > 2) {
-            var lastSlashIndex = res.lastIndexOf("/");
+            const lastSlashIndex = res.lastIndexOf("/");
             if (lastSlashIndex !== res.length - 1) {
               if (lastSlashIndex === -1) {
                 res = "";
@@ -95,17 +95,15 @@ function normalizeStringPosix(path, allowAboveRoot) {
 
 export const posix = {
   // path.resolve([from ...], to)
-  resolve: function resolve() {
-    var resolvedPath = "";
-    var resolvedAbsolute = false;
-    var cwd;
+  resolve: function resolve(...props) {
+    let resolvedPath = "";
+    let resolvedAbsolute = false;
 
-    for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-      var path;
-      if (i >= 0) path = arguments[i];
-      else {
-        // throw new Error("unsupported resolve");
-        // if (cwd === undefined) cwd = process.cwd();
+    for (let i = props.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+      let path;
+      if (i >= 0) {
+        path = props[i];
+      } else {
         path = "/";
       }
 
