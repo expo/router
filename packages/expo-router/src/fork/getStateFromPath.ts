@@ -25,6 +25,7 @@ type Options<ParamList extends object> = {
 type ParseConfig = Record<string, (value: string) => any>;
 
 type RouteConfig = {
+  isInitial?: boolean;
   screen: string;
   regex?: RegExp;
   path: string;
@@ -116,18 +117,29 @@ export default function getStateFromPath<ParamList extends object>(
   }
 
   // Create a normalized configs array which will be easier to use
-  const configs = ([] as RouteConfig[])
-    .concat(
-      ...Object.keys(screens).map((key) =>
-        createNormalizedConfigs(
-          key,
-          screens as PathConfigMap<object>,
-          [],
-          initialRoutes,
-          []
-        )
+  let configs = ([] as RouteConfig[]).concat(
+    ...Object.keys(screens).map((key) =>
+      createNormalizedConfigs(
+        key,
+        screens as PathConfigMap<object>,
+        [],
+        initialRoutes,
+        []
       )
     )
+  );
+
+  const resolvedInitialPatterns = initialRoutes.map((route) =>
+    joinPaths(...route.parentScreens, route.initialRouteName)
+  );
+
+  configs = configs
+    .map((config) => ({
+      ...config,
+      // TODO(EvanBacon): Probably a safer way to do this
+      // Mark initial routes to give them potential priority over other routes that match.
+      isInitial: resolvedInitialPatterns.includes(config.pattern),
+    }))
     .sort((a, b) => {
       // Sort config so that:
       // - the most exhaustive ones are always at the beginning
@@ -205,6 +217,16 @@ export default function getStateFromPath<ParamList extends object>(
           return -1;
         }
       }
+
+      // Sort initial routes with a higher priority than routes which will push more screens
+      // this ensures shared routes go to the shortest path.
+      if (a.isInitial && !b.isInitial) {
+        return -1;
+      }
+      if (!a.isInitial && b.isInitial) {
+        return 1;
+      }
+
       return bParts.length - aParts.length;
     });
 
@@ -330,86 +352,82 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
     if (!config.regex) {
       continue;
     }
-
     // TODO: Make it possible to select the route when there are multiple matches (parallel routes).
     const match = remainingPath.match(config.regex);
-
     // If our regex matches, we need to extract params from the path
-    if (match) {
-      // TODO: Add support for wildcard routes
-      const matchedParams = config.pattern
+    if (!match) {
+      continue;
+    }
+    const matchedParams = config.pattern
+      ?.split("/")
+      .filter((p) => p.startsWith(":") || p === "*")
+      .reduce<Record<string, any>>((acc, p, i) => {
+        if (p === "*") {
+          return {
+            ...acc,
+            [p]: match[i],
+          };
+        }
+        return Object.assign(acc, {
+          // The param segments appear every second item starting from 2 in the regex match result
+          [p]: match![(i + 1) * 2].replace(/\//, ""),
+        });
+      }, {});
+
+    routes = config.routeNames.map((name) => {
+      const config = configs.find((c) => c.screen === name);
+
+      const params = config?.path
         ?.split("/")
         .filter((p) => p.startsWith(":") || p === "*")
-        .reduce<Record<string, any>>((acc, p, i) => {
-          if (p === "*") {
-            return {
-              ...acc,
-              [p]: match[i],
-            };
+        .reduce<Record<string, any>>((acc, p) => {
+          const paramName = p;
+          const value = matchedParams[paramName];
+          if (p.startsWith(":")) {
+            if (value) {
+              const key = paramName.replace(/^:/, "").replace(/\?$/, "");
+              acc[key] = config.parse?.[key] ? config.parse[key](value) : value;
+            }
+          } else {
+            // Get the expo-router-specific wildcard param name.
+            const key = matchDeepDynamicRouteName(name);
+            if (key) {
+              // Convert to an array before providing as a route.
+              const parsed = value.split("/").filter(Boolean);
+              acc[key] = config.parse?.[key]
+                ? config.parse[key](parsed)
+                : parsed;
+            }
           }
-          return Object.assign(acc, {
-            // The param segments appear every second item starting from 2 in the regex match result
-            [p]: match![(i + 1) * 2].replace(/\//, ""),
-          });
+          return acc;
         }, {});
 
-      routes = config.routeNames.map((name) => {
-        const config = configs.find((c) => c.screen === name);
+      if (params && Object.keys(params).length) {
+        return { name, params };
+      }
 
-        const params = config?.path
-          ?.split("/")
-          .filter((p) => p.startsWith(":") || p === "*")
-          .reduce<Record<string, any>>((acc, p) => {
-            const paramName = p;
-            const value = matchedParams[paramName];
-            if (p.startsWith(":")) {
-              if (value) {
-                const key = paramName.replace(/^:/, "").replace(/\?$/, "");
-                acc[key] = config.parse?.[key]
-                  ? config.parse[key](value)
-                  : value;
-              }
-            } else {
-              // Get the expo-router-specific wildcard param name.
-              const key = matchDeepDynamicRouteName(name);
-              if (key) {
-                // Convert to an array before providing as a route.
-                const parsed = value.split("/").filter(Boolean);
-                acc[key] = config.parse?.[key]
-                  ? config.parse[key](parsed)
-                  : parsed;
-              }
-            }
-            return acc;
-          }, {});
+      return { name };
+    });
 
-        if (params && Object.keys(params).length) {
-          return { name, params };
-        }
+    // TODO(EvanBacon): Maybe we should warn / assert if multiple slugs use the same param name.
+    const combinedParams = routes.reduce<Record<string, any>>(
+      (acc, r) => Object.assign(acc, r.params),
+      {}
+    );
 
-        return { name };
-      });
+    const hasCombinedParams = Object.keys(combinedParams).length > 0;
 
-      // TODO(EvanBacon): Maybe we should warn / assert if multiple slugs use the same param name.
-      const combinedParams = routes.reduce<Record<string, any>>(
-        (acc, r) => Object.assign(acc, r.params),
-        {}
-      );
+    // Combine all params so a route `[foo]/[bar]/other.js` has access to `{ foo, bar }`
+    routes = routes.map((r) => {
+      if (hasCombinedParams) {
+        r.params = combinedParams;
+      }
+      return r;
+    });
 
-      const hasCombinedParams = Object.keys(combinedParams).length > 0;
+    remainingPath = remainingPath.replace(match[1], "");
 
-      // Combine all params so a route `[foo]/[bar]/other.js` has access to `{ foo, bar }`
-      routes = routes.map((r) => {
-        if (hasCombinedParams) {
-          r.params = combinedParams;
-        }
-        return r;
-      });
-
-      remainingPath = remainingPath.replace(match[1], "");
-
-      break;
-    }
+    break;
   }
 
   return { routes, remainingPath };
@@ -557,6 +575,18 @@ const findParseConfigForRoute = (
   return undefined;
 };
 
+function hasSameParents(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    if (a[i].localeCompare(b[i]) !== 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
 // Try to find an initial route connected with the one passed
 const findInitialRoute = (
   routeName: string,
@@ -564,19 +594,12 @@ const findInitialRoute = (
   initialRoutes: InitialRouteConfig[]
 ): string | undefined => {
   for (const config of initialRoutes) {
-    if (parentScreens.length === config.parentScreens.length) {
-      let sameParents = true;
-      for (let i = 0; i < parentScreens.length; i++) {
-        if (parentScreens[i].localeCompare(config.parentScreens[i]) !== 0) {
-          sameParents = false;
-          break;
-        }
-      }
-      if (sameParents) {
-        return routeName !== config.initialRouteName
-          ? config.initialRouteName
-          : undefined;
-      }
+    if (hasSameParents(parentScreens, config.parentScreens)) {
+      // If the parents are the same but the route name doesn't match the initial route
+      // then we return the initial route.
+      return routeName !== config.initialRouteName
+        ? config.initialRouteName
+        : undefined;
     }
   }
   return undefined;
@@ -624,7 +647,6 @@ const createNestedStateObject = (
   const parentScreens: string[] = [];
 
   let initialRoute = findInitialRoute(route.name, parentScreens, initialRoutes);
-
   parentScreens.push(route.name);
 
   const state: InitialState = createStateObject(
