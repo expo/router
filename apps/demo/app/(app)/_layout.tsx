@@ -8,7 +8,8 @@ export default function RootLayout() {
       }}
     >
       <Tabs.Screen name="(explore)" />
-      <Tabs.Screen name="(home)" />
+      <Tabs.Screen name="(feed)" />
+      <Tabs.Screen name="([user])" />
     </Tabs>
   );
 }

@@ -5,9 +5,9 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Home</Text>
+        <Text style={styles.title}>User</Text>
 
-        <Link href="./shared">Next</Link>
+        <Link href="/([user])/compose">Next</Link>
       </View>
     </View>
   );

@@ -7,7 +7,7 @@ export default function Page() {
       <View style={styles.main}>
         <Text style={styles.title}>Explore</Text>
 
-        <Link href="./shared">Next</Link>
+        <Link href="./feed">Compose</Link>
       </View>
     </View>
   );

@@ -134,7 +134,7 @@ export default function getStateFromPath<ParamList extends object>(
       ...config,
       // TODO(EvanBacon): Probably a safer way to do this
       // Mark initial routes to give them potential priority over other routes that match.
-      isInitial: resolvedInitialPatterns.includes(config.pattern),
+      isInitial: resolvedInitialPatterns.includes(config.routeNames.join("/")),
     }))
     .sort((a, b) => {
       // Sort config so that:
@@ -366,7 +366,7 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
         }
         return Object.assign(acc, {
           // The param segments appear every second item starting from 2 in the regex match result
-          [p]: match![(i + 1) * 2].replace(/\//, ""),
+          [p]: match![(i + 1) * 2]?.replace(/\//, ""),
         });
       }, {});
 
