@@ -69,6 +69,8 @@ export default function StackLayout({ segment }) {
 }
 ```
 
+The first group listed in the clone syntax will be the default segment. In this case, the `home` tab will be the default. If you rename the directory to `(profile, home)` then the `profile` fragment will be the default.
+
 ## Linking
 
 When linking, you can use `./screen` to move to a route matching `screen` in the same group. When using the absolute syntax `/screen` the app will navigate to the first matching route in the entire app.
