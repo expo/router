@@ -1,19 +1,19 @@
-import { Stack } from "expo-router";
+import { Stack, Tabs } from "expo-router";
 import { useRouteNode } from "expo-router/build/Route";
 
-export const unstable_settings = [
-  {
-    initialRouteName: "home",
-  },
-  {
-    name: "(profile)",
-    initialRouteName: "[user]/index",
-  },
-  {
-    name: "(search)",
-    initialRouteName: "explore/index",
-  },
-];
+// export const unstable_settings = [
+//   {
+//     initialRouteName: "home",
+//   },
+//   {
+//     name: "(profile)",
+//     initialRouteName: "[user]/index",
+//   },
+//   {
+//     name: "(search)",
+//     initialRouteName: "explore/index",
+//   },
+// ];
 
 const firstRoute = {
   "(profile)": "[user]/index",
@@ -26,7 +26,7 @@ export default function StackLayout() {
 
   return (
     <Stack>
-      <Stack.Screen name={firstRoute[route]} />
+      <Stack.Screen />
     </Stack>
   );
 }

@@ -134,7 +134,12 @@ function treeNodeToRouteNode({
   const dynamic = generateDynamic(name);
 
   if (node) {
-    const settings = node.loadRoute().unstable_settings;
+    const fragmentName = matchFragmentName(name);
+    const multiFragment = fragmentName?.includes(",");
+
+    const settings = multiFragment
+      ? fragmentName!.split(",").map((v) => ({ name: `(${v.trim()})` }))
+      : null;
 
     const output = {
       loadRoute: node.loadRoute,
