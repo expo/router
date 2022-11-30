@@ -13,10 +13,6 @@ import * as queryString from "query-string";
 
 import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
 
-//   import findFocusedRoute from './findFocusedRoute';
-//   import type { PathConfigMap } from './types';
-//   import validatePathConfig from './validatePathConfig';
-
 type Options<ParamList extends object> = {
   initialRouteName?: string;
   screens: PathConfigMap<ParamList>;
