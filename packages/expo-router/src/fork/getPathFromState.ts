@@ -10,7 +10,11 @@ import type {
 } from "@react-navigation/routers";
 import * as queryString from "query-string";
 
-import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
+import {
+  matchDeepDynamicRouteName,
+  matchDynamicName,
+  matchFragmentName,
+} from "../matchers";
 
 type Options<ParamList extends object> = {
   initialRouteName?: string;
@@ -27,6 +31,8 @@ type ConfigItem = {
   pattern?: string;
   stringify?: StringifyConfig;
   screens?: Record<string, ConfigItem>;
+  // Used as fallback for fragments
+  initialRouteName?: string;
 };
 
 const getActiveRoute = (state: State): { name: string; params?: object } => {
@@ -217,8 +223,8 @@ export default function getPathFromState<ParamList extends object>(
     }
 
     if (currentOptions[route.name] !== undefined) {
-      path += pattern
-        .split("/")
+      const parts = pattern.split("/");
+      path += parts
         .map((p, i) => {
           const name = getParamName(p);
 
@@ -252,6 +258,25 @@ export default function getPathFromState<ParamList extends object>(
           }
 
           if (!preserveFragments && matchFragmentName(p) != null) {
+            // When the last part is a fragment it could be a shared URL
+            // if the route has an initialRouteName defined, then we should
+            // use that as the component path as we can assume it will be shown.
+            if (parts.length - 1 === i) {
+              const initialRouteName =
+                currentOptions[route.name].initialRouteName;
+
+              if (initialRouteName) {
+                // Return an empty string if the init route is ambiguous.
+                if (
+                  initialRouteName === "index" ||
+                  matchDynamicName(initialRouteName) ||
+                  matchDeepDynamicRouteName(initialRouteName)
+                ) {
+                  return "";
+                }
+                return encodeURIComponent(initialRouteName);
+              }
+            }
             return "";
           }
           return encodeURIComponent(p);
@@ -342,18 +367,19 @@ const createConfigItem = (
     return { pattern };
   }
 
-  if (config.exact && config.path === undefined) {
-    throw new Error(
-      "A 'path' needs to be specified when specifying 'exact: true'. If you don't want this screen in the URL, specify it as empty string, e.g. `path: ''`."
-    );
-  }
+  // if (config.exact && config.path === undefined) {
+  //   throw new Error(
+  //     "A 'path' needs to be specified when specifying 'exact: true'. If you don't want this screen in the URL, specify it as empty string, e.g. `path: ''`."
+  //   );
+  // }
 
   // If an object is specified as the value (e.g. Foo: { ... }),
   // It can have `path` property and `screens` prop which has nested configs
-  const pattern =
-    config.exact !== true
-      ? joinPaths(parentPattern || "", config.path || "")
-      : config.path || "";
+  const pattern = joinPaths(parentPattern || "", config.path || "");
+  // const pattern =
+  //   config.exact !== true
+  //     ? joinPaths(parentPattern || "", config.path || "")
+  //     : config.path || "";
 
   const screens = config.screens
     ? createNormalizedConfigs(config.screens, pattern)
@@ -364,6 +390,8 @@ const createConfigItem = (
     pattern: pattern?.split("/").filter(Boolean).join("/"),
     stringify: config.stringify,
     screens,
+
+    initialRouteName: config.initialRouteName,
   };
 };
 
