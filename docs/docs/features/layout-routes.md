@@ -45,7 +45,7 @@ Layout routes are also similar to `pages/_app.js` in Next.js.
 
 ![](./assets/fragment-routes.png)
 
-Fragment routes add nested layout without appending any path segments. Think of them like `index.js` but as a layout. These are most commonly used for adding navigators like tab, stack, drawer, etc... The format is `/(name)`, the `name` is purely cosmetic and not provided to the route component.
+Fragment routes add nested layout without appending any path segments. Think of them like `index.js` but as a layout. These are most commonly used for adding navigators like tab, stack, drawer, etc... The format is `/(name)`, if the `name` matches a reduced child, that child will be the initial route for a stack.
 
 ```bash title="File System"
 app/
