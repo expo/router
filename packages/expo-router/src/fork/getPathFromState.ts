@@ -270,6 +270,7 @@ export default function getPathFromState<ParamList extends object>(
                 if (
                   initialRouteName === "index" ||
                   matchDynamicName(initialRouteName) ||
+                  matchFragmentName(initialRouteName) ||
                   matchDeepDynamicRouteName(initialRouteName)
                 ) {
                   return "";

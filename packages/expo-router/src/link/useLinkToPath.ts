@@ -30,6 +30,11 @@ export function useLinkToPath() {
         );
       }
 
+      if (to === ".." || to === "../") {
+        navigation.goBack();
+        return;
+      }
+
       if (to.startsWith(".")) {
         let base = linking.options?.getPathFromState(
           navigation.getRootState(),
