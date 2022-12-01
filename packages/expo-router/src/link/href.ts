@@ -1,5 +1,3 @@
-import { matchFragmentName } from "../matchers";
-
 export type Href = string | HrefObject;
 
 export type HrefObject = {
@@ -17,7 +15,6 @@ export const resolveHref = (href: Href): string => {
     return resolveHref({ pathname: href ?? "" });
   }
   const path = href.pathname ?? "";
-  // const path = stripFragmentRoutes(href.pathname ?? "");
   if (!href?.params) {
     return path;
   }
@@ -29,13 +26,6 @@ export const resolveHref = (href: Href): string => {
     (Object.keys(params).length ? `?${createQueryParams(params)}` : "")
   );
 };
-
-function stripFragmentRoutes(pathname: string): string {
-  return pathname
-    .split("/")
-    .filter((segment) => matchFragmentName(segment) == null)
-    .join("/");
-}
 
 function createQualifiedPathname(
   pathname: string,
@@ -63,8 +53,8 @@ function createQualifiedPathname(
   return { pathname, params };
 }
 
-function createQueryParams(params: Record<string, any>) {
-  return Object.keys(params)
-    .map((key) => `${key}=${params[key]}`)
+function createQueryParams(params: Record<string, any>): string {
+  return Object.entries(params)
+    .map((props) => props.join("="))
     .join("&");
 }
