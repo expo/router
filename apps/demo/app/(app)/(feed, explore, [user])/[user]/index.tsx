@@ -7,7 +7,8 @@ export default function Page({ route }) {
       <View style={styles.main}>
         <Text style={styles.title}>User: {route.params?.user}</Text>
 
-        <Link href="/([user])/compose">Next</Link>
+        <Link href="/([user])/compose">User -> Compose</Link>
+        <Link href="./compose">Local -> Compose</Link>
       </View>
     </View>
   );
