@@ -49,7 +49,7 @@ export function useLinkToPath() {
         }
         const pre = to;
         to = posix.resolve(base, to);
-        console.log("to", pre, "->", base, "=", to);
+        console.log("Link:join", base, "+", pre, "=", to);
       }
 
       const { options } = linking;
