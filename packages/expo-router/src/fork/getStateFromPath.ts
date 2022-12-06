@@ -11,7 +11,11 @@ import type {
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
-import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
+import {
+  matchDeepDynamicRouteName,
+  matchFragmentName,
+  stripFragmentSegmentsFromPath,
+} from "../matchers";
 
 type Options<ParamList extends object> = {
   initialRouteName?: string;
@@ -129,7 +133,6 @@ export default function getStateFromPath<ParamList extends object>(
     joinPaths(...route.parentScreens, route.initialRouteName)
   );
 
-  console.log("from path:", path, "configs:", configs);
   configs = configs
     .map((config) => ({
       ...config,
@@ -167,6 +170,7 @@ export default function getStateFromPath<ParamList extends object>(
       // This is so we can compare the length of the pattern, e.g. `foo/*` > `foo` vs `*` < ``.
       const aParts = a.pattern
         .split("/")
+        // Strip out fragment names to ensure they don't affect the priority.
         .filter((part) => matchFragmentName(part) == null);
       if (a.screen === "index") {
         aParts.push("index");
@@ -323,7 +327,6 @@ export default function getStateFromPath<ParamList extends object>(
       regex: c.regex ? new RegExp(c.regex.source + "$") : undefined,
     }))
   );
-  console.log("results:", [...routes], remainingPath);
 
   if (routes !== undefined) {
     // This will always be empty if full path matched
@@ -335,8 +338,6 @@ export default function getStateFromPath<ParamList extends object>(
   if (current == null || result == null) {
     return undefined;
   }
-
-  console.log("RES:", { ...result });
 
   return result;
 }
@@ -356,14 +357,11 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
     if (!config.regex) {
       continue;
     }
-    // TODO: Make it possible to select the route when there are multiple matches (parallel routes).
     const match = remainingPath.match(config.regex);
     // If our regex matches, we need to extract params from the path
     if (!match) {
-      // console.log("no match", config.regex, remainingPath);
       continue;
     }
-    console.log("match", config.regex, match, remainingPath);
 
     const matchedParams = config.pattern
       ?.split("/")
@@ -375,14 +373,12 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
             [p]: match[i],
           };
         }
-        // console.log('match', match[i + 1])
         return Object.assign(acc, {
-          // The param segments appear every second item starting from 2 in the regex match result
+          // The param segments appear every second item starting from 2 in the regex match result.
+          // This will only work if we ensure fragments aren't included in the match.
           [p]: match![(i + 1) * 2]?.replace(/\//, ""),
         });
       }, {});
-
-    console.log("matchedParams", matchedParams);
 
     routes = config.routeNames.map((name) => {
       const config = configs.find((c) => c.screen === name);
@@ -470,18 +466,16 @@ const createNormalizedConfigs = (
     // it can have `path` property and
     // it could have `screens` prop which has nested configs
     if (typeof config.path === "string") {
-      // if (config.exact && config.path === undefined) {
-      //   throw new Error(
-      //     "A 'path' needs to be specified when specifying 'exact: true'. If you don't want this screen in the URL, specify it as empty string, e.g. `path: ''`."
-      //   );
-      // }
+      if (config.exact && config.path === undefined) {
+        throw new Error(
+          "A 'path' needs to be specified when specifying 'exact: true'. If you don't want this screen in the URL, specify it as empty string, e.g. `path: ''`."
+        );
+      }
 
-      pattern = joinPaths(parentPattern || "", config.path || "");
-
-      // pattern =
-      //   config.exact !== true
-      //     ? joinPaths(parentPattern || "", config.path || "")
-      //     : config.path || "";
+      pattern =
+        config.exact !== true
+          ? joinPaths(parentPattern || "", config.path || "")
+          : config.path || "";
 
       configs.push(
         createConfigItem(
@@ -551,6 +545,7 @@ const createConfigItem = (
             if (matchFragmentName(it) != null) {
               // Fragments are optional segments
               // this enables us to match `/bar` and `/(foo)/bar` for the same route
+              // NOTE(EvanBacon): Ignore this match in the regex to avoid capturing the fragment
               return `(?:${escape(it)}\\/)?`;
             }
 
@@ -586,7 +581,7 @@ const findParseConfigForRoute = (
   return undefined;
 };
 
-function hasSameParents(a: string[], b: string[]): boolean {
+function equalHeritage(a: string[], b: string[]): boolean {
   if (a.length !== b.length) {
     return false;
   }
@@ -605,7 +600,7 @@ const findInitialRoute = (
   initialRoutes: InitialRouteConfig[]
 ): string | undefined => {
   for (const config of initialRoutes) {
-    if (hasSameParents(parentScreens, config.parentScreens)) {
+    if (equalHeritage(parentScreens, config.parentScreens)) {
       // If the parents are the same but the route name doesn't match the initial route
       // then we return the initial route.
       return routeName !== config.initialRouteName
@@ -658,6 +653,7 @@ const createNestedStateObject = (
   const parentScreens: string[] = [];
 
   let initialRoute = findInitialRoute(route.name, parentScreens, initialRoutes);
+
   parentScreens.push(route.name);
 
   const state: InitialState = createStateObject(
@@ -692,15 +688,11 @@ const createNestedStateObject = (
 
   route = findFocusedRoute(state) as ParsedRoute;
 
-  const parsedPath = path
-    .split("/")
-    .map((v) => (matchFragmentName(v) ? "" : v))
-    .filter(Boolean)
-    .join("/");
-  route.path = parsedPath;
+  // Remove fragments from the path while preserving a trailing slash.
+  route.path = stripFragmentSegmentsFromPath(path);
 
   const params = parseQueryParams(
-    parsedPath,
+    route.path,
     flatConfig ? findParseConfigForRoute(route.name, flatConfig) : undefined
   );
 

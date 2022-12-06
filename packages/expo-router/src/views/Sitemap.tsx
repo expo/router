@@ -124,9 +124,8 @@ function FileItem({
           if (matchDeepDynamicRouteName(v)) {
             return v + "/" + Date.now();
           }
-          // groups and index must be erased
+          // index must be erased but fragments can be preserved.
           return v === "index" ? "" : v;
-          // return !!matchFragmentName(v) || v === "index" ? "" : v;
         })
         .filter(Boolean)
         .join("/")

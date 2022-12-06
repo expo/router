@@ -7,7 +7,7 @@ import { LinkingContext } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 import * as React from "react";
 
-import { posix } from "./path";
+import { resolve } from "./path";
 
 function isRemoteHref(href: string): boolean {
   return /:\/\//.test(href);
@@ -40,6 +40,7 @@ export function useLinkToPath() {
           navigation.getRootState(),
           {
             ...linking.options!.config,
+            // @ts-expect-error: non-standard option
             preserveFragments: true,
           }
         );
@@ -47,9 +48,7 @@ export function useLinkToPath() {
         if (base && !base.endsWith("/")) {
           base += "/..";
         }
-        const pre = to;
-        to = posix.resolve(base, to);
-        console.log("Link:join", base, "+", pre, "=", to);
+        to = resolve(base, to);
       }
 
       const { options } = linking;

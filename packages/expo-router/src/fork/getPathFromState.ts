@@ -70,6 +70,19 @@ function createFakeState(params: StateAsParams) {
   };
 }
 
+function segmentMatchesConvention(segment: string): boolean {
+  return (
+    segment === "index" ||
+    matchDynamicName(segment) != null ||
+    matchFragmentName(segment) != null ||
+    matchDeepDynamicRouteName(segment) != null
+  );
+}
+
+function encodeURIComponentPreservingBrackets(str: string) {
+  return encodeURIComponent(str).replace(/%5B/g, "[").replace(/%5D/g, "]");
+}
+
 /**
  * Utility to serialize a navigation state object to a path string.
  *
@@ -101,7 +114,10 @@ function createFakeState(params: StateAsParams) {
  */
 export default function getPathFromState<ParamList extends object>(
   state: State,
-  _options?: Options<ParamList> & { preserveFragments?: boolean } = {}
+  // @ts-expect-error: non-standard options
+  _options?: Options<ParamList> & {
+    preserveFragments?: boolean;
+  } = {}
 ): string {
   if (state == null) {
     throw Error(
@@ -109,9 +125,6 @@ export default function getPathFromState<ParamList extends object>(
     );
   }
 
-  // let options: Options<ParamList> | undefined;
-  // let preserveFragments = false;
-  // if
   const { preserveFragments, ...options } = _options;
 
   if (_options) {
@@ -223,8 +236,8 @@ export default function getPathFromState<ParamList extends object>(
     }
 
     if (currentOptions[route.name] !== undefined) {
-      const parts = pattern.split("/");
-      path += parts
+      const segments = pattern.split("/");
+      path += segments
         .map((p, i) => {
           const name = getParamName(p);
 
@@ -261,33 +274,27 @@ export default function getPathFromState<ParamList extends object>(
             // When the last part is a fragment it could be a shared URL
             // if the route has an initialRouteName defined, then we should
             // use that as the component path as we can assume it will be shown.
-            if (parts.length - 1 === i) {
+            if (segments.length - 1 === i) {
               const initialRouteName =
                 currentOptions[route.name].initialRouteName;
 
               if (initialRouteName) {
                 // Return an empty string if the init route is ambiguous.
-                if (
-                  initialRouteName === "index" ||
-                  matchDynamicName(initialRouteName) ||
-                  matchFragmentName(initialRouteName) ||
-                  matchDeepDynamicRouteName(initialRouteName)
-                ) {
+                if (segmentMatchesConvention(initialRouteName)) {
                   return "";
                 }
-                return encodeURIComponent(initialRouteName);
+                return encodeURIComponentPreservingBrackets(initialRouteName);
               }
             }
             return "";
           }
-          const encoded = encodeURIComponent(p);
           // Preserve dynamic syntax for rehydration
-          return encoded.replace("%5B", "[").replace("%5D", "]");
+          return encodeURIComponentPreservingBrackets(p);
         })
         .join("/");
     } else {
       // TODO: Probably fragment routes shouldn't get this far
-      path += encodeURIComponent(
+      path += encodeURIComponentPreservingBrackets(
         matchFragmentName(route.name)
           ? ""
           : route.name === "index"
@@ -370,19 +377,18 @@ const createConfigItem = (
     return { pattern };
   }
 
-  // if (config.exact && config.path === undefined) {
-  //   throw new Error(
-  //     "A 'path' needs to be specified when specifying 'exact: true'. If you don't want this screen in the URL, specify it as empty string, e.g. `path: ''`."
-  //   );
-  // }
+  if (config.exact && config.path === undefined) {
+    throw new Error(
+      "A 'path' needs to be specified when specifying 'exact: true'. If you don't want this screen in the URL, specify it as empty string, e.g. `path: ''`."
+    );
+  }
 
   // If an object is specified as the value (e.g. Foo: { ... }),
   // It can have `path` property and `screens` prop which has nested configs
-  const pattern = joinPaths(parentPattern || "", config.path || "");
-  // const pattern =
-  //   config.exact !== true
-  //     ? joinPaths(parentPattern || "", config.path || "")
-  //     : config.path || "";
+  const pattern =
+    config.exact !== true
+      ? joinPaths(parentPattern || "", config.path || "")
+      : config.path || "";
 
   const screens = config.screens
     ? createNormalizedConfigs(config.screens, pattern)

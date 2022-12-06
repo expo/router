@@ -32,16 +32,16 @@ export const Unmatched = forwardRef((props, ref) => {
         style={styles.subtitle}
       >
         Page could not be found.{" "}
-        <Link href="/" style={styles.link}>
+        <Link href="/" replace style={styles.link}>
           Go back.
         </Link>
       </Text>
 
-      <Link href="/" style={styles.link}>
+      <Link href="/" replace style={styles.link}>
         {url}
       </Link>
 
-      <Link href="/_sitemap" style={[styles.link, { marginTop: 8 }]}>
+      <Link href="/_sitemap" replace style={[styles.link, { marginTop: 8 }]}>
         Sitemap
       </Link>
     </View>

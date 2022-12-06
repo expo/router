@@ -5,8 +5,8 @@ import { getAllWebRedirects } from "./aasa";
 import {
   addEventListener,
   getInitialURL,
-  getRootURL,
   getPathFromState,
+  getRootURL,
   getStateFromPath,
 } from "./link/linking";
 import { matchDeepDynamicRouteName, matchDynamicName } from "./matchers";
@@ -21,23 +21,22 @@ type Screen =
 
 // `[page]` -> `:page`
 // `page` -> `page`
-function convertDynamicRouteToReactNavigation(name: string) {
-  if (name === "index") {
+function convertDynamicRouteToReactNavigation(segment: string): string {
+  // NOTE(EvanBacon): To support shared routes we preserve fragment segments.
+  if (segment === "index") {
     return "";
   }
-  // if (name === "index" || matchFragmentName(name) != null) {
-  //   return "";
-  // }
-  if (matchDeepDynamicRouteName(name) != null) {
+
+  if (matchDeepDynamicRouteName(segment) != null) {
     return "*";
   }
-  const dynamicName = matchDynamicName(name);
+  const dynamicName = matchDynamicName(segment);
 
   if (dynamicName != null) {
     return `:${dynamicName}`;
   }
 
-  return name;
+  return segment;
 }
 
 function parseRouteSegments(segments: string): string {

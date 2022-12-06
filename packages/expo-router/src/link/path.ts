@@ -37,9 +37,13 @@ function normalizeStringPosix(path, allowAboveRoot) {
   let dots = 0;
   let code;
   for (let i = 0; i <= path.length; ++i) {
-    if (i < path.length) code = path.charCodeAt(i);
-    else if (code === 47 /*/*/) break;
-    else code = 47 /*/*/;
+    if (i < path.length) {
+      code = path.charCodeAt(i);
+    } else if (code === 47 /*/*/) {
+      break;
+    } else {
+      code = 47 /*/*/;
+    }
     if (code === 47 /*/*/) {
       if (lastSlash === i - 1 || dots === 1) {
         // NOOP
@@ -93,44 +97,45 @@ function normalizeStringPosix(path, allowAboveRoot) {
   return res;
 }
 
-export const posix = {
-  // path.resolve([from ...], to)
-  resolve: function resolve(...props) {
-    let resolvedPath = "";
-    let resolvedAbsolute = false;
+// path.resolve([from ...], to)
+export function resolve(...segments) {
+  let resolvedPath = "";
+  let resolvedAbsolute = false;
 
-    for (let i = props.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-      let path;
-      if (i >= 0) {
-        path = props[i];
-      } else {
-        path = "/";
-      }
-
-      assertPath(path);
-
-      // Skip empty entries
-      if (path.length === 0) {
-        continue;
-      }
-
-      resolvedPath = path + "/" + resolvedPath;
-      resolvedAbsolute = path.charCodeAt(0) === 47 /*/*/;
-    }
-
-    // At this point the path should be resolved to a full absolute path, but
-    // handle relative paths to be safe (might happen when process.cwd() fails)
-
-    // Normalize the path
-    resolvedPath = normalizeStringPosix(resolvedPath, !resolvedAbsolute);
-
-    if (resolvedAbsolute) {
-      if (resolvedPath.length > 0) return "/" + resolvedPath;
-      else return "/";
-    } else if (resolvedPath.length > 0) {
-      return resolvedPath;
+  for (let i = segments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+    let path;
+    if (i >= 0) {
+      path = segments[i];
     } else {
-      return ".";
+      path = "/";
     }
-  },
-};
+
+    assertPath(path);
+
+    // Skip empty entries
+    if (path.length === 0) {
+      continue;
+    }
+
+    resolvedPath = path + "/" + resolvedPath;
+    resolvedAbsolute = path.charCodeAt(0) === 47 /*/*/;
+  }
+
+  // At this point the path should be resolved to a full absolute path, but
+  // handle relative paths to be safe (might happen when process.cwd() fails)
+
+  // Normalize the path
+  resolvedPath = normalizeStringPosix(resolvedPath, !resolvedAbsolute);
+
+  if (resolvedAbsolute) {
+    if (resolvedPath.length > 0) {
+      return "/" + resolvedPath;
+    } else {
+      return "/";
+    }
+  } else if (resolvedPath.length > 0) {
+    return resolvedPath;
+  } else {
+    return ".";
+  }
+}

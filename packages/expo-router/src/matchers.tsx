@@ -28,3 +28,15 @@ function removeSupportedExtensions(name: string): string {
 function removeFileSystemDots(filePath: string): string {
   return filePath.replace(/^(?:\.\.?\/)+/g, "");
 }
+
+export function stripFragmentSegmentsFromPath(path: string): string {
+  return path
+    .split("/")
+    .reduce((acc, v) => {
+      if (matchFragmentName(v) == null) {
+        acc.push(v);
+      }
+      return acc;
+    }, [] as string[])
+    .join("/");
+}

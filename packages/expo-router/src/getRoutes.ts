@@ -4,6 +4,7 @@ import {
   matchDeepDynamicRouteName,
   matchDynamicName,
   matchFragmentName,
+  stripFragmentSegmentsFromPath,
 } from "./matchers";
 import { RequireContext } from "./types";
 import { DefaultLayout } from "./views/Layout";
@@ -98,13 +99,8 @@ export function generateDynamic(name: string) {
   return dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null;
 }
 
-function reduceRoutes(route: string) {
-  return route
-    .replace(/\/index$/, "")
-    .split("/")
-    .map((v) => (matchFragmentName(v) ? "" : v))
-    .filter(Boolean)
-    .join("/");
+function collapseRouteSegments(route: string) {
+  return stripFragmentSegmentsFromPath(route.replace(/\/index$/, ""));
 }
 
 /**
@@ -116,7 +112,9 @@ function reduceRoutes(route: string) {
  *
  */
 function getDefaultInitialRoute(node: RouteNode, name: string) {
-  return node.children.find((node) => reduceRoutes(node.route) === name);
+  return node.children.find(
+    (node) => collapseRouteSegments(node.route) === name
+  );
 }
 
 function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
@@ -145,7 +143,7 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
   };
 }
 
-function cloneRoute(
+function cloneFragmentRoute(
   node: RouteNode,
   { name: nextName }: { name: string }
 ): RouteNode {
@@ -153,12 +151,10 @@ function cloneRoute(
   const parts = node.contextKey.split("/");
   parts[parts.length - 2] = fragmentName;
 
-  const contextKey = parts.join("/");
-
   return {
     ...node,
     route: fragmentName,
-    contextKey,
+    contextKey: parts.join("/"),
   };
 }
 
@@ -187,7 +183,7 @@ function treeNodeToRouteNode({
 
     if (Array.isArray(clones)) {
       return clones.map((clone) =>
-        applyDefaultInitialRouteName(cloneRoute({ ...output }, clone))
+        applyDefaultInitialRouteName(cloneFragmentRoute({ ...output }, clone))
       );
     }
 
