@@ -72,7 +72,6 @@ export default function getStateFromPath<ParamList extends object>(
   path: string,
   options?: Options<ParamList>
 ): ResultState | undefined {
-  console.log("getStateFromPath", path, options);
   if (options) {
     validatePathConfig(options);
   }
@@ -320,7 +319,7 @@ export default function getStateFromPath<ParamList extends object>(
       regex: c.regex ? new RegExp(c.regex.source + "$") : undefined,
     }))
   );
-  console.log("results:", routes, remainingPath);
+  console.log("results:", [...routes], remainingPath);
 
   if (routes !== undefined) {
     // This will always be empty if full path matched
@@ -332,6 +331,8 @@ export default function getStateFromPath<ParamList extends object>(
   if (current == null || result == null) {
     return undefined;
   }
+
+  console.log("RES:", { ...result });
 
   return result;
 }
@@ -355,10 +356,10 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
     const match = remainingPath.match(config.regex);
     // If our regex matches, we need to extract params from the path
     if (!match) {
-      console.log("no match", config.regex, remainingPath);
+      // console.log("no match", config.regex, remainingPath);
       continue;
     }
-    console.log("match", config.regex, remainingPath);
+    console.log("match", config.regex, match, remainingPath);
 
     const matchedParams = config.pattern
       ?.split("/")
@@ -370,11 +371,14 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
             [p]: match[i],
           };
         }
+        // console.log('match', match[i + 1])
         return Object.assign(acc, {
           // The param segments appear every second item starting from 2 in the regex match result
           [p]: match![(i + 1) * 2]?.replace(/\//, ""),
         });
       }, {});
+
+    console.log("matchedParams", matchedParams);
 
     routes = config.routeNames.map((name) => {
       const config = configs.find((c) => c.screen === name);
@@ -543,7 +547,7 @@ const createConfigItem = (
             if (matchFragmentName(it) != null) {
               // Fragments are optional segments
               // this enables us to match `/bar` and `/(foo)/bar` for the same route
-              return `(${escape(it)}\\/)?`;
+              return `(?:${escape(it)}\\/)?`;
             }
 
             return `${it === "*" ? ".*" : escape(it)}\\/`;
