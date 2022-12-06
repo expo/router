@@ -72,6 +72,7 @@ export default function getStateFromPath<ParamList extends object>(
   path: string,
   options?: Options<ParamList>
 ): ResultState | undefined {
+  console.log("getStateFromPath", path, options);
   if (options) {
     validatePathConfig(options);
   }
@@ -129,6 +130,7 @@ export default function getStateFromPath<ParamList extends object>(
     joinPaths(...route.parentScreens, route.initialRouteName)
   );
 
+  console.log("from path:", path, "configs:", configs);
   configs = configs
     .map((config) => ({
       ...config,
@@ -318,6 +320,7 @@ export default function getStateFromPath<ParamList extends object>(
       regex: c.regex ? new RegExp(c.regex.source + "$") : undefined,
     }))
   );
+  console.log("results:", routes, remainingPath);
 
   if (routes !== undefined) {
     // This will always be empty if full path matched
@@ -352,8 +355,11 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
     const match = remainingPath.match(config.regex);
     // If our regex matches, we need to extract params from the path
     if (!match) {
+      console.log("no match", config.regex, remainingPath);
       continue;
     }
+    console.log("match", config.regex, remainingPath);
+
     const matchedParams = config.pattern
       ?.split("/")
       .filter((p) => p.startsWith(":") || p === "*")
@@ -456,16 +462,18 @@ const createNormalizedConfigs = (
     // it can have `path` property and
     // it could have `screens` prop which has nested configs
     if (typeof config.path === "string") {
-      if (config.exact && config.path === undefined) {
-        throw new Error(
-          "A 'path' needs to be specified when specifying 'exact: true'. If you don't want this screen in the URL, specify it as empty string, e.g. `path: ''`."
-        );
-      }
+      // if (config.exact && config.path === undefined) {
+      //   throw new Error(
+      //     "A 'path' needs to be specified when specifying 'exact: true'. If you don't want this screen in the URL, specify it as empty string, e.g. `path: ''`."
+      //   );
+      // }
 
-      pattern =
-        config.exact !== true
-          ? joinPaths(parentPattern || "", config.path || "")
-          : config.path || "";
+      pattern = joinPaths(parentPattern || "", config.path || "");
+
+      // pattern =
+      //   config.exact !== true
+      //     ? joinPaths(parentPattern || "", config.path || "")
+      //     : config.path || "";
 
       configs.push(
         createConfigItem(
@@ -535,8 +543,7 @@ const createConfigItem = (
             if (matchFragmentName(it) != null) {
               // Fragments are optional segments
               // this enables us to match `/bar` and `/(foo)/bar` for the same route
-              const matchable = `(${escape(it)}\\/)?`;
-              return matchable;
+              return `(${escape(it)}\\/)?`;
             }
 
             return `${it === "*" ? ".*" : escape(it)}\\/`;

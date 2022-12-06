@@ -7,7 +7,7 @@ export default function Page() {
       <View style={styles.main}>
         <Text style={styles.title}>Shared</Text>
 
-        <Link href="./">Back</Link>
+        <Link href="..">Back</Link>
       </View>
     </View>
   );

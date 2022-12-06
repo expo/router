@@ -1,11 +1,11 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Page() {
+export default function Page({ route }) {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>User</Text>
+        <Text style={styles.title}>User: {route.params?.user}</Text>
 
         <Link href="/([user])/compose">Next</Link>
       </View>

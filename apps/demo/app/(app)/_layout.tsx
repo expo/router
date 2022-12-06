@@ -7,9 +7,9 @@ export default function RootLayout() {
         headerShown: false,
       }}
     >
-      <Tabs.Screen name="(explore)" />
-      <Tabs.Screen name="(feed)" />
-      <Tabs.Screen name="([user])" />
+      <Tabs.Screen name="(feed)" options={{ title: "Home" }} />
+      <Tabs.Screen name="(explore)" options={{ title: "Search" }} />
+      <Tabs.Screen name="([user])" options={{ title: "Profile" }} />
     </Tabs>
   );
 }

@@ -2,12 +2,19 @@ import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Page() {
+  const users = ["lydiahallie", "evanbacon", "cedricvanputten"];
   return (
     <View style={styles.container}>
       <View style={styles.main}>
         <Text style={styles.title}>Explore</Text>
 
         <Link href="./feed">Compose</Link>
+
+        {users.map((user) => (
+          <Link href={{ params: { user }, pathname: "./[user]" }}>
+            Visit @{user}
+          </Link>
+        ))}
       </View>
     </View>
   );
