@@ -165,12 +165,16 @@ export default function getStateFromPath<ParamList extends object>(
       // NOTE(EvanBacon): Here we append `index` if the screen was `index` so the length is the same
       // as a slug or wildcard when nested more than one level deep.
       // This is so we can compare the length of the pattern, e.g. `foo/*` > `foo` vs `*` < ``.
-      const aParts = a.pattern.split("/");
+      const aParts = a.pattern
+        .split("/")
+        .filter((part) => matchFragmentName(part) == null);
       if (a.screen === "index") {
         aParts.push("index");
       }
 
-      const bParts = b.pattern.split("/");
+      const bParts = b.pattern
+        .split("/")
+        .filter((part) => matchFragmentName(part) == null);
       if (b.screen === "index") {
         bParts.push("index");
       }
