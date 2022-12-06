@@ -11,7 +11,7 @@ export default function Page() {
         <Link href="./feed">Compose</Link>
 
         {users.map((user) => (
-          <Link href={{ params: { user }, pathname: "./[user]" }}>
+          <Link key={user} href={{ params: { user }, pathname: "./[user]" }}>
             Visit @{user}
           </Link>
         ))}

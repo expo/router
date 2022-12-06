@@ -47,7 +47,13 @@ export function Redirect({ href }: { href: Href }) {
 export const Link = React.forwardRef(ExpoRouterLink);
 
 function ExpoRouterLink(
-  { href, replace, asChild, ...rest }: Props,
+  {
+    href,
+    replace,
+    // TODO: This does not prevent default on the anchor tag.
+    asChild,
+    ...rest
+  }: Props,
   ref: React.ForwardedRef<Text>
 ) {
   // TODO: Auto use router's client-side event.

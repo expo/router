@@ -173,7 +173,7 @@ function treeNodeToRouteNode({
     const fragmentName = matchFragmentName(name);
     const multiFragment = fragmentName?.includes(",");
 
-    const settings = multiFragment
+    const clones = multiFragment
       ? fragmentName!.split(",").map((v) => ({ name: v.trim() }))
       : null;
 
@@ -185,9 +185,9 @@ function treeNodeToRouteNode({
       dynamic,
     };
 
-    if (Array.isArray(settings)) {
-      return settings.map((setting) =>
-        applyDefaultInitialRouteName(cloneRoute({ ...output }, setting))
+    if (Array.isArray(clones)) {
+      return clones.map((clone) =>
+        applyDefaultInitialRouteName(cloneRoute({ ...output }, clone))
       );
     }
 
