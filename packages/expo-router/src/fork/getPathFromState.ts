@@ -280,7 +280,9 @@ export default function getPathFromState<ParamList extends object>(
             }
             return "";
           }
-          return encodeURIComponent(p);
+          const encoded = encodeURIComponent(p);
+          // Preserve dynamic syntax for rehydration
+          return encoded.replace("%5B", "[").replace("%5D", "]");
         })
         .join("/");
     } else {
