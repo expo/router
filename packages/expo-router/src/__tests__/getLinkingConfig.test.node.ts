@@ -73,10 +73,15 @@ describe(getReactNavigationScreensConfig, () => {
       )
     ).toEqual({
       "(fragment)": {
-        path: "",
+        initialRouteName: undefined,
+        path: "(fragment)",
         screens: { "[...deep]": "*", "[dynamic]": ":dynamic", index: "" },
       },
-      "(second-fragment)": { path: "", screens: { people: "people" } },
+      "(second-fragment)": {
+        initialRouteName: undefined,
+        path: "(second-fragment)",
+        screens: { people: "people" },
+      },
       _sitemap: "_sitemap",
       "other/nested/[...screen]": "other/nested/*",
     });

@@ -17,10 +17,13 @@ it(`supports spaces`, () => {
   });
 });
 
-it(`matches xxx`, () => {
+it(`matches unmatched existing fragments against 404`, () => {
   expect(
     getStateFromPath("/(app)/(explore)", {
       screens: {
+        // Should match 404... maybe
+        "[...404]": "*",
+
         "(app)": {
           path: "(app)",
           screens: {

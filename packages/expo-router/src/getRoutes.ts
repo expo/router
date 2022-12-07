@@ -126,9 +126,8 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
   // Guess at the initial route based on the fragment name.
   // TODO(EvanBacon): Perhaps we should attempt to warn when the fragment doesn't match any child routes.
   const initialRouteName = getDefaultInitialRoute(node, fragmentName)?.route;
-  return {
+  const route = {
     ...node,
-    initialRouteName,
     loadRoute() {
       const { unstable_settings, ...route } = node.loadRoute();
       return {
@@ -142,6 +141,10 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
       };
     },
   };
+  if (initialRouteName != null) {
+    route.initialRouteName = initialRouteName;
+  }
+  return route;
 }
 
 function cloneFragmentRoute(
