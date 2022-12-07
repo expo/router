@@ -46,19 +46,25 @@ it(`matches unmatched existing fragments against 404`, () => {
           },
         },
       },
-    })
+    } as any)
   ).toEqual({
     routes: [
       {
         name: "(app)",
-        params: {},
+        params: { user: "(explore)" },
         state: {
           routes: [
             {
-              name: "(explore)",
-              params: {},
+              name: "([user])",
+              params: { user: "(explore)" },
               state: {
-                routes: [{ name: "explore", params: {}, path: "explore" }],
+                routes: [
+                  {
+                    name: "[user]/index",
+                    params: { user: "(explore)" },
+                    path: "",
+                  },
+                ],
               },
             },
           ],
