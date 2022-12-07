@@ -3,12 +3,14 @@ import { createURL } from "expo-linking";
 import React, { forwardRef } from "react";
 
 import { Link } from "../link/Link";
+import { useHref } from "../link/useHref";
 import { useNavigation } from "../useNavigation";
 
 /** Default screen for unmatched routes. */
 export const Unmatched = forwardRef((props, ref) => {
   const navigation = useNavigation();
-  const url = createURL("");
+  const href = useHref();
+  const url = createURL(href.href);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -37,7 +39,7 @@ export const Unmatched = forwardRef((props, ref) => {
         </Link>
       </Text>
 
-      <Link href="/" replace style={styles.link}>
+      <Link href={href.href} replace style={styles.link}>
         {url}
       </Link>
 
