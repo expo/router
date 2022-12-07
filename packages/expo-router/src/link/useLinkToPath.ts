@@ -36,7 +36,7 @@ export function useLinkToPath() {
       }
 
       if (to.startsWith(".")) {
-        let base = linking.options?.getPathFromState(
+        let base = linking.options?.getPathFromState?.(
           navigation.getRootState(),
           {
             ...linking.options!.config,
