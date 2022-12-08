@@ -35,6 +35,10 @@ type ConfigItem = {
   initialRouteName?: string;
 };
 
+type CustomRoute = Route<string> & {
+  state?: State;
+};
+
 const getActiveRoute = (state: State): { name: string; params?: object } => {
   const route =
     typeof state.index === "number"
@@ -131,207 +135,283 @@ export default function getPathFromState<ParamList extends object>(
     validatePathConfig(options);
   }
 
-  // Create a normalized configs object which will be easier to use
-  const configs: Record<string, ConfigItem> = options?.screens
-    ? createNormalizedConfigs(options?.screens)
-    : {};
+  const screens = options?.screens;
+  // Expo Router disallows usage without a linking config.
+  if (!screens) {
+    throw Error(
+      "You must pass a 'screens' object to 'getPathFromState' to generate a path."
+    );
+  }
 
-  let path = "/";
-  let current: State | undefined = state;
+  return getPathFromResolvedState(
+    state,
+    // Create a normalized configs object which will be easier to use
+    createNormalizedConfigs(screens),
+    { preserveFragments }
+  );
+}
+
+function processParamsWithUserSettings(
+  configItem: ConfigItem,
+  params: Record<string, any>
+) {
+  const stringify = configItem?.stringify;
+
+  return Object.fromEntries(
+    Object.entries(params).map(([key, value]) => [
+      key,
+      // TODO: Strip nullish values here.
+      stringify?.[key] ? stringify[key](value) : String(value),
+    ])
+  );
+}
+
+function walkConfigItems(
+  route: CustomRoute,
+  focusedRoute: {
+    name: string;
+    params?: object;
+  },
+  configs: Record<string, ConfigItem>
+) {
+  // NOTE(EvanBacon): Fill in current route using state that was passed as params.
+  if (!route.state && isInvalidParams(route.params)) {
+    route.state = createFakeState(route.params);
+  }
+
+  let pattern: string;
+  let focusedParams: Record<string, any> | undefined;
+
+  const collectedParams: Record<string, any> = {};
+
+  while (route.name in configs) {
+    const configItem = configs[route.name];
+    const inputPattern = configItem.pattern;
+
+    if (inputPattern == null) {
+      // This should never happen in Expo Router.
+      throw new Error("Unexpected: No pattern found for route " + route.name);
+    }
+    pattern = inputPattern;
+
+    if (route.params) {
+      const params = processParamsWithUserSettings(configItem, route.params);
+
+      // TODO: Does this need to be a null check?
+      if (pattern) {
+        Object.assign(collectedParams, params);
+      }
+
+      if (focusedRoute === route) {
+        // If this is the focused route, keep the params for later use
+        // We save it here since it's been stringified already
+        focusedParams = getParamsWithConventionsCollapsed({
+          params,
+          pattern,
+          routeName: route.name,
+        });
+      }
+    }
+
+    // If there is no `screens` property or no nested state, we return pattern
+    if (!configItem.screens || route.state === undefined) {
+      break;
+    }
+
+    const index = route.state.index ?? route.state.routes.length - 1;
+
+    const nextRoute = route.state.routes[index];
+    const nestedScreens = configItem.screens;
+
+    // if there is config for next route name, we go deeper
+    if (nestedScreens && nextRoute.name in nestedScreens) {
+      route = nextRoute as CustomRoute;
+      configs = nestedScreens;
+    } else {
+      // If not, there is no sense in going deeper in config
+      break;
+    }
+  }
+
+  return {
+    pattern: pattern!,
+    nextRoute: route,
+    focusedParams: focusedParams ?? focusedRoute.params,
+    params: collectedParams,
+  };
+}
+
+function getPathFromResolvedState(
+  state: State,
+  configs: Record<string, ConfigItem>,
+  { preserveFragments }: { preserveFragments?: boolean }
+) {
+  let path = "";
+  let current: State = state;
 
   const allParams: Record<string, any> = {};
 
   while (current) {
-    let index = typeof current.index === "number" ? current.index : 0;
-    let route = current.routes[index] as Route<string> & {
-      state?: State;
-    };
+    path += "/";
+
+    const route = current.routes[current.index ?? 0] as CustomRoute;
     // NOTE(EvanBacon): Fill in current route using state that was passed as params.
     if (!route.state && isInvalidParams(route.params)) {
       route.state = createFakeState(route.params);
     }
+    console.log("route.state", route.state);
 
-    let pattern: string | undefined;
+    const { pattern, params, nextRoute, focusedParams } = walkConfigItems(
+      route,
+      getActiveRoute(current),
+      { ...configs }
+    );
 
-    let focusedParams: Record<string, any> | undefined;
-    const focusedRoute = getActiveRoute(state);
-    let currentOptions = configs;
-    // Keep all the route names that appeared during going deeper in config in case the pattern is resolved to undefined
-    const nestedRouteNames = [];
+    Object.assign(allParams, params);
 
-    let hasNext = true;
+    path += synthesizePathFromPattern({
+      pattern,
+      routePath: nextRoute.path,
+      params: allParams,
+      initialRouteName: configs[nextRoute.name]?.initialRouteName,
+      preserveFragments,
+    });
 
-    while (route.name in currentOptions && hasNext) {
-      pattern = currentOptions[route.name].pattern;
+    if (nextRoute.state) {
+      // Continue looping with the next state if available.
+      current = nextRoute.state;
+    } else {
+      // Finished crawling state.
 
-      // @ts-expect-error
-      nestedRouteNames.push(route.name);
-
-      if (route.params) {
-        const stringify = currentOptions[route.name]?.stringify;
-
-        const currentParams = Object.fromEntries(
-          Object.entries(route.params).map(([key, value]) => [
-            key,
-            stringify?.[key] ? stringify[key](value) : String(value),
-          ])
-        );
-
-        if (pattern) {
-          Object.assign(allParams, currentParams);
-        }
-
-        if (focusedRoute === route) {
-          // If this is the focused route, keep the params for later use
-          // We save it here since it's been stringified already
-          focusedParams = { ...currentParams };
-
-          pattern
-            ?.split("/")
-            .filter((p) => p.startsWith(":") || p === "*")
-            // eslint-disable-next-line no-loop-func
-            .forEach((p) => {
-              let name: string;
-              if (p === "*") {
-                // NOTE(EvanBacon): Drop the param name matching the wildcard route name -- this is specific to Expo Router.
-                name = matchDeepDynamicRouteName(route.name) ?? route.name;
-              } else {
-                name = getParamName(p);
-              }
-
-              // Remove the params present in the pattern since we'll only use the rest for query string
-              if (focusedParams) {
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                delete focusedParams[name];
-              }
-            });
-        }
-      }
-
-      // If there is no `screens` property or no nested state, we return pattern
-      if (!currentOptions[route.name].screens || route.state === undefined) {
-        hasNext = false;
-      } else {
-        index =
-          typeof route.state.index === "number"
-            ? route.state.index
-            : route.state.routes.length - 1;
-
-        const nextRoute = route.state.routes[index];
-        const nestedConfig = currentOptions[route.name].screens;
-
-        // if there is config for next route name, we go deeper
-        if (nestedConfig && nextRoute.name in nestedConfig) {
-          route = nextRoute as Route<string> & { state?: State };
-          currentOptions = nestedConfig;
-        } else {
-          // If not, there is no sense in going deeper in config
-          hasNext = false;
-        }
-      }
-    }
-
-    if (pattern === undefined) {
-      pattern = nestedRouteNames.join("/");
-    }
-
-    if (currentOptions[route.name] !== undefined) {
-      const segments = pattern.split("/");
-      path += segments
-        .map((p, i) => {
-          const name = getParamName(p);
-
-          // We don't know what to show for wildcard patterns
-          // Showing the route name seems ok, though whatever we show here will be incorrect
-          // Since the page doesn't actually exist
-          if (p === "*") {
-            if (i === 0) {
-              // This can occur when a wildcard matches all routes and the given path was `/`.
-              return route.path ?? "";
-            }
-            // remove existing segments from route.path and return it
-            // this is used for nested wildcard routes. Without this, the path would add
-            // all nested segments to the beginning of the wildcard route.
-            const path = route.path
-              ?.split("/")
-              .slice(i + 1)
-              .join("/");
-            return path ?? "";
+      // Check for query params before exiting.
+      if (focusedParams) {
+        for (const param in focusedParams) {
+          // TODO: This is not good. We shouldn't squat strings named "undefined".
+          if (focusedParams[param] === "undefined") {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete focusedParams[param];
           }
+        }
 
-          // If the path has a pattern for a param, put the param in the path
-          if (p.startsWith(":")) {
-            const value = allParams[name];
+        const query = queryString.stringify(focusedParams, { sort: false });
 
-            if (value == null) {
-              // Optional params without value assigned in route.params should be ignored
+        if (query) {
+          path += `?${query}`;
+        }
+      }
+      break;
+    }
+  }
+  return basicSanitizePath(path);
+}
+
+function synthesizePathFromPattern({
+  pattern,
+  routePath,
+  params,
+  preserveFragments,
+  initialRouteName,
+}: {
+  pattern: string;
+  routePath?: string;
+  params: Record<string, any>;
+  preserveFragments?: boolean;
+  initialRouteName?: string;
+}) {
+  const segments = pattern.split("/");
+  return segments
+    .map((p, i) => {
+      const name = getParamName(p);
+
+      // We don't know what to show for wildcard patterns
+      // Showing the route name seems ok, though whatever we show here will be incorrect
+      // Since the page doesn't actually exist
+      if (p === "*") {
+        if (i === 0) {
+          // This can occur when a wildcard matches all routes and the given path was `/`.
+          return routePath;
+        }
+        // remove existing segments from route.path and return it
+        // this is used for nested wildcard routes. Without this, the path would add
+        // all nested segments to the beginning of the wildcard route.
+        return routePath
+          ?.split("/")
+          .slice(i + 1)
+          .join("/");
+      }
+
+      // If the path has a pattern for a param, put the param in the path
+      if (p.startsWith(":")) {
+        // Optional params without value assigned in route.params should be ignored
+        return params[name];
+      }
+
+      if (!preserveFragments && matchFragmentName(p) != null) {
+        // When the last part is a fragment it could be a shared URL
+        // if the route has an initialRouteName defined, then we should
+        // use that as the component path as we can assume it will be shown.
+        if (segments.length - 1 === i) {
+          if (initialRouteName) {
+            // Return an empty string if the init route is ambiguous.
+            if (segmentMatchesConvention(initialRouteName)) {
               return "";
             }
-            return value;
+            return encodeURIComponentPreservingBrackets(initialRouteName);
           }
-
-          if (!preserveFragments && matchFragmentName(p) != null) {
-            // When the last part is a fragment it could be a shared URL
-            // if the route has an initialRouteName defined, then we should
-            // use that as the component path as we can assume it will be shown.
-            if (segments.length - 1 === i) {
-              const initialRouteName =
-                currentOptions[route.name].initialRouteName;
-
-              if (initialRouteName) {
-                // Return an empty string if the init route is ambiguous.
-                if (segmentMatchesConvention(initialRouteName)) {
-                  return "";
-                }
-                return encodeURIComponentPreservingBrackets(initialRouteName);
-              }
-            }
-            return "";
-          }
-          // Preserve dynamic syntax for rehydration
-          return encodeURIComponentPreservingBrackets(p);
-        })
-        .join("/");
-    } else {
-      // TODO: Probably fragment routes shouldn't get this far
-      path += encodeURIComponentPreservingBrackets(
-        matchFragmentName(route.name)
-          ? ""
-          : route.name === "index"
-          ? ""
-          : route.name
-      );
-    }
-
-    if (!focusedParams) {
-      focusedParams = focusedRoute.params;
-    }
-
-    if (route.state) {
-      path += "/";
-    } else if (focusedParams) {
-      for (const param in focusedParams) {
-        if (focusedParams[param] === "undefined") {
-          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          delete focusedParams[param];
         }
+        return "";
       }
+      // Preserve dynamic syntax for rehydration
+      return encodeURIComponentPreservingBrackets(p);
+    })
+    .map((v) => v ?? "")
+    .join("/");
+}
 
-      const query = queryString.stringify(focusedParams, { sort: false });
+/** Given a set of query params and a pattern with possible conventions, collapse the conventions and return the remaining params. */
+function getParamsWithConventionsCollapsed({
+  pattern,
+  routeName,
+  params,
+}: {
+  pattern: string;
+  /** Route name is required for matching the wildcard route. This is specific to Expo Router. */
+  routeName: string;
+  params: Record<string, string>;
+}): Record<string, string> {
+  const processedParams = { ...params };
 
-      if (query) {
-        path += `?${query}`;
-      }
-    }
+  // Remove the params present in the pattern since we'll only use the rest for query string
 
-    current = route.state;
+  const segments = pattern.split("/");
+
+  // Dynamic Routes
+  segments
+    .filter((segment) => segment.startsWith(":"))
+    .forEach((segment) => {
+      const name = getParamName(segment);
+      delete processedParams[name];
+    });
+
+  // Deep Dynamic Routes
+  if (segments.some((segment) => segment === "*")) {
+    // NOTE(EvanBacon): Drop the param name matching the wildcard route name -- this is specific to Expo Router.
+    const name = matchDeepDynamicRouteName(routeName) ?? routeName;
+    delete processedParams[name];
   }
 
-  // Remove multiple as well as trailing slashes
-  path = path.replace(/\/+/g, "/");
-  path = path.length > 1 ? path.replace(/\/$/, "") : path;
+  return processedParams;
+}
 
-  return path;
+// Remove multiple as well as trailing slashes
+function basicSanitizePath(path: string) {
+  // Remove duplicate slashes like `foo//bar` -> `foo/bar`
+  const simplifiedPath = path.replace(/\/+/g, "/");
+  if (simplifiedPath.length <= 1) {
+    return simplifiedPath;
+  }
+  // Remove trailing slash like `foo/bar/` -> `foo/bar`
+  return simplifiedPath.replace(/\/$/, "");
 }
 
 type StateAsParams = {
@@ -399,7 +479,6 @@ const createConfigItem = (
     pattern: pattern?.split("/").filter(Boolean).join("/"),
     stringify: config.stringify,
     screens,
-
     initialRouteName: config.initialRouteName,
   };
 };
@@ -409,9 +488,8 @@ const createNormalizedConfigs = (
   pattern?: string
 ): Record<string, ConfigItem> =>
   Object.fromEntries(
-    Object.entries(options).map(([name, c]) => {
-      const result = createConfigItem(c, pattern);
-
-      return [name, result];
-    })
+    Object.entries(options).map(([name, c]) => [
+      name,
+      createConfigItem(c, pattern),
+    ])
   );
