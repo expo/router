@@ -16,38 +16,6 @@ it("returns undefined for invalid path", () => {
   expect(getStateFromPath<object>("//", { screens: {} })).toBe(undefined);
 });
 
-it("converts path string to initial state", () => {
-  const path = "foo/bar/baz%20qux?author=jane%20%26%20co&valid=true";
-  const state = {
-    routes: [
-      {
-        name: "foo",
-        state: {
-          routes: [
-            {
-              name: "bar",
-              state: {
-                routes: [
-                  {
-                    name: "baz qux",
-                    params: { author: "jane & co", valid: "true" },
-                    path,
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
-    ],
-  };
-
-  expect(getStateFromPath<object>(path)).toEqual(state);
-  expect(getStateFromPath<object>(getPathFromState<object>(state))).toEqual(
-    changePath(state, "/foo/bar/baz%20qux?author=jane%20%26%20co&valid=true")
-  );
-});
-
 it("converts path string to initial state with config", () => {
   const path = "/foo/bar/sweet/apple/baz/jane?count=10&answer=42&valid=true";
   const config = {
@@ -186,25 +154,6 @@ it("handles ending slash when converting", () => {
       },
     ],
   });
-});
-
-it("handles route without param", () => {
-  const path = "foo/bar";
-  const state = {
-    routes: [
-      {
-        name: "foo",
-        state: {
-          routes: [{ name: "bar", path }],
-        },
-      },
-    ],
-  };
-
-  expect(getStateFromPath<object>(path)).toEqual(state);
-  expect(getStateFromPath<object>(getPathFromState<object>(state))).toEqual(
-    changePath(state, "/foo/bar")
-  );
 });
 
 it("converts path string to initial state with config with nested screens", () => {
