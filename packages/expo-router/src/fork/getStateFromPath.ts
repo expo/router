@@ -336,41 +336,49 @@ function matchAgainstConfigs(
           });
         }, {});
 
-      routes = config.routeNames.map((name) => {
+      const routeFromName = (name: string) => {
         const config = configs.find((c) => c.screen === name);
-        const params = config?.path
-          ?.split("/")
-          .filter((p) => p.startsWith(":") || p === "*")
-          .reduce<Record<string, any>>((acc, p) => {
+        if (!config?.path) {
+          return { name };
+        }
+
+        const segments = config.path.split("/");
+
+        const params: Record<string, any> = {};
+
+        segments
+          .filter((p) => p.startsWith(":"))
+          .forEach((p) => {
             const paramName = p;
             const value = matchedParams[paramName];
-            if (p.startsWith(":")) {
-              if (value) {
-                const key = paramName.replace(/^:/, "").replace(/\?$/, "");
-                acc[key] = config.parse?.[key]
-                  ? config.parse[key](value)
-                  : value;
-              }
-            } else {
-              // Get the expo-router-specific wildcard param name.
-              const key = matchDeepDynamicRouteName(name);
-              if (key) {
-                // Convert to an array before providing as a route.
-                const parsed = value.split("/").filter(Boolean);
-                acc[key] = config.parse?.[key]
-                  ? config.parse[key](parsed)
-                  : parsed;
-              }
+            if (value) {
+              const key = paramName.replace(/^:/, "").replace(/\?$/, "");
+              params[key] = config.parse?.[key]
+                ? config.parse[key](value)
+                : value;
             }
-            return acc;
-          }, {});
+          });
+
+        if (segments.some((segment) => segment === "*")) {
+          // Get the expo-router-specific wildcard param name.
+          const key = matchDeepDynamicRouteName(name);
+          if (key) {
+            // Convert to an array before providing as a route.
+            const parsed = matchedParams["*"].split("/").filter(Boolean);
+            params[key] = config.parse?.[key]
+              ? config.parse[key](parsed)
+              : parsed;
+          }
+        }
 
         if (params && Object.keys(params).length) {
           return { name, params };
         }
 
         return { name };
-      });
+      };
+
+      routes = config.routeNames.map((name) => routeFromName(name));
 
       // TODO(EvanBacon): Maybe we should warn / assert if multiple slugs use the same param name.
       const combinedParams = routes.reduce<Record<string, any>>(
