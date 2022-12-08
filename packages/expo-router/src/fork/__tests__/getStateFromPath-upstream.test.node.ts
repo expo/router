@@ -13,7 +13,7 @@ const changePath = <T extends InitialState>(state: T, path: string): T =>
   });
 
 it("returns undefined for invalid path", () => {
-  expect(getStateFromPath<object>("//")).toBe(undefined);
+  expect(getStateFromPath<object>("//", { screens: {} })).toBe(undefined);
 });
 
 it("converts path string to initial state with config", () => {
@@ -91,7 +91,20 @@ it("converts path string to initial state with config", () => {
 it("handles leading slash when converting", () => {
   const path = "/foo/bar/?count=42";
 
-  expect(getStateFromPath<object>(path)).toEqual({
+  expect(
+    getStateFromPath<object>(path, {
+      screens: {
+        foo: {
+          path: "foo",
+          screens: {
+            bar: {
+              path: "bar",
+            },
+          },
+        },
+      },
+    })
+  ).toEqual({
     routes: [
       {
         name: "foo",
@@ -112,7 +125,20 @@ it("handles leading slash when converting", () => {
 it("handles ending slash when converting", () => {
   const path = "foo/bar/?count=42";
 
-  expect(getStateFromPath<object>(path)).toEqual({
+  expect(
+    getStateFromPath<object>(path, {
+      screens: {
+        foo: {
+          path: "foo",
+          screens: {
+            bar: {
+              path: "bar",
+            },
+          },
+        },
+      },
+    })
+  ).toEqual({
     routes: [
       {
         name: "foo",
@@ -481,50 +507,6 @@ it("handles parse in nested object for second route depth and and path and parse
 
   const state = {
     routes: [
-      {
-        name: "Foo",
-        state: {
-          routes: [
-            {
-              name: "Bar",
-              state: {
-                routes: [{ name: "Baz", path }],
-              },
-            },
-          ],
-        },
-      },
-    ],
-  };
-
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
-});
-
-it("handles initialRouteName at top level", () => {
-  const path = "/baz";
-  const config = {
-    initialRouteName: "Boo",
-    screens: {
-      Foo: {
-        screens: {
-          Foe: "foe",
-          Bar: {
-            screens: {
-              Baz: "baz",
-            },
-          },
-        },
-      },
-    },
-  };
-
-  const state = {
-    index: 1,
-    routes: [
-      { name: "Boo" },
       {
         name: "Foo",
         state: {

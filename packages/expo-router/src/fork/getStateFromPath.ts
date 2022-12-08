@@ -13,10 +13,6 @@ import * as queryString from "query-string";
 
 import { matchDeepDynamicRouteName } from "../matchers";
 
-//   import findFocusedRoute from './findFocusedRoute';
-//   import type { PathConfigMap } from './types';
-//   import validatePathConfig from './validatePathConfig';
-
 type Options<ParamList extends object> = {
   initialRouteName?: string;
   screens: PathConfigMap<ParamList>;
@@ -50,6 +46,16 @@ type ParsedRoute = {
   params?: Record<string, any> | undefined;
 };
 
+function getPathname(path: string) {
+  const remaining = path
+    .replace(/\/+/g, "/") // Replace multiple slash (//) with single ones
+    .replace(/^\//, "") // Remove extra leading slash
+    .replace(/\?.*$/, ""); // Remove query params which we will handle later
+
+  // Make sure there is a trailing slash
+  return remaining.endsWith("/") ? remaining : `${remaining}/`;
+}
+
 /**
  * Utility to parse a path string to initial state object accepted by the container.
  * This is useful for deep linking when we need to handle the incoming URL.
@@ -79,137 +85,32 @@ export default function getStateFromPath<ParamList extends object>(
     validatePathConfig(options);
   }
 
-  const initialRoutes: InitialRouteConfig[] = [];
-
-  if (options?.initialRouteName) {
-    initialRoutes.push({
-      initialRouteName: options.initialRouteName,
-      parentScreens: [],
-    });
-  }
-
   const screens = options?.screens;
-
-  let remaining = path
-    .replace(/\/+/g, "/") // Replace multiple slash (//) with single ones
-    .replace(/^\//, "") // Remove extra leading slash
-    .replace(/\?.*$/, ""); // Remove query params which we will handle later
-
-  // Make sure there is a trailing slash
-  remaining = remaining.endsWith("/") ? remaining : `${remaining}/`;
-
-  if (screens === undefined) {
-    // When no config is specified, use the path segments as route names
-    const routes = remaining
-      .split("/")
-      .filter(Boolean)
-      .map((segment) => {
-        const name = decodeURIComponent(segment);
-        return { name };
-      });
-
-    if (routes.length) {
-      return createNestedStateObject(path, routes, initialRoutes);
-    }
-
-    return undefined;
+  // Expo Router disallows usage without a linking config.
+  if (!screens) {
+    throw Error(
+      "You must pass a 'screens' object to 'getStateFromPath' to generate a path."
+    );
   }
 
-  // Create a normalized configs array which will be easier to use
-  const configs = ([] as RouteConfig[])
-    .concat(
-      ...Object.keys(screens).map((key) =>
-        createNormalizedConfigs(
-          key,
-          screens as PathConfigMap<object>,
-          [],
-          initialRoutes,
-          []
-        )
-      )
-    )
-    .sort((a, b) => {
-      // Sort config so that:
-      // - the most exhaustive ones are always at the beginning
-      // - patterns with wildcard are always at the end
+  // This will be mutated...
+  const initialRoutes = [];
 
-      // If 2 patterns are same, move the one with less route names up
-      // This is an error state, so it's only useful for consistent error messages
-      if (a.pattern === b.pattern) {
-        return b.routeNames.join(">").localeCompare(a.routeNames.join(">"));
-      }
+  // Create a normalized configs array which will be easier to use.
+  const converted = Object.keys(screens)
+    .map((key) => createNormalizedConfigs(key, screens, [], initialRoutes))
+    .flat();
 
-      // If one of the patterns starts with the other, it's more exhaustive
-      // So move it up
-      if (
-        a.pattern.startsWith(b.pattern) &&
-        // NOTE(EvanBacon): This is a hack to make sure that `*` is always at the end
-        b.screen !== "index"
-      ) {
-        return -1;
-      }
+  // Sort in order of resolution. This is extremely important for the algorithm to work.
+  const configs = converted.sort(sortConfigs);
 
-      if (b.pattern.startsWith(a.pattern) && a.screen !== "index") {
-        return 1;
-      }
+  // Assert any duplicates before we start parsing.
+  assertConfigDuplicates(configs);
 
-      // NOTE(EvanBacon): Here we append `index` if the screen was `index` so the length is the same
-      // as a slug or wildcard when nested more than one level deep.
-      // This is so we can compare the length of the pattern, e.g. `foo/*` > `foo` vs `*` < ``.
-      const aParts = a.pattern.split("/");
-      if (a.screen === "index") {
-        aParts.push("index");
-      }
+  return getStateFromPathWithConfigs(path, configs, initialRoutes);
+}
 
-      const bParts = b.pattern.split("/");
-      if (b.screen === "index") {
-        bParts.push("index");
-      }
-
-      for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
-        // if b is longer, b get higher priority
-        if (aParts[i] == null) {
-          return 1;
-        }
-        // if a is longer, a get higher priority
-        if (bParts[i] == null) {
-          return -1;
-        }
-        const aWildCard = aParts[i] === "*";
-        const bWildCard = bParts[i] === "*";
-        // if both are wildcard we compare next component
-        if (aWildCard && bWildCard) {
-          continue;
-        }
-        // if only a is wild card, b get higher priority
-        if (aWildCard) {
-          return 1;
-        }
-        // if only b is wild card, a get higher priority
-        if (bWildCard) {
-          return -1;
-        }
-
-        const aSlug = aParts[i].startsWith(":");
-        const bSlug = bParts[i].startsWith(":");
-        // if both are wildcard we compare next component
-        if (aSlug && bSlug) {
-          continue;
-        }
-        // if only a is wild card, b get higher priority
-        if (aSlug) {
-          return 1;
-        }
-        // if only b is wild card, a get higher priority
-        if (bSlug) {
-          return -1;
-        }
-      }
-      return bParts.length - aParts.length;
-    });
-
-  // Match full paths
-
+function assertConfigDuplicates(configs: RouteConfig[]) {
   // Check for duplicate patterns in the config
   configs.reduce<Record<string, RouteConfig>>((acc, config) => {
     // NOTE(EvanBacon): Uses the regex pattern as key to detect duplicate slugs.
@@ -250,50 +151,137 @@ export default function getStateFromPath<ParamList extends object>(
       [indexedKey]: config,
     });
   }, {});
+}
 
-  if (remaining === "/") {
-    // We need to add special handling of empty path so navigation to empty path also works
-    // When handling empty path, we should only look at the root level config
+function sortConfigs(a: RouteConfig, b: RouteConfig): number {
+  // Sort config so that:
+  // - the most exhaustive ones are always at the beginning
+  // - patterns with wildcard are always at the end
 
-    // NOTE(EvanBacon): We only care about matching leaf nodes.
-    const leafNodes = configs.filter((config) => !config.hasChildren);
+  // If 2 patterns are same, move the one with less route names up
+  // This is an error state, so it's only useful for consistent error messages
+  if (a.pattern === b.pattern) {
+    return b.routeNames.join(">").localeCompare(a.routeNames.join(">"));
+  }
 
-    const match =
-      leafNodes.find(
-        (config) =>
-          // NOTE(EvanBacon): Test leaf node index routes that either don't have a regex or match an empty string.
-          config.path === "" && (!config.regex || config.regex.test(""))
-      ) ??
-      leafNodes.find(
-        (config) =>
-          // NOTE(EvanBacon): Test leaf node dynamic routes that match an empty string.
-          config.path.startsWith(":") && config.regex!.test("")
-      ) ??
-      // NOTE(EvanBacon): Test leaf node deep dynamic routes that match a slash.
-      // This should be done last to enable dynamic routes having a higher priority.
-      leafNodes.find(
-        (config) => config.path === "*" && config.regex!.test("/")
-      );
+  // If one of the patterns starts with the other, it's more exhaustive
+  // So move it up
+  if (
+    a.pattern.startsWith(b.pattern) &&
+    // NOTE(EvanBacon): This is a hack to make sure that `*` is always at the end
+    b.screen !== "index"
+  ) {
+    return -1;
+  }
 
-    if (match) {
-      return createNestedStateObject(
-        path,
-        match.routeNames.map((name) => ({ name })),
-        initialRoutes,
-        configs
-      );
+  if (b.pattern.startsWith(a.pattern) && a.screen !== "index") {
+    return 1;
+  }
+
+  // NOTE(EvanBacon): Here we append `index` if the screen was `index` so the length is the same
+  // as a slug or wildcard when nested more than one level deep.
+  // This is so we can compare the length of the pattern, e.g. `foo/*` > `foo` vs `*` < ``.
+  const aParts = a.pattern.split("/");
+  if (a.screen === "index") {
+    aParts.push("index");
+  }
+
+  const bParts = b.pattern.split("/");
+  if (b.screen === "index") {
+    bParts.push("index");
+  }
+
+  for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+    // if b is longer, b get higher priority
+    if (aParts[i] == null) {
+      return 1;
+    }
+    // if a is longer, a get higher priority
+    if (bParts[i] == null) {
+      return -1;
+    }
+    const aWildCard = aParts[i] === "*";
+    const bWildCard = bParts[i] === "*";
+    // if both are wildcard we compare next component
+    if (aWildCard && bWildCard) {
+      continue;
+    }
+    // if only a is wild card, b get higher priority
+    if (aWildCard) {
+      return 1;
+    }
+    // if only b is wild card, a get higher priority
+    if (bWildCard) {
+      return -1;
     }
 
+    const aSlug = aParts[i].startsWith(":");
+    const bSlug = bParts[i].startsWith(":");
+    // if both are wildcard we compare next component
+    if (aSlug && bSlug) {
+      continue;
+    }
+    // if only a is wild card, b get higher priority
+    if (aSlug) {
+      return 1;
+    }
+    // if only b is wild card, a get higher priority
+    if (bSlug) {
+      return -1;
+    }
+  }
+  return bParts.length - aParts.length;
+}
+
+function getStateFromEmptyPathWithConfigs(
+  path: string,
+  configs: RouteConfig[],
+  initialRoutes: InitialRouteConfig[]
+): ResultState | undefined {
+  // We need to add special handling of empty path so navigation to empty path also works
+  // When handling empty path, we should only look at the root level config
+
+  // NOTE(EvanBacon): We only care about matching leaf nodes.
+  const leafNodes = configs.filter((config) => !config.hasChildren);
+
+  const match =
+    leafNodes.find(
+      (config) =>
+        // NOTE(EvanBacon): Test leaf node index routes that either don't have a regex or match an empty string.
+        config.path === "" && (!config.regex || config.regex.test(""))
+    ) ??
+    leafNodes.find(
+      (config) =>
+        // NOTE(EvanBacon): Test leaf node dynamic routes that match an empty string.
+        config.path.startsWith(":") && config.regex!.test("")
+    ) ??
+    // NOTE(EvanBacon): Test leaf node deep dynamic routes that match a slash.
+    // This should be done last to enable dynamic routes having a higher priority.
+    leafNodes.find((config) => config.path === "*" && config.regex!.test("/"));
+
+  if (!match) {
     return undefined;
   }
 
-  let result: PartialState<NavigationState> | undefined;
-  let current: PartialState<NavigationState> | undefined;
+  const routes = match.routeNames.map((name) => ({ name }));
+
+  return createNestedStateObject(path, routes, configs, initialRoutes);
+}
+function getStateFromPathWithConfigs(
+  path: string,
+  configs: RouteConfig[],
+  initialRoutes: InitialRouteConfig[]
+): ResultState | undefined {
+  const pathname = getPathname(path);
+
+  if (pathname === "/") {
+    return getStateFromEmptyPathWithConfigs(path, configs, initialRoutes);
+  }
 
   // We match the whole path against the regex instead of segments
   // This makes sure matches such as wildcard will catch any unmatched routes, even if nested
-  const { routes, remainingPath } = matchAgainstConfigs(
-    remaining,
+  const routes = matchAgainstConfigs(
+    pathname,
     configs.map((c) => ({
       ...c,
       // Add `$` to the regex to make sure it matches till end of the path and not just beginning
@@ -301,18 +289,11 @@ export default function getStateFromPath<ParamList extends object>(
     }))
   );
 
-  if (routes !== undefined) {
-    // This will always be empty if full path matched
-    current = createNestedStateObject(path, routes, initialRoutes, configs);
-    remaining = remainingPath;
-    result = current;
-  }
-
-  if (current == null || result == null) {
+  if (routes == null) {
     return undefined;
   }
-
-  return result;
+  // This will always be empty if full path matched
+  return createNestedStateObject(path, routes, configs, initialRoutes);
 }
 
 const joinPaths = (...paths: string[]): string =>
@@ -321,7 +302,10 @@ const joinPaths = (...paths: string[]): string =>
     .filter(Boolean)
     .join("/");
 
-const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
+function matchAgainstConfigs(
+  remaining: string,
+  configs: RouteConfig[]
+): ParsedRoute[] | undefined {
   let routes: ParsedRoute[] | undefined;
   let remainingPath = remaining;
 
@@ -352,41 +336,49 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
           });
         }, {});
 
-      routes = config.routeNames.map((name) => {
+      const routeFromName = (name: string) => {
         const config = configs.find((c) => c.screen === name);
-        const params = config?.path
-          ?.split("/")
-          .filter((p) => p.startsWith(":") || p === "*")
-          .reduce<Record<string, any>>((acc, p) => {
+        if (!config?.path) {
+          return { name };
+        }
+
+        const segments = config.path.split("/");
+
+        const params: Record<string, any> = {};
+
+        segments
+          .filter((p) => p.startsWith(":"))
+          .forEach((p) => {
             const paramName = p;
             const value = matchedParams[paramName];
-            if (p.startsWith(":")) {
-              if (value) {
-                const key = paramName.replace(/^:/, "").replace(/\?$/, "");
-                acc[key] = config.parse?.[key]
-                  ? config.parse[key](value)
-                  : value;
-              }
-            } else {
-              // Get the expo-router-specific wildcard param name.
-              const key = matchDeepDynamicRouteName(name);
-              if (key) {
-                // Convert to an array before providing as a route.
-                const parsed = value.split("/").filter(Boolean);
-                acc[key] = config.parse?.[key]
-                  ? config.parse[key](parsed)
-                  : parsed;
-              }
+            if (value) {
+              const key = paramName.replace(/^:/, "").replace(/\?$/, "");
+              params[key] = config.parse?.[key]
+                ? config.parse[key](value)
+                : value;
             }
-            return acc;
-          }, {});
+          });
+
+        if (segments.some((segment) => segment === "*")) {
+          // Get the expo-router-specific wildcard param name.
+          const key = matchDeepDynamicRouteName(name);
+          if (key) {
+            // Convert to an array before providing as a route.
+            const parsed = matchedParams["*"].split("/").filter(Boolean);
+            params[key] = config.parse?.[key]
+              ? config.parse[key](parsed)
+              : parsed;
+          }
+        }
 
         if (params && Object.keys(params).length) {
           return { name, params };
         }
 
         return { name };
-      });
+      };
+
+      routes = config.routeNames.map((name) => routeFromName(name));
 
       // TODO(EvanBacon): Maybe we should warn / assert if multiple slugs use the same param name.
       const combinedParams = routes.reduce<Record<string, any>>(
@@ -410,15 +402,27 @@ const matchAgainstConfigs = (remaining: string, configs: RouteConfig[]) => {
     }
   }
 
-  return { routes, remainingPath };
-};
+  return routes;
+}
+
+function equalHeritage(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    if (a[i].localeCompare(b[i]) !== 0) {
+      return false;
+    }
+  }
+  return true;
+}
 
 const createNormalizedConfigs = (
   screen: string,
   routeConfig: PathConfigMap<object>,
   routeNames: string[] = [],
-  initials: InitialRouteConfig[],
-  parentScreens: string[],
+  initials: InitialRouteConfig[] = [],
+  parentScreens: string[] = [],
   parentPattern?: string
 ): RouteConfig[] => {
   const configs: RouteConfig[] = [];
@@ -493,6 +497,17 @@ const createNormalizedConfigs = (
   return configs;
 };
 
+function formatRegexPattern(it: string): string {
+  if (it.startsWith(":")) {
+    return `(([^/]+\\/)${it.endsWith("?") ? "?" : ""})`;
+  }
+
+  // Allow spaces in file path names.
+  it = it.replace(" ", "%20");
+
+  return `${it === "*" ? ".*" : escape(it)}\\/`;
+}
+
 const createConfigItem = (
   screen: string,
   routeNames: string[],
@@ -505,21 +520,7 @@ const createConfigItem = (
   pattern = pattern.split("/").filter(Boolean).join("/");
 
   const regex = pattern
-    ? new RegExp(
-        `^(${pattern
-          .split("/")
-          .map((it) => {
-            if (it.startsWith(":")) {
-              return `(([^/]+\\/)${it.endsWith("?") ? "?" : ""})`;
-            }
-
-            // Allow spaces in file path names.
-            it = it.replace(" ", "%20");
-
-            return `${it === "*" ? ".*" : escape(it)}\\/`;
-          })
-          .join("")})`
-      )
+    ? new RegExp(`^(${pattern.split("/").map(formatRegexPattern).join("")})`)
     : undefined;
 
   return {
@@ -537,9 +538,9 @@ const createConfigItem = (
 
 const findParseConfigForRoute = (
   routeName: string,
-  flatConfig: RouteConfig[]
+  routeConfigs: RouteConfig[]
 ): ParseConfig | undefined => {
-  for (const config of flatConfig) {
+  for (const config of routeConfigs) {
     if (routeName === config.routeNames[config.routeNames.length - 1]) {
       return config.parse;
     }
@@ -555,19 +556,12 @@ const findInitialRoute = (
   initialRoutes: InitialRouteConfig[]
 ): string | undefined => {
   for (const config of initialRoutes) {
-    if (parentScreens.length === config.parentScreens.length) {
-      let sameParents = true;
-      for (let i = 0; i < parentScreens.length; i++) {
-        if (parentScreens[i].localeCompare(config.parentScreens[i]) !== 0) {
-          sameParents = false;
-          break;
-        }
-      }
-      if (sameParents) {
-        return routeName !== config.initialRouteName
-          ? config.initialRouteName
-          : undefined;
-      }
+    if (equalHeritage(parentScreens, config.parentScreens)) {
+      // If the parents are the same but the route name doesn't match the initial route
+      // then we return the initial route.
+      return routeName !== config.initialRouteName
+        ? config.initialRouteName
+        : undefined;
     }
   }
   return undefined;
@@ -586,30 +580,28 @@ const createStateObject = (
         index: 1,
         routes: [{ name: initialRoute }, route],
       };
-    } else {
-      return {
-        routes: [route],
-      };
     }
-  } else {
-    if (initialRoute) {
-      return {
-        index: 1,
-        routes: [{ name: initialRoute }, { ...route, state: { routes: [] } }],
-      };
-    } else {
-      return {
-        routes: [{ ...route, state: { routes: [] } }],
-      };
-    }
+    return {
+      routes: [route],
+    };
   }
+
+  if (initialRoute) {
+    return {
+      index: 1,
+      routes: [{ name: initialRoute }, { ...route, state: { routes: [] } }],
+    };
+  }
+  return {
+    routes: [{ ...route, state: { routes: [] } }],
+  };
 };
 
 const createNestedStateObject = (
   path: string,
   routes: ParsedRoute[],
-  initialRoutes: InitialRouteConfig[],
-  flatConfig?: RouteConfig[]
+  routeConfigs: RouteConfig[],
+  initialRoutes: InitialRouteConfig[]
 ) => {
   let route = routes.shift() as ParsedRoute;
   const parentScreens: string[] = [];
@@ -652,8 +644,8 @@ const createNestedStateObject = (
   route.path = path;
 
   const params = parseQueryParams(
-    path,
-    flatConfig ? findParseConfigForRoute(route.name, flatConfig) : undefined
+    route.path,
+    findParseConfigForRoute(route.name, routeConfigs)
   );
 
   if (params) {
