@@ -397,6 +397,18 @@ function matchAgainstConfigs(
   return routes;
 }
 
+function equalHeritage(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    if (a[i].localeCompare(b[i]) !== 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
 const createNormalizedConfigs = (
   screen: string,
   routeConfig: PathConfigMap<object>,
@@ -477,6 +489,17 @@ const createNormalizedConfigs = (
   return configs;
 };
 
+function formatRegexPattern(it: string): string {
+  if (it.startsWith(":")) {
+    return `(([^/]+\\/)${it.endsWith("?") ? "?" : ""})`;
+  }
+
+  // Allow spaces in file path names.
+  it = it.replace(" ", "%20");
+
+  return `${it === "*" ? ".*" : escape(it)}\\/`;
+}
+
 const createConfigItem = (
   screen: string,
   routeNames: string[],
@@ -489,21 +512,7 @@ const createConfigItem = (
   pattern = pattern.split("/").filter(Boolean).join("/");
 
   const regex = pattern
-    ? new RegExp(
-        `^(${pattern
-          .split("/")
-          .map((it) => {
-            if (it.startsWith(":")) {
-              return `(([^/]+\\/)${it.endsWith("?") ? "?" : ""})`;
-            }
-
-            // Allow spaces in file path names.
-            it = it.replace(" ", "%20");
-
-            return `${it === "*" ? ".*" : escape(it)}\\/`;
-          })
-          .join("")})`
-      )
+    ? new RegExp(`^(${pattern.split("/").map(formatRegexPattern).join("")})`)
     : undefined;
 
   return {
@@ -539,19 +548,12 @@ const findInitialRoute = (
   initialRoutes: InitialRouteConfig[]
 ): string | undefined => {
   for (const config of initialRoutes) {
-    if (parentScreens.length === config.parentScreens.length) {
-      let sameParents = true;
-      for (let i = 0; i < parentScreens.length; i++) {
-        if (parentScreens[i].localeCompare(config.parentScreens[i]) !== 0) {
-          sameParents = false;
-          break;
-        }
-      }
-      if (sameParents) {
-        return routeName !== config.initialRouteName
-          ? config.initialRouteName
-          : undefined;
-      }
+    if (equalHeritage(parentScreens, config.parentScreens)) {
+      // If the parents are the same but the route name doesn't match the initial route
+      // then we return the initial route.
+      return routeName !== config.initialRouteName
+        ? config.initialRouteName
+        : undefined;
     }
   }
   return undefined;
@@ -634,7 +636,7 @@ const createNestedStateObject = (
   route.path = path;
 
   const params = parseQueryParams(
-    path,
+    route.path,
     findParseConfigForRoute(route.name, routeConfigs)
   );
 
