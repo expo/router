@@ -1,7 +1,7 @@
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
-import { matchFragmentName } from "../matchers";
+import { stripFragmentSegmentsFromPath } from "../matchers";
 import { useLinkToPath } from "./useLinkToPath";
 
 export default function useLinkToPathProps(props: {
@@ -36,11 +36,7 @@ export default function useLinkToPathProps(props: {
   };
 
   return {
-    href: props.href
-      .split("/")
-      .map((v) => (matchFragmentName(v) ? "" : v))
-      .filter(Boolean)
-      .join("/"),
+    href: stripFragmentSegmentsFromPath(props.href),
     accessibilityRole: "link" as const,
     onPress,
   };

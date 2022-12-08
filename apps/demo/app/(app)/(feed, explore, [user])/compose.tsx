@@ -5,11 +5,9 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Shared</Text>
+        <Text style={styles.title}>Compose</Text>
 
-        <Link pop href="..">
-          Back
-        </Link>
+        <Link href="..">Back</Link>
       </View>
     </View>
   );

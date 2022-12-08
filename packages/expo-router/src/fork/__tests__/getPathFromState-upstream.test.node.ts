@@ -7,6 +7,157 @@ import getStateFromPath from "../getStateFromPath";
 
 type State = PartialState<NavigationState>;
 
+[
+  [
+    {
+      index: 0,
+      routes: [
+        {
+          name: "(app)",
+          params: {
+            user: "evanbacon",
+            initial: true,
+            screen: "(explore)",
+            params: {
+              user: "evanbacon",
+              initial: false,
+              screen: "[user]/index",
+              params: {
+                user: "evanbacon",
+              },
+              path: "/evanbacon",
+            },
+          },
+          state: {
+            index: 0,
+            routes: [
+              {
+                name: "(explore)",
+                params: {
+                  user: "evanbacon",
+                  initial: false,
+                  screen: "[user]/index",
+                  params: {
+                    user: "evanbacon",
+                  },
+                  path: "/evanbacon",
+                },
+              },
+            ],
+          },
+          key: "(app)-xxx",
+        },
+      ],
+    },
+    {
+      screens: {
+        "(app)": {
+          path: "(app)",
+          screens: {
+            "(explore)": {
+              path: "(explore)",
+              screens: {
+                "[user]/index": ":user",
+                explore: "explore",
+              },
+              initialRouteName: "explore",
+            },
+            "([user])": {
+              path: "([user])",
+              screens: {
+                "[user]/index": ":user",
+                explore: "explore",
+              },
+              initialRouteName: "[user]/index",
+            },
+          },
+        },
+
+        "[...404]": "*",
+      },
+    },
+    "/evanbacon",
+  ],
+
+  [
+    {
+      index: 0,
+      routes: [
+        {
+          name: "(app)",
+          params: {
+            initial: true,
+            screen: "(explore)",
+            params: {
+              initial: false,
+              screen: "compose",
+              path: "/compose",
+            },
+          },
+          state: {
+            index: 0,
+            routes: [
+              {
+                name: "([user])",
+                params: {
+                  user: "evanbacon",
+                },
+              },
+            ],
+          },
+          key: "(app)-xxx",
+        },
+      ],
+    },
+    {
+      screens: {
+        "(app)": {
+          path: "(app)",
+          screens: {
+            "(feed)": {
+              path: "(feed)",
+              screens: {
+                "[user]/index": ":user",
+                compose: "compose",
+                explore: "explore",
+                feed: "feed",
+              },
+              initialRouteName: "feed",
+            },
+            "(explore)": {
+              path: "(explore)",
+              screens: {
+                "[user]/index": ":user",
+                compose: "compose",
+                explore: "explore",
+                feed: "feed",
+              },
+              initialRouteName: "explore",
+            },
+            "([user])": {
+              path: "([user])",
+              screens: {
+                "[user]/index": ":user",
+                compose: "compose",
+                explore: "explore",
+                feed: "feed",
+              },
+              initialRouteName: "[user]/index",
+            },
+          },
+        },
+        "[...404]": "*",
+      },
+    },
+    "/evanbacon",
+  ],
+].forEach(([state, config, expected], index) => {
+  it(`matches required assumptions: ${index}`, () => {
+    // @ts-expect-error
+    expect(getPathFromState(state, config)).toBe(expected);
+  });
+});
+
 it("converts state to path string with config", () => {
   const path = "/few/bar/sweet/apple/baz/jane?id=x10&valid=true";
   const config = {

@@ -121,6 +121,7 @@ export default function getPathFromState<ParamList extends object>(
   // @ts-expect-error: non-standard options
   _options?: Options<ParamList> & {
     preserveFragments?: boolean;
+    preserveDynamicRoutes?: boolean;
   } = {}
 ): string {
   if (state == null) {
@@ -129,7 +130,7 @@ export default function getPathFromState<ParamList extends object>(
     );
   }
 
-  const { preserveFragments, ...options } = _options;
+  const { preserveFragments, preserveDynamicRoutes, ...options } = _options;
 
   if (_options) {
     validatePathConfig(options);
@@ -147,7 +148,7 @@ export default function getPathFromState<ParamList extends object>(
     state,
     // Create a normalized configs object which will be easier to use
     createNormalizedConfigs(screens),
-    { preserveFragments }
+    { preserveFragments, preserveDynamicRoutes }
   );
 }
 
@@ -166,6 +167,45 @@ function processParamsWithUserSettings(
   );
 }
 
+function deepEqual(a: any, b: any) {
+  if (a === b) {
+    return true;
+  }
+
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) {
+      return false;
+    }
+
+    for (let i = 0; i < a.length; i++) {
+      if (!deepEqual(a[i], b[i])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  if (typeof a === "object" && typeof b === "object") {
+    const keysA = Object.keys(a);
+    const keysB = Object.keys(b);
+
+    if (keysA.length !== keysB.length) {
+      return false;
+    }
+
+    for (const key of keysA) {
+      if (!deepEqual(a[key], b[key])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
 function walkConfigItems(
   route: CustomRoute,
   focusedRoute: {
@@ -179,7 +219,7 @@ function walkConfigItems(
     route.state = createFakeState(route.params);
   }
 
-  let pattern: string;
+  let pattern: string | null = null;
   let focusedParams: Record<string, any> | undefined;
 
   const collectedParams: Record<string, any> = {};
@@ -201,8 +241,7 @@ function walkConfigItems(
       if (pattern) {
         Object.assign(collectedParams, params);
       }
-
-      if (focusedRoute === route) {
+      if (deepEqual(focusedRoute, route)) {
         // If this is the focused route, keep the params for later use
         // We save it here since it's been stringified already
         focusedParams = getParamsWithConventionsCollapsed({
@@ -213,8 +252,34 @@ function walkConfigItems(
       }
     }
 
+    if (!route.state && isInvalidParams(route.params)) {
+      route.state = createFakeState(route.params);
+    }
+
     // If there is no `screens` property or no nested state, we return pattern
     if (!configItem.screens || route.state === undefined) {
+      if (
+        configItem.initialRouteName &&
+        configItem.screens &&
+        configItem.initialRouteName in configItem.screens &&
+        configItem.screens[configItem.initialRouteName]?.pattern
+      ) {
+        const initialRouteConfig =
+          configItem.screens[configItem.initialRouteName];
+
+        // NOTE(EvanBacon): Big hack to support initial route changes in tab bars.
+        pattern = initialRouteConfig.pattern!;
+
+        if (focusedParams) {
+          // If this is the focused route, keep the params for later use
+          // We save it here since it's been stringified already
+          focusedParams = getParamsWithConventionsCollapsed({
+            params: focusedParams,
+            pattern,
+            routeName: route.name,
+          });
+        }
+      }
       break;
     }
 
@@ -233,10 +298,29 @@ function walkConfigItems(
     }
   }
 
+  if (pattern && !focusedParams && focusedRoute.params) {
+    // If this is the focused route, keep the params for later use
+    // We save it here since it's been stringified already
+    focusedParams = getParamsWithConventionsCollapsed({
+      params: focusedRoute.params,
+      pattern,
+      routeName: route.name,
+    });
+    Object.assign(focusedParams, collectedParams);
+  }
+
+  if (pattern == null) {
+    throw new Error(
+      `No pattern found for route "${route.name}". Options are: ${Object.keys(
+        configs
+      ).join(", ")}.`
+    );
+  }
+
   return {
-    pattern: pattern!,
+    pattern,
     nextRoute: route,
-    focusedParams: focusedParams ?? focusedRoute.params,
+    focusedParams,
     params: collectedParams,
   };
 }
@@ -244,7 +328,10 @@ function walkConfigItems(
 function getPathFromResolvedState(
   state: State,
   configs: Record<string, ConfigItem>,
-  { preserveFragments }: { preserveFragments?: boolean }
+  {
+    preserveFragments,
+    preserveDynamicRoutes,
+  }: { preserveFragments?: boolean; preserveDynamicRoutes?: boolean }
 ) {
   let path = "";
   let current: State = state;
@@ -256,10 +343,10 @@ function getPathFromResolvedState(
 
     const route = current.routes[current.index ?? 0] as CustomRoute;
     // NOTE(EvanBacon): Fill in current route using state that was passed as params.
+    // if (isInvalidParams(route.params)) {
     if (!route.state && isInvalidParams(route.params)) {
       route.state = createFakeState(route.params);
     }
-    console.log("route.state", route.state);
 
     const { pattern, params, nextRoute, focusedParams } = walkConfigItems(
       route,
@@ -269,12 +356,13 @@ function getPathFromResolvedState(
 
     Object.assign(allParams, params);
 
-    path += synthesizePathFromPattern({
+    path += getPathWithConventionsCollapsed({
       pattern,
       routePath: nextRoute.path,
       params: allParams,
       initialRouteName: configs[nextRoute.name]?.initialRouteName,
       preserveFragments,
+      preserveDynamicRoutes,
     });
 
     if (nextRoute.state) {
@@ -305,17 +393,19 @@ function getPathFromResolvedState(
   return basicSanitizePath(path);
 }
 
-function synthesizePathFromPattern({
+function getPathWithConventionsCollapsed({
   pattern,
   routePath,
   params,
   preserveFragments,
+  preserveDynamicRoutes,
   initialRouteName,
 }: {
   pattern: string;
   routePath?: string;
   params: Record<string, any>;
   preserveFragments?: boolean;
+  preserveDynamicRoutes?: boolean;
   initialRouteName?: string;
 }) {
   const segments = pattern.split("/");
@@ -342,6 +432,9 @@ function synthesizePathFromPattern({
 
       // If the path has a pattern for a param, put the param in the path
       if (p.startsWith(":")) {
+        if (preserveDynamicRoutes) {
+          return `[${name}]`;
+        }
         // Optional params without value assigned in route.params should be ignored
         return params[name];
       }
@@ -377,7 +470,7 @@ function getParamsWithConventionsCollapsed({
   pattern: string;
   /** Route name is required for matching the wildcard route. This is specific to Expo Router. */
   routeName: string;
-  params: Record<string, string>;
+  params: object;
 }): Record<string, string> {
   const processedParams = { ...params };
 
@@ -416,7 +509,7 @@ function basicSanitizePath(path: string) {
 
 type StateAsParams = {
   initial: boolean;
-  path: string;
+  path?: string;
   screen: string;
   params: Record<string, any>;
 };
@@ -426,14 +519,23 @@ type StateAsParams = {
 function isInvalidParams(
   params?: Record<string, any>
 ): params is StateAsParams {
-  return (
-    !!params &&
-    "initial" in params &&
-    "path" in params &&
-    "screen" in params &&
+  if (!params) {
+    return false;
+  }
+
+  if (
     "params" in params &&
     typeof params.params === "object" &&
     !!params.params
+  ) {
+    return true;
+  }
+
+  return (
+    "initial" in params &&
+    typeof params.initial === "boolean" &&
+    // "path" in params &&
+    "screen" in params
   );
 }
 

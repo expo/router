@@ -11,7 +11,11 @@ import type {
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
-import { matchDeepDynamicRouteName } from "../matchers";
+import {
+  matchDeepDynamicRouteName,
+  matchFragmentName,
+  stripFragmentSegmentsFromPath,
+} from "../matchers";
 
 type Options<ParamList extends object> = {
   initialRouteName?: string;
@@ -21,6 +25,7 @@ type Options<ParamList extends object> = {
 type ParseConfig = Record<string, (value: string) => any>;
 
 type RouteConfig = {
+  isInitial?: boolean;
   screen: string;
   regex?: RegExp;
   path: string;
@@ -94,15 +99,26 @@ export default function getStateFromPath<ParamList extends object>(
   }
 
   // This will be mutated...
-  const initialRoutes = [];
+  const initialRoutes: InitialRouteConfig[] = [];
 
   // Create a normalized configs array which will be easier to use.
   const converted = Object.keys(screens)
     .map((key) => createNormalizedConfigs(key, screens, [], initialRoutes))
     .flat();
 
+  const resolvedInitialPatterns = initialRoutes.map((route) =>
+    joinPaths(...route.parentScreens, route.initialRouteName)
+  );
+
+  const convertedWithInitial = converted.map((config) => ({
+    ...config,
+    // TODO(EvanBacon): Probably a safer way to do this
+    // Mark initial routes to give them potential priority over other routes that match.
+    isInitial: resolvedInitialPatterns.includes(config.routeNames.join("/")),
+  }));
+
   // Sort in order of resolution. This is extremely important for the algorithm to work.
-  const configs = converted.sort(sortConfigs);
+  const configs = convertedWithInitial.sort(sortConfigs);
 
   // Assert any duplicates before we start parsing.
   assertConfigDuplicates(configs);
@@ -181,12 +197,17 @@ function sortConfigs(a: RouteConfig, b: RouteConfig): number {
   // NOTE(EvanBacon): Here we append `index` if the screen was `index` so the length is the same
   // as a slug or wildcard when nested more than one level deep.
   // This is so we can compare the length of the pattern, e.g. `foo/*` > `foo` vs `*` < ``.
-  const aParts = a.pattern.split("/");
+  const aParts = a.pattern
+    .split("/")
+    // Strip out fragment names to ensure they don't affect the priority.
+    .filter((part) => matchFragmentName(part) == null);
   if (a.screen === "index") {
     aParts.push("index");
   }
 
-  const bParts = b.pattern.split("/");
+  const bParts = b.pattern
+    .split("/")
+    .filter((part) => matchFragmentName(part) == null);
   if (b.screen === "index") {
     bParts.push("index");
   }
@@ -230,6 +251,16 @@ function sortConfigs(a: RouteConfig, b: RouteConfig): number {
       return -1;
     }
   }
+
+  // Sort initial routes with a higher priority than routes which will push more screens
+  // this ensures shared routes go to the shortest path.
+  if (a.isInitial && !b.isInitial) {
+    return -1;
+  }
+  if (!a.isInitial && b.isInitial) {
+    return 1;
+  }
+
   return bParts.length - aParts.length;
 }
 
@@ -318,88 +349,91 @@ function matchAgainstConfigs(
     const match = remainingPath.match(config.regex);
 
     // If our regex matches, we need to extract params from the path
-    if (match) {
-      // TODO: Add support for wildcard routes
-      const matchedParams = config.pattern
-        ?.split("/")
-        .filter((p) => p.startsWith(":") || p === "*")
-        .reduce<Record<string, any>>((acc, p, i) => {
-          if (p === "*") {
-            return {
-              ...acc,
-              [p]: match[i],
-            };
-          }
-          return Object.assign(acc, {
-            // The param segments appear every second item starting from 2 in the regex match result
-            [p]: match![(i + 1) * 2].replace(/\//, ""),
-          });
-        }, {});
-
-      const routeFromName = (name: string) => {
-        const config = configs.find((c) => c.screen === name);
-        if (!config?.path) {
-          return { name };
-        }
-
-        const segments = config.path.split("/");
-
-        const params: Record<string, any> = {};
-
-        segments
-          .filter((p) => p.startsWith(":"))
-          .forEach((p) => {
-            const paramName = p;
-            const value = matchedParams[paramName];
-            if (value) {
-              const key = paramName.replace(/^:/, "").replace(/\?$/, "");
-              params[key] = config.parse?.[key]
-                ? config.parse[key](value)
-                : value;
-            }
-          });
-
-        if (segments.some((segment) => segment === "*")) {
-          // Get the expo-router-specific wildcard param name.
-          const key = matchDeepDynamicRouteName(name);
-          if (key) {
-            // Convert to an array before providing as a route.
-            const parsed = matchedParams["*"].split("/").filter(Boolean);
-            params[key] = config.parse?.[key]
-              ? config.parse[key](parsed)
-              : parsed;
-          }
-        }
-
-        if (params && Object.keys(params).length) {
-          return { name, params };
-        }
-
-        return { name };
-      };
-
-      routes = config.routeNames.map((name) => routeFromName(name));
-
-      // TODO(EvanBacon): Maybe we should warn / assert if multiple slugs use the same param name.
-      const combinedParams = routes.reduce<Record<string, any>>(
-        (acc, r) => Object.assign(acc, r.params),
-        {}
-      );
-
-      const hasCombinedParams = Object.keys(combinedParams).length > 0;
-
-      // Combine all params so a route `[foo]/[bar]/other.js` has access to `{ foo, bar }`
-      routes = routes.map((r) => {
-        if (hasCombinedParams) {
-          r.params = combinedParams;
-        }
-        return r;
-      });
-
-      remainingPath = remainingPath.replace(match[1], "");
-
-      break;
+    if (!match) {
+      continue;
     }
+
+    // TODO: Add support for wildcard routes
+    const matchedParams = config.pattern
+      ?.split("/")
+      .filter((p) => p.startsWith(":") || p === "*")
+      .reduce<Record<string, any>>((acc, p, i) => {
+        if (p === "*") {
+          return {
+            ...acc,
+            [p]: match[i],
+          };
+        }
+        return Object.assign(acc, {
+          // The param segments appear every second item starting from 2 in the regex match result.
+          // This will only work if we ensure fragments aren't included in the match.
+          [p]: match![(i + 1) * 2]?.replace(/\//, ""),
+        });
+      }, {});
+
+    const routeFromName = (name: string) => {
+      const config = configs.find((c) => c.screen === name);
+      if (!config?.path) {
+        return { name };
+      }
+
+      const segments = config.path.split("/");
+
+      const params: Record<string, any> = {};
+
+      segments
+        .filter((p) => p.startsWith(":"))
+        .forEach((p) => {
+          const paramName = p;
+          const value = matchedParams[paramName];
+          if (value) {
+            const key = paramName.replace(/^:/, "").replace(/\?$/, "");
+            params[key] = config.parse?.[key]
+              ? config.parse[key](value)
+              : value;
+          }
+        });
+
+      if (segments.some((segment) => segment === "*")) {
+        // Get the expo-router-specific wildcard param name.
+        const key = matchDeepDynamicRouteName(name);
+        if (key) {
+          // Convert to an array before providing as a route.
+          const parsed = matchedParams["*"].split("/").filter(Boolean);
+          params[key] = config.parse?.[key]
+            ? config.parse[key](parsed)
+            : parsed;
+        }
+      }
+
+      if (params && Object.keys(params).length) {
+        return { name, params };
+      }
+
+      return { name };
+    };
+
+    routes = config.routeNames.map((name) => routeFromName(name));
+
+    // TODO(EvanBacon): Maybe we should warn / assert if multiple slugs use the same param name.
+    const combinedParams = routes.reduce<Record<string, any>>(
+      (acc, r) => Object.assign(acc, r.params),
+      {}
+    );
+
+    const hasCombinedParams = Object.keys(combinedParams).length > 0;
+
+    // Combine all params so a route `[foo]/[bar]/other.js` has access to `{ foo, bar }`
+    routes = routes.map((r) => {
+      if (hasCombinedParams) {
+        r.params = combinedParams;
+      }
+      return r;
+    });
+
+    remainingPath = remainingPath.replace(match[1], "");
+
+    break;
   }
 
   return routes;
@@ -504,6 +538,14 @@ function formatRegexPattern(it: string): string {
 
   // Allow spaces in file path names.
   it = it.replace(" ", "%20");
+
+  // Strip fragments from the matcher
+  if (matchFragmentName(it) != null) {
+    // Fragments are optional segments
+    // this enables us to match `/bar` and `/(foo)/bar` for the same route
+    // NOTE(EvanBacon): Ignore this match in the regex to avoid capturing the fragment
+    return `(?:${escape(it)}\\/)?`;
+  }
 
   return `${it === "*" ? ".*" : escape(it)}\\/`;
 }
@@ -641,7 +683,8 @@ const createNestedStateObject = (
   }
 
   route = findFocusedRoute(state) as ParsedRoute;
-  route.path = path;
+  // Remove fragments from the path while preserving a trailing slash.
+  route.path = stripFragmentSegmentsFromPath(path);
 
   const params = parseQueryParams(
     route.path,

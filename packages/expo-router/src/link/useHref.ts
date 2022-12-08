@@ -22,8 +22,8 @@ function getRouteInfoFromState(
     };
   }
 
-  const pathname = getNormalizedStatePath(getPathFromState(state, false));
-  const href = getPathFromState(state, true);
+  const pathname = getNormalizedStatePath(getPathFromState(state, true));
+  const href = getPathFromState(state, false);
 
   return {
     href,
@@ -99,15 +99,14 @@ export function useGetPathFromState() {
         return "";
       }
       if (linking.options?.getPathFromState) {
-        return linking.options.getPathFromState(
-          state,
-          asPath ? linking.options.config : undefined
-        );
+        return linking.options.getPathFromState(state, {
+          ...linking.options.config,
+          // @ts-expect-error
+          preserveDynamicRoutes: asPath,
+          preserveFragments: asPath,
+        });
       }
-      return getPathFromState(
-        state,
-        asPath ? linking.options?.config : undefined
-      );
+      return getPathFromState(state, linking.options?.config);
     },
     [linking.options]
   );
@@ -115,15 +114,7 @@ export function useGetPathFromState() {
 
 // TODO: Split up getPathFromState to return all this info at once.
 function getNormalizedStatePath(statePath: string) {
-  const pathname =
-    "/" +
-    (statePath
-      .split("/")
-      .map((value) => decodeURIComponent(value))
-      .filter(Boolean)
-      .join("/") || "");
-
-  const components = pathname.split("?");
+  const components = statePath.split("?");
 
   return {
     pathname: components[0],
