@@ -7,41 +7,6 @@ import getStateFromPath from "../getStateFromPath";
 
 type State = PartialState<NavigationState>;
 
-xit("converts state to path string", () => {
-  const state = {
-    routes: [
-      {
-        name: "foo",
-        state: {
-          index: 1,
-          routes: [
-            { name: "boo" },
-            {
-              name: "bar",
-              params: { fruit: "apple" },
-              state: {
-                routes: [
-                  {
-                    name: "baz qux",
-                    params: { author: "jane", valid: true },
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
-    ],
-  };
-
-  const path = "/foo/bar/baz%20qux?author=jane&valid=true";
-
-  expect(getPathFromState<object>(state)).toBe(path);
-  expect(
-    getPathFromState<object>(getStateFromPath<object>(path) as State)
-  ).toBe(path);
-});
-
 it("converts state to path string with config", () => {
   const path = "/few/bar/sweet/apple/baz/jane?id=x10&valid=true";
   const config = {
@@ -108,42 +73,6 @@ it("converts state to path string with config", () => {
       getStateFromPath<object>(path, config) as State,
       config
     )
-  ).toBe(path);
-});
-
-xit("handles route without param", () => {
-  const path = "/foo/bar";
-  const state = {
-    routes: [
-      {
-        name: "foo",
-        state: {
-          routes: [{ name: "bar" }],
-        },
-      },
-    ],
-  };
-
-  expect(getPathFromState<object>(state)).toBe(path);
-  expect(
-    getPathFromState<object>(getStateFromPath<object>(path) as State)
-  ).toBe(path);
-});
-
-xit("doesn't add query param for empty params", () => {
-  const path = "/foo";
-  const state = {
-    routes: [
-      {
-        name: "foo",
-        params: {},
-      },
-    ],
-  };
-
-  expect(getPathFromState<object>(state)).toBe(path);
-  expect(
-    getPathFromState<object>(getStateFromPath<object>(path) as State)
   ).toBe(path);
 });
 
