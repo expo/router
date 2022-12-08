@@ -107,10 +107,16 @@ export default function getPathFromState<ParamList extends object>(
     validatePathConfig(options);
   }
 
+  const screens = options?.screens;
+  // Expo Router disallows usage without a linking config.
+  if (!screens) {
+    throw Error(
+      "You must pass a 'screens' object to 'getPathFromState' to generate a path."
+    );
+  }
+
   // Create a normalized configs object which will be easier to use
-  const configs: Record<string, ConfigItem> = options?.screens
-    ? createNormalizedConfigs(options?.screens)
-    : {};
+  const configs: Record<string, ConfigItem> = createNormalizedConfigs(screens);
 
   let path = "/";
   let current: State | undefined = state;
@@ -127,7 +133,7 @@ export default function getPathFromState<ParamList extends object>(
       route.state = createFakeState(route.params);
     }
 
-    let pattern: string | undefined;
+    let pattern: string;
 
     let focusedParams: Record<string, any> | undefined;
     const focusedRoute = getActiveRoute(state);
@@ -138,7 +144,13 @@ export default function getPathFromState<ParamList extends object>(
     let hasNext = true;
 
     while (route.name in currentOptions && hasNext) {
-      pattern = currentOptions[route.name].pattern;
+      const inputPattern = currentOptions[route.name].pattern;
+
+      if (inputPattern == null) {
+        // This should never happen in Expo Router.
+        throw new Error("Unexpect: No pattern found for route " + route.name);
+      }
+      pattern = inputPattern;
 
       // @ts-expect-error
       nestedRouteNames.push(route.name);
@@ -153,6 +165,7 @@ export default function getPathFromState<ParamList extends object>(
           ])
         );
 
+        // TODO: Does this need to be a null check?
         if (pattern) {
           Object.assign(allParams, currentParams);
         }
@@ -163,7 +176,7 @@ export default function getPathFromState<ParamList extends object>(
           focusedParams = { ...currentParams };
 
           pattern
-            ?.split("/")
+            .split("/")
             .filter((p) => p.startsWith(":") || p === "*")
             // eslint-disable-next-line no-loop-func
             .forEach((p) => {
@@ -201,70 +214,57 @@ export default function getPathFromState<ParamList extends object>(
           route = nextRoute as Route<string> & { state?: State };
           currentOptions = nestedConfig;
         } else {
+          console.log("called.2");
           // If not, there is no sense in going deeper in config
           hasNext = false;
         }
       }
     }
 
-    if (pattern === undefined) {
-      pattern = nestedRouteNames.join("/");
-    }
+    path += pattern!
+      .split("/")
+      .map((p, i) => {
+        const name = getParamName(p);
 
-    if (currentOptions[route.name] !== undefined) {
-      path += pattern
-        .split("/")
-        .map((p, i) => {
-          const name = getParamName(p);
-
-          // We don't know what to show for wildcard patterns
-          // Showing the route name seems ok, though whatever we show here will be incorrect
-          // Since the page doesn't actually exist
-          if (p === "*") {
-            if (i === 0) {
-              // This can occur when a wildcard matches all routes and the given path was `/`.
-              return route.path ?? "";
-            }
-            // remove existing segments from route.path and return it
-            // this is used for nested wildcard routes. Without this, the path would add
-            // all nested segments to the beginning of the wildcard route.
-            const path = route.path
-              ?.split("/")
-              .slice(i + 1)
-              .join("/");
-            return path ?? "";
+        // We don't know what to show for wildcard patterns
+        // Showing the route name seems ok, though whatever we show here will be incorrect
+        // Since the page doesn't actually exist
+        if (p === "*") {
+          if (i === 0) {
+            // This can occur when a wildcard matches all routes and the given path was `/`.
+            return route.path ?? "";
           }
+          // remove existing segments from route.path and return it
+          // this is used for nested wildcard routes. Without this, the path would add
+          // all nested segments to the beginning of the wildcard route.
+          const path = route.path
+            ?.split("/")
+            .slice(i + 1)
+            .join("/");
+          return path ?? "";
+        }
 
-          // If the path has a pattern for a param, put the param in the path
-          if (p.startsWith(":")) {
-            const value = allParams[name];
+        // If the path has a pattern for a param, put the param in the path
+        if (p.startsWith(":")) {
+          const value = allParams[name];
 
-            if (value == null) {
-              // Optional params without value assigned in route.params should be ignored
-              return "";
-            }
-            return value;
+          if (value == null) {
+            // Optional params without value assigned in route.params should be ignored
+            return "";
           }
+          return value;
+        }
 
-          return encodeURIComponent(p);
-        })
-        .join("/");
-    } else {
-      // TODO: Probably fragment routes shouldn't get this far
-      path += encodeURIComponent(
-        matchFragmentName(route.name)
-          ? ""
-          : route.name === "index"
-          ? ""
-          : route.name
-      );
-    }
+        return encodeURIComponent(p);
+      })
+      .join("/");
 
     if (!focusedParams) {
       focusedParams = focusedRoute.params;
     }
 
     if (route.state) {
+      console.log("called.3");
       path += "/";
     } else if (focusedParams) {
       for (const param in focusedParams) {
@@ -364,9 +364,8 @@ const createNormalizedConfigs = (
   pattern?: string
 ): Record<string, ConfigItem> =>
   Object.fromEntries(
-    Object.entries(options).map(([name, c]) => {
-      const result = createConfigItem(c, pattern);
-
-      return [name, result];
-    })
+    Object.entries(options).map(([name, c]) => [
+      name,
+      createConfigItem(c, pattern),
+    ])
   );

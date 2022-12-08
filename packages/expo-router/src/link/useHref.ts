@@ -137,7 +137,7 @@ function parseQueryString(val: string) {
   if (!val) {
     return {};
   }
-  const params = {};
+  const params: Record<string, string> = {};
   const a = val.split("&");
   for (let i = 0; i < a.length; i++) {
     const b = a[i].split("=");
