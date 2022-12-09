@@ -1,3 +1,4 @@
+import * as queryString from "query-string";
 import React from "react";
 
 import { RootContainer } from "../ContextNavigationContainer";
@@ -111,26 +112,16 @@ export function useGetPathFromState() {
 }
 
 // TODO: Split up getPathFromState to return all this info at once.
-function getNormalizedStatePath(statePath: string) {
-  const components = statePath.split("?");
+function getNormalizedStatePath(statePath: string): {
+  pathname: string;
+  params: queryString.ParsedQuery<string>;
+} {
+  const [pathname, querystring] = statePath.split("?");
 
   return {
-    pathname: components[0],
+    pathname,
     // TODO: This is not efficient, we should generate based on the state instead
     // of converting to string then back to object
-    params: parseQueryString(components[1] ?? ""),
+    params: querystring ? queryString.parse(querystring) : {},
   };
-}
-
-function parseQueryString(val: string) {
-  if (!val) {
-    return {};
-  }
-  const params: Record<string, string> = {};
-  const a = val.split("&");
-  for (let i = 0; i < a.length; i++) {
-    const b = a[i].split("=");
-    params[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || "");
-  }
-  return params;
 }
