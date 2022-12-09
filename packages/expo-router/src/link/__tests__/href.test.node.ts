@@ -2,15 +2,18 @@ import { resolveHref } from "../href";
 
 describe(resolveHref, () => {
   it(`passes strings back without resolution`, () => {
-    expect(resolveHref("/foobar")).toBe("/foobar");
-    expect(resolveHref("/foo/[bar]")).toBe("/foo/[bar]");
-    expect(resolveHref("/foo/[...bar]")).toBe("/foo/[...bar]");
-    expect(resolveHref("Tot4lly Wr0n9")).toBe("Tot4lly Wr0n9");
+    [
+      "/foobar",
+      "/foo/[bar]",
+      "/foo/[...bar]",
+      "/(somn)/foobar",
+      "/(somn)/other/(remove)/foobar",
+      "Tot4lly Wr0n9",
+    ].forEach((href) => {
+      expect(resolveHref(href)).toBe(href);
+    });
   });
-  it(`strips fragments`, () => {
-    expect(resolveHref("/(somn)/foobar")).toBe("/foobar");
-    expect(resolveHref("/(somn)/other/(remove)/foobar")).toBe("/other/foobar");
-  });
+
   it(`adds dynamic query parameters`, () => {
     expect(
       resolveHref({ pathname: "/[some]", params: { some: "value" } })

@@ -13,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RouteNode, sortRoutes } from "../Route";
 import { useRootRouteNodeContext } from "../context";
 import { Link } from "../link/Link";
-import { matchDeepDynamicRouteName, matchFragmentName } from "../matchers";
+import { matchDeepDynamicRouteName } from "../matchers";
 
 const INDENT = 24;
 
@@ -99,30 +99,38 @@ function FileItem({
   route,
   level = 0,
   parents = [],
+  isInitial = false,
 }: {
   route: RouteNode;
   level?: number;
   parents?: string[];
+  isInitial?: boolean;
 }) {
   const disabled = route.children.length > 0;
 
   const navigation = useNavigation();
+
+  const segments = React.useMemo(
+    () => [...parents, ...route.route.split("/")],
+    [parents, route.route]
+  );
+
   const href = React.useMemo(() => {
     return (
       "/" +
-      [...parents, route.route]
+      segments
         .map((v) => {
           // add an extra layer of entropy to the url for deep dynamic routes
           if (matchDeepDynamicRouteName(v)) {
             return v + "/" + Date.now();
           }
-          // groups and index must be erased
-          return !!matchFragmentName(v) || v === "index" ? "" : v;
+          // index must be erased but fragments can be preserved.
+          return v === "index" ? "" : v;
         })
         .filter(Boolean)
         .join("/")
     );
-  }, [parents, route.route]);
+  }, [segments, route.route]);
 
   const filename = React.useMemo(() => {
     const segments = route.contextKey.split("/");
@@ -140,56 +148,72 @@ function FileItem({
     return segments.slice(-segmentCount).join("/");
   }, [route]);
 
+  const info = isInitial ? "Initial" : route.generated ? "Virtual" : "";
+
   return (
     <>
       {!route.internal && (
-        <Link
-          accessibilityLabel={route.contextKey}
-          href={href}
-          onPress={() => {
-            if (Platform.OS !== "web") {
-              // Ensure the modal pops
-              navigation.goBack();
-            }
-          }}
-          // Ensure we replace the history so you can't go back to this page.
-          replace
-          // @ts-expect-error: disabled not on type
-          disabled={disabled}
-          asChild
-        >
-          <Pressable>
-            {({ pressed, hovered }) => (
-              <View
-                style={[
-                  styles.itemPressable,
-                  {
-                    paddingLeft: INDENT + level * INDENT,
-                    backgroundColor: hovered
-                      ? "rgba(255,255,255,0.1)"
-                      : "transparent",
-                  },
-                  pressed && { backgroundColor: "#323232" },
-                  disabled && { opacity: 0.4 },
-                ]}
-              >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  {route.children.length ? <PkgIcon /> : <FileIcon />}
-                  <Text style={styles.filename}>{filename}</Text>
-                </View>
+        <Pressable>
+          {({ pressed, hovered }) => (
+            <Link
+              accessibilityLabel={route.contextKey}
+              href={href}
+              onPress={() => {
+                if (Platform.OS !== "web") {
+                  // Ensure the modal pops
+                  navigation.goBack();
+                }
+              }}
+              style={{ flex: 1, display: "flex" }}
+              // @ts-expect-error: disabled not on type
+              disabled={disabled}
+              // Ensure we replace the history so you can't go back to this page.
+              replace
+            >
+              <View style={{ flex: 1 }}>
+                <View
+                  style={[
+                    styles.itemPressable,
+                    {
+                      paddingLeft: INDENT + level * INDENT,
+                      backgroundColor: hovered
+                        ? "rgba(255,255,255,0.1)"
+                        : "transparent",
+                    },
+                    pressed && { backgroundColor: "#323232" },
+                    disabled && { opacity: 0.4 },
+                  ]}
+                >
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    {route.children.length ? <PkgIcon /> : <FileIcon />}
+                    <Text style={styles.filename}>{filename}</Text>
+                  </View>
 
-                {!disabled && <ForwardIcon />}
-                {route.generated && <Text style={styles.virtual}>Virtual</Text>}
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    {!!info && (
+                      <Text
+                        style={[
+                          styles.virtual,
+                          !disabled && { marginRight: 8 },
+                        ]}
+                      >
+                        {info}
+                      </Text>
+                    )}
+                    {!disabled && <ForwardIcon />}
+                  </View>
+                </View>
               </View>
-            )}
-          </Pressable>
-        </Link>
+            </Link>
+          )}
+        </Pressable>
       )}
       {route.children.map((child) => (
         <FileItem
           key={child.contextKey}
           route={child}
-          parents={[...parents, route.route]}
+          isInitial={route.initialRouteName === child.route}
+          parents={segments}
           level={level + (route.generated ? 0 : 1)}
         />
       ))}

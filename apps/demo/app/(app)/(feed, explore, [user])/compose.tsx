@@ -1,10 +1,13 @@
+import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Page() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Not Found!</Text>
+        <Text style={styles.title}>Compose</Text>
+
+        <Link href="..">Back</Link>
       </View>
     </View>
   );

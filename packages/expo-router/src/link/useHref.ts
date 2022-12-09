@@ -1,9 +1,10 @@
-import { LinkingContext } from "@react-navigation/native";
+import * as queryString from "query-string";
 import React from "react";
 
 import { RootContainer } from "../ContextNavigationContainer";
 import getPathFromState, { State } from "../fork/getPathFromState";
 import { HrefObject } from "./href";
+import { useLinkingContext } from "./useLinkingContext";
 
 type RouteInfo = Omit<Required<HrefObject>, "query"> & {
   /** Normalized path representing the selected route `/[id]?id=normal` -> `/normal` */
@@ -22,8 +23,8 @@ function getRouteInfoFromState(
     };
   }
 
-  const pathname = getNormalizedStatePath(getPathFromState(state, false));
-  const href = getPathFromState(state, true);
+  const pathname = getNormalizedStatePath(getPathFromState(state, true));
+  const href = getPathFromState(state, false);
 
   return {
     href,
@@ -91,57 +92,36 @@ export function useHref(): RouteInfo {
 }
 
 export function useGetPathFromState() {
-  const linking = React.useContext(LinkingContext);
+  const linking = useLinkingContext();
 
   return React.useCallback(
     (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
       if (!state) {
         return "";
       }
-      if (linking.options?.getPathFromState) {
-        return linking.options.getPathFromState(
-          state,
-          asPath ? linking.options.config : undefined
-        );
-      }
-      return getPathFromState(
-        state,
-        asPath ? linking.options?.config : undefined
-      );
+
+      return linking.getPathFromState(state, {
+        ...linking.config,
+        // @ts-expect-error
+        preserveDynamicRoutes: asPath,
+        preserveFragments: asPath,
+      });
     },
-    [linking.options]
+    [linking]
   );
 }
 
 // TODO: Split up getPathFromState to return all this info at once.
-function getNormalizedStatePath(statePath: string) {
-  const pathname =
-    "/" +
-    (statePath
-      .split("/")
-      .map((value) => decodeURIComponent(value))
-      .filter(Boolean)
-      .join("/") || "");
-
-  const components = pathname.split("?");
+function getNormalizedStatePath(statePath: string): {
+  pathname: string;
+  params: queryString.ParsedQuery<string>;
+} {
+  const [pathname, querystring] = statePath.split("?");
 
   return {
-    pathname: components[0],
+    pathname,
     // TODO: This is not efficient, we should generate based on the state instead
     // of converting to string then back to object
-    params: parseQueryString(components[1] ?? ""),
+    params: querystring ? queryString.parse(querystring) : {},
   };
-}
-
-function parseQueryString(val: string) {
-  if (!val) {
-    return {};
-  }
-  const params: Record<string, string> = {};
-  const a = val.split("&");
-  for (let i = 0; i < a.length; i++) {
-    const b = a[i].split("=");
-    params[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || "");
-  }
-  return params;
 }

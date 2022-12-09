@@ -6,15 +6,9 @@ export default function Page({ route }) {
     <View style={styles.container}>
       <View style={styles.main}>
         <Text style={styles.title}>User: {route.params?.user}</Text>
-        <Text style={styles.subtitle}>This is the first page of your app.</Text>
-        <Link
-          href={{
-            pathname: "/[user]/posts/all",
-            params: { user: route.params.user },
-          }}
-        >
-          Go to posts
-        </Link>
+
+        <Link href="/([user])/compose">User -> Compose</Link>
+        <Link href="./compose">Local -> Compose</Link>
       </View>
     </View>
   );

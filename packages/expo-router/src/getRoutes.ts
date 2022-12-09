@@ -4,6 +4,7 @@ import {
   matchDeepDynamicRouteName,
   matchDynamicName,
   matchFragmentName,
+  stripFragmentSegmentsFromPath,
 } from "./matchers";
 import { RequireContext } from "./types";
 import { DefaultLayout } from "./views/Layout";
@@ -98,6 +99,69 @@ export function generateDynamic(name: string) {
   return dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null;
 }
 
+function collapseRouteSegments(route: string) {
+  return stripFragmentSegmentsFromPath(route.replace(/\/index$/, ""));
+}
+
+/**
+ * Given a route node and a name representing the fragment name,
+ * find the nearest child matching the name.
+ *
+ * Doesn't support slashes in the name.
+ * Routes like `explore/(something)/index` will be matched against `explore`.
+ *
+ */
+function getDefaultInitialRoute(node: RouteNode, name: string) {
+  return node.children.find(
+    (node) => collapseRouteSegments(node.route) === name
+  );
+}
+
+function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
+  const fragmentName = matchFragmentName(node.route);
+  if (!node.children || !fragmentName) {
+    return node;
+  }
+
+  // Guess at the initial route based on the fragment name.
+  // TODO(EvanBacon): Perhaps we should attempt to warn when the fragment doesn't match any child routes.
+  const initialRouteName = getDefaultInitialRoute(node, fragmentName)?.route;
+  const route = {
+    ...node,
+    loadRoute() {
+      const { unstable_settings, ...route } = node.loadRoute();
+      return {
+        ...route,
+        unstable_settings: {
+          initialRouteName:
+            unstable_settings?.initialRouteName ?? initialRouteName,
+          // Allow overriding the initial route name using the layout settings.
+          ...unstable_settings,
+        },
+      };
+    },
+  };
+  if (initialRouteName != null) {
+    route.initialRouteName = initialRouteName;
+  }
+  return route;
+}
+
+function cloneFragmentRoute(
+  node: RouteNode,
+  { name: nextName }: { name: string }
+): RouteNode {
+  const fragmentName = `(${nextName})`;
+  const parts = node.contextKey.split("/");
+  parts[parts.length - 2] = fragmentName;
+
+  return {
+    ...node,
+    route: fragmentName,
+    contextKey: parts.join("/"),
+  };
+}
+
 function treeNodeToRouteNode({
   name,
   node,
@@ -106,14 +170,35 @@ function treeNodeToRouteNode({
   const dynamic = generateDynamic(name);
 
   if (node) {
+    const fragmentName = matchFragmentName(name);
+    const multiFragment = fragmentName?.includes(",");
+
+    const clones = multiFragment
+      ? fragmentName!.split(",").map((v) => ({ name: v.trim() }))
+      : null;
+
+    const output = {
+      loadRoute: node.loadRoute,
+      route: name,
+      contextKey: node.contextKey,
+      children: getTreeNodesAsRouteNodes(children),
+      dynamic,
+    };
+
+    if (Array.isArray(clones)) {
+      return clones.map((clone) =>
+        applyDefaultInitialRouteName(cloneFragmentRoute({ ...output }, clone))
+      );
+    }
+
     return [
-      {
+      applyDefaultInitialRouteName({
         loadRoute: node.loadRoute,
         route: name,
         contextKey: node.contextKey,
         children: getTreeNodesAsRouteNodes(children),
         dynamic,
-      },
+      }),
     ];
   }
 

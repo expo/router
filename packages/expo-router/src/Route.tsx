@@ -10,6 +10,9 @@ export type PickPartial<T, K extends keyof T> = Omit<T, K> &
 export type RouteNode = {
   /** Load a route into memory. Returns the exports from a route. */
   loadRoute: () => any;
+
+  /** Loaded initial route name. */
+  initialRouteName?: string;
   /** nested routes */
   children: RouteNode[];
   /** Is the route a dynamic path */
@@ -78,6 +81,19 @@ export function useRootRoute(): RouteNode | null {
   return useContext(RootRouteNodeContext);
 }
 
+export function sortRoutesWithInitial(initialRouteName?: string) {
+  return (a: RouteNode, b: RouteNode): number => {
+    if (initialRouteName) {
+      if (a.route === initialRouteName) {
+        return -1;
+      }
+      if (b.route === initialRouteName) {
+        return 1;
+      }
+    }
+    return sortRoutes(a, b);
+  };
+}
 export function sortRoutes(a: RouteNode, b: RouteNode): number {
   if (a.dynamic && !b.dynamic) {
     return 1;

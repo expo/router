@@ -1,19 +1,15 @@
-import { LinkingOptions } from "@react-navigation/native";
+import { LinkingOptions, getActionFromState } from "@react-navigation/native";
 
 import { RouteNode } from "./Route";
 import { getAllWebRedirects } from "./aasa";
 import {
   addEventListener,
   getInitialURL,
-  getRootURL,
   getPathFromState,
+  getRootURL,
   getStateFromPath,
 } from "./link/linking";
-import {
-  matchDeepDynamicRouteName,
-  matchDynamicName,
-  matchFragmentName,
-} from "./matchers";
+import { matchDeepDynamicRouteName, matchDynamicName } from "./matchers";
 
 type Screen =
   | string
@@ -25,20 +21,22 @@ type Screen =
 
 // `[page]` -> `:page`
 // `page` -> `page`
-function convertDynamicRouteToReactNavigation(name: string) {
-  if (name === "index" || matchFragmentName(name) != null) {
+function convertDynamicRouteToReactNavigation(segment: string): string {
+  // NOTE(EvanBacon): To support shared routes we preserve fragment segments.
+  if (segment === "index") {
     return "";
   }
-  if (matchDeepDynamicRouteName(name) != null) {
+
+  if (matchDeepDynamicRouteName(segment) != null) {
     return "*";
   }
-  const dynamicName = matchDynamicName(name);
+  const dynamicName = matchDynamicName(segment);
 
   if (dynamicName != null) {
     return `:${dynamicName}`;
   }
 
-  return name;
+  return segment;
 }
 
 function parseRouteSegments(segments: string): string {
@@ -104,5 +102,8 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
     subscribe: addEventListener,
     getStateFromPath,
     getPathFromState,
+    // Add all functions to ensure the types never need to fallback.
+    // This is a convenience for usage in the package.
+    getActionFromState,
   };
 }

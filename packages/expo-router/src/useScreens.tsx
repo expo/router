@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Route, RouteNode, sortRoutes, useRouteNode } from "./Route";
+import { Route, RouteNode, sortRoutesWithInitial, useRouteNode } from "./Route";
 import { Screen } from "./primitives";
 import { Try } from "./views/Try";
 
@@ -20,10 +20,13 @@ export type ScreenProps<
 
 function getSortedChildren(
   children: RouteNode[],
-  order?: ScreenProps[]
+  order?: ScreenProps[],
+  initialRouteName?: string
 ): { route: RouteNode; props: any }[] {
   if (!order?.length) {
-    return children.sort(sortRoutes).map((route) => ({ route, props: {} }));
+    return children
+      .sort(sortRoutesWithInitial(initialRouteName))
+      .map((route) => ({ route, props: {} }));
   }
   const entries = [...children];
 
@@ -67,7 +70,9 @@ function getSortedChildren(
 
   // Add any remaining children
   ordered.push(
-    ...entries.sort(sortRoutes).map((route) => ({ route, props: {} }))
+    ...entries
+      .sort(sortRoutesWithInitial(initialRouteName))
+      .map((route) => ({ route, props: {} }))
   );
 
   return ordered;
@@ -80,7 +85,7 @@ export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
   const node = useRouteNode();
 
   const sorted = node?.children?.length
-    ? getSortedChildren(node.children, order)
+    ? getSortedChildren(node.children, order, node.initialRouteName)
     : [];
   return React.useMemo(
     () => sorted.map((value) => routeToScreen(value.route, value.props)),
@@ -102,10 +107,12 @@ export function getQualifiedRouteComponent(value: RouteNode) {
 
   const QualifiedRoute = React.forwardRef(
     (props: { route: any; navigation: any }, ref: any) => {
-      // Surface dynamic name as props to the view
       const children = React.createElement(Component, {
         ...props,
         ref,
+        // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
+        // the intention is to make it possible to deduce shared routes.
+        segment: value.route,
       });
 
       const errorBoundary = ErrorBoundary ? (

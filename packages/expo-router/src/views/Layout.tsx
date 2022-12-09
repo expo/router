@@ -44,7 +44,7 @@ export function Layout({
   // Allows adding Screen components as children to configure routes.
   const { screens, children: otherChildren } = useFilterScreenChildren(
     children,
-    { isCustomNavigator: true }
+    { isCustomNavigator: true, contextKey }
   );
 
   const sorted = useSortedScreens(screens ?? []);
