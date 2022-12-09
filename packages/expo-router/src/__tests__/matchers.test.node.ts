@@ -3,7 +3,17 @@ import {
   matchDeepDynamicRouteName,
   getNameFromFilePath,
   matchFragmentName,
+  stripFragmentSegmentsFromPath,
 } from "../matchers";
+
+describe(stripFragmentSegmentsFromPath, () => {
+  it(`strips fragment segments, preserving initial slash`, () => {
+    expect(
+      stripFragmentSegmentsFromPath("/[[...foobar]]/(foo)/bar/[bax]/(other)")
+    ).toBe("/[[...foobar]]/bar/[bax]");
+    expect(stripFragmentSegmentsFromPath("(foo)/(bar)")).toBe("");
+  });
+});
 
 describe(matchFragmentName, () => {
   it(`matches`, () => {
