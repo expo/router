@@ -1,4 +1,4 @@
-import { LinkingOptions } from "@react-navigation/native";
+import { LinkingOptions, getActionFromState } from "@react-navigation/native";
 
 import { RouteNode } from "./Route";
 import { getAllWebRedirects } from "./aasa";
@@ -102,5 +102,8 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
     subscribe: addEventListener,
     getStateFromPath,
     getPathFromState,
+    // Add all functions to ensure the types never need to fallback.
+    // This is a convenience for usage in the package.
+    getActionFromState,
   };
 }

@@ -1,9 +1,9 @@
-import { LinkingContext } from "@react-navigation/native";
 import React from "react";
 
 import { RootContainer } from "../ContextNavigationContainer";
 import getPathFromState, { State } from "../fork/getPathFromState";
 import { HrefObject } from "./href";
+import { useLinkingContext } from "./useLinkingContext";
 
 type RouteInfo = Omit<Required<HrefObject>, "query"> & {
   /** Normalized path representing the selected route `/[id]?id=normal` -> `/normal` */
@@ -91,24 +91,22 @@ export function useHref(): RouteInfo {
 }
 
 export function useGetPathFromState() {
-  const linking = React.useContext(LinkingContext);
+  const linking = useLinkingContext();
 
   return React.useCallback(
     (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
       if (!state) {
         return "";
       }
-      if (linking.options?.getPathFromState) {
-        return linking.options.getPathFromState(state, {
-          ...linking.options.config,
-          // @ts-expect-error
-          preserveDynamicRoutes: asPath,
-          preserveFragments: asPath,
-        });
-      }
-      return getPathFromState(state, linking.options?.config);
+
+      return linking.getPathFromState(state, {
+        ...linking.config,
+        // @ts-expect-error
+        preserveDynamicRoutes: asPath,
+        preserveFragments: asPath,
+      });
     },
-    [linking.options]
+    [linking]
   );
 }
 
