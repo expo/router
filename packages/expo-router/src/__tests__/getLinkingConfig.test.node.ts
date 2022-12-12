@@ -18,19 +18,23 @@ const mockRoutes = [
     children: [
       {
         children: [],
-        dynamic: {
-          name: "deep",
-          deep: true,
-        },
+        dynamic: [
+          {
+            name: "deep",
+            deep: true,
+          },
+        ],
         route: "[...deep]",
         contextKey: "./(fragment)/[...deep].tsx",
       },
       {
         children: [],
-        dynamic: {
-          name: "dynamic",
-          deep: false,
-        },
+        dynamic: [
+          {
+            name: "dynamic",
+            deep: false,
+          },
+        ],
         route: "[dynamic]",
         contextKey: "./(fragment)/[dynamic].tsx",
       },
@@ -47,10 +51,12 @@ const mockRoutes = [
   },
   {
     children: [],
-    dynamic: {
-      name: "screen",
-      deep: true,
-    },
+    dynamic: [
+      {
+        name: "screen",
+        deep: true,
+      },
+    ],
     route: "other/nested/[...screen]",
     contextKey: "./other/nested/[...screen].js",
   },

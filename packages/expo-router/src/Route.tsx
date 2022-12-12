@@ -7,6 +7,8 @@ import { getNameFromFilePath, matchFragmentName } from "./matchers";
 export type PickPartial<T, K extends keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
+export type DynamicConvention = { name: string; deep: boolean };
+
 export type RouteNode = {
   /** Load a route into memory. Returns the exports from a route. */
   loadRoute: () => any;
@@ -16,7 +18,7 @@ export type RouteNode = {
   /** nested routes */
   children: RouteNode[];
   /** Is the route a dynamic path */
-  dynamic: null | { name: string; deep: boolean };
+  dynamic: null | DynamicConvention[];
   /** `index`, `error-boundary`, etc. */
   route: string;
   /** require.context key, used for matching children. */
@@ -94,6 +96,7 @@ export function sortRoutesWithInitial(initialRouteName?: string) {
     return sortRoutes(a, b);
   };
 }
+
 export function sortRoutes(a: RouteNode, b: RouteNode): number {
   if (a.dynamic && !b.dynamic) {
     return 1;
@@ -102,11 +105,18 @@ export function sortRoutes(a: RouteNode, b: RouteNode): number {
     return -1;
   }
   if (a.dynamic && b.dynamic) {
-    if (a.dynamic.deep && !b.dynamic.deep) {
-      return 1;
+    if (a.dynamic.length !== b.dynamic.length) {
+      return b.dynamic.length - a.dynamic.length;
     }
-    if (!a.dynamic.deep && b.dynamic.deep) {
-      return -1;
+    for (let i = 0; i < a.dynamic.length; i++) {
+      const aDynamic = a.dynamic[i];
+      const bDynamic = b.dynamic[i];
+      if (aDynamic.deep && !bDynamic.deep) {
+        return 1;
+      }
+      if (!aDynamic.deep && bDynamic.deep) {
+        return -1;
+      }
     }
     return 0;
   }
