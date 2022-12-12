@@ -1,4 +1,4 @@
-import { RouteNode } from "./Route";
+import { DynamicConvention, RouteNode } from "./Route";
 import {
   getNameFromFilePath,
   matchDeepDynamicRouteName,
@@ -92,11 +92,21 @@ function getTreeNodesAsRouteNodes(nodes: TreeNode[]): RouteNode[] {
   return nodes.map(treeNodeToRouteNode).flat().filter(Boolean) as RouteNode[];
 }
 
-export function generateDynamic(name: string) {
+export function generateDynamicFromSegment(
+  name: string
+): DynamicConvention | null {
   const deepDynamicName = matchDeepDynamicRouteName(name);
   const dynamicName = deepDynamicName ?? matchDynamicName(name);
 
   return dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null;
+}
+
+export function generateDynamic(name: string): RouteNode["dynamic"] {
+  const description = name
+    .split("/")
+    .map((segment) => generateDynamicFromSegment(segment))
+    .filter(Boolean) as DynamicConvention[];
+  return description.length === 0 ? null : description;
 }
 
 function collapseRouteSegments(route: string) {
@@ -334,7 +344,7 @@ function appendUnmatchedRoute(routes: RouteNode) {
       },
       route: "[...404]",
       contextKey: "./[...404].tsx",
-      dynamic: { name: "404", deep: true },
+      dynamic: [{ name: "404", deep: true }],
       children: [],
       generated: true,
       internal: true,

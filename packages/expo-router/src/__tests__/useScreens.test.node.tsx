@@ -47,4 +47,20 @@ describe(createGetIdForRoute, () => {
     // Should never happen, but just in case.
     expect(getId({ params: { user: "" } })).toBe("[user]");
   });
+
+  it(`returns a function that picks multiple dynamic names from params`, () => {
+    const getId = createGetIdForRoute(createMockRoute("[user]/foo/[bar]"))!;
+    expect(getId).toBeDefined();
+
+    expect(getId({ params: { user: "bacon", bar: "hey" } })).toBe("bacon/hey");
+    // Fills partial params
+    expect(getId({ params: { user: "bacon" } })).toBe("bacon/[bar]");
+    // Unmatching param
+    expect(getId({ params: { baz: "foo" } })).toBe("[user]/[bar]");
+    // No params
+    expect(getId({ params: null })).toBe("[user]/[bar]");
+
+    // Should never happen, but just in case.
+    expect(getId({ params: { user: "" } })).toBe("[user]/[bar]");
+  });
 });

@@ -1,6 +1,12 @@
 import React from "react";
 
-import { Route, RouteNode, sortRoutesWithInitial, useRouteNode } from "./Route";
+import {
+  DynamicConvention,
+  Route,
+  RouteNode,
+  sortRoutesWithInitial,
+  useRouteNode,
+} from "./Route";
 import { Screen } from "./primitives";
 import { Try } from "./views/Try";
 
@@ -136,26 +142,29 @@ export function getQualifiedRouteComponent(value: RouteNode) {
 export function createGetIdForRoute(
   route: Pick<RouteNode, "dynamic" | "route">
 ) {
-  if (!route.dynamic) {
+  if (!route.dynamic?.length) {
     return undefined;
   }
-  const dynamicName = route.dynamic.name;
-  const routeName = route.route;
   return ({ params }) => {
-    // Params can be undefined when there are no params in the route.
-    const preferredId = params?.[dynamicName];
-    // If the route has a dynamic segment, use the matching parameter
-    // as the screen id. This enables pushing a screen like `/[user]` multiple times
-    // when the user is different.
-    if (preferredId) {
-      // Deep dynamic routes will return as an array, so we'll join them to create a
-      // fully qualified string.
-      return (
-        (Array.isArray(preferredId) ? preferredId.join("/") : preferredId) ||
-        routeName
-      );
-    }
-    return routeName;
+    const getPreferredId = (segment: DynamicConvention) => {
+      // Params can be undefined when there are no params in the route.
+      const preferredId = params?.[segment.name];
+      // If the route has a dynamic segment, use the matching parameter
+      // as the screen id. This enables pushing a screen like `/[user]` multiple times
+      // when the user is different.
+      if (preferredId) {
+        if (!Array.isArray(preferredId)) {
+          return preferredId;
+        } else if (preferredId.length) {
+          // Deep dynamic routes will return as an array, so we'll join them to create a
+          // fully qualified string.
+          return preferredId.join("/");
+        }
+        // Empty arrays...
+      }
+      return segment.deep ? `[...${segment.name}]` : `[${segment.name}]`;
+    };
+    return route.dynamic?.map((segment) => getPreferredId(segment)).join("/");
   };
 }
 

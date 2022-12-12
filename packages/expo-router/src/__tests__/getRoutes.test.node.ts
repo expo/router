@@ -22,7 +22,7 @@ function createMockContextModule(
 const ROUTE_404 = {
   children: [],
   contextKey: "./[...404].tsx",
-  dynamic: { deep: true, name: "404" },
+  dynamic: [{ deep: true, name: "404" }],
   generated: true,
   internal: true,
   route: "[...404]",
@@ -221,7 +221,7 @@ describe(getRoutes, () => {
         {
           children: [],
           contextKey: "./[...404].tsx",
-          dynamic: { deep: true, name: "404" },
+          dynamic: [{ deep: true, name: "404" }],
           generated: true,
           internal: true,
           route: "[...404]",
@@ -277,20 +277,24 @@ describe(getRoutes, () => {
           {
             children: [],
             contextKey: "./[dynamic].tsx",
-            dynamic: {
-              deep: false,
-              name: "dynamic",
-            },
+            dynamic: [
+              {
+                deep: false,
+                name: "dynamic",
+              },
+            ],
 
             route: "[dynamic]",
           },
           {
             children: [],
             contextKey: "./[...deep].tsx",
-            dynamic: {
-              deep: true,
-              name: "deep",
-            },
+            dynamic: [
+              {
+                deep: true,
+                name: "deep",
+              },
+            ],
 
             route: "[...deep]",
           },
@@ -366,7 +370,12 @@ describe(getRoutes, () => {
             {
               children: [],
               contextKey: "./(stack)/user/[profile].tsx",
-              dynamic: null,
+              dynamic: [
+                {
+                  deep: false,
+                  name: "profile",
+                },
+              ],
               route: "user/[profile]",
             },
             {
@@ -380,7 +389,7 @@ describe(getRoutes, () => {
                 {
                   children: [],
                   contextKey: "./(stack)/user/settings/[...other].tsx",
-                  dynamic: { deep: true, name: "other" },
+                  dynamic: [{ deep: true, name: "other" }],
                   route: "[...other]",
                 },
               ],
