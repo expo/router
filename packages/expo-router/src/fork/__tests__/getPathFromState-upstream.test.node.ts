@@ -158,6 +158,94 @@ type State = PartialState<NavigationState>;
   });
 });
 
+it("does not collapse conventions", () => {
+  expect(
+    getPathFromState(
+      {
+        stale: false,
+        type: "stack",
+        key: "stack-As9iX2L8B1j6ZjV3xN8aQ",
+        index: 0,
+        routeNames: ["(app)"],
+        routes: [
+          {
+            name: "(app)",
+            params: {
+              user: "bacon",
+            },
+            state: {
+              stale: false,
+              type: "stack",
+              key: "stack-TihHf0Ci6SaO_avdb9IAz",
+              index: 0,
+              routeNames: ["[user]"],
+              routes: [
+                {
+                  name: "[user]",
+                  params: {
+                    user: "bacon",
+                  },
+                  state: {
+                    stale: false,
+                    type: "tab",
+                    key: "tab-n3xlu2kPlKh1VOAQWJbEb",
+                    index: 1,
+                    routeNames: ["index", "related"],
+                    history: [
+                      {
+                        type: "route",
+                        key: "index-z-ZR1oYFE3kHksOXi4L9j",
+                      },
+                      {
+                        type: "route",
+                        key: "related-WWyKJe4_3X-PyqW5MIzN4",
+                      },
+                    ],
+                    routes: [
+                      {
+                        name: "index",
+                        key: "index-z-ZR1oYFE3kHksOXi4L9j",
+                      },
+                      {
+                        name: "related",
+                        params: {
+                          user: "bacon",
+                        },
+                        path: "/bacon/related",
+                        key: "related-WWyKJe4_3X-PyqW5MIzN4",
+                      },
+                    ],
+                  },
+                  key: "[user]-9qb40LvrbVOw4HArHBQQN",
+                },
+              ],
+            },
+            key: "(app)-eHHi2MUdVaFK_IshK8Y2J",
+          },
+        ],
+      },
+      {
+        screens: {
+          "(app)": {
+            path: "(app)",
+            screens: {
+              "[user]": {
+                path: ":user",
+                screens: {
+                  index: "",
+                  related: "related",
+                },
+              },
+            },
+          },
+        },
+        preserveDynamicRoutes: true,
+        preserveFragments: true,
+      } as any
+    )
+  ).toBe("/(app)/[user]/related?user=bacon");
+});
+
 it("converts state to path string with config", () => {
   const path = "/few/bar/sweet/apple/baz/jane?id=x10&valid=true";
   const config = {

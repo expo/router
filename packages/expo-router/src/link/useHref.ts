@@ -3,6 +3,7 @@ import React from "react";
 
 import { RootContainer } from "../ContextNavigationContainer";
 import getPathFromState, { State } from "../fork/getPathFromState";
+import { useInitialRootStateContext } from "../rootStateContext";
 import { HrefObject } from "./href";
 import { useLinkingContext } from "./useLinkingContext";
 
@@ -13,22 +14,11 @@ type RouteInfo = Omit<Required<HrefObject>, "query"> & {
 
 function getRouteInfoFromState(
   getPathFromState: (state: State, asPath: boolean) => string,
-  state?: State | null
+  state: State
 ): RouteInfo {
-  if (!state) {
-    return {
-      href: "",
-      pathname: "",
-      params: {},
-    };
-  }
-
-  const pathname = getNormalizedStatePath(getPathFromState(state, true));
-  const href = getPathFromState(state, false);
-
   return {
-    href,
-    ...pathname,
+    href: getPathFromState(state, false),
+    ...getNormalizedStatePath(getPathFromState(state, true)),
   };
 }
 
@@ -58,35 +48,50 @@ function compareRouteInfo(a: RouteInfo, b: RouteInfo) {
 }
 
 export function useHref(): RouteInfo {
+  const initialRootState = useInitialRootStateContext();
   const getPathFromState = useGetPathFromState();
 
-  const navigation = RootContainer.getRef();
   const [routeInfo, setRouteInfo] = React.useState<RouteInfo>(
-    getRouteInfoFromState(getPathFromState, navigation?.getRootState())
+    getRouteInfoFromState(
+      getPathFromState,
+      // If the root state (from upstream) is not ready, use the hacky initial state.
+      // Initial state can be generate because it assumes the linking configuration never changes.
+      RootContainer.getRef().getRootState() ?? initialRootState
+    )
   );
 
+  const routeInfoRef = React.useRef(routeInfo);
+
+  React.useEffect(() => {
+    routeInfoRef.current = routeInfo;
+  }, [routeInfo]);
+
   const maybeUpdateRouteInfo = React.useCallback(
-    (state: State | null) => {
+    (state: State) => {
       // Prevent unnecessary updates
       const newRouteInfo = getRouteInfoFromState(getPathFromState, state);
-      if (!compareRouteInfo(routeInfo, newRouteInfo)) {
+      if (!compareRouteInfo(routeInfoRef.current, newRouteInfo)) {
         setRouteInfo(newRouteInfo);
       }
     },
-    [getPathFromState, routeInfo]
+    [
+      // TODO: This probably never changes
+      getPathFromState,
+    ]
   );
 
   React.useEffect(() => {
-    if (navigation) {
-      maybeUpdateRouteInfo(navigation.getRootState());
-      const unsubscribe = navigation.addListener("state", ({ data }) => {
-        const navigationState = data.state as unknown as State;
-        maybeUpdateRouteInfo(navigationState);
-      });
-      return unsubscribe;
-    }
-    return undefined;
-  }, [maybeUpdateRouteInfo, navigation]);
+    const rootNavigation = RootContainer.getRef();
+
+    return rootNavigation.addListener("state", ({ data }) => {
+      // Attempt to use the complete state from the root, otherwise this will default to
+      // sending events from the nearest layout.
+      const navigationState =
+        rootNavigation.getRootState() ?? (data.state as unknown as State);
+      // NOTE(EvanBacon): It's probably worth asserting if the root state is missing here.
+      maybeUpdateRouteInfo(navigationState);
+    });
+  }, [maybeUpdateRouteInfo]);
 
   return routeInfo;
 }
@@ -96,10 +101,6 @@ export function useGetPathFromState() {
 
   return React.useCallback(
     (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
-      if (!state) {
-        return "";
-      }
-
       return linking.getPathFromState(state, {
         ...linking.config,
         // @ts-expect-error
