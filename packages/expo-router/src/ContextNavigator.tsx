@@ -4,6 +4,7 @@ import { ContextNavigationContainer } from "./ContextNavigationContainer";
 import { RootRouteNodeContext, useRootRouteNodeContext } from "./context";
 import { getRoutes } from "./getRoutes";
 import { useTutorial } from "./onboard/useTutorial";
+import { InitialRootStateProvider } from "./rootStateContext";
 import { RequireContext } from "./types";
 import { getQualifiedRouteComponent } from "./useScreens";
 import { SplashScreen } from "./views/Splash";
@@ -39,7 +40,9 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
   return (
     <RootRouteNodeProvider context={context}>
       <ContextNavigationContainer>
-        <RootRoute />
+        <InitialRootStateProvider>
+          <RootRoute />
+        </InitialRootStateProvider>
       </ContextNavigationContainer>
     </RootRouteNodeProvider>
   );
@@ -47,7 +50,6 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
 
 function RootRoute() {
   const root = useRootRouteNodeContext();
-
   const Component = getQualifiedRouteComponent(root);
   // @ts-expect-error: TODO: Drop navigation and route props
   return <Component />;

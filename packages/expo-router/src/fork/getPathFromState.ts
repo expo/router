@@ -371,17 +371,18 @@ function getPathFromResolvedState(
     } else {
       // Finished crawling state.
 
+      const outputParams = preserveDynamicRoutes ? params : focusedParams;
       // Check for query params before exiting.
-      if (focusedParams) {
-        for (const param in focusedParams) {
+      if (outputParams) {
+        for (const param in outputParams) {
           // TODO: This is not good. We shouldn't squat strings named "undefined".
-          if (focusedParams[param] === "undefined") {
+          if (outputParams[param] === "undefined") {
             // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-            delete focusedParams[param];
+            delete outputParams[param];
           }
         }
 
-        const query = queryString.stringify(focusedParams, { sort: false });
+        const query = queryString.stringify(outputParams, { sort: false });
 
         if (query) {
           path += `?${query}`;
