@@ -34,5 +34,6 @@ The router demo uses a custom version of Metro, this may cause conflicting versi
 ## Examples
 
 - [Test app](/apps/demo) - Test app, in this repository
+- [Kind Words App](https://github.com/hola-soy-milk/react-native-expo) - Demo app with `expo-router`, created during a workshop for beginners
 
 > Add yours today!
