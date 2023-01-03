@@ -70,6 +70,10 @@ function InternalContextNavigationContainer(props: object) {
     return linking;
   }, [root]);
 
+  React.useEffect(() => {
+    contextProps.onReady?.();
+  }, [!!contextProps?.onReady]);
+
   return (
     <RootNavigationRef.Provider value={{ ref }}>
       {!isReady && <SplashScreen />}
@@ -80,7 +84,6 @@ function InternalContextNavigationContainer(props: object) {
         linking={linking}
         ref={navigationRef}
         onReady={() => {
-          contextProps.onReady?.();
           setReady(true);
         }}
       />
