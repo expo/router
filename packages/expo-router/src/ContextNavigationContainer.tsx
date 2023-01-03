@@ -70,9 +70,9 @@ function InternalContextNavigationContainer(props: object) {
     return linking;
   }, [root]);
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     contextProps.onReady?.();
-  }, [!!(contextProps?.onReady)])
+  }, [!!contextProps?.onReady])
 
   return (
     <RootNavigationRef.Provider value={{ ref }}>
