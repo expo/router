@@ -57,7 +57,7 @@ export function ContextNavigationContainer(props: NavigationContainerProps) {
   );
 }
 
-function InternalContextNavigationContainer(props: object) {
+function InternalContextNavigationContainer() {
   const [contextProps] = useNavigationContainerContext();
   const [isReady, setReady] = React.useState(false);
   const ref = React.useMemo(() => (isReady ? navigationRef : null), [isReady]);
@@ -75,7 +75,6 @@ function InternalContextNavigationContainer(props: object) {
       {!isReady && <SplashScreen />}
       {/* @ts-expect-error: children are required */}
       <NavigationContainer
-        {...props}
         {...contextProps}
         linking={linking}
         ref={navigationRef}
@@ -88,20 +87,49 @@ function InternalContextNavigationContainer(props: object) {
   );
 }
 
-export function RootContainer({
-  documentTitle,
-  fallback,
-  onReady,
-  initialState,
-  onStateChange,
-  onUnhandledAction,
-  theme,
-}: Omit<
-  NavigationContainerProps,
-  "independent" | "ref" | "children" | "linking"
->) {
+export function RootContainer(
+  props: Omit<
+    NavigationContainerProps,
+    "independent" | "ref" | "children" | "linking"
+  >
+) {
   const [, setProps] = useNavigationContainerContext();
 
+  React.useEffect(() => {
+    if (process.env.NODE_ENV !== "production") {
+      const restrictedProps = [
+        "fallback",
+        "independent",
+        "onReady",
+        "initialState",
+        "onStateChange",
+        "onUnhandledAction",
+        "children",
+        "linking",
+      ];
+      const invalidProps = Object.keys(props).filter((prop) =>
+        restrictedProps.includes(prop)
+      );
+
+      if (invalidProps.length > 0) {
+        console.warn(
+          `RootContainer does not support the following props: ${invalidProps.join(
+            ", "
+          )}. Learn more: https://expo.github.io/router/docs/features/container#restrictions`
+        );
+      }
+    }
+  }, [props]);
+
+  const {
+    documentTitle,
+    fallback,
+    onReady,
+    initialState,
+    onStateChange,
+    onUnhandledAction,
+    theme,
+  } = props;
   React.useEffect(() => {
     setProps({
       documentTitle,
