@@ -158,6 +158,60 @@ type State = PartialState<NavigationState>;
   });
 });
 
+it(`supports resolving nonexistent, nested synthetic states into paths that cannot be resolved`, () => {
+  expect(
+    getPathFromState(
+      {
+        index: 0,
+        routes: [
+          {
+            name: "(root)",
+            state: {
+              index: 0,
+              routes: [
+                {
+                  name: "modal",
+                  path: "/modal",
+                  key: "modal-qhPtAt8RdiCEcxrLJtxG1",
+                  state: {
+                    index: 0,
+                    routes: [
+                      {
+                        name: "index",
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+            key: "(root)-teRKULujwLUHDOUPQ8g2Z",
+          },
+        ],
+      },
+      {
+        screens: {
+          "(root)": {
+            path: "(root)",
+            screens: {
+              "(tabs)": {
+                path: "(tabs)",
+                screens: {
+                  index: "",
+                  two: "two",
+                },
+              },
+              "[...missing]": "*",
+              modal: "modal",
+            },
+            initialRouteName: "(tabs)",
+          },
+          _sitemap: "_sitemap",
+        },
+      } as any
+    )
+  ).toEqual("/modal");
+});
+
 it("does not collapse conventions", () => {
   expect(
     getPathFromState(
