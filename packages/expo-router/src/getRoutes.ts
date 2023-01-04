@@ -135,25 +135,29 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
 
   // Guess at the initial route based on the fragment name.
   // TODO(EvanBacon): Perhaps we should attempt to warn when the fragment doesn't match any child routes.
-  const initialRouteName = getDefaultInitialRoute(node, fragmentName)?.route;
+  let initialRouteName = getDefaultInitialRoute(node, fragmentName)?.route;
+  const loaded = node.loadRoute();
+
+  if (loaded.unstable_settings) {
+    // Allow unstable_settings={ initialRouteName: '...' } to override the default initial route name.
+    const definedInitialRouteName = loaded.unstable_settings.initialRouteName;
+    // Allow unstable_settings={ 'custom': { initialRouteName: '...' } } to override the less specific initial route name.
+    const groupSpecificInitialRouteName =
+      loaded.unstable_settings?.[fragmentName]?.initialRouteName;
+
+    initialRouteName =
+      groupSpecificInitialRouteName ??
+      definedInitialRouteName ??
+      initialRouteName;
+  }
+
   const route = {
     ...node,
-    loadRoute() {
-      const { unstable_settings, ...route } = node.loadRoute();
-      return {
-        ...route,
-        unstable_settings: {
-          initialRouteName:
-            unstable_settings?.initialRouteName ?? initialRouteName,
-          // Allow overriding the initial route name using the layout settings.
-          ...unstable_settings,
-        },
-      };
-    },
+    initialRouteName,
   };
-  if (initialRouteName != null) {
-    route.initialRouteName = initialRouteName;
-  }
+  // if (initialRouteName != null) {
+  //   route.initialRouteName = initialRouteName;
+  // }
   return route;
 }
 
