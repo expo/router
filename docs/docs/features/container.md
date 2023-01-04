@@ -3,7 +3,7 @@ title: Navigation Container
 sidebar_position: 6
 ---
 
-The global React Navigation [`<NavigationContainer />`](https://reactnavigation.org/docs/navigation-container/) is managed by Expo Router, you can pass it props like `theme` from any screen by using the `<RootContainer />` component.
+The global React Navigation [`<NavigationContainer />`](https://reactnavigation.org/docs/navigation-container/) is managed by Expo Router, you can pass it props like `theme` from any screen by using the `<RootContainer />` component but this is discouraged.
 
 ```tsx title=app/_layout.tsx
 import { RootContainer, Children } from "expo-router";
@@ -53,6 +53,10 @@ function Page() {
 ## Restrictions
 
 The navigation container has many props that should not be used with Expo Router. Carefully reconsider how your app is using the following props before migrating to Expo Router.
+
+### `theme`
+
+Use the `<ThemeProvider />` component instead. Learn more in the [Themes guide](/docs/guides/themes).
 
 ### `onReady`
 
