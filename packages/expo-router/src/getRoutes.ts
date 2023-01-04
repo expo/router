@@ -151,14 +151,10 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
       initialRouteName;
   }
 
-  const route = {
+  return {
     ...node,
     initialRouteName,
   };
-  // if (initialRouteName != null) {
-  //   route.initialRouteName = initialRouteName;
-  // }
-  return route;
 }
 
 function cloneFragmentRoute(
