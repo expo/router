@@ -101,6 +101,7 @@ export function RootContainer(
   React.useEffect(() => {
     if (process.env.NODE_ENV !== "production") {
       const restrictedProps = [
+        "theme",
         "fallback",
         "independent",
         "onReady",
