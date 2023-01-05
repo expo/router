@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 
 import { ContextNavigationContainer } from "./ContextNavigationContainer";
+import { LocationProvider } from "./LocationProvider";
 import { RootRouteNodeContext, useRootRouteNodeContext } from "./context";
 import { getRoutes } from "./getRoutes";
 import { useTutorial } from "./onboard/useTutorial";
@@ -8,7 +9,6 @@ import { InitialRootStateProvider } from "./rootStateContext";
 import { RequireContext } from "./types";
 import { getQualifiedRouteComponent } from "./useScreens";
 import { SplashScreen } from "./views/Splash";
-import { LocationProvider } from "./LocationProvider";
 
 function useContextModuleAsRoutes(context: RequireContext) {
   // TODO: Is this an optimal hook dependency?
