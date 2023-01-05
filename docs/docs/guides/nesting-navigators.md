@@ -40,22 +40,22 @@ export default function Root() {
 This is nested in the `home.js` layout, so it will be rendered as a tab.
 
 ```js title=app/home/feed.js
-import { SafeAreaView, Text } from "react-native";
+import { View, Text } from "react-native";
 
 export default function Feed() {
-  return (<SafeAreaView>
+  return (<View>
     <Text>Feed screen</Text>
-   </SafeAreaView>);
+   </View>);
 }
 ```
 
 ```js title=app/home/messages.js
-import { View } from "react-native";
+import { View, Text } from "react-native";
 
 export default function Messages() {
-  return (<SafeAreaView>
+  return (<View>
     <Text>Messages screen</Text>
-   </SafeAreaView>);
+   </View>);
 }
 ```
 
