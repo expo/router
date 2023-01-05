@@ -129,3 +129,16 @@ export default function Layout() {
 ```
 
 Now deep linking directly to `/other` or reloading the page will continue to show the back arrow.
+
+When using clone syntax `(foo, bar)` you can specify the name of a group in the `unstable_settings` object.
+
+```js
+export const unstable_settings = {
+  // Used for `(foo)`
+  initialRouteName: "first",
+  // Used for `(bar)`
+  bar: {
+    initialRouteName: "second",
+  },
+};
+```
