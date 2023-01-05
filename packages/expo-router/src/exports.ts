@@ -9,11 +9,11 @@ export { ErrorBoundary } from "./views/ErrorBoundary";
 
 export { Layout, Children } from "./views/Layout";
 export { Link, Redirect } from "./link/Link";
-export { useLink } from "./link/useLink";
+export { useRouter } from "./link/useRouter";
 export { RootContainer } from "./ContextNavigationContainer";
 
 export * as Linking from "./link/linking";
 
 export { SplashScreen } from "./views/Splash";
-export { useHref } from "./link/useHref";
+export { usePathname, useSearchParams, useSegments } from "./LocationProvider";
 export { useNavigation } from "./useNavigation";

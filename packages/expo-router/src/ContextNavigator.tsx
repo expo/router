@@ -8,6 +8,7 @@ import { InitialRootStateProvider } from "./rootStateContext";
 import { RequireContext } from "./types";
 import { getQualifiedRouteComponent } from "./useScreens";
 import { SplashScreen } from "./views/Splash";
+import { LocationProvider } from "./LocationProvider";
 
 function useContextModuleAsRoutes(context: RequireContext) {
   // TODO: Is this an optimal hook dependency?
@@ -41,7 +42,9 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
     <RootRouteNodeProvider context={context}>
       <ContextNavigationContainer>
         <InitialRootStateProvider>
-          <RootRoute />
+          <LocationProvider>
+            <RootRoute />
+          </LocationProvider>
         </InitialRootStateProvider>
       </ContextNavigationContainer>
     </RootRouteNodeProvider>
