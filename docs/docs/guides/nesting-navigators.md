@@ -8,8 +8,9 @@ Ports the guide [React Navigation: Nesting navigators](https://reactnavigation.o
 ```bash title="File System"
 app/
   _layout.js
-  home.js
+  index.js
   home/
+    _layout.js
     feed.js # Matches /home/feed
     messages.js # Matches /home/messages
 ```
@@ -22,16 +23,16 @@ export default Stack;
 
 This is nested in the `_layout.js` layout, so it will be rendered as a stack.
 
-```js title=app/home.js
+```js title=app/home/_layout.js
 import { Tabs } from "expo-router";
 
 export default Tabs;
 ```
 
-```js title=app/profile.js
+```js title=app/index.js
 import { Link } from "expo-router";
 
-export default function Feed() {
+export default function Root() {
   return <Link href="/home/messages">Navigate to nested route</Link>;
 }
 ```
@@ -39,10 +40,12 @@ export default function Feed() {
 This is nested in the `home.js` layout, so it will be rendered as a tab.
 
 ```js title=app/home/feed.js
-import { View } from "react-native";
+import { SafeAreaView, Text } from "react-native";
 
 export default function Feed() {
-  return <View />;
+  return (<SafeAreaView>
+    <Text>Feed screen</Text>
+   </SafeAreaView>);
 }
 ```
 
@@ -50,7 +53,9 @@ export default function Feed() {
 import { View } from "react-native";
 
 export default function Messages() {
-  return <View />;
+  return (<SafeAreaView>
+    <Text>Messages screen</Text>
+   </SafeAreaView>);
 }
 ```
 
