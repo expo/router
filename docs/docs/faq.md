@@ -11,7 +11,7 @@ Discuss them with us on [GitHub](https://github.com/expo/router/discussions).
 
 ## Expo Router vs. Expo vs. React Native CLI
 
-Expo Router is akin to modern web frameworks like Next.js or Remix, whereas default Expo/React Native projects are more closely related to default React projects built with Create React App.
+Expo Router is akin to modern web frameworks like SvelteKit, Next.js or Remix, whereas default Expo/React Native projects are more closely related to default React projects built with Create React App.
 
 After this framework has been proven at scale and we have had time to collect and implement community feedback then we will consider moving this framework into the `expo` default offering. If this happens then `expo-router` will become `expo/router` and the entire process will be even easier to use.
 
@@ -42,8 +42,4 @@ Expo's routing API is designed to be universal for iOS, Android, and web but our
 
 ## How do I server-render my Expo Router website?
 
-This functionality is not currently offered. Web support is secondary to our native offering and serves to help test and debug the native implementation. We recommend using Next.js or Remix for server-rendered websites that compliment your native app.
-
-## How do I use Expo Router with Next.js?
-
-The Expo routing API is similar to Next's router but they aren't interchangeable. We recommend setting up a monorepo with a Next.js app and a React Native app. You can then export universal React Native components from the respective file paths in both projects to obtain the optimal behavior for both systems.
+This functionality is not currently offered. Web support is secondary to our native offering and serves to help test and debug the native implementation. We recommend using SvelteKit, Next.js, or Remix for server-rendered websites that compliment your native app.

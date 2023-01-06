@@ -7,7 +7,7 @@ slug: /
 
 :::warning Beta Release
 
-Expo Router is in the earliest stage of development. The API is subject to breaking changes. The documentation is incomplete and may be inaccurate. The project is not yet ready for production use. Please [contribute to the discussion](https://github.com/expo/router/discussions/1) if you have any ideas or suggestions on how we can improve the convention.
+Expo Router is in the earliest stage of development. The API is subject to breaking changes. The documentation is incomplete and may be inaccurate. The project is not yet ready for production use. Please [contribute to the discussion](https://github.com/expo/router/discussions) if you have any ideas or suggestions on how we can improve the convention.
 
 :::
 
@@ -146,5 +146,7 @@ Create files in the `app` directory and they will be automatically added to the 
 
 ## Next Steps
 
+- [Routing](/docs/features/routing).
+- [Linking](/docs/features/linking).
 - [Guides](/router/docs/guides/).
-- [Features and conventions](/docs/category/features).
+- [Migrating from React Navigation](/docs/migration/react-navigation).
