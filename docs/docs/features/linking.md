@@ -101,7 +101,7 @@ The navigation prop is useful for layout-specific functionality like `navigation
 
 You can immediately redirect from a particular screen by using the `Redirect` component:
 
-```tsx
+```js
 import { Redirect } from "expo-router";
 
 export default function Page() {
