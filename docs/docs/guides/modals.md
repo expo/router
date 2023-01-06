@@ -74,7 +74,7 @@ export default function Modal({ navigation }) {
       {!isPresented && <Link href="../">Dismiss</Link>}
 
       {/* Native modals have dark backgrounds on iOS, set the status bar to light content. */}
-      <StatusBar barStyle="light-content" />
+      <StatusBar style="light" />
     </View>
   );
 }
