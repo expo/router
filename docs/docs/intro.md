@@ -1,6 +1,6 @@
 ---
 title: Introduction
-description: File System-based Routing for React Native apps
+description: File-based Routing for React Native apps
 sidebar_position: 1
 slug: /
 ---

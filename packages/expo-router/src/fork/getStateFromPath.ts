@@ -146,7 +146,7 @@ function assertConfigDuplicates(configs: RouteConfig[]) {
 
       if (!intersects) {
         // NOTE(EvanBacon): Adds more context to the error message since we know about the
-        // file system-based routing.
+        // file-based routing.
         const last = config.pattern.split("/").pop();
         const routeType = last?.startsWith(":")
           ? "dynamic route"

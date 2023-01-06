@@ -7,7 +7,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Expo Router",
-  tagline: "File System-based Routing for React Native apps",
+  tagline: "File-based Routing for React Native apps",
   url: "https://expo.github.io",
   baseUrl: "/router/",
   onBrokenLinks: "throw",

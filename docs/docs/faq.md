@@ -24,9 +24,9 @@ Yes, all of Expo's tools and services can be used with any React Native project.
 ## What are the benefits of file based routing?
 
 1. The file system is a well-known and well-understood concept. The simpler mental model makes it easier to onboard new team members, and scale your application.
-2. The fastest way to onboard new users is by having them open a universal link which opens the app or website to the correct screen depending on if they have the app installed or not. This technique is so advanced that it's usually only available to large companies that can afford to make and maintain the parity between platforms. But with Expo's file system-based routing you can have this feature out of the box!
+2. The fastest way to onboard new users is by having them open a universal link which opens the app or website to the correct screen depending on if they have the app installed or not. This technique is so advanced that it's usually only available to large companies that can afford to make and maintain the parity between platforms. But with Expo's file-based routing you can have this feature out of the box!
 3. Refactoring is easier to do because you can move files around without having to update any imports or routing components.
-4. When using React Navigation manually, you have to define the routes and the linking config, this can be error-prone and tedious. It's also extremely difficult to validate that all of your routes work. With a file system based router, you can automatically generate the routes and linking config, and know that all of your routes **Just Work™**.
+4. When using React Navigation manually, you have to define the routes and the linking config, this can be error-prone and tedious. It's also extremely difficult to validate that all of your routes work. With a file-based router, you can automatically generate the routes and linking config, and know that all of your routes **Just Work™**.
 5. **Expo CLI** can infer a lot of information about your application when it follows a known convention. For example, we could implement automatic bundle splitting per route, or automatically generate a sitemap for your website. This is not possible when your app only has a single entry point.
 6. Files can export settings per route, like rendering pattern, or which pages can be universally linking between web and mobile.
 
