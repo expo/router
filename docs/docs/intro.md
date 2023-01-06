@@ -103,8 +103,8 @@ If you use npm, this requires npm 8.3.0 or higher. You can install this with `np
 ```json title=package.json
 {
   "overrides": {
-    "metro": "0.73.3",
-    "metro-resolver": "0.73.3"
+    "metro": "0.73.1",
+    "metro-resolver": "0.73.1"
   }
 }
 ```
@@ -123,8 +123,6 @@ module.exports = function (api) {
   };
 };
 ```
-
-> Additional setup is required for the Drawer navigator. See [the Drawer documentation](/router/docs/guides/drawer) for more information.
 
 ## Troubleshooting
 

@@ -73,7 +73,7 @@ Avoid using this pattern in favor of deep linking (e.g. user opens your app to `
 
 Use the [`usePathname()`](/docs/features/linking#usepathname), [`useSegments()`](/docs/features/linking#usesegments), and [`useSearchParams()`](/docs/features/linking#useSearchParams) hooks to identify the current route state. Use in conjunction with `useEffect(() => {}, [...])` to observe changes.
 
-- If you're attempting to track screen changes, follow the [Screen Tracking guide](/docs/guides/screen-tracking).
+- If you're attempting to track screen changes, follow the [Screen Tracking guide](/docs/migration/react-navigation/screen-tracking).
 - React Navigation recommends avoiding [`onStateChange`](https://reactnavigation.org/docs/navigation-container/#onstatechange).
 
 <!-- - If you need to see when the root navigation state changes (discouraged as the state format can change between versions), use the `RootContainer.useState()` hook instead.
@@ -100,7 +100,7 @@ The [`fallback`](https://reactnavigation.org/docs/navigation-container/#fallback
 
 ### `theme`
 
-Use the `<ThemeProvider />` component instead. Learn more in the [Themes guide](/docs/guides/themes).
+Use the `<ThemeProvider />` component instead. Learn more in the [Themes guide](/docs/migration/react-navigation/themes).
 
 ### `children`
 
@@ -114,7 +114,7 @@ Expo Router does not support [`independent`](https://reactnavigation.org/docs/na
 
 <!-- TODO: Replace this with an auto ssg / Expo Head component -->
 
-This property is not yet supported in Expo Router. Set the web page title using [screen options](/docs/docs/features/options.md).
+This property is not yet supported in Expo Router. Set the web page title using [screen options](/docs/migration/react-navigation/screen.md).
 
 ### `ref`
 
