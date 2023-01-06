@@ -7,14 +7,15 @@ The file-based routing convention enables developers to structure their app in a
 
 The convention is based on the concept of nesting routes inside each other to create shared UI elements like tab bars and headers across multiple children. This format should feel familiar to React developers.
 
-File-based routing enables URLs for every page in your app. Routes are created by defining files in the `app/` directory. The file path is the route path.
+File-based routing enables URLs for every page in your app. All routes must be created within the root `app/` directory. Within this directory, you can create routes by defining files using the route name.
 
-- `app/` -- All routes are defined in the `app/` directory.
-- `app/home.js` -- Matches `/home` in your app and in the browser.
+- `app/home.js` matches `/home`.
+- `app/settings/index.js` matches `/settings`.
+- `app/[user].js` matches any unmatched path like `/evanbacon` or `/expo`.
 
 ## Pages
 
-Pages are defined as files in the `app/` directory that export a React component as _default_. The file path is the route path.
+Pages are defined by exporting a React component as the default value from a file in the app directory.
 
 ```js title="app/home.js"
 import { Text } from "react-native";
@@ -24,9 +25,9 @@ export default function Home() {
 }
 ```
 
-- Pages named `index` add no path segment to the URL. For example, `app/index.js` matches `/` in your app and in the browser.
-- You can use extensions: `js`, `jsx`, `ts`, `tsx`. In a future iteration we will add support for any extension in the Metro config [`resolver.sourceExts`](https://facebook.github.io/metro/docs/configuration#sourceexts).
-- Platform extensions like `.ios.js` or `.native.ts` are not currently supported in the `app/` directory.
+- Files named `index` add no path segment to the URL. For example, `app/index.js` matches `/`.
+- The following extensions are supported by default: `js`, `jsx`, `ts`, `tsx`.
+- Metro platform extensions (e.g. `.ios.js`, `.native.ts`) are not currently supported.
 
 ## Dynamic Routes
 
@@ -75,7 +76,7 @@ export default function HomeLayout() {
 
 ### Native Layouts
 
-Mobile app users expect a certain look and feel for layouts that are hard to replicate (e.g. stacks). Expo Router provides a few drop-in native layouts that you can use to easily achieve familiar native behavior.
+Mobile app users expect a refined platform-specific look and native feel for layouts. Expo Router provides a few drop-in native layouts that you can use to easily achieve familiar native behavior.
 
 - `Stack` - Render a stack of screens like a deck of cards with a header on top. This is a native stack navigator that uses native animations and gestures. Extends the library [`@react-navigation/native-stack`](https://reactnavigation.org/docs/native-stack-navigator).
 - `Tabs` - Render screens with a tab bar below. [`@react-navigation/bottom-tabs`](https://reactnavigation.org/docs/bottom-tab-navigator/).
@@ -90,6 +91,47 @@ export default function HomeLayout() {
 }
 ```
 
+### Layout Settings
+
+> Unstable: This feature will be replaced with something that supports React Suspense in the future.
+
+To support defining the `initialRouteName` you can use the `unstable_settings` object export from any Layout Route.
+
+```bash title="File System"
+app/
+  _layout.js
+  index.js
+  other.js
+```
+
+```js title=app/_layout.tsx
+import { Stack } from "expo-router";
+
+export const unstable_settings = {
+  // Ensure any route can link back to `/`
+  initialRouteName: "index",
+};
+
+export default function Layout() {
+  return <Stack />;
+}
+```
+
+Now deep linking directly to `/other` or reloading the page will continue to show the back arrow.
+
+When using [array syntax](#arrays) `(foo,bar)` you can specify the name of a group in the `unstable_settings` object to target a particular segment.
+
+```js
+export const unstable_settings = {
+  // Used for `(foo)`
+  initialRouteName: "first",
+  // Used for `(bar)`
+  bar: {
+    initialRouteName: "second",
+  },
+};
+```
+
 ## Groups
 
 <!-- > Also known as _optional routes_. -->
@@ -101,7 +143,7 @@ You can prevent a segment from showing in the URL by using the group syntax `()`
 
 This is useful for adding layouts without adding additional segments to the URL.
 
-## Shared Routes
+### Shared Routes
 
 To match the same URL with different layouts, use _groups_ with overlapping child routes.
 
@@ -127,7 +169,7 @@ Shared routes can be navigated to directly by including the group name in the ro
 
 <!-- TODO: optional group syntax `(())` -->
 
-## Arrays
+### Arrays
 
 Instead of defining the same route multiple times with different layouts, use the array syntax `(,)` to duplicate the children of a group.
 
@@ -143,46 +185,4 @@ export default function DynamicLayout({ segment }) {
 
   return <Stack />;
 }
-```
-
-## Layout Settings
-
-> This feature will be replaced with something that supports React Suspense in the future.
-
-To support defining the `initialRouteName` you can use the `unstable_settings` object export from any Layout Route.
-
-```bash title="File System"
-app/
-  (app)/
-    _layout.js
-    index.js
-    other.js
-```
-
-```js title=app/(app)/_layout.tsx
-import { Stack } from "expo-router";
-
-export const unstable_settings = {
-  // Ensure any route can link back to `/`
-  initialRouteName: "index",
-};
-
-export default function Layout() {
-  return <Stack />;
-}
-```
-
-Now deep linking directly to `/other` or reloading the page will continue to show the back arrow.
-
-When using array syntax `(foo,bar)` you can specify the name of a group in the `unstable_settings` object to target a particular segment.
-
-```js
-export const unstable_settings = {
-  // Used for `(foo)`
-  initialRouteName: "first",
-  // Used for `(bar)`
-  bar: {
-    initialRouteName: "second",
-  },
-};
 ```
