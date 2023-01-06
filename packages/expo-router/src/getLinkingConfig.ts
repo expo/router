@@ -68,7 +68,7 @@ function convertRouteNodeToScreen(node: RouteNode): Screen {
     // to be loaded into memory. We should move towards a system where
     // the initial route name is either loaded asynchronously in the Layout Route
     // or defined via a file system convention.
-    initialRouteName: node.loadRoute?.().unstable_settings?.initialRouteName,
+    initialRouteName: node.initialRouteName,
   };
 }
 

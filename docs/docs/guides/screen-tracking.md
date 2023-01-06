@@ -15,15 +15,16 @@ app/
 
 ```js title=app/_layout.js
 import { useEffect } from "react";
-import { useHref, Children } from "expo-router";
+import { usePathname, useSearchParams, Children } from "expo-router";
 
 export default function Layout() {
-  const location = useHref();
+  const pathname = usePathname();
+  const params = useSearchParams();
 
   // Track the location in your analytics provider here.
   useEffect(() => {
-    analytics.track(location);
-  }, [location]);
+    analytics.track({ pathname, params });
+  }, [pathname, params]);
 
   // Export all the children routes in the most basic way.
   return <Children />;
