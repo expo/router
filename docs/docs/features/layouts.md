@@ -79,50 +79,6 @@ export default Tabs;
 
 > `@react-navigation/stack` is not supported by default, you can use it by creating a custom layout.
 
-## Custom
-
-Custom layouts have an internal context that is ignored when using the `<Children />` component without a `<Layout />` component wrapping it.
-
-```tsx
-import { View } from "react-native";
-import { TabRouter } from "@react-navigation/native";
-
-import { Layout, useHref, Children, Link } from "expo-router";
-
-export default function App() {
-  return (
-    // highlight-next-line
-    <Layout router={TabRouter}>
-      <Header />
-      <Children />
-    </Layout>
-  );
-}
-
-function Header() {
-  const { navigation, state, descriptors, router } = Layout.useContext();
-
-  const { pathname } = useHref();
-
-  return (
-    <View>
-      <Link href="/">Home</Link>
-      <Link
-        href="/profile"
-        // Use `pathname` to determine if the link is active.
-        // highlight-next-line
-        style={[pathname === "/profile" && { color: "blue" }]}
-      >
-        Profile
-      </Link>
-      <Link href="/settings">Settings</Link>
-    </View>
-  );
-}
-```
-
-> In `expo-router`, you currently need all layout routes to be a navigator. This is because we don't have a way to render a route without a parent navigator.
-
 ## Converting Navigators to Layouts
 
 You can make a React Navigation navigator into a layout by using the `withLayoutContext` function. Consider this example which makes a drawer navigator from `@react-navigation/drawer` into a layout:

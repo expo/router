@@ -91,3 +91,23 @@ export default function Page() {
   );
 }
 ```
+
+## Props
+
+Migrate the following props from React Navigation Screen:
+
+### `component`
+
+Expo Router automatically sets the component based on the file convention. This prop is not used.
+
+### `children`
+
+Expo Router does not support the `children` prop. Use query parameters and React Context to pass data to the route component.
+
+### `name`
+
+This is similar to the `name` prop in React Navigation, but it can only be used when the `Screen` is a child of a layout component. The name can also be used with a relative path to access a parent layout's options when not used as the child of a layout.
+
+### `getId`
+
+By default, Expo Router automatically generates the ID based on the query parameters of a dynamic route. This value can be customized by using as-is in Expo Router.
