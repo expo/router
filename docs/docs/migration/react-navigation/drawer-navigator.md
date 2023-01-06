@@ -34,24 +34,6 @@ export const Drawer = withLayoutContext<
 >(Navigator);
 ```
 
-<details>
-  <summary>JavaScript</summary>
-  
-    ```js title=./Drawer.tsx
-    import {
-    createDrawerNavigator,
-    } from "@react-navigation/drawer";
-
-    import { withLayoutContext } from "expo-router";
-
-    const { Navigator } = createDrawerNavigator();
-
-    export const Drawer = withLayoutContext(Navigator);
-
-    ```
-
-</details>
-
 ## Usage
 
 ```js title=app/_layout.js

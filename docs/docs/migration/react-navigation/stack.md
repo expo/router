@@ -31,24 +31,6 @@ export const CustomStack = withLayoutContext<
 >(Navigator);
 ```
 
-<details>
-  <summary>JavaScript</summary>
-  
-    ```js title=./CustomStack.tsx
-    import {
-      createStackNavigator,
-    } from "@react-navigation/drawer";
-
-    import { withLayoutContext } from "expo-router";
-
-    const { Navigator } = createStackNavigator();
-
-    export const CustomStack = withLayoutContext(Navigator);
-
-    ```
-
-</details>
-
 ## Usage
 
 ```js title=app/_layout.js
