@@ -122,7 +122,8 @@ function getNormalizedStatePath(
   const [pathname, querystring] = statePath.split("?");
 
   return {
-    segments: pathname.split("/"),
+    // Strip empty path at the start
+    segments: pathname.split("/").filter(Boolean),
     // TODO: This is not efficient, we should generate based on the state instead
     // of converting to string then back to object
     params: new URLSearchParams(querystring),
