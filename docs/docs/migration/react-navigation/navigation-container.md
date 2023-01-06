@@ -1,5 +1,6 @@
 ---
 title: Navigation Container
+sidebar_position: 2
 ---
 
 The global React Navigation [`<NavigationContainer />`](https://reactnavigation.org/docs/navigation-container/) is completely managed by Expo Router. Expo Router provides systems for achieving the same functionality as the `NavigationContainer` without needing to use it directly.

@@ -1,5 +1,6 @@
 ---
 title: Link
+sidebar_position: 1
 ---
 
 The Expo Router `Link` component is a wrapper around the React Navigation `Link` component. It is used to navigate to a route using a declarative API.

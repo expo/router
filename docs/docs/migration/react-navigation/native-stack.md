@@ -1,5 +1,6 @@
 ---
 title: Native Stack
+sidebar_position: 3
 ---
 
 The `Stack` Layout in Expo Router wraps the [Native Stack Navigator](https://reactnavigation.org/docs/native-stack-navigator) from React Navigation, not to be confused with the legacy [JS Stack Navigator](https://reactnavigation.org/docs/stack-navigator).

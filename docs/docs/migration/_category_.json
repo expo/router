@@ -1,8 +1,9 @@
 {
   "label": "Migration",
   "position": 4,
+  "collapsible": false,
   "link": {
-    "type": "generated-index",
-    "description": "Migrating to Expo router."
+    "type": "doc",
+    "id": "docs/category/react-navigation"
   }
 }

@@ -1,5 +1,5 @@
 ---
-title: Error handling
+title: Errors
 sidebar_position: 4
 ---
 
