@@ -1,9 +1,5 @@
 {
   "label": "Migration",
   "position": 4,
-  "collapsible": false,
-  "link": {
-    "type": "doc",
-    "id": "docs/category/react-navigation"
-  }
+  "collapsible": false
 }

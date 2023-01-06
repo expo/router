@@ -94,7 +94,7 @@ const config = {
 
         items: [
           {
-            to: "/docs/category/features",
+            to: "/docs/features/routing",
             label: "Features",
             position: "left",
           },
@@ -117,7 +117,7 @@ const config = {
               },
               {
                 label: "Features",
-                to: "/docs/category/features",
+                to: "/docs/features/routing",
               },
               {
                 label: "Guides",
@@ -148,6 +148,10 @@ const config = {
               {
                 label: "Work with us at Expo",
                 href: "https://expo.dev/careers",
+              },
+              {
+                label: "Source code",
+                href: "https://github.com/expo/router",
               },
             ],
           },
