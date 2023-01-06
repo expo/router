@@ -1,5 +1,4 @@
 import React from "react";
-import { URLSearchParams } from "url";
 
 import { RootContainer } from "./ContextNavigationContainer";
 import getPathFromState, { State } from "./fork/getPathFromState";
@@ -16,8 +15,11 @@ function getRouteInfoFromState(
   getPathFromState: (state: State, asPath: boolean) => string,
   state: State
 ): UrlObject {
+  const path = getPathFromState(state, false);
+
   return {
-    pathname: getPathFromState(state, false),
+    pathname: path.split("?")["0"],
+    //  TODO: This sometimes returns: `params=[object Object]&screen=XX&path=XX&initial=true`
     ...getNormalizedStatePath(getPathFromState(state, true)),
   };
 }
