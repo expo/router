@@ -139,11 +139,12 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
   const loaded = node.loadRoute();
 
   if (loaded.unstable_settings) {
-    // Allow unstable_settings={ initialRouteName: '...' } to override the default initial route name.
-    const definedInitialRouteName = loaded.unstable_settings.initialRouteName;
     // Allow unstable_settings={ 'custom': { initialRouteName: '...' } } to override the less specific initial route name.
     const groupSpecificInitialRouteName =
       loaded.unstable_settings?.[fragmentName]?.initialRouteName;
+
+    // Allow unstable_settings={ initialRouteName: '...' } to override the default initial route name.
+    const definedInitialRouteName = loaded.unstable_settings.initialRouteName;
 
     initialRouteName =
       groupSpecificInitialRouteName ??
