@@ -50,6 +50,8 @@ import { Stack } from "expo-router";
 
 Use `Link` from `expo-router` as this provides child context.
 
+Migrate from `useNavigation()` to `useRouter()` for navigating between screens.
+
 ### Screen Options
 
 > Think of this component like a `<head />` component from web frameworks.
