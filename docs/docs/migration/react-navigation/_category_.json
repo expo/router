@@ -1,0 +1,8 @@
+{
+  "label": "Migrating from React Navigation",
+  "position": 1,
+  "link": {
+    "type": "generated-index",
+    "description": "Converting React Navigation concepts to Expo Router."
+  }
+}
