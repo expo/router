@@ -5,12 +5,21 @@ import { useLinkToPath } from "./useLinkToPath";
 import { useLoadedNavigation } from "./useLoadedNavigation";
 
 // Wraps useLinkTo to provide an API which is similar to the Link component.
-export function useLink(): {
+export function useLink() {
+  console.warn("`useLink()` is deprecated in favor of `useRouter()`");
+  return useRouter();
+}
+
+type Router = {
+  /** Navigate to the provided href. */
   push: (href: Href) => void;
+  /** Navigate to route without appending to the history. */
   replace: (href: Href) => void;
+  /** Go back in the history. */
   back: () => void;
-  parse: typeof resolveHref;
-} {
+};
+
+export function useRouter(): Router {
   const pending = useLoadedNavigation();
   const linkTo = useLinkToPath();
 
@@ -33,7 +42,6 @@ export function useLink(): {
     push,
     back,
     replace,
-    parse: resolveHref,
     // TODO(EvanBacon): add `reload`
     // TODO(EvanBacon): add `canGoBack` but maybe more like a `hasContext`
   };

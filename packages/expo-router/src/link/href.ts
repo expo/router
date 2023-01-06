@@ -5,8 +5,6 @@ export type HrefObject = {
   pathname?: string;
   /** Query parameters for the path. */
   params?: Record<string, any>;
-  /** @deprecated use `params` instead. */
-  query?: Record<string, any>;
 };
 
 /** Resolve an href object into a fully qualified, relative href. */
