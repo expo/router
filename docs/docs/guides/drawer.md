@@ -27,7 +27,7 @@ module.exports = {
 Now you can use the `Drawer` layout to create a drawer navigator:
 
 ```js
-import Drawer from "expo-router/drawer";
+import { Drawer } from "expo-router/drawer";
 
 export default function Layout() {
   return <Drawer />;
