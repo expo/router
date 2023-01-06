@@ -148,5 +148,5 @@ Create files in the `app` directory and they will be automatically added to the 
 
 - [Routing](/docs/features/routing).
 - [Linking](/docs/features/linking).
-- [Guides](/router/docs/guides/).
-- [Migrating from React Navigation](/docs/migration/react-navigation).
+- [Guides](/docs/category/guides).
+- [Migrating from React Navigation](/docs/category/react-navigation).
