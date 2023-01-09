@@ -2,10 +2,10 @@
 // `to` / `action` support removed.
 import { Text, TextProps } from "@bacons/react-views";
 import { Slot } from "@radix-ui/react-slot";
-import { useFocusEffect } from "@react-navigation/native";
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
+import { useFocusEffect } from "../useFocusEffect";
 import { Href, resolveHref } from "./href";
 import useLinkToPathProps from "./useLinkToPathProps";
 import { useRouter } from "./useRouter";

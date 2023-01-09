@@ -19,4 +19,4 @@ export * as Linking from "./link/linking";
 // React Navigation
 export { useNavigation } from "./useNavigation";
 export { RootContainer } from "./ContextNavigationContainer";
-export { useFocusEffect } from "@react-navigation/native";
+export { useFocusEffect } from "./useFocusEffect";
