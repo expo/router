@@ -188,6 +188,19 @@ function treeNodeToRouteNode({
       ? fragmentName!.split(",").map((v) => ({ name: v.trim() }))
       : null;
 
+    // Assert duplicates:
+    if (clones) {
+      const names = new Set<string>();
+      for (const clone of clones) {
+        if (names.has(clone.name)) {
+          throw new Error(
+            `Array syntax cannot contain duplicate group name "${clone.name}" in "${node.contextKey}".`
+          );
+        }
+        names.add(clone.name);
+      }
+    }
+
     const output = {
       loadRoute: node.loadRoute,
       route: name,
