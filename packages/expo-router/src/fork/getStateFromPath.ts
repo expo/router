@@ -13,8 +13,8 @@ import * as queryString from "query-string";
 
 import {
   matchDeepDynamicRouteName,
-  matchFragmentName,
-  stripFragmentSegmentsFromPath,
+  matchGroupName,
+  stripGroupSegmentsFromPath,
 } from "../matchers";
 
 type Options<ParamList extends object> = {
@@ -199,15 +199,15 @@ function sortConfigs(a: RouteConfig, b: RouteConfig): number {
   // This is so we can compare the length of the pattern, e.g. `foo/*` > `foo` vs `*` < ``.
   const aParts = a.pattern
     .split("/")
-    // Strip out fragment names to ensure they don't affect the priority.
-    .filter((part) => matchFragmentName(part) == null);
+    // Strip out group names to ensure they don't affect the priority.
+    .filter((part) => matchGroupName(part) == null);
   if (a.screen === "index") {
     aParts.push("index");
   }
 
   const bParts = b.pattern
     .split("/")
-    .filter((part) => matchFragmentName(part) == null);
+    .filter((part) => matchGroupName(part) == null);
   if (b.screen === "index") {
     bParts.push("index");
   }
@@ -366,7 +366,7 @@ function matchAgainstConfigs(
         }
         return Object.assign(acc, {
           // The param segments appear every second item starting from 2 in the regex match result.
-          // This will only work if we ensure fragments aren't included in the match.
+          // This will only work if we ensure groups aren't included in the match.
           [p]: match![(i + 1) * 2]?.replace(/\//, ""),
         });
       }, {});
@@ -539,11 +539,11 @@ function formatRegexPattern(it: string): string {
   // Allow spaces in file path names.
   it = it.replace(" ", "%20");
 
-  // Strip fragments from the matcher
-  if (matchFragmentName(it) != null) {
-    // Fragments are optional segments
+  // Strip groups from the matcher
+  if (matchGroupName(it) != null) {
+    // Groups are optional segments
     // this enables us to match `/bar` and `/(foo)/bar` for the same route
-    // NOTE(EvanBacon): Ignore this match in the regex to avoid capturing the fragment
+    // NOTE(EvanBacon): Ignore this match in the regex to avoid capturing the group
     return `(?:${escape(it)}\\/)?`;
   }
 
@@ -683,8 +683,8 @@ const createNestedStateObject = (
   }
 
   route = findFocusedRoute(state) as ParsedRoute;
-  // Remove fragments from the path while preserving a trailing slash.
-  route.path = stripFragmentSegmentsFromPath(path);
+  // Remove groups from the path while preserving a trailing slash.
+  route.path = stripGroupSegmentsFromPath(path);
 
   const params = parseQueryParams(
     route.path,

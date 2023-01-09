@@ -1,7 +1,7 @@
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
-import { stripFragmentSegmentsFromPath } from "../matchers";
+import { stripGroupSegmentsFromPath } from "../matchers";
 import { useLinkToPath } from "./useLinkToPath";
 
 export default function useLinkToPathProps(props: {
@@ -36,7 +36,7 @@ export default function useLinkToPathProps(props: {
   };
 
   return {
-    href: stripFragmentSegmentsFromPath(props.href),
+    href: stripGroupSegmentsFromPath(props.href),
     accessibilityRole: "link" as const,
     onPress,
   };

@@ -3,8 +3,8 @@ import {
   getNameFromFilePath,
   matchDeepDynamicRouteName,
   matchDynamicName,
-  matchFragmentName,
-  stripFragmentSegmentsFromPath,
+  matchGroupName,
+  stripGroupSegmentsFromPath,
 } from "./matchers";
 import { RequireContext } from "./types";
 import { DefaultLayout } from "./views/Layout";
@@ -110,11 +110,11 @@ export function generateDynamic(name: string): RouteNode["dynamic"] {
 }
 
 function collapseRouteSegments(route: string) {
-  return stripFragmentSegmentsFromPath(route.replace(/\/index$/, ""));
+  return stripGroupSegmentsFromPath(route.replace(/\/index$/, ""));
 }
 
 /**
- * Given a route node and a name representing the fragment name,
+ * Given a route node and a name representing the group name,
  * find the nearest child matching the name.
  *
  * Doesn't support slashes in the name.
@@ -128,20 +128,20 @@ function getDefaultInitialRoute(node: RouteNode, name: string) {
 }
 
 function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
-  const fragmentName = matchFragmentName(node.route);
-  if (!node.children || !fragmentName) {
+  const groupName = matchGroupName(node.route);
+  if (!node.children || !groupName) {
     return node;
   }
 
-  // Guess at the initial route based on the fragment name.
-  // TODO(EvanBacon): Perhaps we should attempt to warn when the fragment doesn't match any child routes.
-  let initialRouteName = getDefaultInitialRoute(node, fragmentName)?.route;
+  // Guess at the initial route based on the group name.
+  // TODO(EvanBacon): Perhaps we should attempt to warn when the group doesn't match any child routes.
+  let initialRouteName = getDefaultInitialRoute(node, groupName)?.route;
   const loaded = node.loadRoute();
 
   if (loaded.unstable_settings) {
     // Allow unstable_settings={ 'custom': { initialRouteName: '...' } } to override the less specific initial route name.
     const groupSpecificInitialRouteName =
-      loaded.unstable_settings?.[fragmentName]?.initialRouteName;
+      loaded.unstable_settings?.[groupName]?.initialRouteName;
 
     // Allow unstable_settings={ initialRouteName: '...' } to override the default initial route name.
     const definedInitialRouteName = loaded.unstable_settings.initialRouteName;
@@ -158,17 +158,17 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
   };
 }
 
-function cloneFragmentRoute(
+function cloneGroupRoute(
   node: RouteNode,
   { name: nextName }: { name: string }
 ): RouteNode {
-  const fragmentName = `(${nextName})`;
+  const groupName = `(${nextName})`;
   const parts = node.contextKey.split("/");
-  parts[parts.length - 2] = fragmentName;
+  parts[parts.length - 2] = groupName;
 
   return {
     ...node,
-    route: fragmentName,
+    route: groupName,
     contextKey: parts.join("/"),
   };
 }
@@ -181,11 +181,11 @@ function treeNodeToRouteNode({
   const dynamic = generateDynamic(name);
 
   if (node) {
-    const fragmentName = matchFragmentName(name);
-    const multiFragment = fragmentName?.includes(",");
+    const groupName = matchGroupName(name);
+    const multiGroup = groupName?.includes(",");
 
-    const clones = multiFragment
-      ? fragmentName!.split(",").map((v) => ({ name: v.trim() }))
+    const clones = multiGroup
+      ? groupName!.split(",").map((v) => ({ name: v.trim() }))
       : null;
 
     // Assert duplicates:
@@ -211,7 +211,7 @@ function treeNodeToRouteNode({
 
     if (Array.isArray(clones)) {
       return clones.map((clone) =>
-        applyDefaultInitialRouteName(cloneFragmentRoute({ ...output }, clone))
+        applyDefaultInitialRouteName(cloneGroupRoute({ ...output }, clone))
       );
     }
 
@@ -380,8 +380,8 @@ export function getUserDefinedDeepDynamicRoute(
     if (isDeepDynamic) {
       return route;
     }
-    // Recurse through fragment routes
-    if (matchFragmentName(route.route)) {
+    // Recurse through group routes
+    if (matchGroupName(route.route)) {
       const child = getUserDefinedDeepDynamicRoute(route);
       if (child) {
         return child;

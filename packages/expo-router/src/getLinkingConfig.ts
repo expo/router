@@ -22,7 +22,7 @@ type Screen =
 // `[page]` -> `:page`
 // `page` -> `page`
 function convertDynamicRouteToReactNavigation(segment: string): string {
-  // NOTE(EvanBacon): To support shared routes we preserve fragment segments.
+  // NOTE(EvanBacon): To support shared routes we preserve group segments.
   if (segment === "index") {
     return "";
   }
@@ -48,7 +48,7 @@ function parseRouteSegments(segments: string): string {
       .split("/")
       // Convert each segment to a React Navigation format.
       .map(convertDynamicRouteToReactNavigation)
-      // Remove any empty paths from fragments or index routes.
+      // Remove any empty paths from groups or index routes.
       .filter(Boolean)
       // Join to return as a path.
       .join("/")
