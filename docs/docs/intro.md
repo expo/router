@@ -85,15 +85,15 @@ The following beta setup steps are required for now, but will not be necessary w
 
 ### Override the Metro version
 
-Ensure you're using at least `metro@0.73.1` by setting a Yarn resolution or npm override (this step goes away in Expo SDK 47).
+Ensure you're using at least `metro@0.73.7` by setting a Yarn resolution or npm override (this step goes away in Expo SDK 47).
 
 If you use Yarn:
 
 ```json title=package.json
 {
   "resolutions": {
-    "metro": "0.73.1",
-    "metro-resolver": "0.73.1"
+    "metro": "0.73.7",
+    "metro-resolver": "0.73.7"
   }
 }
 ```
@@ -103,8 +103,8 @@ If you use npm, this requires npm 8.3.0 or higher. You can install this with `np
 ```json title=package.json
 {
   "overrides": {
-    "metro": "0.73.1",
-    "metro-resolver": "0.73.1"
+    "metro": "0.73.7",
+    "metro-resolver": "0.73.7"
   }
 }
 ```
