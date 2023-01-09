@@ -1,6 +1,5 @@
 // A fork of `useFocusEffect` that waits for the navigation state to load before
 // running the effect. This is especially useful for native redirects.
-import { NavigationProp } from "@react-navigation/native";
 import * as React from "react";
 
 import { useOptionalNavigation } from "./link/useLoadedNavigation";
@@ -14,10 +13,13 @@ type EffectCallback = () => undefined | void | (() => void);
  *
  * @param callback Memoized callback containing the effect, should optionally return a cleanup function.
  */
-export function useFocusEffect(effect: EffectCallback) {
+export function useFocusEffect(
+  effect: EffectCallback,
+  do_not_pass_a_second_prop?: any
+) {
   const navigation = useOptionalNavigation();
 
-  if (arguments[1] !== undefined) {
+  if (do_not_pass_a_second_prop !== undefined) {
     const message =
       "You passed a second argument to 'useFocusEffect', but it only accepts one argument. " +
       "If you want to pass a dependency array, you can use 'React.useCallback':\n\n" +
