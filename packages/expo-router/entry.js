@@ -1,3 +1,4 @@
+import "@expo/metro-runtime";
 import { withErrorOverlay } from "@expo/metro-runtime/error-overlay";
 import { registerRootComponent } from "expo";
 import { ExpoRoot, SplashScreen } from "expo-router";
