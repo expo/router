@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[1514],{7810:(e,r,t)=>{t.r(r),t.d(r,{default:()=>c});var s=t(7294),u=t(6775);function c(){return s.createElement(u.l_,{to:"/router/docs/features/routing#shared-routes"})}}}]);
