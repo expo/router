@@ -108,7 +108,7 @@ function useGetPathFromState() {
         ...linking.config,
         // @ts-expect-error
         preserveDynamicRoutes: asPath,
-        preserveFragments: asPath,
+        preserveGroups: asPath,
       });
     },
     [linking]

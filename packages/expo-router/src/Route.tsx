@@ -1,7 +1,7 @@
 import React, { ReactNode, useContext } from "react";
 
 import { RootRouteNodeContext } from "./context";
-import { getNameFromFilePath, matchFragmentName } from "./matchers";
+import { getNameFromFilePath, matchGroupName } from "./matchers";
 
 /** The list of input keys will become optional, everything else will remain the same. */
 export type PickPartial<T, K extends keyof T> = Omit<T, K> &
@@ -121,8 +121,8 @@ export function sortRoutes(a: RouteNode, b: RouteNode): number {
     return 0;
   }
 
-  const aIndex = a.route === "index" || matchFragmentName(a.route) != null;
-  const bIndex = b.route === "index" || matchFragmentName(b.route) != null;
+  const aIndex = a.route === "index" || matchGroupName(a.route) != null;
+  const bIndex = b.route === "index" || matchGroupName(b.route) != null;
 
   if (aIndex && !bIndex) {
     return -1;

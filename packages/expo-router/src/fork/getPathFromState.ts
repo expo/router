@@ -13,7 +13,7 @@ import * as queryString from "query-string";
 import {
   matchDeepDynamicRouteName,
   matchDynamicName,
-  matchFragmentName,
+  matchGroupName,
 } from "../matchers";
 
 type Options<ParamList extends object> = {
@@ -31,7 +31,7 @@ type ConfigItem = {
   pattern?: string;
   stringify?: StringifyConfig;
   screens?: Record<string, ConfigItem>;
-  // Used as fallback for fragments
+  // Used as fallback for groups
   initialRouteName?: string;
 };
 
@@ -78,7 +78,7 @@ function segmentMatchesConvention(segment: string): boolean {
   return (
     segment === "index" ||
     matchDynamicName(segment) != null ||
-    matchFragmentName(segment) != null ||
+    matchGroupName(segment) != null ||
     matchDeepDynamicRouteName(segment) != null
   );
 }
@@ -120,7 +120,7 @@ export default function getPathFromState<ParamList extends object>(
   state: State,
   // @ts-expect-error: non-standard options
   _options?: Options<ParamList> & {
-    preserveFragments?: boolean;
+    preserveGroups?: boolean;
     preserveDynamicRoutes?: boolean;
   } = {}
 ): string {
@@ -130,7 +130,7 @@ export default function getPathFromState<ParamList extends object>(
     );
   }
 
-  const { preserveFragments, preserveDynamicRoutes, ...options } = _options;
+  const { preserveGroups, preserveDynamicRoutes, ...options } = _options;
 
   if (_options) {
     validatePathConfig(options);
@@ -148,7 +148,7 @@ export default function getPathFromState<ParamList extends object>(
     state,
     // Create a normalized configs object which will be easier to use
     createNormalizedConfigs(screens),
-    { preserveFragments, preserveDynamicRoutes }
+    { preserveGroups, preserveDynamicRoutes }
   );
 }
 
@@ -328,9 +328,9 @@ function getPathFromResolvedState(
   state: State,
   configs: Record<string, ConfigItem>,
   {
-    preserveFragments,
+    preserveGroups,
     preserveDynamicRoutes,
-  }: { preserveFragments?: boolean; preserveDynamicRoutes?: boolean }
+  }: { preserveGroups?: boolean; preserveDynamicRoutes?: boolean }
 ) {
   let path = "";
   let current: State = state;
@@ -360,7 +360,7 @@ function getPathFromResolvedState(
       routePath: nextRoute.path,
       params: allParams,
       initialRouteName: configs[nextRoute.name]?.initialRouteName,
-      preserveFragments,
+      preserveGroups,
       preserveDynamicRoutes,
     });
 
@@ -404,14 +404,14 @@ function getPathWithConventionsCollapsed({
   pattern,
   routePath,
   params,
-  preserveFragments,
+  preserveGroups,
   preserveDynamicRoutes,
   initialRouteName,
 }: {
   pattern: string;
   routePath?: string;
   params: Record<string, any>;
-  preserveFragments?: boolean;
+  preserveGroups?: boolean;
   preserveDynamicRoutes?: boolean;
   initialRouteName?: string;
 }) {
@@ -446,8 +446,8 @@ function getPathWithConventionsCollapsed({
         return params[name];
       }
 
-      if (!preserveFragments && matchFragmentName(p) != null) {
-        // When the last part is a fragment it could be a shared URL
+      if (!preserveGroups && matchGroupName(p) != null) {
+        // When the last part is a group it could be a shared URL
         // if the route has an initialRouteName defined, then we should
         // use that as the component path as we can assume it will be shown.
         if (segments.length - 1 === i) {

@@ -294,7 +294,7 @@ it("does not collapse conventions", () => {
           },
         },
         preserveDynamicRoutes: true,
-        preserveFragments: true,
+        preserveGroups: true,
       } as any
     )
   ).toBe("/(app)/[user]/related?user=bacon");

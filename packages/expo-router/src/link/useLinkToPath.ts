@@ -38,7 +38,7 @@ export function useLinkToPath() {
         let base = linking.getPathFromState?.(navigation.getRootState(), {
           ...linking.config,
           // @ts-expect-error: non-standard option
-          preserveFragments: true,
+          preserveGroups: true,
         });
 
         if (base && !base.endsWith("/")) {

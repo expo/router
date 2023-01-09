@@ -11,7 +11,7 @@ export function matchDeepDynamicRouteName(name: string): string | undefined {
 }
 
 /** Match `(page)` -> `page` */
-export function matchFragmentName(name: string): string | undefined {
+export function matchGroupName(name: string): string | undefined {
   return name.match(/^\(([^/]+?)\)$/)?.[1];
 }
 
@@ -29,11 +29,11 @@ function removeFileSystemDots(filePath: string): string {
   return filePath.replace(/^(?:\.\.?\/)+/g, "");
 }
 
-export function stripFragmentSegmentsFromPath(path: string): string {
+export function stripGroupSegmentsFromPath(path: string): string {
   return path
     .split("/")
     .reduce((acc, v) => {
-      if (matchFragmentName(v) == null) {
+      if (matchGroupName(v) == null) {
         acc.push(v);
       }
       return acc;

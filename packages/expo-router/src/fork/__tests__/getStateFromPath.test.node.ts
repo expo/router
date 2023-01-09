@@ -17,7 +17,7 @@ it(`supports spaces`, () => {
   });
 });
 
-it(`matches unmatched existing fragments against 404`, () => {
+it(`matches unmatched existing groups against 404`, () => {
   expect(
     getStateFromPath("/(app)/(explore)", {
       screens: {

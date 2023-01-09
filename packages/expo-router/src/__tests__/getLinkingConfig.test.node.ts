@@ -7,12 +7,12 @@ const mockRoutes = [
         children: [],
         dynamic: null,
         route: "people",
-        contextKey: "./(second-fragment)/people.tsx",
+        contextKey: "./(second-group)/people.tsx",
       },
     ],
     dynamic: null,
-    route: "(second-fragment)",
-    contextKey: "./(second-fragment)/_layout.tsx",
+    route: "(second-group)",
+    contextKey: "./(second-group)/_layout.tsx",
   },
   {
     children: [
@@ -25,7 +25,7 @@ const mockRoutes = [
           },
         ],
         route: "[...deep]",
-        contextKey: "./(fragment)/[...deep].tsx",
+        contextKey: "./(group)/[...deep].tsx",
       },
       {
         children: [],
@@ -36,18 +36,18 @@ const mockRoutes = [
           },
         ],
         route: "[dynamic]",
-        contextKey: "./(fragment)/[dynamic].tsx",
+        contextKey: "./(group)/[dynamic].tsx",
       },
       {
         children: [],
         dynamic: null,
         route: "index",
-        contextKey: "./(fragment)/index.tsx",
+        contextKey: "./(group)/index.tsx",
       },
     ],
     dynamic: null,
-    route: "(fragment)",
-    contextKey: "./(fragment)/_layout.tsx",
+    route: "(group)",
+    contextKey: "./(group)/_layout.tsx",
   },
   {
     children: [],
@@ -78,14 +78,14 @@ describe(getReactNavigationScreensConfig, () => {
         mockRoutes
       )
     ).toEqual({
-      "(fragment)": {
+      "(group)": {
         initialRouteName: undefined,
-        path: "(fragment)",
+        path: "(group)",
         screens: { "[...deep]": "*", "[dynamic]": ":dynamic", index: "" },
       },
-      "(second-fragment)": {
+      "(second-group)": {
         initialRouteName: undefined,
-        path: "(second-fragment)",
+        path: "(second-group)",
         screens: { people: "people" },
       },
       _sitemap: "_sitemap",
