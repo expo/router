@@ -1,6 +1,6 @@
 ---
-title: Unmatched Routes
-sidebar_position: 8
+title: 404s
+sidebar_position: 3
 ---
 
 ![](/img/unmatched.png)

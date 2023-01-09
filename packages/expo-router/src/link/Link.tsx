@@ -2,13 +2,13 @@
 // `to` / `action` support removed.
 import { Text, TextProps } from "@bacons/react-views";
 import { Slot } from "@radix-ui/react-slot";
-import { useFocusEffect } from "@react-navigation/native";
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
+import { useFocusEffect } from "../useFocusEffect";
 import { Href, resolveHref } from "./href";
-import { useLink } from "./useLink";
 import useLinkToPathProps from "./useLinkToPathProps";
+import { useRouter } from "./useRouter";
 
 type Props = {
   /** Add a property which is familiar to  */
@@ -28,9 +28,9 @@ type Props = {
 
 /** Redirects to the href as soon as the component is mounted. */
 export function Redirect({ href }: { href: Href }) {
-  const link = useLink();
+  const router = useRouter();
   useFocusEffect(() => {
-    link.replace(href);
+    router.replace(href);
   });
   return null;
 }

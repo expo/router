@@ -139,11 +139,12 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
   const loaded = node.loadRoute();
 
   if (loaded.unstable_settings) {
-    // Allow unstable_settings={ initialRouteName: '...' } to override the default initial route name.
-    const definedInitialRouteName = loaded.unstable_settings.initialRouteName;
     // Allow unstable_settings={ 'custom': { initialRouteName: '...' } } to override the less specific initial route name.
     const groupSpecificInitialRouteName =
       loaded.unstable_settings?.[fragmentName]?.initialRouteName;
+
+    // Allow unstable_settings={ initialRouteName: '...' } to override the default initial route name.
+    const definedInitialRouteName = loaded.unstable_settings.initialRouteName;
 
     initialRouteName =
       groupSpecificInitialRouteName ??
@@ -186,6 +187,19 @@ function treeNodeToRouteNode({
     const clones = multiFragment
       ? fragmentName!.split(",").map((v) => ({ name: v.trim() }))
       : null;
+
+    // Assert duplicates:
+    if (clones) {
+      const names = new Set<string>();
+      for (const clone of clones) {
+        if (names.has(clone.name)) {
+          throw new Error(
+            `Array syntax cannot contain duplicate group name "${clone.name}" in "${node.contextKey}".`
+          );
+        }
+        names.add(clone.name);
+      }
+    }
 
     const output = {
       loadRoute: node.loadRoute,

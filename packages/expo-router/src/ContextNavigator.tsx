@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 
 import { ContextNavigationContainer } from "./ContextNavigationContainer";
+import { LocationProvider } from "./LocationProvider";
 import { RootRouteNodeContext, useRootRouteNodeContext } from "./context";
 import { getRoutes } from "./getRoutes";
 import { useTutorial } from "./onboard/useTutorial";
@@ -41,7 +42,9 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
     <RootRouteNodeProvider context={context}>
       <ContextNavigationContainer>
         <InitialRootStateProvider>
-          <RootRoute />
+          <LocationProvider>
+            <RootRoute />
+          </LocationProvider>
         </InitialRootStateProvider>
       </ContextNavigationContainer>
     </RootRouteNodeProvider>
