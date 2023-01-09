@@ -59,10 +59,3 @@ export { ErrorBoundary } from "expo-router";
 
 - Metro errors need to be symbolicated in order to show the correct file name and line number on web.
 - React Native LogBox needs to be presented less aggressively in order to develop with errors. Currently it shows for `console.error`s and `console.warn`s but it should ideally only show for uncaught errors.
-
-<details>
-  <summary>Interoperability</summary>
-
-The exports convention is somewhat similar to [Redwood cells](https://redwoodjs.com/docs/cells) and data loading in [Remix](https://remix.run/docs/en/v1/api/conventions#data-loading), Next.js, etc.
-
-</details>
