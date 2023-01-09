@@ -1,3 +1,5 @@
+import "@expo/metro-runtime";
+import { withErrorOverlay } from "@expo/metro-runtime/error-overlay";
 import { registerRootComponent } from "expo";
 import { ExpoRoot, SplashScreen } from "expo-router";
 import { View, Platform } from "react-native";
@@ -56,7 +58,7 @@ function convertError(error) {
   try {
     SplashScreen.preventAutoHideAsync();
 
-    registerRootComponent(App);
+    registerRootComponent(withErrorOverlay(App));
   } catch (e) {
     // Hide the splash screen if there was an error so the user can see it.
     SplashScreen.hideAsync();
