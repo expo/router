@@ -1,13 +1,13 @@
 ---
 title: Introduction
-description: File System-based Routing for React Native apps
+description: File-based Routing for React Native apps
 sidebar_position: 1
 slug: /
 ---
 
 :::warning Beta Release
 
-Expo Router is in the earliest stage of development. The API is subject to breaking changes. The documentation is incomplete and may be inaccurate. The project is not yet ready for production use. Please [contribute to the discussion](https://github.com/expo/router/discussions/1) if you have any ideas or suggestions on how we can improve the convention.
+Expo Router is in the earliest stage of development. The API is subject to breaking changes. The documentation is incomplete and may be inaccurate. The project is not yet ready for production use. Please [contribute to the discussion](https://github.com/expo/router/discussions) if you have any ideas or suggestions on how we can improve the convention.
 
 :::
 
@@ -103,8 +103,8 @@ If you use npm, this requires npm 8.3.0 or higher. You can install this with `np
 ```json title=package.json
 {
   "overrides": {
-    "metro": "0.73.3",
-    "metro-resolver": "0.73.3"
+    "metro": "0.73.1",
+    "metro-resolver": "0.73.1"
   }
 }
 ```
@@ -123,8 +123,6 @@ module.exports = function (api) {
   };
 };
 ```
-
-> Additional setup is required for the Drawer navigator. See [the Drawer documentation](/router/docs/guides/drawer) for more information.
 
 ## Troubleshooting
 
@@ -148,5 +146,7 @@ Create files in the `app` directory and they will be automatically added to the 
 
 ## Next Steps
 
-- [Guides](/router/docs/guides/).
-- [Features and conventions](/docs/category/features).
+- [Routing](/docs/features/routing).
+- [Linking](/docs/features/linking).
+- [Guides](/docs/category/guides).
+- [Migrating from React Navigation](/docs/category/react-navigation).

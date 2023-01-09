@@ -1,6 +1,6 @@
 ---
-title: Error handling
-sidebar_position: 7
+title: Errors
+sidebar_position: 4
 ---
 
 ![](/img/error-boundary.png)

@@ -1,6 +1,5 @@
 ---
-title: Screen Options
-sidebar_position: 5
+title: Screen
 ---
 
 Qualified layouts, like the ones found in `expo-router` (Stack, Tabs, Layout) have a static `Screen` component which can be used to configure the behavior of a route declaratively.
@@ -78,46 +77,37 @@ export default function Layout() {
 }
 ```
 
-## Parent Options
-
-You can access any parent `navigation` prop by using the [`navigation.getParent()`](https://reactnavigation.org/docs/navigation-prop/#getparent) function. Each layout automatically indexes itself using the normalized path.
-
-The format for the normalized path is `/folder/file` where the string always starts with a `/` and there is no file extension or trailing slash.
-
-Consider the following structure:
-
-```bash title="File System"
-app/
-  _layout.js
-  tabs/
-    _layout.js
-    page.js
-```
+You can also use a relative path as the `name` prop to access a parent layout's options:
 
 ```tsx title=app/tabs/page.tsx
-import { useNavigation } from "expo-router";
-
-export default function Page() {
-  // This navigation prop controls the direct parent `/tabs/_layout.js`.
-  const navigation = useNavigation();
-  // This navigation prop controls the direct parent `/_layout.js`.
-  const rootNavigation = useNavigation("/");
-
-  // ...
-}
-```
-
-The same effect can be achieved by using the `name` prop of the Screen component.
-
-```tsx title=app/tabs/page.tsx
-import { NativeStack, Tabs } from "expo-router";
+import { Stack, Tabs } from "expo-router";
 
 export default function Page() {
   return (
     <>
-      <NativeStack.Screen name="../../" options={{ ... }} />
+      <Stack.Screen name="../../" options={{ ... }} />
       <Tabs.Screen name="/_layout.js" options={{ ... }} />
     </>
   );
 }
 ```
+
+## Props
+
+Migrate the following props from React Navigation Screen:
+
+### `component`
+
+Expo Router automatically sets the component based on the file convention. This prop is not used.
+
+### `children`
+
+Expo Router does not support the `children` prop. Use query parameters and React Context to pass data to the route component.
+
+### `name`
+
+This is similar to the `name` prop in React Navigation, but it can only be used when the `Screen` is a child of a layout component. The name can also be used with a relative path to access a parent layout's options when not used as the child of a layout.
+
+### `getId`
+
+By default, Expo Router automatically generates the ID based on the query parameters of a dynamic route. This value can be customized by using as-is in Expo Router.
