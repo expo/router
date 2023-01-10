@@ -7,7 +7,7 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>User: {params.get("user")}</Text>
+        <Text style={styles.title}>User: {params.user}</Text>
 
         <Link href="/([user])/compose">User {"->"} Compose</Link>
         <Link href="./compose">Local {"->"} Compose</Link>

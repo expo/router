@@ -1,14 +1,15 @@
 import React from "react";
 
 import { RootContainer } from "./ContextNavigationContainer";
-import { ImmutableURLSearchParams } from "./ImmutableURLSearchParams";
 import getPathFromState, { State } from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
 import { useInitialRootStateContext } from "./rootStateContext";
 
+type SearchParams = Record<string, string>;
+
 type UrlObject = {
   pathname: string;
-  readonly params: ImmutableURLSearchParams;
+  readonly params: SearchParams;
   segments: string[];
 };
 
@@ -33,24 +34,15 @@ function compareRouteInfo(a: UrlObject, b: UrlObject) {
   );
 }
 
-function compareUrlSearchParams(
-  a: ImmutableURLSearchParams,
-  b: ImmutableURLSearchParams
-) {
-  const aKeys = a.keys();
-  const bKeys = b.keys();
+function compareUrlSearchParams(a: SearchParams, b: SearchParams): boolean {
+  const aKeys = Object.keys(a);
+  const bKeys = Object.keys(b);
 
-  if ([...aKeys].length !== [...bKeys].length) {
+  if (aKeys.length !== bKeys.length) {
     return false;
   }
 
-  for (const key of aKeys) {
-    if (a.get(key) !== b.get(key)) {
-      return false;
-    }
-  }
-
-  return true;
+  return aKeys.every((key) => a[key] === b[key]);
 }
 
 function useUrlObject(): UrlObject {
@@ -129,8 +121,18 @@ function getNormalizedStatePath(
     segments: pathname.split("/").filter(Boolean),
     // TODO: This is not efficient, we should generate based on the state instead
     // of converting to string then back to object
-    params: new ImmutableURLSearchParams(querystring),
+    params: queryStringToObject(querystring),
   };
+}
+
+function queryStringToObject(queryString: string): SearchParams {
+  return queryString
+    .split("&")
+    .map((pair) => pair.split("="))
+    .reduce((acc, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {} as SearchParams);
 }
 
 const LocationContext = React.createContext<UrlObject | undefined>(undefined);
@@ -165,12 +167,11 @@ export function usePathname(): string {
 }
 
 /** @returns Current URL Search Parameters. */
-export function useSearchParams(): ImmutableURLSearchParams {
-  // TODO: Make this readonly
+export function useSearchParams(): SearchParams {
   return useLocation().params;
 }
 
-/** @returns array of selected segments. */
+/** @returns Array of selected segments. */
 export function useSegments(): string[] {
   return useLocation().segments;
 }

@@ -27,9 +27,7 @@ import { useEffect } from "react";
 import { View, Text } from "react-native";
 
 export default function Home() {
-  const params = useSearchParams();
-
-  const post = params.get("post");
+  const { post } = useSearchParams();
 
   useEffect(() => {
     if (post) {
@@ -63,8 +61,7 @@ export default function Details() {
   const navigation = useNavigation();
   const router = useRouter();
   const params = useSearchParams();
-  const id = params.get("id") ?? 42;
-  const other = params.get("other");
+  const { id = 42, other } = params;
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
