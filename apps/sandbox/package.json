@@ -1,5 +1,5 @@
 {
-  "name": "expo-router-demo",
+  "name": "expo-router-sandbox",
   "version": "1.0.0",
   "main": "index",
   "scripts": {
@@ -10,17 +10,13 @@
   },
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
-    "@expo/html-elements": "^0.2.2",
     "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-navigation/drawer": "^6.4.4",
-    "classnames": "^2.3.2",
-    "date-fns": "^2.29.3",
     "expo": "^47.0.0-beta.7",
     "expo-auth-session": "~3.7.2",
     "expo-random": "~13.0.0",
     "expo-router": "*",
     "expo-secure-store": "~12.0.0",
-    "nativewind": "^2.0.11",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-native": "0.70.4",
@@ -36,8 +32,7 @@
     "@types/react": "~18.0.0",
     "@types/react-native": "~0.69.1",
     "@welldone-software/why-did-you-render": "^7.0.1",
-    "babel-plugin-transform-imports": "^2.0.0",
-    "tailwindcss": "^3.2.4"
+    "babel-plugin-transform-imports": "^2.0.0"
   },
   "private": true
 }

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Router Demo",
     "slug": "expo-router",
-    "scheme": "bacontext",
+    "scheme": "acme",
     "splash": {
       "image": "./splash.png",
       "backgroundColor": "#1c2026"
