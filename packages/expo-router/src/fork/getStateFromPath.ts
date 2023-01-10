@@ -101,6 +101,13 @@ export default function getStateFromPath<ParamList extends object>(
   // This will be mutated...
   const initialRoutes: InitialRouteConfig[] = [];
 
+  if (options?.initialRouteName) {
+    initialRoutes.push({
+      initialRouteName: options.initialRouteName,
+      parentScreens: [],
+    });
+  }
+
   // Create a normalized configs array which will be easier to use.
   const converted = Object.keys(screens)
     .map((key) => createNormalizedConfigs(key, screens, [], initialRoutes))

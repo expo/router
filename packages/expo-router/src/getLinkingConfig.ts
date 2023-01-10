@@ -91,6 +91,8 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
       ...getAllWebRedirects(),
     ],
     config: {
+      // @ts-expect-error
+      initialRouteName: routes.initialRouteName,
       screens: getReactNavigationScreensConfig(routes.children),
     },
     // A custom getInitialURL is used on native to ensure the app always starts at

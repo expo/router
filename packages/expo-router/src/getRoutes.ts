@@ -129,27 +129,29 @@ function getDefaultInitialRoute(node: RouteNode, name: string) {
 
 function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
   const groupName = matchGroupName(node.route);
-  if (!node.children || !groupName) {
+  if (!node.children?.length) {
     return node;
   }
 
   // Guess at the initial route based on the group name.
   // TODO(EvanBacon): Perhaps we should attempt to warn when the group doesn't match any child routes.
-  let initialRouteName = getDefaultInitialRoute(node, groupName)?.route;
+  let initialRouteName = groupName
+    ? getDefaultInitialRoute(node, groupName)?.route
+    : undefined;
   const loaded = node.loadRoute();
 
   if (loaded.unstable_settings) {
-    // Allow unstable_settings={ 'custom': { initialRouteName: '...' } } to override the less specific initial route name.
-    const groupSpecificInitialRouteName =
-      loaded.unstable_settings?.[groupName]?.initialRouteName;
-
     // Allow unstable_settings={ initialRouteName: '...' } to override the default initial route name.
-    const definedInitialRouteName = loaded.unstable_settings.initialRouteName;
-
     initialRouteName =
-      groupSpecificInitialRouteName ??
-      definedInitialRouteName ??
-      initialRouteName;
+      loaded.unstable_settings.initialRouteName ?? initialRouteName;
+
+    if (groupName) {
+      // Allow unstable_settings={ 'custom': { initialRouteName: '...' } } to override the less specific initial route name.
+      const groupSpecificInitialRouteName =
+        loaded.unstable_settings?.[groupName]?.initialRouteName;
+
+      initialRouteName = groupSpecificInitialRouteName ?? initialRouteName;
+    }
   }
 
   return {
