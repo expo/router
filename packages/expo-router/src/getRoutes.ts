@@ -7,7 +7,7 @@ import {
   stripGroupSegmentsFromPath,
 } from "./matchers";
 import { RequireContext } from "./types";
-import { DefaultLayout } from "./views/Layout";
+import { DefaultNavigator } from "./views/Layout";
 
 export type FileNode = Pick<RouteNode, "contextKey" | "loadRoute"> & {
   /** Like `(tab)/index` */
@@ -299,7 +299,7 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
   }
 
   return {
-    loadRoute: () => ({ default: DefaultLayout }),
+    loadRoute: () => ({ default: DefaultNavigator }),
     // Generate a fake file name for the directory
     contextKey: "./_layout.tsx",
     route: "",

@@ -1,10 +1,12 @@
 // Expo Router API
+import { Navigator, Slot } from "./views/Layout";
+
 export { useRouter } from "./link/useRouter";
 export { usePathname, useSearchParams, useSegments } from "./LocationProvider";
 export { Link, Redirect } from "./link/Link";
 
 export { withLayoutContext } from "./layouts/withLayoutContext";
-export { Layout, Children } from "./views/Layout";
+export { Navigator, Slot };
 
 // Expo Router Views
 export { ExpoRoot } from "./views/Root";
@@ -20,3 +22,10 @@ export * as Linking from "./link/linking";
 export { useNavigation } from "./useNavigation";
 export { RootContainer } from "./ContextNavigationContainer";
 export { useFocusEffect } from "./useFocusEffect";
+
+// Deprecated (doesn't matter in beta)
+
+/** @deprecated use `<Navigator />` */
+export const Layout = Navigator;
+/** @deprecated use `<Slot />` */
+export const Children = Slot;

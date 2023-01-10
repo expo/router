@@ -11,7 +11,7 @@ import { useSortedScreens } from "../useScreens";
 import { Screen } from "./Screen";
 
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
-export const LayoutContext = React.createContext<{
+export const NavigatorContext = React.createContext<{
   contextKey: string;
   state: any;
   navigation: any;
@@ -20,10 +20,10 @@ export const LayoutContext = React.createContext<{
 } | null>(null);
 
 if (process.env.NODE_ENV !== "production") {
-  LayoutContext.displayName = "LayoutContext";
+  NavigatorContext.displayName = "NavigatorContext";
 }
 
-export type LayoutProps = {
+export type NavigatorProps = {
   initialRouteName?: Parameters<
     typeof useNavigationBuilder
   >[1]["initialRouteName"];
@@ -33,48 +33,48 @@ export type LayoutProps = {
 };
 
 /** An unstyled custom navigator. Good for basic web layouts */
-export function Layout({
+export function Navigator({
   initialRouteName,
   screenOptions,
   children,
   router,
-}: LayoutProps) {
+}: NavigatorProps) {
   const contextKey = useContextKey();
 
   // Allows adding Screen components as children to configure routes.
-  const { screens, children: otherChildren } = useFilterScreenChildren(
-    children,
-    { isCustomNavigator: true, contextKey }
-  );
+  const { screens, children: otherSlot } = useFilterScreenChildren(children, {
+    isCustomNavigator: true,
+    contextKey,
+  });
 
   const sorted = useSortedScreens(screens ?? []);
 
   if (!sorted.length) {
-    console.warn(`Layout at "${contextKey}" has no children.`);
+    console.warn(`Navigator at "${contextKey}" has no children.`);
     return null;
   }
 
   return (
-    <QualifiedLayout
+    <QualifiedNavigator
       initialRouteName={initialRouteName}
       screenOptions={screenOptions}
       screens={sorted}
       contextKey={contextKey}
       router={router}
     >
-      {otherChildren}
-    </QualifiedLayout>
+      {otherSlot}
+    </QualifiedNavigator>
   );
 }
 
-function QualifiedLayout({
+function QualifiedNavigator({
   initialRouteName,
   screenOptions,
   children,
   screens,
   contextKey,
   router = StackRouter,
-}: LayoutProps & { contextKey: string; screens: React.ReactNode[] }) {
+}: NavigatorProps & { contextKey: string; screens: React.ReactNode[] }) {
   const { state, navigation, descriptors, NavigationContent } =
     useNavigationBuilder(router, {
       // Used for getting the parent with navigation.getParent('/normalized/path')
@@ -85,7 +85,7 @@ function QualifiedLayout({
     });
 
   return (
-    <LayoutContext.Provider
+    <NavigatorContext.Provider
       value={{
         contextKey,
         state,
@@ -95,20 +95,20 @@ function QualifiedLayout({
       }}
     >
       <NavigationContent>{children}</NavigationContent>
-    </LayoutContext.Provider>
+    </NavigatorContext.Provider>
   );
 }
 
-export function useLayoutContext() {
-  const context = React.useContext(LayoutContext);
+export function useNavigatorContext() {
+  const context = React.useContext(NavigatorContext);
   if (!context) {
-    throw new Error("useLayoutContext must be used within a <Layout />");
+    throw new Error("useNavigatorContext must be used within a <Navigator />");
   }
   return context;
 }
 
-export function useChild() {
-  const context = useLayoutContext();
+export function useSlot() {
+  const context = useNavigatorContext();
 
   const { state, descriptors } = context;
 
@@ -124,36 +124,36 @@ export function useChild() {
 }
 
 /** Renders the currently selected content. */
-export function Children(props: Omit<LayoutProps, "children">) {
+export function Slot(props: Omit<NavigatorProps, "children">) {
   const contextKey = useContextKey();
-  const context = React.useContext(LayoutContext);
+  const context = React.useContext(NavigatorContext);
   // Ensure the context is for the current contextKey
   if (context?.contextKey !== contextKey) {
     // Qualify the content and re-export.
     return (
-      <Layout {...props}>
-        <TrustedChildren />
-      </Layout>
+      <Navigator {...props}>
+        <QualifiedSlot />
+      </Navigator>
     );
   }
 
-  return <TrustedChildren />;
+  return <QualifiedSlot />;
 }
 
-export function TrustedChildren() {
-  return useChild();
+export function QualifiedSlot() {
+  return useSlot();
 }
 
-export function DefaultLayout() {
+export function DefaultNavigator() {
   return (
-    <Layout>
-      <TrustedChildren />
-    </Layout>
+    <Navigator>
+      <QualifiedSlot />
+    </Navigator>
   );
 }
 
-Layout.Children = Children;
-Layout.useContext = useLayoutContext;
+Navigator.Slot = Slot;
+Navigator.useContext = useNavigatorContext;
 
 /** Used to configure route settings. */
-Layout.Screen = Screen;
+Navigator.Screen = Screen;
