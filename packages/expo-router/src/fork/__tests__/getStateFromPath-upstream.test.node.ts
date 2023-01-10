@@ -932,6 +932,7 @@ it("returns matching screen if path is only slash", () => {
   ).toEqual(changePath(state, "/"));
 });
 
+// Test `app/(app)/index.js` matching `/`
 it("returns matching screen if path is only slash and root is a group", () => {
   expect(
     getStateFromPath<object>("/", {
@@ -942,6 +943,19 @@ it("returns matching screen if path is only slash and root is a group", () => {
       },
     })
   ).toEqual({ routes: [{ name: "(app)/index", path: "/" }] });
+});
+
+// Test `app/(one)/(two)/index.js` matching `/`
+it("returns matching screen if path is only slash and root is a nested group", () => {
+  expect(
+    getStateFromPath<object>("/", {
+      screens: {
+        "(one)/(two)/index": "(one)/(two)",
+        "[id]": ":id",
+        "[...404]": "*",
+      },
+    })
+  ).toEqual({ routes: [{ name: "(one)/(two)/index", path: "/" }] });
 });
 
 it("returns matching screen with params if path is empty", () => {

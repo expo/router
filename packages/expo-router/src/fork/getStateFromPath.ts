@@ -273,18 +273,22 @@ function getStateFromEmptyPathWithConfigs(
   // When handling empty path, we should only look at the root level config
 
   // NOTE(EvanBacon): We only care about matching leaf nodes.
-  const leafNodes = configs.filter((config) => !config.hasChildren);
+  const leafNodes = configs
+    .filter((config) => !config.hasChildren)
+    .map((value) => {
+      return {
+        ...value,
+        // Collapse all levels of group segments before testing.
+        // This enables `app/(one)/(two)/index.js` to be matched.
+        path: stripGroupSegmentsFromPath(value.path),
+      };
+    });
 
   const match =
     leafNodes.find(
       (config) =>
         // NOTE(EvanBacon): Test leaf node index routes that either don't have a regex or match an empty string.
         config.path === "" && (!config.regex || config.regex.test(""))
-    ) ??
-    leafNodes.find(
-      (config) =>
-        // NOTE(EvanBacon): Find empty groups, e.g. `app/(app)/index.js`
-        matchGroupName(config.path) && (!config.regex || config.regex.test(""))
     ) ??
     leafNodes.find(
       (config) =>
@@ -303,6 +307,7 @@ function getStateFromEmptyPathWithConfigs(
 
   return createNestedStateObject(path, routes, configs, initialRoutes);
 }
+
 function getStateFromPathWithConfigs(
   path: string,
   configs: RouteConfig[],
@@ -688,6 +693,7 @@ const createNestedStateObject = (
   }
 
   route = findFocusedRoute(state) as ParsedRoute;
+
   // Remove groups from the path while preserving a trailing slash.
   route.path = stripGroupSegmentsFromPath(path);
 
