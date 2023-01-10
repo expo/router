@@ -23,13 +23,16 @@ export type ScreenProps<
   redirect?: boolean | string;
   initialParams?: { [key: string]: any };
   options?: TOptions;
+
+  // TODO: types
+  listeners?: any;
 };
 
 function getSortedChildren(
   children: RouteNode[],
   order?: ScreenProps[],
   initialRouteName?: string
-): { route: RouteNode; props: any }[] {
+): { route: RouteNode; props: Partial<ScreenProps> }[] {
   if (!order?.length) {
     return children
       .sort(sortRoutesWithInitial(initialRouteName))
@@ -38,7 +41,7 @@ function getSortedChildren(
   const entries = [...children];
 
   const ordered = order
-    .map(({ name, redirect, initialParams, options }) => {
+    .map(({ name, redirect, initialParams, listeners, options }) => {
       if (!entries.length) {
         console.warn(
           `[Layout children]: Too many screens defined. Route "${name}" is extraneous.`
@@ -67,7 +70,7 @@ function getSortedChildren(
           return null;
         }
 
-        return { route: match, props: { initialParams, options } };
+        return { route: match, props: { initialParams, listeners, options } };
       }
     })
     .filter(Boolean) as {
