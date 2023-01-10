@@ -54,6 +54,5 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
 function RootRoute() {
   const root = useRootRouteNodeContext();
   const Component = getQualifiedRouteComponent(root);
-  // @ts-expect-error: TODO: Drop navigation and route props
   return <Component />;
 }
