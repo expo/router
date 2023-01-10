@@ -283,6 +283,11 @@ function getStateFromEmptyPathWithConfigs(
     ) ??
     leafNodes.find(
       (config) =>
+        // NOTE(EvanBacon): Find empty groups, e.g. `app/(app)/index.js`
+        matchGroupName(config.path) && (!config.regex || config.regex.test(""))
+    ) ??
+    leafNodes.find(
+      (config) =>
         // NOTE(EvanBacon): Test leaf node dynamic routes that match an empty string.
         config.path.startsWith(":") && config.regex!.test("")
     ) ??

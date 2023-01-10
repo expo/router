@@ -932,6 +932,18 @@ it("returns matching screen if path is only slash", () => {
   ).toEqual(changePath(state, "/"));
 });
 
+it("returns matching screen if path is only slash and root is a group", () => {
+  expect(
+    getStateFromPath<object>("/", {
+      screens: {
+        "(app)/index": "(app)",
+        "[id]": ":id",
+        "[...404]": "*",
+      },
+    })
+  ).toEqual({ routes: [{ name: "(app)/index", path: "/" }] });
+});
+
 it("returns matching screen with params if path is empty", () => {
   const path = "?foo=42";
   const config = {
