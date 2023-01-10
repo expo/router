@@ -212,7 +212,12 @@ function walkConfigItems(
     name: string;
     params?: object;
   },
-  configs: Record<string, ConfigItem>
+  configs: Record<string, ConfigItem>,
+  {
+    preserveDynamicRoutes,
+  }: {
+    preserveDynamicRoutes?: boolean;
+  }
 ) {
   // NOTE(EvanBacon): Fill in current route using state that was passed as params.
   if (!route.state && isInvalidParams(route.params)) {
@@ -242,13 +247,17 @@ function walkConfigItems(
         Object.assign(collectedParams, params);
       }
       if (deepEqual(focusedRoute, route)) {
-        // If this is the focused route, keep the params for later use
-        // We save it here since it's been stringified already
-        focusedParams = getParamsWithConventionsCollapsed({
-          params,
-          pattern,
-          routeName: route.name,
-        });
+        if (preserveDynamicRoutes) {
+          focusedParams = params;
+        } else {
+          // If this is the focused route, keep the params for later use
+          // We save it here since it's been stringified already
+          focusedParams = getParamsWithConventionsCollapsed({
+            params,
+            pattern,
+            routeName: route.name,
+          });
+        }
       }
     }
 
@@ -270,13 +279,15 @@ function walkConfigItems(
         // NOTE(EvanBacon): Big hack to support initial route changes in tab bars.
         pattern = initialRouteConfig.pattern!;
         if (focusedParams) {
-          // If this is the focused route, keep the params for later use
-          // We save it here since it's been stringified already
-          focusedParams = getParamsWithConventionsCollapsed({
-            params: focusedParams,
-            pattern,
-            routeName: route.name,
-          });
+          if (!preserveDynamicRoutes) {
+            // If this is the focused route, keep the params for later use
+            // We save it here since it's been stringified already
+            focusedParams = getParamsWithConventionsCollapsed({
+              params: focusedParams,
+              pattern,
+              routeName: route.name,
+            });
+          }
         }
       }
       break;
@@ -306,13 +317,17 @@ function walkConfigItems(
   }
 
   if (pattern && !focusedParams && focusedRoute.params) {
-    // If this is the focused route, keep the params for later use
-    // We save it here since it's been stringified already
-    focusedParams = getParamsWithConventionsCollapsed({
-      params: focusedRoute.params,
-      pattern,
-      routeName: route.name,
-    });
+    if (preserveDynamicRoutes) {
+      focusedParams = focusedRoute.params;
+    } else {
+      // If this is the focused route, keep the params for later use
+      // We save it here since it's been stringified already
+      focusedParams = getParamsWithConventionsCollapsed({
+        params: focusedRoute.params,
+        pattern,
+        routeName: route.name,
+      });
+    }
     Object.assign(focusedParams, collectedParams);
   }
 
@@ -350,7 +365,8 @@ function getPathFromResolvedState(
     const { pattern, params, nextRoute, focusedParams } = walkConfigItems(
       route,
       getActiveRoute(current),
-      { ...configs }
+      { ...configs },
+      { preserveDynamicRoutes }
     );
 
     Object.assign(allParams, params);
@@ -377,18 +393,17 @@ function getPathFromResolvedState(
     } else {
       // Finished crawling state.
 
-      const outputParams = preserveDynamicRoutes ? params : focusedParams;
       // Check for query params before exiting.
-      if (outputParams) {
-        for (const param in outputParams) {
+      if (focusedParams) {
+        for (const param in focusedParams) {
           // TODO: This is not good. We shouldn't squat strings named "undefined".
-          if (outputParams[param] === "undefined") {
+          if (focusedParams[param] === "undefined") {
             // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-            delete outputParams[param];
+            delete focusedParams[param];
           }
         }
 
-        const query = queryString.stringify(outputParams, { sort: false });
+        const query = queryString.stringify(focusedParams, { sort: false });
 
         if (query) {
           path += `?${query}`;
