@@ -115,13 +115,14 @@ export function getQualifiedRouteComponent(value: RouteNode) {
   const QualifiedRoute = React.forwardRef(
     (
       {
-        // Remove these props to enforce usage of expo router hooks.
+        // Remove these React Navigation props to
+        // enforce usage of expo-router hooks (where the query params are correct).
         route,
         navigation,
 
         // Pass all other props to the component
         ...props
-      }: { route: any; navigation: any },
+      }: any,
       ref: any
     ) => {
       const children = React.createElement(Component, {
