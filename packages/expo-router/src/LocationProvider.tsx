@@ -125,14 +125,16 @@ function getNormalizedStatePath(
   };
 }
 
-function queryStringToObject(queryString: string): SearchParams {
-  return queryString
-    .split("&")
-    .map((pair) => pair.split("="))
-    .reduce((acc, [key, value]) => {
-      acc[key] = value;
-      return acc;
-    }, {} as SearchParams);
+function queryStringToObject(queryString?: string): SearchParams {
+  return (
+    queryString
+      ?.split("&")
+      .map((pair) => pair.split("="))
+      .reduce((acc, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {} as SearchParams) ?? {}
+  );
 }
 
 const LocationContext = React.createContext<UrlObject | undefined>(undefined);
