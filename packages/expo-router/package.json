@@ -80,7 +80,6 @@
     "@react-navigation/native": "^6.0.12",
     "@react-navigation/native-stack": "^6.8.0",
     "expo-splash-screen": "*",
-    "url": "^0.11.0",
-    "whatwg-url-without-unicode": "8.0.0-3"
+    "url": "^0.11.0"
   }
 }

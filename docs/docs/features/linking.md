@@ -57,7 +57,7 @@ Returns the currently selected route location without search parameters. e.g. `/
 
 ## `useSearchParams`
 
-Returns `URLSearchParameters` for the currently selected route.
+Returns the URL search parameters for the currently selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`.
 
 Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `/profile/123`, the results of `useSearchParams` would be as follows:
 
