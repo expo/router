@@ -21,16 +21,22 @@ export default function Layout() {
 ```
 
 ```js title=app/index.js
+import { useSearchParams } from "expo-router";
+
 import { useEffect } from "react";
 import { View, Text } from "react-native";
 
-export default function Home({ navigation, route }) {
+export default function Home() {
+  const params = useSearchParams();
+
+  const post = params.get("post");
+
   useEffect(() => {
-    if (route.params?.post) {
-      // Post updated, do something with `route.params.post`
+    if (post) {
+      // Post updated, do something with `post`
       // For example, send the post to the server
     }
-  }, [route.params?.post]);
+  }, [post]);
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -39,7 +45,7 @@ export default function Home({ navigation, route }) {
         href={{
           pathname: "details",
           // /* 1. Navigate to the details route with query params */
-          query: { itemId: 86, otherParam: "anything you want here" },
+          params: { id: 86, other: "anything you want here" },
         }}
       >
         Go to Details
@@ -51,33 +57,23 @@ export default function Home({ navigation, route }) {
 
 ```js title=app/details.js
 import { View, Text } from "react-native";
+import { useNavigation, useRouter, useSearchParams } from "expo-router";
 
-export default function Details({ navigation, route }) {
-  const {
-    // NOTE(EvanBacon): Prefer default value to initialParams -- https://reactnavigation.org/docs/params#initial-params
-    itemId = 42,
-    otherParam,
-  } = route.params;
+export default function Details() {
+  const navigation = useNavigation();
+  const router = useRouter();
+  const params = useSearchParams();
+  const id = params.get("id") ?? 42;
+  const other = params.get("other");
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text
         onPress={() => {
-          // https://reactnavigation.org/docs/params#updating-params
-          navigation.setParams({
-            query: "someText",
-          });
-
-          // https://reactnavigation.org/docs/params#passing-params-to-a-previous-screen
-          // Pass and merge params back to home screen
-          navigation.navigate({
-            name: "home",
-            params: { post: "random text" },
-            merge: true,
-          });
+          router.push({ pathname: "/", params: { post: "random", id, other } });
         }}
       >
-        Details Screen
+        Go Home
       </Text>
     </View>
   );

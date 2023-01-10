@@ -1,14 +1,16 @@
+import { useSearchParams } from "expo-router";
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Page({ route }) {
+export default function Page() {
+  const params = useSearchParams();
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>User: {route.params?.user}</Text>
+        <Text style={styles.title}>User: {params.get("user")}</Text>
 
-        <Link href="/([user])/compose">User -> Compose</Link>
-        <Link href="./compose">Local -> Compose</Link>
+        <Link href="/([user])/compose">User {"->"} Compose</Link>
+        <Link href="./compose">Local {"->"} Compose</Link>
       </View>
     </View>
   );

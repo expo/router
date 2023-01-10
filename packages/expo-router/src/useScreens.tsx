@@ -1,5 +1,6 @@
 import React from "react";
 
+import { LocationProvider } from "./LocationProvider";
 import {
   DynamicConvention,
   Route,
@@ -112,7 +113,18 @@ export function getQualifiedRouteComponent(value: RouteNode) {
   const { default: Component, ErrorBoundary } = value.loadRoute();
 
   const QualifiedRoute = React.forwardRef(
-    (props: { route: any; navigation: any }, ref: any) => {
+    (
+      {
+        // Remove these React Navigation props to
+        // enforce usage of expo-router hooks (where the query params are correct).
+        route,
+        navigation,
+
+        // Pass all other props to the component
+        ...props
+      }: any,
+      ref: any
+    ) => {
       const children = React.createElement(Component, {
         ...props,
         ref,
@@ -127,7 +139,11 @@ export function getQualifiedRouteComponent(value: RouteNode) {
         children
       );
 
-      return <Route node={value}>{errorBoundary}</Route>;
+      return (
+        <LocationProvider>
+          <Route node={value}>{errorBoundary}</Route>
+        </LocationProvider>
+      );
     }
   );
 

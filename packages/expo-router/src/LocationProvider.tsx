@@ -1,13 +1,14 @@
 import React from "react";
 
 import { RootContainer } from "./ContextNavigationContainer";
+import { ImmutableURLSearchParams } from "./ImmutableURLSearchParams";
 import getPathFromState, { State } from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
 import { useInitialRootStateContext } from "./rootStateContext";
 
 type UrlObject = {
   pathname: string;
-  readonly params: URLSearchParams;
+  readonly params: ImmutableURLSearchParams;
   segments: string[];
 };
 
@@ -16,29 +17,11 @@ function getRouteInfoFromState(
   state: State
 ): UrlObject {
   const path = getPathFromState(state, false);
-
+  const qualified = getPathFromState(state, true);
   return {
     pathname: path.split("?")["0"],
-    //  TODO: This sometimes returns: `params=[object Object]&screen=XX&path=XX&initial=true`
-    ...getNormalizedStatePath(getPathFromState(state, true)),
+    ...getNormalizedStatePath(qualified),
   };
-}
-
-function compareShallowRecords(a: Record<string, any>, b: Record<string, any>) {
-  const aKeys = Object.keys(a);
-  const bKeys = Object.keys(b);
-
-  if (aKeys.length !== bKeys.length) {
-    return false;
-  }
-
-  for (const key of aKeys) {
-    if (a[key] !== b[key]) {
-      return false;
-    }
-  }
-
-  return true;
 }
 
 function compareRouteInfo(a: UrlObject, b: UrlObject) {
@@ -46,8 +29,28 @@ function compareRouteInfo(a: UrlObject, b: UrlObject) {
     a.segments.length === b.segments.length &&
     a.segments.every((segment, index) => segment === b.segments[index]) &&
     a.pathname === b.pathname &&
-    compareShallowRecords(a.params, b.params)
+    compareUrlSearchParams(a.params, b.params)
   );
+}
+
+function compareUrlSearchParams(
+  a: ImmutableURLSearchParams,
+  b: ImmutableURLSearchParams
+) {
+  const aKeys = a.keys();
+  const bKeys = b.keys();
+
+  if ([...aKeys].length !== [...bKeys].length) {
+    return false;
+  }
+
+  for (const key of aKeys) {
+    if (a.get(key) !== b.get(key)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function useUrlObject(): UrlObject {
@@ -126,7 +129,7 @@ function getNormalizedStatePath(
     segments: pathname.split("/").filter(Boolean),
     // TODO: This is not efficient, we should generate based on the state instead
     // of converting to string then back to object
-    params: new URLSearchParams(querystring),
+    params: new ImmutableURLSearchParams(querystring),
   };
 }
 
@@ -162,7 +165,7 @@ export function usePathname(): string {
 }
 
 /** @returns Current URL Search Parameters. */
-export function useSearchParams(): URLSearchParams {
+export function useSearchParams(): ImmutableURLSearchParams {
   // TODO: Make this readonly
   return useLocation().params;
 }
