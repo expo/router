@@ -1,0 +1,33 @@
+diff --git a/node_modules/@expo/html-elements/babel.js b/node_modules/@expo/html-elements/babel.js
+index fbd661a..4c01578 100644
+--- a/node_modules/@expo/html-elements/babel.js
++++ b/node_modules/@expo/html-elements/babel.js
+@@ -93,15 +93,28 @@ module.exports = ({ types: t }, { expo }) => {
+     },
+   };
+ 
++  const source = '@expo/html-elements';
+   return {
+     name: 'Rewrite React DOM to universal Expo elements',
+     visitor: {
+       Program(path, state) {
++
+         state.replacedComponents = new Set();
+         state.unsupportedComponents = new Set();
+       
+         path.traverse(htmlElementVisitor, state);
++
++        // If state.replacedComponents is not empty, then ensure `import { ... } from '@expo/html-elements'` is present
++        if (state.replacedComponents.size > 0) {
++          const importDeclaration = t.importDeclaration(
++            [],
++            t.stringLiteral(source)
++          );
++          path.unshiftContainer('body', importDeclaration);
++        }
++
+         path.traverse(importDeclarationVisitor, state);
++
+       },
+     },
+   };

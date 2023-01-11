@@ -2,17 +2,24 @@ import React from "react";
 import { useNavigation } from "expo-router";
 
 function formatLikeConsoleLog(args: any) {
+  if (typeof args === "string") {
+    return args;
+  }
+
   let str = "";
+  if (Array.isArray(args)) {
+    for (const arg of args) {
+      if (str.length > 0) {
+        str += " ";
+      }
 
-  for (const arg of args) {
-    if (str.length > 0) {
-      str += " ";
-    }
-
-    if (typeof arg === "string") {
-      str += arg;
-    } else {
-      str += JSON.stringify(arg);
+      if (typeof arg === "string") {
+        str += arg;
+      } else if (Array.isArray(arg)) {
+        str += formatLikeConsoleLog(arg);
+      } else {
+        str += JSON.stringify(arg);
+      }
     }
   }
 
@@ -47,8 +54,6 @@ export function Head({
   const title = React.useMemo(() => {
     for (const child of metaChildren) {
       if (child.type === "title") {
-        console.log("Title:", child);
-
         return child.props.children;
       }
     }
@@ -58,7 +63,6 @@ export function Head({
 
   React.useEffect(() => {
     if (title !== undefined) {
-      console.log("set title:", title);
       navigation.setOptions({
         title: formatLikeConsoleLog(title),
       });
