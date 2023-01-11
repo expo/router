@@ -10,11 +10,12 @@ const workspaceRoot = path.resolve(projectRoot, "../..");
 const config = getDefaultConfig(__dirname);
 
 config.transformer = {
-  asyncRequireModulePath: require.resolve(
-    "@bacons/expo-metro-runtime/asyncRequire"
-  ),
+  ...config.transformer,
+  asyncRequireModulePath: require.resolve("@expo/metro-runtime/asyncRequire"),
   experimentalImportBundleSupport: true,
 };
+
+console.log(">>>", require.resolve("@expo/metro-runtime/asyncRequire"));
 
 // 1. Watch all files within the monorepo
 config.watchFolders = [workspaceRoot];
@@ -25,11 +26,5 @@ config.resolver.nodeModulesPaths = [
 ];
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true;
-
-config.transformer = {
-  ...config.transformer,
-  experimentalImportBundleSupport: true,
-  asyncRequireModulePath: "@expo/metro-runtime/asyncRequire",
-};
 
 module.exports = config;
