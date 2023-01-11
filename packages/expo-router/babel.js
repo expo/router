@@ -1,7 +1,20 @@
 const nodePath = require("path");
 const resolveFrom = require("resolve-from");
+const { getExpoConstantsManifest } = require("./node/getExpoConstantsManifest");
 
 const debug = require("debug")("expo:router:babel");
+
+function getExpoAppManifest(projectRoot) {
+  if (process.env.APP_MANIFEST) {
+    return process.env.APP_MANIFEST;
+  }
+
+  const exp = getExpoConstantsManifest(projectRoot);
+
+  debug("public manifest", exp);
+
+  return JSON.stringify(exp);
+}
 
 function getExpoRouterAppRoot(projectRoot) {
   if (process.env.EXPO_ROUTER_APP_ROOT) {
@@ -35,7 +48,17 @@ module.exports = function (api) {
       // Add support for Node.js __filename
       Identifier(path, state) {
         if (path.node.name === "__filename") {
-          path.replaceWith(t.stringLiteral(getRelPath(state)));
+          path.replaceWith(
+            t.stringLiteral(
+              // `/index.js` is the value used by Webpack.
+              getRelPath(state)
+            )
+          );
+        }
+        // Add support for Node.js `__dirname`.
+        // This static value comes from Webpack somewhere.
+        if (path.node.name === "__dirname") {
+          path.replaceWith(t.stringLiteral("/"));
         }
       },
 
@@ -53,6 +76,9 @@ module.exports = function (api) {
           return;
         }
 
+        const projectRoot =
+          process.env.EXPO_PROJECT_ROOT || state.file.opts.root || "";
+
         // Used for log box and stuff
         if (
           t.isIdentifier(parent.node.property, {
@@ -60,11 +86,20 @@ module.exports = function (api) {
           }) &&
           !parent.parentPath.isAssignmentExpression()
         ) {
-          parent.replaceWith(
-            t.stringLiteral(
-              process.env.EXPO_PROJECT_ROOT || state.file.opts.root || ""
-            )
-          );
+          parent.replaceWith(t.stringLiteral(projectRoot));
+          return;
+        }
+
+        // Surfaces the `app.json` (config) as an environment variable which is then parsed by
+        // `expo-constants` https://docs.expo.dev/versions/latest/sdk/constants/
+        if (
+          t.isIdentifier(parent.node.property, {
+            name: "APP_MANIFEST",
+          }) &&
+          !parent.parentPath.isAssignmentExpression()
+        ) {
+          const manifest = getExpoAppManifest(projectRoot);
+          parent.replaceWith(t.stringLiteral(manifest));
           return;
         }
 
@@ -82,7 +117,7 @@ module.exports = function (api) {
 
         parent.replaceWith(
           // This is defined in Expo CLI when using Metro. It points to the relative path for the project app directory.
-          t.stringLiteral(getExpoRouterAppRoot(state.file.opts.root))
+          t.stringLiteral(getExpoRouterAppRoot(projectRoot))
         );
       },
     },

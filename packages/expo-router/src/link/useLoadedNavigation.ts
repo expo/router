@@ -1,5 +1,5 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 
 import { RootContainer } from "../ContextNavigationContainer";
 
@@ -46,4 +46,15 @@ export function useLoadedNavigation() {
   );
 
   return push;
+}
+
+export function useOptionalNavigation(): GenericNavigation | null {
+  const [navigation, setNavigation] = useState<GenericNavigation | null>(null);
+  const loadNavigation = useLoadedNavigation();
+
+  useEffect(() => {
+    loadNavigation((nav) => setNavigation(nav));
+  }, []);
+
+  return navigation;
 }

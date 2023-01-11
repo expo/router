@@ -5,13 +5,12 @@ const asRouteNode = (route: string) =>
   ({
     children: [],
     dynamic: generateDynamic(route),
-    getComponent(): any {
-      return function () {
-        return null;
+    loadRoute(): any {
+      return {
+        default() {
+          return null;
+        },
       };
-    },
-    getExtras(): any {
-      return {};
     },
     route,
     contextKey: "INVALID_TEST_VALUE",
@@ -37,11 +36,18 @@ describe(sortRoutes, () => {
     expect(sortRoutes(asRouteNode("(zzz)"), asRouteNode("z"))).toBe(-1);
     expect(sortRoutes(asRouteNode("(zzz)"), asRouteNode("index"))).toBe(0);
   });
+  it(`sorts multiple dynamic routes higher than a single deep dynamic route`, () => {
+    // dynamic before deep dynamic
+    expect(sortRoutes(asRouteNode("[a]/[b]"), asRouteNode("[...a]"))).toBe(-1);
+    expect(sortRoutes(asRouteNode("[...a]"), asRouteNode("[a]/[b]"))).toBe(1);
+  });
+
   it(`sorts dynamic routes by priority`, () => {
     // dynamic before deep dynamic
     expect(sortRoutes(asRouteNode("[a]"), asRouteNode("[...a]"))).toBe(-1);
     // tied with two dynamic routes
     expect(sortRoutes(asRouteNode("[a]"), asRouteNode("[b]"))).toBe(0);
+    expect(sortRoutes(asRouteNode("[a]/[b]"), asRouteNode("[b]/[a]"))).toBe(0);
     // Lower priority
     expect(sortRoutes(asRouteNode("[a]"), asRouteNode("index"))).toBe(1);
     expect(sortRoutes(asRouteNode("[a]"), asRouteNode("a"))).toBe(1);
@@ -49,8 +55,14 @@ describe(sortRoutes, () => {
   });
   it(`sorts deep dynamic routes by priority`, () => {
     expect(sortRoutes(asRouteNode("[...a]"), asRouteNode("[...beta]"))).toBe(0);
+    expect(
+      sortRoutes(asRouteNode("[...a]/[b]"), asRouteNode("[...beta]/[c]"))
+    ).toBe(0);
     // Lower priority
     expect(sortRoutes(asRouteNode("[...a]"), asRouteNode("[b]"))).toBe(1);
+    expect(sortRoutes(asRouteNode("[...a]/[a]"), asRouteNode("[b]/[c]"))).toBe(
+      1
+    );
     expect(sortRoutes(asRouteNode("[...a]"), asRouteNode("index"))).toBe(1);
     expect(sortRoutes(asRouteNode("[...a]"), asRouteNode("a"))).toBe(1);
     expect(sortRoutes(asRouteNode("[...a]"), asRouteNode("(a)"))).toBe(1);

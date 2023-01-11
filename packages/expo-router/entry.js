@@ -1,4 +1,5 @@
-import ErrorOverlay from "@bacons/expo-metro-runtime/error-overlay";
+import "@expo/metro-runtime";
+import { withErrorOverlay } from "@expo/metro-runtime/error-overlay";
 import { registerRootComponent } from "expo";
 import { ExpoRoot, SplashScreen } from "expo-router";
 import { View, Platform } from "react-native";
@@ -13,11 +14,7 @@ export function App() {
     /.*/,
     "lazy"
   );
-  return (
-    <ErrorOverlay>
-      <ExpoRoot context={ctx} />
-    </ErrorOverlay>
-  );
+  return <ExpoRoot context={ctx} />;
 }
 
 function isBaseObject(obj) {
@@ -66,7 +63,7 @@ function convertError(error) {
   try {
     SplashScreen.preventAutoHideAsync();
 
-    registerRootComponent(App);
+    registerRootComponent(withErrorOverlay(App));
   } catch (e) {
     // Hide the splash screen if there was an error so the user can see it.
     SplashScreen.hideAsync();

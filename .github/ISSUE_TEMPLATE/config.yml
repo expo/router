@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Support
+    url: https://github.com/expo/router/discussions
+    about: Please ask and answer questions regarding Expo Router in the discussions.
+  - name: Expo Developers Discord
+    url: https://chat.expo.dev/
+    about: Join other developers in discussions regarding Expo.

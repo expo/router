@@ -1,19 +1,31 @@
-export { useFocusEffect } from "@react-navigation/native";
-export { ErrorBoundaryProps } from "./views/Try";
+// Expo Router API
+import { Navigator, Slot } from "./views/Layout";
+
+export { useRouter } from "./link/useRouter";
+export { usePathname, useSearchParams, useSegments } from "./LocationProvider";
+export { Link, Redirect } from "./link/Link";
 
 export { withLayoutContext } from "./layouts/withLayoutContext";
+export { Navigator, Slot };
 
+// Expo Router Views
 export { ExpoRoot } from "./views/Root";
 export { Unmatched } from "./views/Unmatched";
+export { ErrorBoundaryProps } from "./views/Try";
 export { ErrorBoundary } from "./views/ErrorBoundary";
 
-export { Layout, Children } from "./views/Layout";
-export { Link, Redirect } from "./link/Link";
-export { useLink } from "./link/useLink";
-export { RootContainer } from "./ContextNavigationContainer";
-
+// Platform
+export { SplashScreen } from "./views/Splash";
 export * as Linking from "./link/linking";
 
-export { SplashScreen } from "./views/Splash";
-export { useHref } from "./link/useHref";
+// React Navigation
 export { useNavigation } from "./useNavigation";
+export { RootContainer } from "./ContextNavigationContainer";
+export { useFocusEffect } from "./useFocusEffect";
+
+// Deprecated (doesn't matter in beta)
+
+/** @deprecated use `<Navigator />` */
+export const Layout = Navigator;
+/** @deprecated use `<Slot />` */
+export const Children = Slot;

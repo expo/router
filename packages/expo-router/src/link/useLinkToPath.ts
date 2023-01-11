@@ -1,11 +1,12 @@
 import {
   getActionFromState,
-  getStateFromPath,
   NavigationContainerRefContext,
 } from "@react-navigation/core";
-import { LinkingContext } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 import * as React from "react";
+
+import { resolve } from "./path";
+import { useLinkingContext } from "./useLinkingContext";
 
 function isRemoteHref(href: string): boolean {
   return /:\/\//.test(href);
@@ -13,7 +14,7 @@ function isRemoteHref(href: string): boolean {
 
 export function useLinkToPath() {
   const navigation = React.useContext(NavigationContainerRefContext);
-  const linking = React.useContext(LinkingContext);
+  const linking = useLinkingContext();
 
   const linkTo = React.useCallback(
     (to: string, event?: string) => {
@@ -22,20 +23,34 @@ export function useLinkToPath() {
         return;
       }
 
-      if (navigation === undefined) {
+      if (navigation == null) {
         throw new Error(
           "Couldn't find a navigation object. Is your component inside NavigationContainer?"
         );
       }
 
-      const { options } = linking;
+      if (to === ".." || to === "../") {
+        navigation.goBack();
+        return;
+      }
 
-      const state = options?.getStateFromPath
-        ? options.getStateFromPath(to, options.config)
-        : getStateFromPath(to, options?.config);
+      if (to.startsWith(".")) {
+        let base = linking.getPathFromState?.(navigation.getRootState(), {
+          ...linking.config,
+          // @ts-expect-error: non-standard option
+          preserveGroups: true,
+        });
+
+        if (base && !base.endsWith("/")) {
+          base += "/..";
+        }
+        to = resolve(base, to);
+      }
+
+      const state = linking.getStateFromPath!(to, linking!.config);
 
       if (state) {
-        const action = getActionFromState(state, options?.config);
+        const action = getActionFromState(state, linking?.config);
 
         if (action !== undefined) {
           if (event) {

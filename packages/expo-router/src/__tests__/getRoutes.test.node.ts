@@ -22,7 +22,7 @@ function createMockContextModule(
 const ROUTE_404 = {
   children: [],
   contextKey: "./[...404].tsx",
-  dynamic: { deep: true, name: "404" },
+  dynamic: [{ deep: true, name: "404" }],
   generated: true,
   internal: true,
   route: "[...404]",
@@ -38,13 +38,12 @@ const ROUTE_DIRECTORY = {
 };
 
 const asFileNode = (route: Partial<FileNode>): FileNode => ({
-  getComponent(): any {
-    return function () {
-      return null;
+  loadRoute(): any {
+    return {
+      default() {
+        return null;
+      },
     };
-  },
-  getExtras(): any {
-    return {};
   },
   normalizedName: "INVALID_TEST_VALUE",
   contextKey: "INVALID_TEST_VALUE",
@@ -52,13 +51,12 @@ const asFileNode = (route: Partial<FileNode>): FileNode => ({
 });
 
 const asRouteNode = (route: Partial<RouteNode>) => ({
-  getComponent(): any {
-    return function () {
-      return null;
+  loadRoute(): any {
+    return {
+      default() {
+        return null;
+      },
     };
-  },
-  getExtras(): any {
-    return {};
   },
   children: [],
   dynamic: null,
@@ -223,7 +221,7 @@ describe(getRoutes, () => {
         {
           children: [],
           contextKey: "./[...404].tsx",
-          dynamic: { deep: true, name: "404" },
+          dynamic: [{ deep: true, name: "404" }],
           generated: true,
           internal: true,
           route: "[...404]",
@@ -279,20 +277,24 @@ describe(getRoutes, () => {
           {
             children: [],
             contextKey: "./[dynamic].tsx",
-            dynamic: {
-              deep: false,
-              name: "dynamic",
-            },
+            dynamic: [
+              {
+                deep: false,
+                name: "dynamic",
+              },
+            ],
 
             route: "[dynamic]",
           },
           {
             children: [],
             contextKey: "./[...deep].tsx",
-            dynamic: {
-              deep: true,
-              name: "deep",
-            },
+            dynamic: [
+              {
+                deep: true,
+                name: "deep",
+              },
+            ],
 
             route: "[...deep]",
           },
@@ -303,7 +305,7 @@ describe(getRoutes, () => {
     );
   });
 
-  function dropFunctions({ getComponent, getExtras, ...node }: RouteNode) {
+  function dropFunctions({ loadRoute, ...node }: RouteNode) {
     return {
       ...node,
       children: node.children.map(dropFunctions),
@@ -368,7 +370,12 @@ describe(getRoutes, () => {
             {
               children: [],
               contextKey: "./(stack)/user/[profile].tsx",
-              dynamic: null,
+              dynamic: [
+                {
+                  deep: false,
+                  name: "profile",
+                },
+              ],
               route: "user/[profile]",
             },
             {
@@ -382,7 +389,7 @@ describe(getRoutes, () => {
                 {
                   children: [],
                   contextKey: "./(stack)/user/settings/[...other].tsx",
-                  dynamic: { deep: true, name: "other" },
+                  dynamic: [{ deep: true, name: "other" }],
                   route: "[...other]",
                 },
               ],

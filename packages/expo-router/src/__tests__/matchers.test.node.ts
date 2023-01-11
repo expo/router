@@ -2,19 +2,29 @@ import {
   matchDynamicName,
   matchDeepDynamicRouteName,
   getNameFromFilePath,
-  matchFragmentName,
+  matchGroupName,
+  stripGroupSegmentsFromPath,
 } from "../matchers";
 
-describe(matchFragmentName, () => {
+describe(stripGroupSegmentsFromPath, () => {
+  it(`strips group segments, preserving initial slash`, () => {
+    expect(
+      stripGroupSegmentsFromPath("/[[...foobar]]/(foo)/bar/[bax]/(other)")
+    ).toBe("/[[...foobar]]/bar/[bax]");
+    expect(stripGroupSegmentsFromPath("(foo)/(bar)")).toBe("");
+  });
+});
+
+describe(matchGroupName, () => {
   it(`matches`, () => {
-    expect(matchFragmentName("[[...foobar]]")).toEqual(undefined);
-    expect(matchFragmentName("[[foobar]]")).toEqual(undefined);
-    expect(matchFragmentName("[...foobar]")).toEqual(undefined);
-    expect(matchFragmentName("[foobar]")).toEqual(undefined);
-    expect(matchFragmentName("(foobar)")).toEqual("foobar");
-    expect(matchFragmentName("((foobar))")).toEqual("(foobar)");
-    expect(matchFragmentName("(...foobar)")).toEqual("...foobar");
-    expect(matchFragmentName("foobar")).toEqual(undefined);
+    expect(matchGroupName("[[...foobar]]")).toEqual(undefined);
+    expect(matchGroupName("[[foobar]]")).toEqual(undefined);
+    expect(matchGroupName("[...foobar]")).toEqual(undefined);
+    expect(matchGroupName("[foobar]")).toEqual(undefined);
+    expect(matchGroupName("(foobar)")).toEqual("foobar");
+    expect(matchGroupName("((foobar))")).toEqual("(foobar)");
+    expect(matchGroupName("(...foobar)")).toEqual("...foobar");
+    expect(matchGroupName("foobar")).toEqual(undefined);
   });
 });
 describe(matchDynamicName, () => {

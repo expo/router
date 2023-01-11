@@ -2,13 +2,15 @@ import { StyleSheet, Text, View } from "@bacons/react-views";
 import { createURL } from "expo-linking";
 import React, { forwardRef } from "react";
 
+import { usePathname } from "../LocationProvider";
 import { Link } from "../link/Link";
 import { useNavigation } from "../useNavigation";
 
 /** Default screen for unmatched routes. */
 export const Unmatched = forwardRef((props, ref) => {
   const navigation = useNavigation();
-  const url = createURL("");
+  const pathname = usePathname();
+  const url = createURL(pathname);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -32,16 +34,16 @@ export const Unmatched = forwardRef((props, ref) => {
         style={styles.subtitle}
       >
         Page could not be found.{" "}
-        <Link href="/" style={styles.link}>
+        <Link href="/" replace style={styles.link}>
           Go back.
         </Link>
       </Text>
 
-      <Link href="/" style={styles.link}>
+      <Link href={pathname} replace style={styles.link}>
         {url}
       </Link>
 
-      <Link href="/_sitemap" style={[styles.link, { marginTop: 8 }]}>
+      <Link href="/_sitemap" replace style={[styles.link, { marginTop: 8 }]}>
         Sitemap
       </Link>
     </View>

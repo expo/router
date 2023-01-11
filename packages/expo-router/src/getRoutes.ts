@@ -1,17 +1,15 @@
-import { RouteNode } from "./Route";
+import { DynamicConvention, RouteNode } from "./Route";
 import {
   getNameFromFilePath,
   matchDeepDynamicRouteName,
   matchDynamicName,
-  matchFragmentName,
+  matchGroupName,
+  stripGroupSegmentsFromPath,
 } from "./matchers";
 import { RequireContext } from "./types";
-import { DefaultLayout } from "./views/Layout";
+import { DefaultNavigator } from "./views/Layout";
 
-export type FileNode = Pick<
-  RouteNode,
-  "contextKey" | "getComponent" | "getExtras"
-> & {
+export type FileNode = Pick<RouteNode, "contextKey" | "loadRoute"> & {
   /** Like `(tab)/index` */
   normalizedName: string;
 };
@@ -94,11 +92,87 @@ function getTreeNodesAsRouteNodes(nodes: TreeNode[]): RouteNode[] {
   return nodes.map(treeNodeToRouteNode).flat().filter(Boolean) as RouteNode[];
 }
 
-export function generateDynamic(name: string) {
+export function generateDynamicFromSegment(
+  name: string
+): DynamicConvention | null {
   const deepDynamicName = matchDeepDynamicRouteName(name);
   const dynamicName = deepDynamicName ?? matchDynamicName(name);
 
   return dynamicName ? { name: dynamicName, deep: !!deepDynamicName } : null;
+}
+
+export function generateDynamic(name: string): RouteNode["dynamic"] {
+  const description = name
+    .split("/")
+    .map((segment) => generateDynamicFromSegment(segment))
+    .filter(Boolean) as DynamicConvention[];
+  return description.length === 0 ? null : description;
+}
+
+function collapseRouteSegments(route: string) {
+  return stripGroupSegmentsFromPath(route.replace(/\/index$/, ""));
+}
+
+/**
+ * Given a route node and a name representing the group name,
+ * find the nearest child matching the name.
+ *
+ * Doesn't support slashes in the name.
+ * Routes like `explore/(something)/index` will be matched against `explore`.
+ *
+ */
+function getDefaultInitialRoute(node: RouteNode, name: string) {
+  return node.children.find(
+    (node) => collapseRouteSegments(node.route) === name
+  );
+}
+
+function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
+  const groupName = matchGroupName(node.route);
+  if (!node.children?.length) {
+    return node;
+  }
+
+  // Guess at the initial route based on the group name.
+  // TODO(EvanBacon): Perhaps we should attempt to warn when the group doesn't match any child routes.
+  let initialRouteName = groupName
+    ? getDefaultInitialRoute(node, groupName)?.route
+    : undefined;
+  const loaded = node.loadRoute();
+
+  if (loaded.unstable_settings) {
+    // Allow unstable_settings={ initialRouteName: '...' } to override the default initial route name.
+    initialRouteName =
+      loaded.unstable_settings.initialRouteName ?? initialRouteName;
+
+    if (groupName) {
+      // Allow unstable_settings={ 'custom': { initialRouteName: '...' } } to override the less specific initial route name.
+      const groupSpecificInitialRouteName =
+        loaded.unstable_settings?.[groupName]?.initialRouteName;
+
+      initialRouteName = groupSpecificInitialRouteName ?? initialRouteName;
+    }
+  }
+
+  return {
+    ...node,
+    initialRouteName,
+  };
+}
+
+function cloneGroupRoute(
+  node: RouteNode,
+  { name: nextName }: { name: string }
+): RouteNode {
+  const groupName = `(${nextName})`;
+  const parts = node.contextKey.split("/");
+  parts[parts.length - 2] = groupName;
+
+  return {
+    ...node,
+    route: groupName,
+    contextKey: parts.join("/"),
+  };
 }
 
 function treeNodeToRouteNode({
@@ -109,15 +183,48 @@ function treeNodeToRouteNode({
   const dynamic = generateDynamic(name);
 
   if (node) {
+    const groupName = matchGroupName(name);
+    const multiGroup = groupName?.includes(",");
+
+    const clones = multiGroup
+      ? groupName!.split(",").map((v) => ({ name: v.trim() }))
+      : null;
+
+    // Assert duplicates:
+    if (clones) {
+      const names = new Set<string>();
+      for (const clone of clones) {
+        if (names.has(clone.name)) {
+          throw new Error(
+            `Array syntax cannot contain duplicate group name "${clone.name}" in "${node.contextKey}".`
+          );
+        }
+        names.add(clone.name);
+      }
+    }
+
+    const output = {
+      loadRoute: node.loadRoute,
+      route: name,
+      contextKey: node.contextKey,
+      children: getTreeNodesAsRouteNodes(children),
+      dynamic,
+    };
+
+    if (Array.isArray(clones)) {
+      return clones.map((clone) =>
+        applyDefaultInitialRouteName(cloneGroupRoute({ ...output }, clone))
+      );
+    }
+
     return [
-      {
+      applyDefaultInitialRouteName({
+        loadRoute: node.loadRoute,
         route: name,
-        getExtras: node.getExtras,
-        getComponent: node.getComponent,
         contextKey: node.contextKey,
         children: getTreeNodesAsRouteNodes(children),
         dynamic,
-      },
+      }),
     ];
   }
 
@@ -153,25 +260,15 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
     // }
 
     const node: FileNode = {
-      normalizedName: getNameFromFilePath(key),
-      getComponent() {
+      loadRoute: () => {
         const mod = contextModule(key);
         if (mod instanceof Promise) {
           return mod.then((m) => m);
         }
         return mod;
       },
+      normalizedName: getNameFromFilePath(key),
       contextKey: key,
-      getExtras() {
-        const mod = contextModule(key);
-
-        if (mod instanceof Promise) {
-          return mod.then(({ default: _, ...extras }) => extras ?? {});
-        }
-
-        const { default: _, ...extras } = mod;
-        return extras;
-      },
     };
 
     return node;
@@ -208,13 +305,12 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
   }
 
   return {
+    loadRoute: () => ({ default: DefaultNavigator }),
     // Generate a fake file name for the directory
     contextKey: "./_layout.tsx",
     route: "",
     generated: true,
     dynamic: null,
-    getExtras: () => ({}),
-    getComponent: () => ({ default: DefaultLayout }),
     children: routes,
   };
 }
@@ -245,13 +341,10 @@ function appendSitemapRoute(routes: RouteNode) {
   ) {
     return routes;
   }
-  const { Directory, getNavOptions } = require("./views/Directory");
+  const { Sitemap, getNavOptions } = require("./views/Sitemap");
   routes.children.push({
-    getComponent() {
-      return { default: Directory };
-    },
-    getExtras() {
-      return { getNavOptions };
+    loadRoute() {
+      return { default: Sitemap, getNavOptions };
     },
     route: "_sitemap",
     contextKey: "./_sitemap.tsx",
@@ -268,15 +361,12 @@ function appendUnmatchedRoute(routes: RouteNode) {
   const userDefinedDynamicRoute = getUserDefinedDeepDynamicRoute(routes);
   if (!userDefinedDynamicRoute) {
     routes.children.push({
-      getComponent() {
+      loadRoute() {
         return { default: require("./views/Unmatched").Unmatched };
-      },
-      getExtras() {
-        return {};
       },
       route: "[...404]",
       contextKey: "./[...404].tsx",
-      dynamic: { name: "404", deep: true },
+      dynamic: [{ name: "404", deep: true }],
       children: [],
       generated: true,
       internal: true,
@@ -298,8 +388,8 @@ export function getUserDefinedDeepDynamicRoute(
     if (isDeepDynamic) {
       return route;
     }
-    // Recurse through fragment routes
-    if (matchFragmentName(route.route)) {
+    // Recurse through group routes
+    if (matchGroupName(route.route)) {
       const child = getUserDefinedDeepDynamicRoute(route);
       if (child) {
         return child;

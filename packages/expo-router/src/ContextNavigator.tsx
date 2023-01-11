@@ -1,11 +1,14 @@
 import React, { useMemo } from "react";
 
 import { ContextNavigationContainer } from "./ContextNavigationContainer";
+import { LocationProvider } from "./LocationProvider";
 import { RootRouteNodeContext, useRootRouteNodeContext } from "./context";
 import { getRoutes } from "./getRoutes";
 import { useTutorial } from "./onboard/useTutorial";
+import { InitialRootStateProvider } from "./rootStateContext";
 import { RequireContext } from "./types";
 import { getQualifiedRouteComponent } from "./useScreens";
+import { SplashScreen } from "./views/Splash";
 
 function useContextModuleAsRoutes(context: RequireContext) {
   // TODO: Is this an optimal hook dependency?
@@ -31,13 +34,18 @@ function RootRouteNodeProvider({
 export function ContextNavigator({ context }: { context: RequireContext }) {
   const Tutorial = useTutorial(context);
   if (Tutorial) {
+    SplashScreen.hideAsync();
     return <Tutorial />;
   }
 
   return (
     <RootRouteNodeProvider context={context}>
       <ContextNavigationContainer>
-        <RootRoute />
+        <InitialRootStateProvider>
+          <LocationProvider>
+            <RootRoute />
+          </LocationProvider>
+        </InitialRootStateProvider>
       </ContextNavigationContainer>
     </RootRouteNodeProvider>
   );
@@ -45,8 +53,6 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
 
 function RootRoute() {
   const root = useRootRouteNodeContext();
-
   const Component = getQualifiedRouteComponent(root);
-  // @ts-expect-error: TODO: Drop navigation and route props
   return <Component />;
 }

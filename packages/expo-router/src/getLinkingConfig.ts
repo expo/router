@@ -1,43 +1,42 @@
-import { LinkingOptions } from "@react-navigation/native";
+import { LinkingOptions, getActionFromState } from "@react-navigation/native";
 
 import { RouteNode } from "./Route";
 import { getAllWebRedirects } from "./aasa";
 import {
   addEventListener,
   getInitialURL,
-  getRootURL,
   getPathFromState,
+  getRootURL,
   getStateFromPath,
 } from "./link/linking";
-import {
-  matchDeepDynamicRouteName,
-  matchDynamicName,
-  matchFragmentName,
-} from "./matchers";
+import { matchDeepDynamicRouteName, matchDynamicName } from "./matchers";
 
 type Screen =
   | string
   | {
       path: string;
       screens: Record<string, Screen>;
+      initialRouteName?: string;
     };
 
 // `[page]` -> `:page`
 // `page` -> `page`
-function convertDynamicRouteToReactNavigation(name: string) {
-  if (name === "index" || matchFragmentName(name) != null) {
+function convertDynamicRouteToReactNavigation(segment: string): string {
+  // NOTE(EvanBacon): To support shared routes we preserve group segments.
+  if (segment === "index") {
     return "";
   }
-  if (matchDeepDynamicRouteName(name) != null) {
+
+  if (matchDeepDynamicRouteName(segment) != null) {
     return "*";
   }
-  const dynamicName = matchDynamicName(name);
+  const dynamicName = matchDynamicName(segment);
 
   if (dynamicName != null) {
     return `:${dynamicName}`;
   }
 
-  return name;
+  return segment;
 }
 
 function parseRouteSegments(segments: string): string {
@@ -49,7 +48,7 @@ function parseRouteSegments(segments: string): string {
       .split("/")
       // Convert each segment to a React Navigation format.
       .map(convertDynamicRouteToReactNavigation)
-      // Remove any empty paths from fragments or index routes.
+      // Remove any empty paths from groups or index routes.
       .filter(Boolean)
       // Join to return as a path.
       .join("/")
@@ -62,7 +61,15 @@ function convertRouteNodeToScreen(node: RouteNode): Screen {
     return path;
   }
   const screens = getReactNavigationScreensConfig(node.children);
-  return { path, screens };
+  return {
+    path,
+    screens,
+    // NOTE(EvanBacon): This is bad because it forces all Layout Routes
+    // to be loaded into memory. We should move towards a system where
+    // the initial route name is either loaded asynchronously in the Layout Route
+    // or defined via a file system convention.
+    initialRouteName: node.initialRouteName,
+  };
 }
 
 export function getReactNavigationScreensConfig(
@@ -84,6 +91,8 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
       ...getAllWebRedirects(),
     ],
     config: {
+      // @ts-expect-error
+      initialRouteName: routes.initialRouteName,
       screens: getReactNavigationScreensConfig(routes.children),
     },
     // A custom getInitialURL is used on native to ensure the app always starts at
@@ -95,5 +104,8 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
     subscribe: addEventListener,
     getStateFromPath,
     getPathFromState,
+    // Add all functions to ensure the types never need to fallback.
+    // This is a convenience for usage in the package.
+    getActionFromState,
   };
 }

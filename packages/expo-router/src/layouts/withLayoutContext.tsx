@@ -8,7 +8,14 @@ type PickPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export function useFilterScreenChildren(
   children: React.ReactNode,
-  { isCustomNavigator }: { isCustomNavigator?: boolean } = {}
+  {
+    isCustomNavigator,
+    contextKey,
+  }: {
+    isCustomNavigator?: boolean;
+    /** Used for sending developer hints */
+    contextKey?: string;
+  } = {}
 ) {
   return React.useMemo(() => {
     const customChildren: any[] = [];
@@ -16,7 +23,7 @@ export function useFilterScreenChildren(
       if (React.isValidElement(child) && child && child.type === Screen) {
         if (!child.props.name) {
           throw new Error(
-            "Screen must have a name prop when used as a child of a Layout"
+            `<Screen /> component in \`default export\` at \`app${contextKey}/_layout\` must have a \`name\` prop when used as a child of a Layout Route.`
           );
         }
         if (process.env.NODE_ENV !== "production") {
@@ -26,7 +33,7 @@ export function useFilterScreenChildren(
             )
           ) {
             throw new Error(
-              "Screen must not have a children, component, or getComponent prop when used as a child of a Layout"
+              `<Screen /> component in \`default export\` at \`app${contextKey}/_layout\` must not have a \`children\`, \`component\`, or \`getComponent\` prop when used as a child of a Layout Route`
             );
           }
         }
@@ -36,7 +43,7 @@ export function useFilterScreenChildren(
           customChildren.push(child);
         } else {
           console.warn(
-            "Layout children must be of type Screen, all other children are ignored. To use custom children, create a custom <Layout />."
+            `Layout children must be of type Screen, all other children are ignored. To use custom children, create a custom <Layout />. Update Layout Route at: "app${contextKey}/_layout"`
           );
         }
       }
@@ -81,7 +88,9 @@ export function withLayoutContext<
     ) => {
       const contextKey = useContextKey();
 
-      const { screens } = useFilterScreenChildren(userDefinedChildren);
+      const { screens } = useFilterScreenChildren(userDefinedChildren, {
+        contextKey,
+      });
 
       const processed = processor ? processor(screens ?? []) : screens;
 

@@ -7,50 +7,56 @@ const mockRoutes = [
         children: [],
         dynamic: null,
         route: "people",
-        contextKey: "./(second-fragment)/people.tsx",
+        contextKey: "./(second-group)/people.tsx",
       },
     ],
     dynamic: null,
-    route: "(second-fragment)",
-    contextKey: "./(second-fragment)/_layout.tsx",
+    route: "(second-group)",
+    contextKey: "./(second-group)/_layout.tsx",
   },
   {
     children: [
       {
         children: [],
-        dynamic: {
-          name: "deep",
-          deep: true,
-        },
+        dynamic: [
+          {
+            name: "deep",
+            deep: true,
+          },
+        ],
         route: "[...deep]",
-        contextKey: "./(fragment)/[...deep].tsx",
+        contextKey: "./(group)/[...deep].tsx",
       },
       {
         children: [],
-        dynamic: {
-          name: "dynamic",
-          deep: false,
-        },
+        dynamic: [
+          {
+            name: "dynamic",
+            deep: false,
+          },
+        ],
         route: "[dynamic]",
-        contextKey: "./(fragment)/[dynamic].tsx",
+        contextKey: "./(group)/[dynamic].tsx",
       },
       {
         children: [],
         dynamic: null,
         route: "index",
-        contextKey: "./(fragment)/index.tsx",
+        contextKey: "./(group)/index.tsx",
       },
     ],
     dynamic: null,
-    route: "(fragment)",
-    contextKey: "./(fragment)/_layout.tsx",
+    route: "(group)",
+    contextKey: "./(group)/_layout.tsx",
   },
   {
     children: [],
-    dynamic: {
-      name: "screen",
-      deep: true,
-    },
+    dynamic: [
+      {
+        name: "screen",
+        deep: true,
+      },
+    ],
     route: "other/nested/[...screen]",
     contextKey: "./other/nested/[...screen].js",
   },
@@ -72,11 +78,16 @@ describe(getReactNavigationScreensConfig, () => {
         mockRoutes
       )
     ).toEqual({
-      "(fragment)": {
-        path: "",
+      "(group)": {
+        initialRouteName: undefined,
+        path: "(group)",
         screens: { "[...deep]": "*", "[dynamic]": ":dynamic", index: "" },
       },
-      "(second-fragment)": { path: "", screens: { people: "people" } },
+      "(second-group)": {
+        initialRouteName: undefined,
+        path: "(second-group)",
+        screens: { people: "people" },
+      },
       _sitemap: "_sitemap",
       "other/nested/[...screen]": "other/nested/*",
     });

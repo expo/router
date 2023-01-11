@@ -1,21 +1,24 @@
 import React, { ReactNode, useContext } from "react";
 
 import { RootRouteNodeContext } from "./context";
-import { getNameFromFilePath, matchFragmentName } from "./matchers";
+import { getNameFromFilePath, matchGroupName } from "./matchers";
 
 /** The list of input keys will become optional, everything else will remain the same. */
 export type PickPartial<T, K extends keyof T> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
+export type DynamicConvention = { name: string; deep: boolean };
+
 export type RouteNode = {
+  /** Load a route into memory. Returns the exports from a route. */
+  loadRoute: () => any;
+
+  /** Loaded initial route name. */
+  initialRouteName?: string;
   /** nested routes */
   children: RouteNode[];
-  /** Lazily get the React component */
-  getComponent: () => React.ComponentType<any>;
   /** Is the route a dynamic path */
-  dynamic: null | { name: string; deep: boolean };
-  /** All static exports from the file. */
-  getExtras: () => Record<string, any>;
+  dynamic: null | DynamicConvention[];
   /** `index`, `error-boundary`, etc. */
   route: string;
   /** require.context key, used for matching children. */
@@ -80,6 +83,20 @@ export function useRootRoute(): RouteNode | null {
   return useContext(RootRouteNodeContext);
 }
 
+export function sortRoutesWithInitial(initialRouteName?: string) {
+  return (a: RouteNode, b: RouteNode): number => {
+    if (initialRouteName) {
+      if (a.route === initialRouteName) {
+        return -1;
+      }
+      if (b.route === initialRouteName) {
+        return 1;
+      }
+    }
+    return sortRoutes(a, b);
+  };
+}
+
 export function sortRoutes(a: RouteNode, b: RouteNode): number {
   if (a.dynamic && !b.dynamic) {
     return 1;
@@ -88,17 +105,24 @@ export function sortRoutes(a: RouteNode, b: RouteNode): number {
     return -1;
   }
   if (a.dynamic && b.dynamic) {
-    if (a.dynamic.deep && !b.dynamic.deep) {
-      return 1;
+    if (a.dynamic.length !== b.dynamic.length) {
+      return b.dynamic.length - a.dynamic.length;
     }
-    if (!a.dynamic.deep && b.dynamic.deep) {
-      return -1;
+    for (let i = 0; i < a.dynamic.length; i++) {
+      const aDynamic = a.dynamic[i];
+      const bDynamic = b.dynamic[i];
+      if (aDynamic.deep && !bDynamic.deep) {
+        return 1;
+      }
+      if (!aDynamic.deep && bDynamic.deep) {
+        return -1;
+      }
     }
     return 0;
   }
 
-  const aIndex = a.route === "index" || matchFragmentName(a.route) != null;
-  const bIndex = b.route === "index" || matchFragmentName(b.route) != null;
+  const aIndex = a.route === "index" || matchGroupName(a.route) != null;
+  const bIndex = b.route === "index" || matchGroupName(b.route) != null;
 
   if (aIndex && !bIndex) {
     return -1;

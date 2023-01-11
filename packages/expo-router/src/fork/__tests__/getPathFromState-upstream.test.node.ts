@@ -7,39 +7,297 @@ import getStateFromPath from "../getStateFromPath";
 
 type State = PartialState<NavigationState>;
 
-it("converts state to path string", () => {
-  const state = {
-    routes: [
-      {
-        name: "foo",
-        state: {
-          index: 1,
-          routes: [
-            { name: "boo" },
-            {
-              name: "bar",
-              params: { fruit: "apple" },
-              state: {
-                routes: [
-                  {
-                    name: "baz qux",
-                    params: { author: "jane", valid: true },
+[
+  [
+    {
+      index: 0,
+      routes: [
+        {
+          name: "(app)",
+          params: {
+            user: "evanbacon",
+            initial: true,
+            screen: "(explore)",
+            params: {
+              user: "evanbacon",
+              initial: false,
+              screen: "[user]/index",
+              params: {
+                user: "evanbacon",
+              },
+              path: "/evanbacon",
+            },
+          },
+          state: {
+            index: 0,
+            routes: [
+              {
+                name: "(explore)",
+                params: {
+                  user: "evanbacon",
+                  initial: false,
+                  screen: "[user]/index",
+                  params: {
+                    user: "evanbacon",
                   },
-                ],
+                  path: "/evanbacon",
+                },
+              },
+            ],
+          },
+          key: "(app)-xxx",
+        },
+      ],
+    },
+    {
+      screens: {
+        "(app)": {
+          path: "(app)",
+          screens: {
+            "(explore)": {
+              path: "(explore)",
+              screens: {
+                "[user]/index": ":user",
+                explore: "explore",
+              },
+              initialRouteName: "explore",
+            },
+            "([user])": {
+              path: "([user])",
+              screens: {
+                "[user]/index": ":user",
+                explore: "explore",
+              },
+              initialRouteName: "[user]/index",
+            },
+          },
+        },
+
+        "[...404]": "*",
+      },
+    },
+    "/evanbacon",
+  ],
+
+  [
+    {
+      index: 0,
+      routes: [
+        {
+          name: "(app)",
+          params: {
+            initial: true,
+            screen: "(explore)",
+            params: {
+              initial: false,
+              screen: "compose",
+              path: "/compose",
+            },
+          },
+          state: {
+            index: 0,
+            routes: [
+              {
+                name: "([user])",
+                params: {
+                  user: "evanbacon",
+                },
+              },
+            ],
+          },
+          key: "(app)-xxx",
+        },
+      ],
+    },
+    {
+      screens: {
+        "(app)": {
+          path: "(app)",
+          screens: {
+            "(feed)": {
+              path: "(feed)",
+              screens: {
+                "[user]/index": ":user",
+                compose: "compose",
+                explore: "explore",
+                feed: "feed",
+              },
+              initialRouteName: "feed",
+            },
+            "(explore)": {
+              path: "(explore)",
+              screens: {
+                "[user]/index": ":user",
+                compose: "compose",
+                explore: "explore",
+                feed: "feed",
+              },
+              initialRouteName: "explore",
+            },
+            "([user])": {
+              path: "([user])",
+              screens: {
+                "[user]/index": ":user",
+                compose: "compose",
+                explore: "explore",
+                feed: "feed",
+              },
+              initialRouteName: "[user]/index",
+            },
+          },
+        },
+        "[...404]": "*",
+      },
+    },
+    "/evanbacon",
+  ],
+].forEach(([state, config, expected], index) => {
+  it(`matches required assumptions: ${index}`, () => {
+    // @ts-expect-error
+    expect(getPathFromState(state, config)).toBe(expected);
+  });
+});
+
+it(`supports resolving nonexistent, nested synthetic states into paths that cannot be resolved`, () => {
+  expect(
+    getPathFromState(
+      {
+        index: 0,
+        routes: [
+          {
+            name: "(root)",
+            state: {
+              index: 0,
+              routes: [
+                {
+                  name: "modal",
+                  path: "/modal",
+                  key: "modal-qhPtAt8RdiCEcxrLJtxG1",
+                  state: {
+                    index: 0,
+                    routes: [
+                      {
+                        name: "index",
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+            key: "(root)-teRKULujwLUHDOUPQ8g2Z",
+          },
+        ],
+      },
+      {
+        screens: {
+          "(root)": {
+            path: "(root)",
+            screens: {
+              "(tabs)": {
+                path: "(tabs)",
+                screens: {
+                  index: "",
+                  two: "two",
+                },
+              },
+              "[...missing]": "*",
+              modal: "modal",
+            },
+            initialRouteName: "(tabs)",
+          },
+          _sitemap: "_sitemap",
+        },
+      } as any
+    )
+  ).toEqual("/modal");
+});
+
+it("does not collapse conventions", () => {
+  expect(
+    getPathFromState(
+      {
+        stale: false,
+        type: "stack",
+        key: "stack-As9iX2L8B1j6ZjV3xN8aQ",
+        index: 0,
+        routeNames: ["(app)"],
+        routes: [
+          {
+            name: "(app)",
+            params: {
+              user: "bacon",
+            },
+            state: {
+              stale: false,
+              type: "stack",
+              key: "stack-TihHf0Ci6SaO_avdb9IAz",
+              index: 0,
+              routeNames: ["[user]"],
+              routes: [
+                {
+                  name: "[user]",
+                  params: {
+                    user: "bacon",
+                  },
+                  state: {
+                    stale: false,
+                    type: "tab",
+                    key: "tab-n3xlu2kPlKh1VOAQWJbEb",
+                    index: 1,
+                    routeNames: ["index", "related"],
+                    history: [
+                      {
+                        type: "route",
+                        key: "index-z-ZR1oYFE3kHksOXi4L9j",
+                      },
+                      {
+                        type: "route",
+                        key: "related-WWyKJe4_3X-PyqW5MIzN4",
+                      },
+                    ],
+                    routes: [
+                      {
+                        name: "index",
+                        key: "index-z-ZR1oYFE3kHksOXi4L9j",
+                      },
+                      {
+                        name: "related",
+                        params: {
+                          user: "bacon",
+                        },
+                        path: "/bacon/related",
+                        key: "related-WWyKJe4_3X-PyqW5MIzN4",
+                      },
+                    ],
+                  },
+                  key: "[user]-9qb40LvrbVOw4HArHBQQN",
+                },
+              ],
+            },
+            key: "(app)-eHHi2MUdVaFK_IshK8Y2J",
+          },
+        ],
+      },
+      {
+        screens: {
+          "(app)": {
+            path: "(app)",
+            screens: {
+              "[user]": {
+                path: ":user",
+                screens: {
+                  index: "",
+                  related: "related",
+                },
               },
             },
-          ],
+          },
         },
-      },
-    ],
-  };
-
-  const path = "/foo/bar/baz%20qux?author=jane&valid=true";
-
-  expect(getPathFromState<object>(state)).toBe(path);
-  expect(
-    getPathFromState<object>(getStateFromPath<object>(path) as State)
-  ).toBe(path);
+        preserveDynamicRoutes: true,
+        preserveGroups: true,
+      } as any
+    )
+  ).toBe("/(app)/[user]/related?user=bacon");
 });
 
 it("converts state to path string with config", () => {
@@ -108,42 +366,6 @@ it("converts state to path string with config", () => {
       getStateFromPath<object>(path, config) as State,
       config
     )
-  ).toBe(path);
-});
-
-it("handles route without param", () => {
-  const path = "/foo/bar";
-  const state = {
-    routes: [
-      {
-        name: "foo",
-        state: {
-          routes: [{ name: "bar" }],
-        },
-      },
-    ],
-  };
-
-  expect(getPathFromState<object>(state)).toBe(path);
-  expect(
-    getPathFromState<object>(getStateFromPath<object>(path) as State)
-  ).toBe(path);
-});
-
-it("doesn't add query param for empty params", () => {
-  const path = "/foo";
-  const state = {
-    routes: [
-      {
-        name: "foo",
-        params: {},
-      },
-    ],
-  };
-
-  expect(getPathFromState<object>(state)).toBe(path);
-  expect(
-    getPathFromState<object>(getStateFromPath<object>(path) as State)
   ).toBe(path);
 });
 

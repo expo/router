@@ -1,5 +1,6 @@
 ---
 title: Splash Screen
+sidebar_position: 5
 ---
 
 Expo Router automatically orchestrates the native splash screen to keep it visible until the first route is rendered, this applies to any route that the user deep links into. To enable this functionality, install `expo-splash-screen` in your project.
