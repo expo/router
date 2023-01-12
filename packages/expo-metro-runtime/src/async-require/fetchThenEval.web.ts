@@ -22,11 +22,49 @@ export function fetchThenEvalAsync(
       script.parentNode && script.parentNode.removeChild(script);
       resolve();
     };
+    // Create a new error object to preserve the original stack trace.
+    const error = new AsyncRequireError();
 
-    script.onerror = (error) => {
+    // Server error or network error.
+    script.onerror = (ev) => {
+      let event: Event;
+      if (typeof ev === "string") {
+        event = {
+          type: "error",
+          target: {
+            // @ts-expect-error
+            src: event,
+          },
+        };
+      } else {
+        event = ev;
+      }
+
+      const errorType =
+        event && (event.type === "load" ? "missing" : event.type);
+      // @ts-expect-error
+      const realSrc = event?.target?.src;
+      error.message =
+        "Loading module " +
+        url +
+        " failed.\n(" +
+        errorType +
+        ": " +
+        realSrc +
+        ")";
+      error.type = errorType;
+      error.request = realSrc;
+
       script.parentNode && script.parentNode.removeChild(script);
       reject(error);
     };
     document.head.appendChild(script);
+    document.head.appendChild(script);
   });
+}
+
+class AsyncRequireError extends Error {
+  readonly name = "AsyncRequireError";
+  type?: string;
+  request?: string;
 }
