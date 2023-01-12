@@ -160,8 +160,6 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     return qualifiedStore.get(value)!;
   }
 
-  // const { default: Component, ErrorBoundary } = value.loadRoute();
-
   const Component = React.lazy(async () => {
     const res = value.loadRoute();
     if (res instanceof Promise) {

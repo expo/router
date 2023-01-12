@@ -261,6 +261,7 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
 
     const node: FileNode = {
       loadRoute: () => {
+        console.log("load:", key);
         const mod = contextModule(key);
         if (mod instanceof Promise) {
           return mod.then((m) => m);

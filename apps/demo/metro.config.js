@@ -12,7 +12,18 @@ const config = getDefaultConfig(__dirname);
 config.transformer = {
   ...config.transformer,
   asyncRequireModulePath: require.resolve("@expo/metro-runtime/asyncRequire"),
+};
+config.server = {
+  ...config.server,
   experimentalImportBundleSupport: true,
+};
+
+// 73.3
+config.watcher = {
+  ...config.watcher,
+  healthCheck: {
+    enabled: true,
+  },
 };
 
 console.log(">>>", require.resolve("@expo/metro-runtime/asyncRequire"));
