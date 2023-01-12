@@ -1,8 +1,7 @@
-import { Text, View } from "@bacons/react-views";
 import React from "react";
-import { Animated, ActivityIndicator } from "react-native";
 
 import { LocationProvider } from "./LocationProvider";
+import { LoadingRoute, MissingRoute } from "./MissingRoute";
 import {
   DynamicConvention,
   Route,
@@ -105,8 +104,6 @@ export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
   );
 }
 
-import { LoadingRoute, MissingRoute } from "./MissingRoute";
-
 // TODO: Maybe there's a more React-y way to do this?
 // Without this store, the process enters a recursive loop.
 const qualifiedStore = new WeakMap<RouteNode, React.ComponentType<any>>();
@@ -140,8 +137,6 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     }
     return { default: res.default || MissingRoute };
   });
-
-  // const { ErrorBoundary } = value.getExtras();
 
   const getLoadable = (props: any, ref: any) => (
     <React.Suspense fallback={<LoadingRoute route={value} />}>
