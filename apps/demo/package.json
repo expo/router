@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
-    "@expo/html-elements": "^0.2.2",
+    "@expo/html-elements": "^0.3.0",
     "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-navigation/drawer": "^6.4.4",
     "classnames": "^2.3.2",
