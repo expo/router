@@ -1,4 +1,4 @@
-import { Text } from "react-native";
+import { Platform, Text } from "react-native";
 import { Link, Stack, useNavigation, useRouter } from "expo-router";
 import { useAuth } from "../../context/auth";
 import { NotesProvider } from "../../context/notes";
@@ -83,7 +83,9 @@ export default function AppLayout() {
           options={{
             title: "Compose",
             presentation: "modal",
-            headerRight: DismissComposeButton,
+            headerRight: Platform.select({
+              ios: DismissComposeButton,
+            }),
           }}
         />
       </Stack>

@@ -1,28 +1,10 @@
-import {
-  Link,
-  Stack,
-  useNavigation,
-  usePathname,
-  useSearchParams,
-} from "expo-router";
-import React, { useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Link, useSearchParams } from "expo-router";
+import React, { useMemo } from "react";
+import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-import Task from "../../components/task";
+import { View, Text, Pressable } from "@bacons/react-views";
 import { useNotes } from "../../context/notes";
 
 export default function App() {
@@ -40,11 +22,19 @@ export default function App() {
 }
 
 function Index() {
+  return (
+    <>
+      <NotesList />
+      <Footer />
+    </>
+  );
+}
+
+function useQueriedNotes() {
   const notes = useNotes();
   const { q } = useSearchParams();
-  const { bottom } = useSafeAreaInsets();
 
-  const queriedNotes = useMemo(
+  return useMemo(
     () =>
       notes.notes.filter((item) => {
         if (!q) {
@@ -54,60 +44,101 @@ function Index() {
       }),
     [q, notes.notes]
   );
+}
 
-  console.log("q", q, queriedNotes);
-
-  const noResults = !queriedNotes.length && !!q.length;
+function NotesList() {
+  const notes = useQueriedNotes();
 
   return (
-    <>
-      <View style={styles.container}>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          contentContainerStyle={{
-            flexGrow: 1,
+    <FlatList
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={{
+        padding: 20,
+      }}
+      ListEmptyComponent={ListEmptyComponent}
+      data={notes}
+      renderItem={({ item }) => (
+        <Link
+          style={{ marginBottom: 20 }}
+          key={item.id}
+          href={{
+            pathname: "/(app)/note/[note]",
+            params: {
+              note: item.id,
+            },
           }}
-          keyboardShouldPersistTaps="handled"
+          asChild
         >
-          <View style={styles.tasksWrapper}>
-            <View style={styles.items}>
-              {queriedNotes.map((item) => (
-                <Link
-                  key={item.id}
-                  href={{
-                    pathname: "/(app)/note/[note]",
-                    params: {
-                      note: item.id,
+          <Pressable>
+            {({ hovered, pressed }) => (
+              <View
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: 12,
+                  overflow: "hidden",
+                }}
+              >
+                <View
+                  style={[
+                    {
+                      flex: 1,
+                      paddingHorizontal: 20,
+                      paddingVertical: 12,
+                      transitionDuration: "200ms",
                     },
-                  }}
-                  asChild
+                    hovered && { backgroundColor: "rgba(0,0,0,0.1)" },
+                    pressed && { backgroundColor: "rgba(0,0,0,0.2)" },
+                  ]}
                 >
-                  <Pressable>
-                    <Task text={item.text} />
-                  </Pressable>
-                </Link>
-              ))}
-            </View>
-          </View>
-        </ScrollView>
-        <View
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 48 + bottom,
-            paddingBottom: bottom,
-            padding: 8,
-            paddingHorizontal: 24,
+                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                    {item.text}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </Pressable>
+        </Link>
+      )}
+    />
+  );
+}
 
-            backgroundColor: "white",
-            borderTopColor: "#ccc",
-            borderTopWidth: StyleSheet.hairlineWidth,
-          }}
-        >
-          <Link href="/compose" asChild>
-            <Pressable style={{ flexDirection: "row", alignItems: "center" }}>
+function Footer() {
+  const { bottom } = useSafeAreaInsets();
+
+  return (
+    <View
+      style={{
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 48 + bottom,
+        paddingBottom: bottom,
+        padding: 8,
+        alignItems: "flex-start",
+        paddingHorizontal: 24,
+        backgroundColor: "white",
+        borderTopColor: "#ccc",
+        borderTopWidth: StyleSheet.hairlineWidth,
+      }}
+    >
+      <Link href="/compose" asChild>
+        <Pressable>
+          {({ hovered, pressed }) => (
+            <View
+              style={[
+                {
+                  paddingHorizontal: 8,
+                  paddingVertical: 2,
+                  borderRadius: 8,
+                  flexDirection: "row",
+                  alignItems: "center",
+                },
+                hovered && { backgroundColor: "rgba(0,0,0,0.1)" },
+                pressed && { backgroundColor: "rgba(0,0,0,0.2)" },
+              ]}
+            >
               <FontAwesome
                 style={{ marginRight: 8 }}
                 name="plus-circle"
@@ -119,30 +150,31 @@ function Index() {
               >
                 Press me
               </Text>
-            </Pressable>
-          </Link>
-        </View>
-
-        {/* Write a task */}
-        {/* Uses a keyboard avoiding view which ensures the keyboard does not cover the items on screen */}
-        {/* <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.writeTaskWrapper}
-        >
-          <TextInput
-            style={styles.input}
-            placeholder="Write a task"
-            value={task}
-            onChangeText={(text) => setTask(text)}
-          />
-          <TouchableOpacity onPress={() => handleAddTask()}>
-            <View style={styles.addWrapper}>
-              <Text style={styles.addText}>+</Text>
             </View>
-          </TouchableOpacity>
-        </KeyboardAvoidingView> */}
-      </View>
-    </>
+          )}
+        </Pressable>
+      </Link>
+    </View>
+  );
+}
+
+function ListEmptyComponent() {
+  const { q } = useSearchParams();
+
+  const message = React.useMemo(() => {
+    return q != null ? "No items found: " + q : "Create an item to get started";
+  }, [q]);
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Text style={{ fontSize: 16, textAlign: "center" }}>{message}</Text>
+    </View>
   );
 }
 
