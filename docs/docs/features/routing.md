@@ -51,23 +51,23 @@ In native apps, users expect shared elements like headers and tab bars to persis
 To create a layout route for a directory, create a file named `_layout.js` in the directory, and export a React component as _default_.
 
 ```js title="app/home/_layout.js"
-import { Children } from "expo-router";
+import { Slot } from "expo-router";
 
 export default function HomeLayout() {
-  return <Children />;
+  return <Slot />;
 }
 ```
 
-`<Children />` will render the selected child route. This component can be wrapped with other components to create a layout.
+`<Slot />` will render the selected child route. This component can be wrapped with other components to create a layout.
 
 ```js title="app/home/_layout.js"
-import { Children } from "expo-router";
+import { Slot } from "expo-router";
 
 export default function HomeLayout() {
   return (
     <>
       <Header />
-      <Children />
+      <Slot />
       <Footer />
     </>
   );

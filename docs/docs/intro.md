@@ -21,6 +21,8 @@ Run the following to create a project with `expo-router` setup:
 npx create-react-native-app -t with-router
 ```
 
+> [Template source](https://github.com/expo/examples/tree/master/with-router).
+
 ## Features
 
 <video src="/router/demo/routing.mp4" controls style={{ width: "100%" }} autoplay loop />
@@ -43,16 +45,10 @@ Create a new Expo project (`expo@46.0.13` and greater):
 npx create-expo-app
 ```
 
-Install `expo-router`:
+Install `expo-router` and peer dependencies:
 
 ```bash
-npx expo install expo-router
-```
-
-Install peer dependencies:
-
-```
-npx expo install react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
 ```
 
 Then delete the entry point in your `package.json`, or replace it with `index.js` to be explicit:
@@ -69,25 +65,25 @@ Create a new file `index.js` in the root of your project. If it exists already, 
 import "expo-router/entry";
 ```
 
-Add a scheme to your `app.json` (or `app.config.js`):
+Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guides/customizing-metro/#web-support-how) in your `app.json` (or `app.config.js`):
 
 ```json
 {
   "expo": {
-    "scheme": "myapp"
+    "scheme": "myapp",
+
+    "web": {
+      "bundler": "metro"
+    }
   }
 }
 ```
 
-## Beta setup
-
-The following beta setup steps are required for now, but will not be necessary when we release a stable version of Expo Router.
-
-### Override the Metro version
+<!-- TODO: Drop this when we upgrade React Native -->
 
 Ensure you're using at least `metro@0.73.7` by setting a Yarn resolution or npm override (this step goes away in Expo SDK 47).
 
-If you use Yarn:
+If you use **Yarn**:
 
 ```json title=package.json
 {
@@ -98,7 +94,7 @@ If you use Yarn:
 }
 ```
 
-If you use npm, this requires npm 8.3.0 or higher. You can install this with `npm i -g npm@^8.3.0`. After that, configure `overrides` in `package.json`:
+If you use **npm**, this requires npm 8.3.0 or higher. You can install this with `npm i -g npm@^8.3.0`. After that, configure `overrides` in `package.json`:
 
 ```json title=package.json
 {
@@ -124,14 +120,6 @@ module.exports = function (api) {
 };
 ```
 
-## Troubleshooting
-
-If you run into any issues, please check the [troubleshooting guide](/router/docs/troubleshooting). If you're still running into problems, please [open an issue](https://github.com/expo/router/issues).
-
-## Web setup
-
-If you want to use the router with web, you'll need to enable Expo CLI's [experimental Metro web support](https://docs.expo.dev/guides/customizing-metro/#web-support-how). Webpack is not currently supported.
-
 ## Usage
 
 Start the server with:
@@ -143,6 +131,10 @@ npx expo start --clear
 Then open by pressing `i`, `a`, or `w` for web (only tested against Metro web).
 
 Create files in the `app` directory and they will be automatically added to the app.
+
+## Troubleshooting
+
+If you run into any issues, please check the [troubleshooting guide](/router/docs/troubleshooting). If you're still running into problems, please [open an issue](https://github.com/expo/router/issues).
 
 ## Next Steps
 

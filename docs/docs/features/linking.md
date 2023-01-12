@@ -59,6 +59,19 @@ Returns the currently selected route location without search parameters. e.g. `/
 
 Returns the URL search parameters for the currently selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`.
 
+> `/profile/baconbrix?extra=info`
+
+```js title=app/profile/[user].tsx
+import { Text } from "react-native";
+import { useSearchParams } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const { user, extra } = useSearchParams();
+  return <Text>User: {user}</Text>;
+}
+```
+
 Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `/profile/123`, the results of `useSearchParams` would be as follows:
 
 ```js
@@ -70,6 +83,18 @@ Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `
 ## `useSegments`
 
 Returns a list of segments for the currently selected route. Segments are not normalized, so they will be the same as the file path. e.g. `/[id]?id=normal` -> `["[id]"]`
+
+```js title=app/profile/[user].tsx
+import { Text } from "react-native";
+import { useSegments } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const segments = useSegments();
+  // segments = ["profile", "[user]"]
+  return <Text>Hello</Text>;
+}
+```
 
 ## `useNavigation`
 
@@ -99,6 +124,7 @@ export default function Route() {
 You can immediately redirect from a particular screen by using the `Redirect` component:
 
 ```js
+import { View, Text } from "react-native";
 import { Redirect } from "expo-router";
 
 export default function Page() {
@@ -121,6 +147,7 @@ export default function Page() {
 You can also redirect imperatively using the `useRouter` hook:
 
 ```js
+import { Text } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 
 function MyScreen() {
