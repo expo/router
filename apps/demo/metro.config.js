@@ -9,6 +9,24 @@ const workspaceRoot = path.resolve(projectRoot, "../..");
 
 const config = getDefaultConfig(__dirname);
 
+config.transformer = {
+  ...config.transformer,
+  asyncRequireModulePath: require.resolve("@expo/metro-runtime/async-require"),
+};
+
+config.server = {
+  ...config.server,
+  experimentalImportBundleSupport: true,
+};
+
+config.watcher = {
+  // +73.3
+  ...config.watcher,
+  healthCheck: {
+    enabled: true,
+  },
+};
+
 // 1. Watch all files within the monorepo
 config.watchFolders = [workspaceRoot];
 // 2. Let Metro know where to resolve packages and in what order
@@ -18,11 +36,5 @@ config.resolver.nodeModulesPaths = [
 ];
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true;
-
-config.transformer = {
-  ...config.transformer,
-  experimentalImportBundleSupport: true,
-  asyncRequireModulePath: "@expo/metro-runtime/asyncRequire",
-};
 
 module.exports = config;

@@ -48,6 +48,7 @@ export function buildAsyncRequire(metroRequire: MetroRequire): AsyncRequire {
     moduleName: string = "",
     options: { isPrefetchOnly: boolean } = { isPrefetchOnly: false }
   ): Promise<TModule | void> | TModule {
+    console.log("async require:", moduleID, moduleName, options);
     if (options.isPrefetchOnly) {
       return Promise.resolve();
     }
