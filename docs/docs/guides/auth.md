@@ -17,7 +17,7 @@ app/
 We can configure the `/(app)` routes to be redirect when the user is not authenticated:
 
 ```tsx title=app/_layout.js
-import { Layout } from "expo-router";
+import { Navigator } from "expo-router";
 
 // Some generic authentication system...
 import { AuthContext } from "../context/auth";
@@ -37,20 +37,20 @@ function RootLayout() {
 
   return (
     // Create a basic custom layout to render some children routes.
-    <Layout>
-      <Layout.Screen
+    <Navigator>
+      <Navigator.Screen
         name="(app)/index"
         // When the auth is unavailable (no user signed in), restrict access to all the routes in the `(app)` directory.
         redirect={!auth}
       />
-      <Layout.Screen
+      <Navigator.Screen
         name="sign-in"
         // When the auth is available (user is signed in), restrict access to the sign-in page.
         redirect={auth}
       />
 
-      <Layout.Children />
-    </Layout>
+      <Navigator.Slot />
+    </Navigator>
   );
 }
 ```

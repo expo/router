@@ -13,14 +13,14 @@ import {
   useTheme,
 } from "@react-navigation/native";
 
-import { Children } from 'expo-router';
+import { Slot } from 'expo-router';
 
 export default function RootLayout() {
     return (
         {/* All layouts inside this provider will use the dark theme. */}
         // highlight-next-line
         <ThemeProvider value={DarkTheme}>
-            <Children />
+            <Slot />
         </ThemeProvider>
     );
 }
