@@ -1,4 +1,3 @@
-import { H3 } from "@expo/html-elements";
 import { Link } from "expo-router";
 import { Head } from "../../../../components/head";
 import { View } from "react-native";
@@ -10,7 +9,7 @@ export default function Photos() {
         <Head>
           <title>Photos</title>
         </Head>
-        <H3>Look at my photos</H3>
+        <h3>Look at my photos</h3>
 
         <Link href="/photos/123">Photo 123</Link>
         <Link href="/modal">Open modal</Link>
