@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "Router Sandbox",
+    "slug": "router-sandbox",
+    "scheme": "sandbox",
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

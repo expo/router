@@ -1,19 +1,25 @@
 import { Tabs } from "expo-router";
 
-export default function RootLayout() {
+export default function AppLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Tabs.Screen name="index" options={{ href: null }} />
-      <Tabs.Screen name="(feed)" options={{ title: "Home" }} />
-      <Tabs.Screen name="(explore)" options={{ title: "Search" }} />
+    <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
-        name="([user])"
-        initialParams={{ user: "foobar" }}
-        options={{ title: "Profile" }}
+        name="(index)"
+        options={{
+          title: "About",
+        }}
+      />
+      <Tabs.Screen
+        name="(posts)"
+        options={{
+          title: "Posts",
+        }}
+      />
+      <Tabs.Screen
+        name="(photos)"
+        options={{
+          title: "Photos",
+        }}
       />
     </Tabs>
   );
