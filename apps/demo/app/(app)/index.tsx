@@ -1,5 +1,11 @@
-import { Link, Stack } from "expo-router";
-import React, { useState } from "react";
+import {
+  Link,
+  Stack,
+  useNavigation,
+  usePathname,
+  useSearchParams,
+} from "expo-router";
+import React, { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
@@ -35,15 +41,23 @@ export default function App() {
 
 function Index() {
   const notes = useNotes();
-  const [task, setTask] = useState<string | undefined>();
-
-  const handleAddTask = () => {
-    notes.addNote(task);
-    Keyboard.dismiss();
-    setTask(null);
-  };
-
+  const { q } = useSearchParams();
   const { bottom } = useSafeAreaInsets();
+
+  const queriedNotes = useMemo(
+    () =>
+      notes.notes.filter((item) => {
+        if (!q) {
+          return true;
+        }
+        return item.text.toLowerCase().includes(q.toLowerCase());
+      }),
+    [q, notes.notes]
+  );
+
+  console.log("q", q, queriedNotes);
+
+  const noResults = !queriedNotes.length && !!q.length;
 
   return (
     <>
@@ -57,7 +71,7 @@ function Index() {
         >
           <View style={styles.tasksWrapper}>
             <View style={styles.items}>
-              {notes.notes.map((item) => (
+              {queriedNotes.map((item) => (
                 <Link
                   key={item.id}
                   href={{
