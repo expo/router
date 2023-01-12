@@ -41,7 +41,6 @@ export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
   // Persist notes to storage
   useEffect(() => {
     if (!notes) return;
-    console.log("persist", notes);
     setItem(JSON.stringify(notes));
   }, [notes]);
 

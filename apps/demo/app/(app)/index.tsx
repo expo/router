@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, Stack } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -13,7 +13,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Task from "../../components/task";
 import { useNotes } from "../../context/notes";
 
@@ -41,26 +43,25 @@ function Index() {
     setTask(null);
   };
 
+  const { bottom } = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
-      {/* Added this scroll view to enable scrolling when list gets longer than the page */}
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-        }}
-        keyboardShouldPersistTaps="handled"
-      >
-        {/* Today's Tasks */}
-        <View style={styles.tasksWrapper}>
-          <Text style={styles.sectionTitle}>Today's tasks</Text>
-          <View style={styles.items}>
-            {/* This is where the tasks will go! */}
-            {notes.notes.map((item) => {
-              return (
+    <>
+      <View style={styles.container}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={{
+            flexGrow: 1,
+          }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.tasksWrapper}>
+            <View style={styles.items}>
+              {notes.notes.map((item) => (
                 <Link
                   key={item.id}
                   href={{
-                    pathname: "/(app)/[note]",
+                    pathname: "/(app)/note/[note]",
                     params: {
                       note: item.id,
                     },
@@ -71,31 +72,63 @@ function Index() {
                     <Task text={item.text} />
                   </Pressable>
                 </Link>
-              );
-            })}
+              ))}
+            </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+        <View
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 48 + bottom,
+            paddingBottom: bottom,
+            padding: 8,
+            paddingHorizontal: 24,
 
-      {/* Write a task */}
-      {/* Uses a keyboard avoiding view which ensures the keyboard does not cover the items on screen */}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.writeTaskWrapper}
-      >
-        <TextInput
-          style={styles.input}
-          placeholder="Write a task"
-          value={task}
-          onChangeText={(text) => setTask(text)}
-        />
-        <TouchableOpacity onPress={() => handleAddTask()}>
-          <View style={styles.addWrapper}>
-            <Text style={styles.addText}>+</Text>
-          </View>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </View>
+            backgroundColor: "white",
+            borderTopColor: "#ccc",
+            borderTopWidth: StyleSheet.hairlineWidth,
+          }}
+        >
+          <Link href="/compose" asChild>
+            <Pressable style={{ flexDirection: "row", alignItems: "center" }}>
+              <FontAwesome
+                style={{ marginRight: 8 }}
+                name="plus-circle"
+                size={32}
+                color="black"
+              />
+              <Text
+                style={{ color: "black", fontSize: 16, fontWeight: "bold" }}
+              >
+                Press me
+              </Text>
+            </Pressable>
+          </Link>
+        </View>
+
+        {/* Write a task */}
+        {/* Uses a keyboard avoiding view which ensures the keyboard does not cover the items on screen */}
+        {/* <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.writeTaskWrapper}
+        >
+          <TextInput
+            style={styles.input}
+            placeholder="Write a task"
+            value={task}
+            onChangeText={(text) => setTask(text)}
+          />
+          <TouchableOpacity onPress={() => handleAddTask()}>
+            <View style={styles.addWrapper}>
+              <Text style={styles.addText}>+</Text>
+            </View>
+          </TouchableOpacity>
+        </KeyboardAvoidingView> */}
+      </View>
+    </>
   );
 }
 
@@ -105,7 +138,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#E8EAED",
   },
   tasksWrapper: {
-    paddingTop: 80,
     paddingHorizontal: 20,
   },
   sectionTitle: {
