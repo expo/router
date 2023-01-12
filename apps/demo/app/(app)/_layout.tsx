@@ -1,20 +1,18 @@
-import { Tabs } from "expo-router";
+import { Text } from "react-native";
+import { Stack } from "expo-router";
+import { useAuth } from "../../context/auth";
+import { NotesProvider } from "../../context/notes";
 
-export default function RootLayout() {
+export default function AppLayout() {
+  const { signOut } = useAuth();
+
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Tabs.Screen name="index" options={{ href: null }} />
-      <Tabs.Screen name="(feed)" options={{ title: "Home" }} />
-      <Tabs.Screen name="(explore)" options={{ title: "Search" }} />
-      <Tabs.Screen
-        name="([user])"
-        initialParams={{ user: "foobar" }}
-        options={{ title: "Profile" }}
+    <NotesProvider>
+      <Stack
+        screenOptions={{
+          headerRight: () => <Text onPress={() => signOut()}>Sign Out</Text>,
+        }}
       />
-    </Tabs>
+    </NotesProvider>
   );
 }
