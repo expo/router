@@ -12,8 +12,8 @@
     "packages/*"
   ],
   "resolutions": {
-    "metro": "0.73.5",
-    "metro-resolver": "0.73.5"
+    "metro": "0.73.6",
+    "metro-resolver": "0.73.6"
   },
   "devDependencies": {
     "eslint": "^8.13.0",
