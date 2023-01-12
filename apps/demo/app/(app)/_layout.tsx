@@ -1,11 +1,9 @@
+import { Link, Stack, useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { Platform, Text } from "react-native";
-import { Link, Stack, useNavigation, useRouter } from "expo-router";
+
 import { useAuth } from "../../context/auth";
 import { NotesProvider } from "../../context/notes";
-
-import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
-import { useRootNavigation } from "expo-router/build/useRootNavigation";
 
 function SignOutButton() {
   const { signOut } = useAuth();

@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 type Note = {
   id: string;
   text: string;
+  date: string;
 };
 
 type NotesContext = {
@@ -46,7 +47,7 @@ export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
 
   const addNote = (text: string) => {
     const id = Math.random().toString(36).substr(2, 9);
-    const note = { id, text };
+    const note = { id, text, date: new Date().toISOString() };
     setNotes((notes) => [...notes, note]);
   };
 

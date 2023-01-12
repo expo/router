@@ -2,7 +2,6 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -15,13 +14,12 @@ import {
 import { useNotes } from "../../context/notes";
 
 export default function Compose() {
-  const notes = useNotes();
+  const { addNote } = useNotes();
   const [task, setTask] = useState<string | undefined>();
 
   const router = useRouter();
   const handleAddTask = () => {
-    notes.addNote(task);
-    Keyboard.dismiss();
+    addNote(task);
     router.back();
     setTask(null);
   };

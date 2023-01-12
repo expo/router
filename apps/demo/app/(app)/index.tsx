@@ -1,10 +1,10 @@
+import { Pressable, Text, View } from "@bacons/react-views";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, useSearchParams } from "expo-router";
 import React, { useMemo } from "react";
 import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { View, Text, Pressable } from "@bacons/react-views";
 import { useNotes } from "../../context/notes";
 
 export default function App() {
@@ -177,48 +177,3 @@ function ListEmptyComponent() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#E8EAED",
-  },
-  tasksWrapper: {
-    paddingHorizontal: 20,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  items: {
-    marginTop: 30,
-  },
-  writeTaskWrapper: {
-    position: "absolute",
-    bottom: 60,
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  input: {
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    backgroundColor: "#FFF",
-    borderRadius: 60,
-    borderColor: "#C0C0C0",
-    borderWidth: 1,
-    width: 250,
-  },
-  addWrapper: {
-    width: 60,
-    height: 60,
-    backgroundColor: "#FFF",
-    borderRadius: 60,
-    justifyContent: "center",
-    alignItems: "center",
-    borderColor: "#C0C0C0",
-    borderWidth: 1,
-  },
-  addText: {},
-});

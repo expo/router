@@ -46,7 +46,6 @@ export const Tabs = withLayoutContext<
               <Link
                 {...props}
                 style={[{ display: "flex" }, props.style]}
-                // @ts-expect-error
                 href={href}
                 asChild={Platform.OS !== "web"}
                 children={children}
