@@ -13,6 +13,7 @@ config.transformer = {
   ...config.transformer,
   asyncRequireModulePath: require.resolve("@expo/metro-runtime/async-require"),
 };
+
 config.server = {
   ...config.server,
   experimentalImportBundleSupport: true,
