@@ -1,3 +1,5 @@
+import { P } from "@expo/html-elements";
+
 import { useSearchParams } from "expo-router";
 import { Head } from "../../../../components/head";
 export default function About() {
@@ -7,7 +9,7 @@ export default function About() {
       <Head>
         <title>Photo: {id}</title>
       </Head>
-      <p>Photo: {id}</p>
+      <P>Photo: {id}</P>
     </>
   );
 }
