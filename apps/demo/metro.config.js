@@ -11,22 +11,20 @@ const config = getDefaultConfig(__dirname);
 
 config.transformer = {
   ...config.transformer,
-  asyncRequireModulePath: require.resolve("@expo/metro-runtime/asyncRequire"),
+  asyncRequireModulePath: require.resolve("@expo/metro-runtime/async-require"),
 };
 config.server = {
   ...config.server,
   experimentalImportBundleSupport: true,
 };
 
-// 73.3
 config.watcher = {
+  // +73.3
   ...config.watcher,
   healthCheck: {
     enabled: true,
   },
 };
-
-console.log(">>>", require.resolve("@expo/metro-runtime/asyncRequire"));
 
 // 1. Watch all files within the monorepo
 config.watchFolders = [workspaceRoot];
