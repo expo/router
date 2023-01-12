@@ -5,46 +5,6 @@ import { Platform, Text } from "react-native";
 import { useAuth } from "../../context/auth";
 import { NotesProvider } from "../../context/notes";
 
-function SignOutButton() {
-  const { signOut } = useAuth();
-
-  return (
-    <Link
-      href="/sign-in"
-      onPress={(ev) => {
-        ev.preventDefault();
-        signOut();
-      }}
-    >
-      <Text
-        style={{
-          fontWeight: "normal",
-          paddingHorizontal: 8,
-          fontSize: 16,
-        }}
-      >
-        Sign Out
-      </Text>
-    </Link>
-  );
-}
-
-function DismissComposeButton() {
-  return (
-    <Link href="/">
-      <Text
-        style={{
-          fontWeight: "normal",
-          paddingHorizontal: 8,
-          fontSize: 16,
-        }}
-      >
-        Back
-      </Text>
-    </Link>
-  );
-}
-
 export const unstable_settings = {
   initialRouteName: "index",
 };
@@ -88,5 +48,45 @@ export default function AppLayout() {
         />
       </Stack>
     </NotesProvider>
+  );
+}
+
+function SignOutButton() {
+  const { signOut } = useAuth();
+
+  return (
+    <Link
+      href="/sign-in"
+      onPress={(ev) => {
+        ev.preventDefault();
+        signOut();
+      }}
+    >
+      <Text
+        style={{
+          fontWeight: "normal",
+          paddingHorizontal: 8,
+          fontSize: 16,
+        }}
+      >
+        Sign Out
+      </Text>
+    </Link>
+  );
+}
+
+function DismissComposeButton() {
+  return (
+    <Link href="..">
+      <Text
+        style={{
+          fontWeight: "normal",
+          paddingHorizontal: 8,
+          fontSize: 16,
+        }}
+      >
+        Back
+      </Text>
+    </Link>
   );
 }
