@@ -13,16 +13,17 @@ function useProtectedRoute(user) {
   const router = useRouter();
 
   React.useEffect(() => {
-    const inAuthGroup = segments[0] === "(auth)";
-
+    if (user === undefined) {
+      return;
+    }
     if (
       // If the user is not signed in and the initial segment is not anything in the auth group.
       !user &&
-      !inAuthGroup
+      segments[0] !== "(auth)"
     ) {
       // Redirect to the sign-in page.
       router.replace("/sign-in");
-    } else if (user && inAuthGroup) {
+    } else if (user && segments[0] !== "(app)") {
       // Redirect away from the sign-in page.
       router.replace("/");
     }
@@ -31,7 +32,7 @@ function useProtectedRoute(user) {
 
 export function Provider(props) {
   const { getItem, setItem, removeItem } = useAsyncStorage("USER");
-  const [user, setAuth] = React.useState(null);
+  const [user, setAuth] = React.useState(undefined);
 
   React.useEffect(() => {
     getItem().then((json) => {
