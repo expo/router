@@ -199,7 +199,11 @@ function MyScreen() {
 
 ## Testing
 
-On native, you can use the `uri-scheme` CLI to test opening native links on a device.
+On native, you can use the [`uri-scheme`](https://www.npmjs.com/package/uri-scheme) CLI to test opening native links on a device.
+
+For example, if you want to launch the Expo Go app on iOS to the `/form-sheet` route, you can run:
+
+> Replace `192.168.87.39:19000` with the IP address shown when running `npx expo start`.
 
 ```bash
 npx uri-scheme open exp://192.168.87.39:19000/--/form-sheet --ios
