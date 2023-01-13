@@ -148,7 +148,7 @@ function Footer() {
               <Text
                 style={{ color: "black", fontSize: 16, fontWeight: "bold" }}
               >
-                Press me
+                Create Task
               </Text>
             </View>
           )}
