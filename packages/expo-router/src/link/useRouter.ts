@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { RootContainer } from "../ContextNavigationContainer";
 
+import { RootContainer } from "../ContextNavigationContainer";
 import { Href, resolveHref } from "./href";
 import { useLinkToPath } from "./useLinkToPath";
 import { useLoadedNavigation } from "./useLoadedNavigation";
