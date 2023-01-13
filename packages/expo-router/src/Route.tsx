@@ -21,7 +21,7 @@ export type RouteNode = {
   dynamic: null | DynamicConvention[];
   /** `index`, `error-boundary`, etc. */
   route: string;
-  /** require.context key, used for matching children. */
+  /** Context Module ID, used for matching children. */
   contextKey: string;
   /** Added in-memory */
   generated?: boolean;
