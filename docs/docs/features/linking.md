@@ -6,11 +6,13 @@ sidebar_position: 2
 Use the `<Link />` component to navigate between pages. This is conceptually similar to the `<a>` element in HTML.
 
 ```js
+// highlight-next-line
 import { Link } from "expo-router";
 
 export default function Page() {
   return (
     <View>
+      {/* highlight-next-line */}
       <Link href="/">Home</Link>
     </View>
   );
@@ -27,14 +29,23 @@ For more advanced use cases, you can use the imperative `useRouter()` hook to na
 
 ```js
 import { View, Text } from "react-native";
+// highlight-next-line
 import { useRouter } from "expo-router";
 
 export default function Page() {
+  // highlight-next-line
   const router = useRouter();
 
   return (
     <View>
-      <Text onPress={() => router.push("/profile/settings")}>Settings</Text>
+      <Text
+        onPress={() => {
+          // highlight-next-line
+          router.push("/profile/settings");
+        }}
+      >
+        Settings
+      </Text>
     </View>
   );
 }
@@ -43,6 +54,7 @@ export default function Page() {
 - **push**: _`(href: Href) => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', params: { id: '123' } }`.
 - **replace**: _`(href: Href) => void`_ Same API as `push` but replaces the current route in the history instead of pushing a new one. This is useful for redirects.
 - **back**: _`() => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', params: { id: '123' } }`.
+- **setParams**: _`(params: Record<string, string>) => void`_ Update the query params for the currently selected route.
 
 ### `Href` type
 
@@ -54,6 +66,21 @@ The `Href` type is a union of the following types:
 ## `usePathname`
 
 Returns the currently selected route location without search parameters. e.g. `/acme?foo=bar` -> `/acme`. Segments will be normalized: `/[id]?id=normal` -> `/normal`
+
+> `/profile/baconbrix?extra=info`
+
+```js title=app/profile/[user].tsx
+import { Text } from "react-native";
+// highlight-next-line
+import { usePathname } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const pathname = usePathname();
+  // pathname = "/profile/baconbrix"
+  return <Text>User: {user}</Text>;
+}
+```
 
 ## `useSearchParams`
 
@@ -86,6 +113,7 @@ Returns a list of segments for the currently selected route. Segments are not no
 
 ```js title=app/profile/[user].tsx
 import { Text } from "react-native";
+// highlight-next-line
 import { useSegments } from "expo-router";
 
 export default function Route() {
@@ -101,14 +129,17 @@ export default function Route() {
 Access the underlying React Navigation [`navigation` prop](https://reactnavigation.org/docs/navigation-prop) to imperatively access layout-specific functionality like `navigation.openDrawer()` in a Drawer layout. [Learn more](https://reactnavigation.org/docs/navigation-prop/#navigator-dependent-functions).
 
 ```js
+// highlight-next-line
 import { useNavigation } from "expo-router";
 
 export default function Route() {
+  // highlight-next-line
   const navigation = useNavigation();
   return (
     <View>
       <Text
         onPress={() => {
+          // highlight-next-line
           navigation.openDrawer();
         }}
       >
@@ -125,6 +156,7 @@ You can immediately redirect from a particular screen by using the `Redirect` co
 
 ```js
 import { View, Text } from "react-native";
+// highlight-next-line
 import { Redirect } from "expo-router";
 
 export default function Page() {
@@ -133,6 +165,7 @@ export default function Page() {
 
   if (!user) {
     // Redirect to the login screen if the user is not authenticated.
+    // highlight-next-line
     return <Redirect href="/login" />;
   }
 
