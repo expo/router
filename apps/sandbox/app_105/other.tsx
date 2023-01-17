@@ -1,11 +1,12 @@
-import { Link } from "expo-router";
+import { Link, useSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Page({ route }) {
+export default function Page() {
+  const params = useSearchParams();
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>User: {route.params?.user}</Text>
+        <Text style={styles.title}>User: {params.user}</Text>
         <Link
           href={{
             pathname: "/other",
