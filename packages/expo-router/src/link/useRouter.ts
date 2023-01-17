@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 
+import { RootContainer } from "../ContextNavigationContainer";
 import { Href, resolveHref } from "./href";
 import { useLinkToPath } from "./useLinkToPath";
 import { useLoadedNavigation } from "./useLoadedNavigation";
@@ -17,9 +18,13 @@ type Router = {
   replace: (href: Href) => void;
   /** Go back in the history. */
   back: () => void;
+  /** Update the current route query params. */
+  setParams: (params?: Record<string, string>) => void;
 };
 
 export function useRouter(): Router {
+  const root = RootContainer.useRef();
+
   const pending = useLoadedNavigation();
   const linkTo = useLinkToPath();
 
@@ -42,6 +47,12 @@ export function useRouter(): Router {
     push,
     back,
     replace,
+    setParams: (params) => {
+      root?.current?.setParams(
+        // @ts-expect-error
+        params
+      );
+    },
     // TODO(EvanBacon): add `reload`
     // TODO(EvanBacon): add `canGoBack` but maybe more like a `hasContext`
   };
