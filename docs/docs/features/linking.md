@@ -23,6 +23,26 @@ export default function Page() {
 - `href` can also accept an object like `{ pathname: 'profile', params: { id: '123' } }` to navigate to dynamic routes.
 - Use the `replace` prop to replace the current route in the history instead of pushing a new route.
 
+The Link component renders a `<Text>` component by default. You can customize the component by passing `asChild` which will forward all props to the first child of the Link component.
+
+```js
+import { Pressable, Text } from 'react-native';
+import { Link } from 'expo-router';
+
+function Home() {
+  return (
+    {/* highlight-next-line */}
+    <Link href="/other" asChild >
+      <Pressable>
+        {({ hovered, pressed }) => (
+          <Text>Home</Text>
+        )}
+      </Pressable>
+    </Link>
+  )
+}
+```
+
 ## `useRouter`
 
 For more advanced use cases, you can use the imperative `useRouter()` hook to navigate imperatively.
