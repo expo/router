@@ -80,6 +80,7 @@ Mobile app users expect a refined platform-specific look and native feel for lay
 
 - `Stack` - Render a stack of screens like a deck of cards with a header on top. This is a native stack navigator that uses native animations and gestures. Extends the library [`@react-navigation/native-stack`](https://reactnavigation.org/docs/native-stack-navigator).
 - `Tabs` - Render screens with a tab bar below. [`@react-navigation/bottom-tabs`](https://reactnavigation.org/docs/bottom-tab-navigator/).
+- `Navigator` - Render screens in a generic, unstyled wrapper. This is useful for creating custom layouts.
 
 ```js title="app/home/_layout.js"
 import { Stack } from 'expo-router';
