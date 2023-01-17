@@ -36,9 +36,7 @@ function Example() {
 
 #### `getRootState`
 
-> TODO: Replace this with a standalone hook
-
-Use `RootContainer.useState()`
+Use `useRootNavigationState()`.
 
 #### `getCurrentRoute`
 
@@ -121,4 +119,4 @@ This property is not yet supported in Expo Router. Set the web page title using 
 
 <!-- TODO: Replace this with something like `useNavigation('...')` -->
 
-Use the `RootContainer.useRef()` function instead.
+Use the `useRootNavigation()` hook instead.

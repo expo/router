@@ -61,14 +61,8 @@ function InternalContextNavigationContainer() {
   const [contextProps] = useNavigationContainerContext();
   const [isReady, setReady] = React.useState(false);
   const ref = React.useMemo(() => (isReady ? navigationRef : null), [isReady]);
-
   const root = useRootRouteNodeContext();
-
-  const linking = React.useMemo(() => {
-    const linking = getLinkingConfig(root);
-    console.log("linking", linking);
-    return linking;
-  }, [root]);
+  const linking = React.useMemo(() => getLinkingConfig(root), [root]);
 
   React.useEffect(() => {
     contextProps.onReady?.();

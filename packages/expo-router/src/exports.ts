@@ -20,7 +20,7 @@ export * as Linking from "./link/linking";
 
 // React Navigation
 export { useNavigation } from "./useNavigation";
-export { RootContainer } from "./ContextNavigationContainer";
+export { useRootNavigation, useRootNavigationState } from "./useRootNavigation";
 export { useFocusEffect } from "./useFocusEffect";
 
 // Deprecated (doesn't matter in beta)
