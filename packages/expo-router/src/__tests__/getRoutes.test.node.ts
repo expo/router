@@ -426,4 +426,36 @@ describe(getRoutes, () => {
   it(`should convert an empty context module to routes`, () => {
     expect(getRoutes(createMockContextModule({}))).toEqual(null);
   });
+
+  it(`get platform specific routes`, () => {
+    expect(
+      dropFunctions(
+        getRoutes(
+          createMockContextModule({
+            "./_layout.tsx": { default() {} },
+            "./_layout.ios.tsx": { default() {} },
+            "./user.tsx": { default() {} },
+            "./user.web.tsx": { default() {} },
+            "./user.ios.tsx": { default() {} },
+          })
+        )!
+      )
+    ).toEqual(
+      expect.objectContaining({
+        children: [
+          {
+            children: [],
+            contextKey: "./user.ios.tsx",
+            dynamic: null,
+            route: "user",
+          },
+          ROUTE_DIRECTORY,
+          ROUTE_404,
+        ],
+        contextKey: "./_layout.ios.tsx",
+        dynamic: null,
+        route: "",
+      })
+    );
+  });
 });

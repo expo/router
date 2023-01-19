@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 import { DynamicConvention, RouteNode } from "./Route";
 import {
   getNameFromFilePath,
@@ -5,6 +7,7 @@ import {
   matchDynamicName,
   matchGroupName,
   stripGroupSegmentsFromPath,
+  matchPlatformSpecific,
 } from "./matchers";
 import { RequireContext } from "./types";
 import { DefaultNavigator } from "./views/Layout";
@@ -22,6 +25,8 @@ type TreeNode = {
   node: FileNode | null;
 };
 
+const platformSuffix = new RegExp(`\\.${Platform.OS}$`);
+
 /** Convert a flat map of file nodes into a nested tree of files. */
 export function getRecursiveTree(files: FileNode[]): TreeNode {
   const tree = {
@@ -31,14 +36,34 @@ export function getRecursiveTree(files: FileNode[]): TreeNode {
     node: null,
   };
 
-  for (const file of files) {
+  // manage overrides with platform specific files
+  const filteredByPlatform = files.filter((file) => {
+    if (
+      matchPlatformSpecific(file.normalizedName) &&
+      !file.normalizedName.endsWith(`.${Platform.OS}`)
+    ) {
+      return false;
+    }
+
+    if (
+      files.some(
+        (f) => f.normalizedName === `${file.normalizedName}.${Platform.OS}`
+      )
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  for (const file of filteredByPlatform) {
     // ['(tab)', 'settings', '[...another]']
     const parts = file.normalizedName.split("/");
     let currentNode: TreeNode = tree;
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
 
-      if (i === parts.length - 1 && part === "_layout") {
+      if (i === parts.length - 1 && part.startsWith("_layout")) {
         if (currentNode.node) {
           const overwritten = currentNode.node.contextKey;
           throw new Error(
@@ -53,7 +78,7 @@ export function getRecursiveTree(files: FileNode[]): TreeNode {
         currentNode = existing;
       } else {
         const newNode: TreeNode = {
-          name: part,
+          name: part.replace(platformSuffix, ""),
           children: [],
           parents: [...currentNode.parents, currentNode.name],
           node: null,
@@ -271,6 +296,10 @@ function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
   return nodes.filter(Boolean) as FileNode[];
 }
 
+const platformDependantLayout = new RegExp(
+  `\\.\\/_layout(?:\\.${Platform.OS})?\\.([jt]sx?)$`
+);
+
 function hasCustomRootLayoutNode(routes: RouteNode[]) {
   if (routes.length !== 1) {
     return false;
@@ -278,10 +307,7 @@ function hasCustomRootLayoutNode(routes: RouteNode[]) {
   // This could either be the root _layout or an app with a single file.
   const route = routes[0];
 
-  if (
-    route.route === "" &&
-    route.contextKey.match(/^\.\/_layout\.([jt]sx?)$/)
-  ) {
+  if (route.route === "" && platformDependantLayout.test(route.contextKey)) {
     return true;
   }
   return false;

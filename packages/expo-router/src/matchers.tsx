@@ -19,6 +19,11 @@ export function getNameFromFilePath(name: string): string {
   return removeSupportedExtensions(removeFileSystemDots(name));
 }
 
+/** Check if name ends with .ios, .android, .web ... */
+export function matchPlatformSpecific(name: string): boolean {
+  return /\.[a-z]+$/.test(name);
+}
+
 /** Remove `.js`, `.ts`, `.jsx`, `.tsx` */
 function removeSupportedExtensions(name: string): string {
   return name.replace(/\.[jt]sx?$/g, "");
