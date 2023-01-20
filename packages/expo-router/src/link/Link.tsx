@@ -57,7 +57,12 @@ function ExpoRouterLink(
   ref: React.ForwardedRef<Text>
 ) {
   // TODO: Auto use router's client-side event.
-  const resolvedHref = React.useMemo(() => resolveHref(href), [href]);
+  const resolvedHref = React.useMemo(() => {
+    if (href == null) {
+      throw new Error("Link: href is required");
+    }
+    return resolveHref(href);
+  }, [href]);
 
   const props = useLinkToPathProps({ href: resolvedHref, replace });
 
