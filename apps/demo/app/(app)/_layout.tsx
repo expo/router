@@ -1,6 +1,7 @@
 import { Link, Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Platform, Text } from "react-native";
+import { Platform, Pressable, Text } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import { useAuth } from "../../context/auth";
 import { NotesProvider } from "../../context/notes";
@@ -39,7 +40,7 @@ export default function AppLayout() {
         <Stack.Screen
           name="compose"
           options={{
-            title: "Compose",
+            title: "Create a new note",
             presentation: "modal",
             headerRight: Platform.select({
               ios: DismissComposeButton,
@@ -61,16 +62,27 @@ function SignOutButton() {
         ev.preventDefault();
         signOut();
       }}
+      asChild
     >
-      <Text
+      <Pressable
         style={{
-          fontWeight: "normal",
-          paddingHorizontal: 8,
-          fontSize: 16,
+          flexDirection: "row",
+          display: "flex",
+          alignItems: "center",
+          paddingRight: 8,
         }}
       >
-        Sign Out
-      </Text>
+        <Text
+          style={{
+            fontWeight: "normal",
+            paddingHorizontal: 8,
+            fontSize: 16,
+          }}
+        >
+          Sign Out
+        </Text>
+        <FontAwesome name="sign-out" size={24} color="black" />
+      </Pressable>
     </Link>
   );
 }

@@ -6,11 +6,12 @@ type Note = {
   id: string;
   text: string;
   date: string;
+  priority: number;
 };
 
 type NotesContext = {
   notes: Note[];
-  addNote: (text: string) => void;
+  addNote: (props: { text: string; priority: number }) => void;
   deleteNote: (id: string) => void;
 };
 
@@ -45,9 +46,14 @@ export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
     setItem(JSON.stringify(notes));
   }, [notes]);
 
-  const addNote = (text: string) => {
+  const addNote = (props: { text: string; priority: number }) => {
     const id = Math.random().toString(36).substr(2, 9);
-    const note = { id, text, date: new Date().toISOString() };
+    const note = {
+      id,
+      text: props.text,
+      priority: props.priority,
+      date: new Date().toISOString(),
+    };
     setNotes((notes) => [...notes, note]);
   };
 

@@ -1,9 +1,11 @@
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
+import { useWindowDimensions } from "react-native";
 import {
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -12,38 +14,69 @@ import {
 } from "react-native";
 
 import { useNotes } from "../../context/notes";
+import { Button, ToggleButton } from "../../etc/button";
 
 export default function Compose() {
   const { addNote } = useNotes();
+  const textInput = React.useRef<TextInput>(null);
   const [task, setTask] = useState<string | undefined>();
-
+  const [priority, setPriority] = useState(0);
+  const { width } = useWindowDimensions();
   const router = useRouter();
   const handleAddTask = () => {
-    addNote(task);
+    addNote({ text: task, priority });
     router.back();
     setTask(null);
   };
+
+  React.useEffect(() => {
+    textInput.current?.focus();
+  }, [textInput.current]);
 
   return (
     <>
       <StatusBar style="light" />
       <View style={styles.container}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.writeTaskWrapper}
-        >
+        <View style={styles.main}>
           <TextInput
-            style={styles.input}
+            ref={textInput}
+            style={{
+              height: 40,
+              backgroundColor: "#D1D1D6",
+              borderRadius: 8,
+              paddingHorizontal: 16,
+              outline: "none",
+              marginBottom: 16,
+              minWidth: width / 2,
+            }}
+            placeholderTextColor="#38434D"
             placeholder="Write a task"
             value={task}
             onChangeText={(text) => setTask(text)}
           />
-          <TouchableOpacity onPress={() => handleAddTask()}>
-            <View style={styles.addWrapper}>
-              <Text style={styles.addText}>+</Text>
+
+          <View>
+            <Text style={{ fontSize: 16, marginBottom: 16 }}>Priority</Text>
+            <View style={{ flexDirection: "row" }}>
+              {["Low", "Medium", "High"].map((label, index) => (
+                <ToggleButton
+                  key={index}
+                  selected={index === priority}
+                  onPress={() => setPriority(index)}
+                >
+                  {label}
+                </ToggleButton>
+              ))}
             </View>
-          </TouchableOpacity>
-        </KeyboardAvoidingView>
+          </View>
+          <Button
+            onPress={() => handleAddTask()}
+            style={{ marginTop: 16 }}
+            buttonStyle={{ backgroundColor: "#0033cc" }}
+          >
+            Save
+          </Button>
+        </View>
       </View>
     </>
   );
@@ -52,7 +85,14 @@ export default function Compose() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#E8EAED",
+    alignItems: "center",
+    padding: 24,
+  },
+  main: {
+    flex: 1,
+    justifyContent: "center",
+    maxWidth: 960,
+    marginHorizontal: "auto",
   },
   tasksWrapper: {
     paddingTop: 80,
