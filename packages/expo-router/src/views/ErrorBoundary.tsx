@@ -65,7 +65,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 
         <StackTrace error={error} />
         {process.env.NODE_ENV === "development" && (
-          <Link href="/__index" style={styles.link}>
+          <Link href="/_sitemap" style={styles.link}>
             Sitemap
           </Link>
         )}
