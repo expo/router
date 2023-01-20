@@ -2,6 +2,7 @@ import { Pressable, Text, View } from "@bacons/react-views";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, useSearchParams } from "expo-router";
 import React, { useMemo } from "react";
+import { useWindowDimensions } from "react-native";
 import {
   ActivityIndicator,
   FlatList,
@@ -53,12 +54,15 @@ function useQueriedNotes() {
 
 function NotesList() {
   const notes = useQueriedNotes();
-
+  const { width } = useWindowDimensions();
+  const innerWindow = width - 48;
+  const insets = useSafeAreaInsets();
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       contentContainerStyle={{
         padding: 20,
+        paddingHorizontal: Math.max(20, insets.left + insets.right),
         flexDirection: "row",
         flexWrap: "wrap",
       }}
@@ -66,7 +70,7 @@ function NotesList() {
       {!notes.length && <ListEmptyComponent />}
       {notes.map((item) => (
         <Link
-          style={{ minWidth: 386, padding: 4, flex: 1 }}
+          style={{ minWidth: Math.min(300, innerWindow), padding: 4, flex: 1 }}
           key={item.id}
           href={{
             pathname: "/(app)/note/[note]",
@@ -114,7 +118,7 @@ function NotesList() {
                     )}
                   </View>
                   <View style={{ flexDirection: "row" }}>
-                    {item.priority && (
+                    {!!item.priority && (
                       <Text
                         style={{
                           fontSize: 16,
