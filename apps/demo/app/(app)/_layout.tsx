@@ -39,7 +39,7 @@ export default function AppLayout() {
         <Stack.Screen
           name="compose"
           options={{
-            title: "Compose",
+            title: "Create a new note",
             presentation: "modal",
             headerRight: Platform.select({
               ios: DismissComposeButton,

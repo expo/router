@@ -16,6 +16,8 @@ function useProtectedRoute(user) {
     if (user === undefined) {
       return;
     }
+    console.log("segments", segments, user);
+
     if (
       // If the user is not signed in and the initial segment is not anything in the auth group.
       !user &&
@@ -36,8 +38,11 @@ export function Provider(props) {
 
   React.useEffect(() => {
     getItem().then((json) => {
+      console.log("json", json);
       if (json != null) {
         setAuth(JSON.parse(json));
+      } else {
+        setAuth(null);
       }
     });
   }, []);

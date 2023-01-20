@@ -2,7 +2,12 @@ import { Pressable, Text, View } from "@bacons/react-views";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, useSearchParams } from "expo-router";
 import React, { useMemo } from "react";
-import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useNotes } from "../../context/notes";
@@ -50,16 +55,18 @@ function NotesList() {
   const notes = useQueriedNotes();
 
   return (
-    <FlatList
+    <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       contentContainerStyle={{
         padding: 20,
+        flexDirection: "row",
+        flexWrap: "wrap",
       }}
-      ListEmptyComponent={ListEmptyComponent}
-      data={notes}
-      renderItem={({ item }) => (
+    >
+      {!notes.length && <ListEmptyComponent />}
+      {notes.map((item) => (
         <Link
-          style={{ marginBottom: 20 }}
+          style={{ minWidth: 386, padding: 4, flex: 1 }}
           key={item.id}
           href={{
             pathname: "/(app)/note/[note]",
@@ -76,6 +83,7 @@ function NotesList() {
                   backgroundColor: "white",
                   borderRadius: 12,
                   overflow: "hidden",
+                  flex: 1,
                 }}
               >
                 <View
@@ -85,21 +93,55 @@ function NotesList() {
                       paddingHorizontal: 20,
                       paddingVertical: 12,
                       transitionDuration: "200ms",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     },
                     hovered && { backgroundColor: "rgba(0,0,0,0.1)" },
                     pressed && { backgroundColor: "rgba(0,0,0,0.2)" },
                   ]}
                 >
-                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                    {item.text}
-                  </Text>
+                  <View>
+                    <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                      {item.text}
+                    </Text>
+                    {item.date && (
+                      <Text
+                        style={{ fontSize: 12, marginTop: 4, color: "#38434D" }}
+                      >
+                        {new Date(item.date).toDateString()}
+                      </Text>
+                    )}
+                  </View>
+                  <View style={{ flexDirection: "row" }}>
+                    {item.priority && (
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          textAlign: "center",
+                          lineHeight: 16,
+                          paddingHorizontal: 16,
+                          fontWeight: "bold",
+                          color: "#919497",
+                        }}
+                      >
+                        {new Array(item.priority).fill("!")}
+                      </Text>
+                    )}
+
+                    <FontAwesome
+                      name="chevron-right"
+                      size={16}
+                      color="#919497"
+                    />
+                  </View>
                 </View>
               </View>
             )}
           </Pressable>
         </Link>
-      )}
-    />
+      ))}
+    </ScrollView>
   );
 }
 
@@ -117,7 +159,7 @@ function Footer() {
         paddingBottom: bottom,
         padding: 8,
         alignItems: "flex-start",
-        paddingHorizontal: 24,
+        paddingHorizontal: 8,
         backgroundColor: "white",
         borderTopColor: "#ccc",
         borderTopWidth: StyleSheet.hairlineWidth,
@@ -148,7 +190,7 @@ function Footer() {
               <Text
                 style={{ color: "black", fontSize: 16, fontWeight: "bold" }}
               >
-                Create Task
+                Create Note
               </Text>
             </View>
           )}
