@@ -62,7 +62,9 @@ export function useLinkToPath() {
           navigation.reset(state);
         }
       } else {
-        throw new Error("Failed to parse the path to a navigation state.");
+        throw new Error(
+          "Failed to parse the path to a navigation state: " + to
+        );
       }
     },
     [linking, navigation]

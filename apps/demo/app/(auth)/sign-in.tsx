@@ -1,5 +1,5 @@
-import { Link } from "expo-router";
 import { Text, View } from "react-native";
+
 import { useAuth } from "../../context/auth";
 import { Button } from "../../etc/button";
 
