@@ -9,27 +9,26 @@ export function useAuth() {
 }
 
 function useProtectedRoute(user) {
-  const segments = useSegments();
+  const rootSegment = useSegments()[0];
   const router = useRouter();
 
   React.useEffect(() => {
     if (user === undefined) {
       return;
     }
-    console.log("segments", segments, user);
 
     if (
       // If the user is not signed in and the initial segment is not anything in the auth group.
       !user &&
-      segments[0] !== "(auth)"
+      rootSegment !== "(auth)"
     ) {
       // Redirect to the sign-in page.
       router.replace("/sign-in");
-    } else if (user && segments[0] !== "(app)") {
+    } else if (user && rootSegment !== "(app)") {
       // Redirect away from the sign-in page.
       router.replace("/");
     }
-  }, [user, segments]);
+  }, [user, rootSegment]);
 }
 
 export function Provider(props) {

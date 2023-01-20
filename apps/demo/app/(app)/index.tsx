@@ -2,12 +2,11 @@ import { Pressable, Text, View } from "@bacons/react-views";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, useSearchParams } from "expo-router";
 import React, { useMemo } from "react";
-import { useWindowDimensions } from "react-native";
 import {
   ActivityIndicator,
-  FlatList,
   ScrollView,
   StyleSheet,
+  useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
