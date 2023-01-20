@@ -60,17 +60,27 @@ function NotesList() {
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
-      contentContainerStyle={{
-        padding: 20,
-        paddingHorizontal: Math.max(20, insets.left + insets.right),
-        flexDirection: "row",
-        flexWrap: "wrap",
-      }}
+      contentContainerStyle={[
+        {
+          maxWidth: 960,
+          paddingVertical: 20,
+          paddingHorizontal: Math.max(20, insets.left + insets.right),
+          flexDirection: "row",
+          flexWrap: "wrap",
+          marginHorizontal: "auto",
+        },
+        {},
+      ]}
     >
       {!notes.length && <ListEmptyComponent />}
       {notes.map((item) => (
         <Link
-          style={{ minWidth: Math.min(300, innerWindow), padding: 4, flex: 1 }}
+          style={{
+            minWidth: Math.min(300, innerWindow),
+            padding: 4,
+            flex: 1,
+            flexBasis: Math.min(300, innerWindow),
+          }}
           key={item.id}
           href={{
             pathname: "/(app)/note/[note]",
@@ -150,7 +160,7 @@ function NotesList() {
 }
 
 function Footer() {
-  const { bottom } = useSafeAreaInsets();
+  const { left, bottom } = useSafeAreaInsets();
 
   return (
     <View
@@ -161,6 +171,7 @@ function Footer() {
         right: 0,
         height: 48 + bottom,
         paddingBottom: bottom,
+        paddingLeft: Math.max(8, left),
         padding: 8,
         alignItems: "flex-start",
         paddingHorizontal: 8,
