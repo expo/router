@@ -165,7 +165,6 @@ function FileItem({
                 }
               }}
               style={{ flex: 1, display: "flex" }}
-              // @ts-expect-error: disabled not on type
               disabled={disabled}
               // Ensure we replace the history so you can't go back to this page.
               replace
