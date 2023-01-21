@@ -9,6 +9,8 @@
     "async-require.d.ts",
     "error-overlay.js",
     "error-overlay.d.ts",
+    "transformer.js",
+    "transformer.d.ts",
     "assets"
   ],
   "scripts": {

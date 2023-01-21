@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
-
+import "../styles.css";
 export default function Page() {
   return (
     <View style={styles.container}>

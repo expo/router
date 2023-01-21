@@ -1,9 +1,9 @@
 import { Platform } from "react-native";
 
-import HMRClient from "../HMRClient";
-import LoadingView from "../LoadingView";
 import { buildUrlForBundle } from "./buildUrlForBundle";
 import { fetchThenEvalAsync } from "./fetchThenEval";
+import HMRClient from "../HMRClient";
+import LoadingView from "../LoadingView";
 
 let pendingRequests = 0;
 
