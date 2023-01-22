@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 
-import { RootContainer } from "../ContextNavigationContainer";
 import { Href, resolveHref } from "./href";
 import { useLinkToPath } from "./useLinkToPath";
 import { useLoadedNavigation } from "./useLoadedNavigation";
+import { RootContainer } from "../ContextNavigationContainer";
 
 // Wraps useLinkTo to provide an API which is similar to the Link component.
 export function useLink() {

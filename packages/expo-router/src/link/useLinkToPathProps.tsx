@@ -1,8 +1,8 @@
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
-import { stripGroupSegmentsFromPath } from "../matchers";
 import { useLinkToPath } from "./useLinkToPath";
+import { stripGroupSegmentsFromPath } from "../matchers";
 
 export default function useLinkToPathProps(props: {
   href: string;
