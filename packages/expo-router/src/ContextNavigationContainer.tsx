@@ -77,7 +77,11 @@ function InternalContextNavigationContainer() {
         linking={linking}
         ref={navigationRef}
         onReady={() => {
-          setReady(true);
+          // Allow one cycle for the children to mount a splash screen
+          // that will prevent the splash screen from hiding.
+          requestAnimationFrame(() => {
+            setReady(true);
+          });
         }}
       />
     </RootNavigationRef.Provider>

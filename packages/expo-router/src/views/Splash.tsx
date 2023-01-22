@@ -66,7 +66,7 @@ SplashScreen.preventAutoHideAsync = () => {
   }
   _preventAutoHideAsyncInvoked = true;
   // Append error handling to ensure any uncaught exceptions result in the splash screen being hidden.
-  if (Platform.OS !== "web" && ErrorUtils && ErrorUtils.getGlobalHandler) {
+  if (Platform.OS !== "web" && ErrorUtils?.getGlobalHandler) {
     const originalHandler = ErrorUtils.getGlobalHandler();
     ErrorUtils.setGlobalHandler((error, isFatal) => {
       SplashScreen.hideAsync();
