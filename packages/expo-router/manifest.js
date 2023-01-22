@@ -1,5 +1,5 @@
-import { getRoutes } from "./build/getRoutes";
 import { getNavigationConfig } from "./build/getLinkingConfig";
+import { getRoutes } from "./build/getRoutes";
 
 /** Get the linking manifest from a Node.js process. */
 export function getManifestFromContextModule(contextModule) {
@@ -12,8 +12,6 @@ export function getManifestFromContextModule(contextModule) {
 
 // Must be exported or Fast Refresh won't update the context >:[
 export function getManifest() {
-  // Babel + Expo CLI: process.env.EXPO_ROUTER_APP_ROOT -> '../../apps/demo/app'
-  //   console.log("output", process.env.EXPO_ROUTER_APP_ROOT);
   const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT);
   return getManifestFromContextModule(ctx);
 }
