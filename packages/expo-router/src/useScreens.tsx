@@ -1,7 +1,7 @@
 import React from "react";
 
 import { LocationProvider } from "./LocationProvider";
-import { LoadingRoute, MissingRoute } from "./MissingRoute";
+import { EmptyRoute } from "./views/EmptyRoute";
 import {
   DynamicConvention,
   Route,
@@ -10,6 +10,7 @@ import {
   useRouteNode,
 } from "./Route";
 import { Screen } from "./primitives";
+import { SuspenseFallback } from "./views/SuspenseFallback";
 import { Try } from "./views/Try";
 
 export type ScreenProps<
@@ -132,14 +133,14 @@ export function getQualifiedRouteComponent(value: RouteNode) {
             ),
           };
         }
-        return { default: component.default || MissingRoute };
+        return { default: component.default || EmptyRoute };
       });
     }
-    return { default: res.default || MissingRoute };
+    return { default: res.default || EmptyRoute };
   });
 
   const getLoadable = (props: any, ref: any) => (
-    <React.Suspense fallback={<LoadingRoute route={value} />}>
+    <React.Suspense fallback={<SuspenseFallback route={value} />}>
       <Component
         {...{
           ...props,
