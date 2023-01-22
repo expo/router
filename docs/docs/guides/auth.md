@@ -2,55 +2,117 @@
 title: Authentication
 ---
 
-It's common to restrict certain routes to users who are not authenticated. In `expo-router`, you can use the `redirect` prop on the `<Screen />` component to prevent access to a route.
+It's common to restrict certain routes to users who are not authenticated. This can be achieved in a very organized way by using React Context and Route Groups.
 
 Consider the following project:
 
 ```bash title="File System"
 app/
   _layout.js
-  sign-in.js
-  (app)/
-    index.js
+  index.js
+  (auth)/
+    sign-in.js
 ```
 
-We can configure the `/(app)` routes to be redirect when the user is not authenticated:
+First, we'll setup a [React Context provider](https://reactjs.org/docs/context.html) that we can use to protect routes. This provider will use a mock implementation, you can replace it with your own [authentication provider](https://docs.expo.dev/guides/authentication/).
+
+```js title=auth/provider.js
+import { useRouter, useSegments } from "expo-router";
+import React from "react";
+
+const AuthContext = React.createContext(null);
+
+// This hook can be used to access the user info.
+export function useAuth() {
+  return React.useContext(AuthContext);
+}
+
+// This hook will protect the route access based on user authentication.
+function useProtectedRoute(user) {
+  const segments = useSegments();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    const inAuthGroup = segments[0] === "(auth)";
+
+    if (
+      // If the user is not signed in and the initial segment is not anything in the auth group.
+      !user &&
+      !inAuthGroup
+    ) {
+      // Redirect to the sign-in page.
+      router.replace("/sign-in");
+    } else if (user && inAuthGroup) {
+      // Redirect away from the sign-in page.
+      router.replace("/");
+    }
+  }, [user, segments]);
+}
+
+export function Provider(props) {
+  const [user, setAuth] = React.useState(null);
+
+  useProtectedRoute(user);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        signIn: () => setAuth({}),
+        signOut: () => setAuth(null),
+        user,
+      }}
+    >
+      {props.children}
+    </AuthContext.Provider>
+  );
+}
+```
+
+Now we can use this context to control the access to the routes, we'll do this by using a Layout Route that wraps all the screens which require authentication.
 
 ```tsx title=app/_layout.js
-import { Layout } from "expo-router";
-
-// Some generic authentication system...
-import { AuthContext } from "../context/auth";
+import { Slot } from "expo-router";
+import { Provider } from "../context/auth";
 
 export default function Root() {
   return (
     // Setup the auth context and render our layout inside of it.
-    <AuthContext.Provider>
-      <RootLayout />
-    </AuthContext.Provider>
+    <Provider>
+      <Slot />
+    </Provider>
   );
 }
+```
 
-function RootLayout() {
-  // Use some global auth context to control the route access.
-  const auth = AuthContext.useToken();
+Now we can create our `(auth)` group which is protected, this screen can toggle the authentication using `signIn()`.
 
+```js title=app/(auth)/sign-in.js
+import { Text, View } from "react-native";
+import { useAuth } from "../../context/auth";
+
+export default function SignIn() {
+  const { signIn } = useAuth();
   return (
-    // Create a basic custom layout to render some children routes.
-    <Layout>
-      <Layout.Screen
-        name="(app)/index"
-        // When the auth is unavailable (no user signed in), restrict access to all the routes in the `(app)` directory.
-        redirect={!auth}
-      />
-      <Layout.Screen
-        name="sign-in"
-        // When the auth is available (user is signed in), restrict access to the sign-in page.
-        redirect={auth}
-      />
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text onPress={() => signIn()}>Sign In</Text>
+    </View>
+  );
+}
+```
 
-      <Layout.Children />
-    </Layout>
+And finally we'll implement an authenticated screen which can sign out.
+
+```js title=app/index.js
+import { Text, View } from "react-native";
+
+import { useAuth } from "../context/auth";
+
+export default function Index() {
+  const { signOut } = useAuth();
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text onPress={() => signOut()}>Sign Out</Text>
+    </View>
   );
 }
 ```

@@ -15,7 +15,7 @@ app/
 
 ```js title=app/_layout.js
 import { useEffect } from "react";
-import { usePathname, useSearchParams, Children } from "expo-router";
+import { usePathname, useSearchParams, Slot } from "expo-router";
 
 export default function Layout() {
   const pathname = usePathname();
@@ -27,7 +27,7 @@ export default function Layout() {
   }, [pathname, params]);
 
   // Export all the children routes in the most basic way.
-  return <Children />;
+  return <Slot />;
 }
 ```
 

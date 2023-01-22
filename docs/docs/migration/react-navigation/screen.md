@@ -2,7 +2,7 @@
 title: Screen
 ---
 
-Qualified layouts, like the ones found in `expo-router` (Stack, Tabs, Layout) have a static `Screen` component which can be used to configure the behavior of a route declaratively.
+Qualified layouts, like the ones found in `expo-router` (Stack, Tabs, Navigator) have a static `Screen` component which can be used to configure the behavior of a route declaratively.
 
 All `Screen` components are the same and render `null`, but they have different types for convenience. The common props are:
 

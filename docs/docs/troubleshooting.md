@@ -32,6 +32,8 @@ export function App() {
 registerRootComponent(App);
 ```
 
+> Do not use this to change the root directory (app) as it won't account for usage in any other places.
+
 ## `require.context` not enabled
 
 - This can happen if you are using an `expo` version lower than `expo@^46.0.13`. The version `46.0.13` enables context modules and injects `process.env.EXPO_ROUTER_APP_ROOT` into the process.

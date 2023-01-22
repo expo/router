@@ -11,7 +11,7 @@ import useLinkToPathProps from "./useLinkToPathProps";
 import { useRouter } from "./useRouter";
 
 type Props = {
-  /** Add a property which is familiar to  */
+  /** Path to route to. */
   href: Href;
 
   // TODO(EvanBacon): This may need to be extracted for React Native style support.
@@ -24,7 +24,7 @@ type Props = {
   onPress?: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => void;
-} & (TextProps & { children: React.ReactNode });
+} & (Omit<TextProps, "href"> & { children: React.ReactNode });
 
 /** Redirects to the href as soon as the component is mounted. */
 export function Redirect({ href }: { href: Href }) {
@@ -57,7 +57,12 @@ function ExpoRouterLink(
   ref: React.ForwardedRef<Text>
 ) {
   // TODO: Auto use router's client-side event.
-  const resolvedHref = React.useMemo(() => resolveHref(href), [href]);
+  const resolvedHref = React.useMemo(() => {
+    if (href == null) {
+      throw new Error("Link: href is required");
+    }
+    return resolveHref(href);
+  }, [href]);
 
   const props = useLinkToPathProps({ href: resolvedHref, replace });
 

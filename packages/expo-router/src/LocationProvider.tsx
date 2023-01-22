@@ -131,7 +131,7 @@ function queryStringToObject(queryString?: string): SearchParams {
       ?.split("&")
       .map((pair) => pair.split("="))
       .reduce((acc, [key, value]) => {
-        acc[key] = value;
+        acc[key] = decodeURIComponent(value);
         return acc;
       }, {} as SearchParams) ?? {}
   );

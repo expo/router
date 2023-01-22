@@ -4,19 +4,29 @@ title: Tabs
 
 Expo Router adds an additional `href` screen option which can only be used with screen options that are an object (e.g. `screenOptions={{ href: "/path" }}`) and cannot be used simultaneously with `tabBarButton`.
 
+Avoid using a `<Tabs />` layout in the root `app/_layout.js` as it will expose the 404 and Sitemap. Instead, use a group like `app/(root)/_layout.js`.
+
 ## Hiding a tab
 
 Sometimes you want a route to exist but not show up in the tab bar, you can pass `href: null` to disable the button:
 
 ```js
-<Tabs.Screen
-  // Name of the route to hide.
-  name="index"
-  options={{
-    // This tab will no longer show up in the tab bar.
-    href: null,
-  }}
-/>
+import { Tabs } from "expo-router";
+
+export default function AppLayout() {
+  return (
+    <Tabs>
+      <Tabs.Screen
+        // Name of the route to hide.
+        name="index"
+        options={{
+          // This tab will no longer show up in the tab bar.
+          href: null,
+        }}
+      />
+    </Tabs>
+  );
+}
 ```
 
 ## Dynamic routes

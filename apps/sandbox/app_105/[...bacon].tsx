@@ -1,17 +1,20 @@
-import { Link } from "expo-router";
+import { Link, useSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Page({ route }) {
+export default function Page() {
+  const params = useSearchParams();
+  console.log("params", params);
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>User: {route.params?.user}</Text>
+        <Text style={styles.title}>User: {params?.bacon}</Text>
         <Link
           href={{
-            pathname: "/other",
+            pathname: "/[user]",
+            params: { user: params?.bacon },
           }}
         >
-          Go to same
+          Go to same user
         </Link>
         <Link
           href={{
@@ -20,6 +23,22 @@ export default function Page({ route }) {
           }}
         >
           Go to posts
+        </Link>
+        <Link
+          replace
+          href={{
+            pathname: "/[user]",
+            params: { user: Date.now() },
+          }}
+        >
+          Go to posts (replace)
+        </Link>
+        <Link
+          href={{
+            pathname: "/other",
+          }}
+        >
+          Go to "other"
         </Link>
       </View>
     </View>
