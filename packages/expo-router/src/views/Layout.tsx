@@ -5,10 +5,10 @@ import {
 } from "@react-navigation/native";
 import * as React from "react";
 
+import { Screen } from "./Screen";
 import { useContextKey } from "../Route";
 import { useFilterScreenChildren } from "../layouts/withLayoutContext";
 import { useSortedScreens } from "../useScreens";
-import { Screen } from "./Screen";
 
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
 export const NavigatorContext = React.createContext<{

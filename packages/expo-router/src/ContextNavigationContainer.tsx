@@ -60,6 +60,7 @@ export function ContextNavigationContainer(props: NavigationContainerProps) {
 function InternalContextNavigationContainer() {
   const [contextProps] = useNavigationContainerContext();
   const [isReady, setReady] = React.useState(false);
+  const [isSplashReady, setSplashReady] = React.useState(false);
   const ref = React.useMemo(() => (isReady ? navigationRef : null), [isReady]);
   const root = useRootRouteNodeContext();
   const linking = React.useMemo(() => getLinkingConfig(root), [root]);
@@ -70,7 +71,7 @@ function InternalContextNavigationContainer() {
 
   return (
     <RootNavigationRef.Provider value={{ ref }}>
-      {!isReady && <SplashScreen />}
+      {!isSplashReady && <SplashScreen />}
       {/* @ts-expect-error: children are required */}
       <NavigationContainer
         {...contextProps}
@@ -78,6 +79,11 @@ function InternalContextNavigationContainer() {
         ref={navigationRef}
         onReady={() => {
           setReady(true);
+          // Allow one cycle for the children to mount a splash screen
+          // that will prevent the splash screen from hiding.
+          requestAnimationFrame(() => {
+            setSplashReady(true);
+          });
         }}
       />
     </RootNavigationRef.Provider>

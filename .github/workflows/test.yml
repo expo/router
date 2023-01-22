@@ -45,7 +45,7 @@ jobs:
       fail-fast: false
       matrix:
         node: ["16"]
-        package: [expo-router]
+        package: [expo-router, expo-metro-runtime]
     name: Test ${{ matrix.package }} on Node ${{ matrix.node }}
     steps:
       - name: ♻️ Restore build artifacts
