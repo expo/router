@@ -1,8 +1,9 @@
 import { loadBundleAsync } from "./loadBundle";
 
-type ImportBundleNames = Record<string, string> & {
-  __proto__: null;
-};
+type ImportBundleNames = Record<string, string>;
+// type ImportBundleNames = Record<string, string> & {
+//   __proto__: null;
+// };
 
 type MetroRequire = {
   (id: number): any;
@@ -22,39 +23,41 @@ type ImportBundlePromises = Record<string, Promise<any>> & {
 type AsyncRequire = {
   <TModule>(
     moduleID: number,
-    moduleName?: string,
+    moduleName: string,
+    paths: ImportBundleNames,
     options?: { isPrefetchOnly: boolean }
   ): Promise<TModule | void> | TModule;
-  prefetch(moduleID: number, moduleName: string): void;
+  prefetch(
+    moduleID: number,
+    moduleName: string,
+    paths: ImportBundleNames
+  ): void;
   /** NOTE(EvanBacon): Unclear what this should return `__jsResource` ?? */
-  resource(moduleID: number, moduleName: string): never;
-
-  /** Register the 'moduleID<>bundle path' that can be loaded via `asyncRequire(moduleID)` */
-  addImportBundleNames(names: Record<string, string>): void;
+  resource(
+    moduleID: number,
+    moduleName: string,
+    paths: ImportBundleNames
+  ): never;
 };
 
 /** Create an `asyncRequire` function in the expected shape for Metro bundler. */
 export function buildAsyncRequire(metroRequire: MetroRequire): AsyncRequire {
-  const importBundleNames: ImportBundleNames = Object.create(null);
   const importBundlePromises: ImportBundlePromises = Object.create(null);
-
-  // This is basically `__webpack_require__.u` -> returns the bundle path for a numeric moduleID
-  function getBundlePath(moduleID: string): string | undefined {
-    return importBundleNames[moduleID];
-  }
 
   function asyncRequire<TModule>(
     moduleID: number,
-    moduleName: string = "",
+    moduleName: string,
+    paths: ImportBundleNames,
     options: { isPrefetchOnly: boolean } = { isPrefetchOnly: false }
   ): Promise<TModule | void> | TModule {
-    console.log("async require:", moduleID, moduleName, options);
+    // console.log("async require:", moduleID, moduleName, options);
     if (options.isPrefetchOnly) {
       return Promise.resolve();
     }
 
     const stringModuleID = String(moduleID);
-    const bundlePath = getBundlePath(stringModuleID);
+    // This is basically `__webpack_require__.u` -> returns the bundle path for a numeric moduleID
+    const bundlePath = paths[stringModuleID];
     if (bundlePath) {
       // Prevent loading the same module more than once.
       if (!importBundlePromises[stringModuleID]) {
@@ -71,9 +74,12 @@ export function buildAsyncRequire(metroRequire: MetroRequire): AsyncRequire {
 
   asyncRequire.prefetch = function (
     moduleID: number,
-    moduleName: string
+    moduleName: string,
+    paths: ImportBundleNames
   ): void {
-    const result = asyncRequire(moduleID, moduleName, { isPrefetchOnly: true });
+    const result = asyncRequire(moduleID, moduleName, paths, {
+      isPrefetchOnly: true,
+    });
     if (result instanceof Promise) {
       result.then(
         () => {},
@@ -84,21 +90,10 @@ export function buildAsyncRequire(metroRequire: MetroRequire): AsyncRequire {
 
   asyncRequire.resource = function (
     moduleID: number,
-    moduleName: string
+    moduleName: string,
+    paths: ImportBundleNames
   ): never {
     throw new Error("Unimplemented Metro runtime feature");
-  };
-
-  /**
-   * Register modules that can be loaded async.
-   * Key is a numeric string and value is a string denoting the bundle path.
-   *
-   * @example { '1': 'Second' }
-   */
-  asyncRequire.addImportBundleNames = function (
-    names: Record<string, string>
-  ): void {
-    Object.assign(importBundleNames, names);
   };
 
   return asyncRequire;
