@@ -1,0 +1,23 @@
+import { StyleSheet, Text, View } from "react-native";
+
+export default function Page() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Batman!</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    padding: 24,
+  },
+
+  title: {
+    fontSize: 36,
+    color: "dodgerblue",
+    fontWeight: "bold",
+  },
+});

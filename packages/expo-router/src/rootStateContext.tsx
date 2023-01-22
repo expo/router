@@ -41,7 +41,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export function useInitialRootStateContext() {
-  const state = useContext(InitialRootStateContext);
+  const state = useContext(InitialRootStateContext) ?? {};
   if (!state) {
     throw new Error(
       "useInitialRootStateContext is being used outside of InitialRootStateContext.Provider"
@@ -59,9 +59,9 @@ export function InitialRootStateProvider({
 
   // Prevent all rendering until we have the initial root state.
   // Probably React Navigation should be doing this for us.
-  if (!state) {
-    return null;
-  }
+  // if (!state) {
+  //   return null;
+  // }
 
   return (
     <InitialRootStateContext.Provider value={state}>

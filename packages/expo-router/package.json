@@ -13,6 +13,7 @@
     "stack.d.ts",
     "tabs.js",
     "tabs.d.ts",
+    "manifest.js",
     "node"
   ],
   "repository": {

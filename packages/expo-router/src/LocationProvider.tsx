@@ -46,6 +46,15 @@ function compareUrlSearchParams(a: SearchParams, b: SearchParams): boolean {
 }
 
 function useUrlObject(): UrlObject {
+  // TODO: Don't shim in SSR
+  if (typeof window === "undefined") {
+    return {
+      pathname: "",
+      params: {},
+      segments: [],
+    };
+  }
+
   const initialRootState = useInitialRootStateContext();
   const getPathFromState = useGetPathFromState();
 
