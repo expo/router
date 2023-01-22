@@ -9,7 +9,6 @@ import { InitialRootStateProvider } from "./rootStateContext";
 import { RequireContext } from "./types";
 import { getQualifiedRouteComponent } from "./useScreens";
 import { SplashScreen } from "./views/Splash";
-import { View } from "@bacons/react-views";
 
 function useContextModuleAsRoutes(context: RequireContext) {
   // TODO: Is this an optimal hook dependency?

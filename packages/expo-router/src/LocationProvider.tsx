@@ -4,6 +4,7 @@ import { RootContainer } from "./ContextNavigationContainer";
 import getPathFromState, { State } from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
 import { useInitialRootStateContext } from "./rootStateContext";
+import { useServerState } from "./useServerState";
 
 type SearchParams = Record<string, string>;
 
@@ -46,15 +47,7 @@ function compareUrlSearchParams(a: SearchParams, b: SearchParams): boolean {
 }
 
 function useUrlObject(): UrlObject {
-  // TODO: Don't shim in SSR
-  if (typeof window === "undefined") {
-    return {
-      pathname: "",
-      params: {},
-      segments: [],
-    };
-  }
-
+  const serverState = useServerState();
   const initialRootState = useInitialRootStateContext();
   const getPathFromState = useGetPathFromState();
 
@@ -63,7 +56,7 @@ function useUrlObject(): UrlObject {
       getPathFromState,
       // If the root state (from upstream) is not ready, use the hacky initial state.
       // Initial state can be generate because it assumes the linking configuration never changes.
-      RootContainer.getRef().getRootState() ?? initialRootState
+      serverState ?? RootContainer.getRef().getRootState() ?? initialRootState
     )
   );
 

@@ -1,4 +1,3 @@
-import { View } from "@bacons/react-views";
 import {
   createNavigationContainerRef,
   NavigationContainer,
@@ -68,8 +67,6 @@ function InternalContextNavigationContainer() {
   React.useEffect(() => {
     contextProps.onReady?.();
   }, [!!contextProps?.onReady]);
-
-  // return <View testID='fallback-navigation-container-view'/>
 
   return (
     <RootNavigationRef.Provider value={{ ref }}>
