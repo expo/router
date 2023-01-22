@@ -1,7 +1,6 @@
 import React from "react";
 
 import { LocationProvider } from "./LocationProvider";
-import { EmptyRoute } from "./views/EmptyRoute";
 import {
   DynamicConvention,
   Route,
@@ -10,6 +9,7 @@ import {
   useRouteNode,
 } from "./Route";
 import { Screen } from "./primitives";
+import { EmptyRoute } from "./views/EmptyRoute";
 import { SuspenseFallback } from "./views/SuspenseFallback";
 import { Try } from "./views/Try";
 
