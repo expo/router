@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "deploy": "EXPO_USE_STATIC=1 nexpo export -p web --output-dir .vercel/output && vc deploy --prebuilt"
   },
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
@@ -15,7 +16,7 @@
     "expo": "^47.0.0-beta.7",
     "expo-auth-session": "~3.7.2",
     "expo-random": "~13.0.0",
-    "expo-router": "1.0.0-rc1",
+    "expo-router": "1.0.0-rc2",
     "expo-secure-store": "~12.0.0",
     "react": "18.1.0",
     "react-dom": "18.1.0",
