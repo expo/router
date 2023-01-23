@@ -5,6 +5,4 @@ export default function Foobar(req, res, next) {
 
   res.setHeader("Content-Type", "text/html");
   res.end("<h1>Hello World!</h1>");
-
-  //   return next();
 }

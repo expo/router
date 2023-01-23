@@ -63,3 +63,5 @@ apps/*/dist/*
 apps/*/ios/*
 apps/*/android/*
 apps/*/web-build/*
+
+.vercel
