@@ -8,6 +8,9 @@ export { Link, Redirect } from "./link/Link";
 export { withLayoutContext } from "./layouts/withLayoutContext";
 export { Navigator, Slot };
 
+// Static rendering
+export { Head } from "./head/Head";
+
 // Expo Router Views
 export { ExpoRoot } from "./views/Root";
 export { Unmatched } from "./views/Unmatched";

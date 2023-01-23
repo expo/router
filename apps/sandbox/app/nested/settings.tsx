@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 export default function Page() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Other</Text>
+      <Text style={styles.title}>Settings</Text>
     </View>
   );
 }
