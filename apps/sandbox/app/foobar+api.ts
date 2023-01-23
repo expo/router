@@ -4,5 +4,5 @@ export default function Foobar(req, res, next) {
   console.log("Foobar API called " + chalk.green("successfully") + "!");
 
   res.setHeader("Content-Type", "text/html");
-  res.end("<h1>Hello World!</h1>");
+  res.end("<h1>Hello Again</h1>");
 }

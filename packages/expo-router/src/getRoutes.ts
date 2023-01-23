@@ -247,7 +247,7 @@ function treeNodeToRouteNode({
 
 function contextModuleToFileNodes(
   contextModule: RequireContext,
-  { preserveApiRoutes }: { preserveApiRoutes?: boolean } = {}
+  { preserveApiRoutes = false }: { preserveApiRoutes?: boolean } = {}
 ): FileNode[] {
   const nodes = contextModule
     .keys()

@@ -4,7 +4,15 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.mainTitle}>!Hello World</Text>
+        <Text
+          style={styles.mainTitle}
+          onPress={async () => {
+            const data = await fetch("/foobar").then((v) => v.text());
+            console.log(data);
+          }}
+        >
+          !Hello World
+        </Text>
         <Text style={styles.subtitle}>This is the first page of your app.</Text>
       </View>
     </View>
