@@ -9,7 +9,7 @@ import { useLinkingContext } from "./link/useLinkingContext";
 export function useServerState() {
   const getStateFromPath = useGetStateFromPath();
 
-  const server = React.useContext(ServerContext);
+  const server = React.useContext<any>(ServerContext);
 
   return React.useMemo(() => {
     const location =
