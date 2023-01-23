@@ -245,28 +245,40 @@ function treeNodeToRouteNode({
   );
 }
 
-function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
-  const nodes = contextModule.keys().map((key) => {
-    // In development, check if the file exports a default component
-    // this helps keep things snappy when creating files. In production we load all screens lazily.
-    try {
-      if (!contextModule(key)?.default) {
+function contextModuleToFileNodes(
+  contextModule: RequireContext,
+  { preserveApiRoutes }: { preserveApiRoutes?: boolean } = {}
+): FileNode[] {
+  const nodes = contextModule
+    .keys()
+    .filter((key) => {
+      if (preserveApiRoutes) {
+        return true;
+      }
+      // Filter out API routes which end with +api.tsx
+      return !key.match(/\+api\.[jt]sx?$/);
+    })
+    .map((key) => {
+      // In development, check if the file exports a default component
+      // this helps keep things snappy when creating files. In production we load all screens lazily.
+      try {
+        if (!contextModule(key)?.default) {
+          return null;
+        }
+      } catch (error) {
+        // Probably this won't stop metro from freaking out but it's worth a try.
+        console.warn('Error loading route "' + key + '"', error);
         return null;
       }
-    } catch (error) {
-      // Probably this won't stop metro from freaking out but it's worth a try.
-      console.warn('Error loading route "' + key + '"', error);
-      return null;
-    }
 
-    const node: FileNode = {
-      loadRoute: () => contextModule(key),
-      normalizedName: getNameFromFilePath(key),
-      contextKey: key,
-    };
+      const node: FileNode = {
+        loadRoute: () => contextModule(key),
+        normalizedName: getNameFromFilePath(key),
+        contextKey: key,
+      };
 
-    return node;
-  });
+      return node;
+    });
 
   return nodes.filter(Boolean) as FileNode[];
 }
@@ -310,8 +322,11 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
 }
 
 /** Given a Metro context module, return an array of nested routes. */
-export function getRoutes(contextModule: RequireContext): RouteNode | null {
-  const files = contextModuleToFileNodes(contextModule);
+export function getRoutes(
+  contextModule: RequireContext,
+  options: { preserveApiRoutes?: boolean } = {}
+): RouteNode | null {
+  const files = contextModuleToFileNodes(contextModule, options);
   const treeNodes = getRecursiveTree(files);
   const route = treeNodesToRootRoute(treeNodes);
 

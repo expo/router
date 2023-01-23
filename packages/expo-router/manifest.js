@@ -3,7 +3,7 @@ import { getRoutes } from "./build/getRoutes";
 
 /** Get the linking manifest from a Node.js process. */
 export function getManifestFromContextModule(contextModule) {
-  const routeTree = getRoutes(contextModule);
+  const routeTree = getRoutes(contextModule, { preserveApiRoutes: true });
   if (!routeTree) {
     return {};
   }
