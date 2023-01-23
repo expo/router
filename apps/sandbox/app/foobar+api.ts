@@ -1,8 +1,8 @@
-import chalk from "chalk";
+// import chalk from "chalk";
 
 export default function Foobar(req, res, next) {
-  console.log("Foobar API called " + chalk.green("successfully") + "!");
+  // console.log("Foobar API called " + chalk.green("successfully") + "!");
 
   res.setHeader("Content-Type", "text/html");
-  res.end("<h1>Hello Again</h1>");
+  res.end("<h1>Hello been</h1>");
 }
