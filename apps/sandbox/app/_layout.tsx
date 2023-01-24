@@ -8,7 +8,10 @@ export default function Layout() {
   return (
     <>
       <Head>
+        {/* favicon */}
+        <link rel="icon" href="/favicon.ico" />
         <link rel="shortcut icon" href="/favicon.ico" />
+
         {/* og image */}
         <meta property="og:image" content="/og/og-image.jpg" />
         <meta property="og:image:width" content="1280" />

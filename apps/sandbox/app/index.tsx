@@ -25,6 +25,22 @@ export default function Page() {
           >
             GET: /endpoint
           </Text>
+
+          <main>
+            <article>
+              <h3>Welcome</h3>
+              <div>
+                <p>
+                  This is the first page of your app. You can edit it in{" "}
+                  <code>apps/sandbox/app/index.tsx</code>.
+                </p>
+              </div>
+            </article>
+          </main>
+
+          <footer>
+            <p>Evan Bacon © 2023</p>
+          </footer>
         </View>
       </View>
     </>
