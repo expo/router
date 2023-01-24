@@ -607,7 +607,7 @@ const createConfigItem = (
   };
 };
 
-const createNormalizedConfigs = (
+export const createNormalizedConfigs = (
   options: PathConfigMap<object>,
   pattern?: string
 ): Record<string, ConfigItem> =>

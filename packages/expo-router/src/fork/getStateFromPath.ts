@@ -61,31 +61,7 @@ function getPathname(path: string) {
   return remaining.endsWith("/") ? remaining : `${remaining}/`;
 }
 
-/**
- * Utility to parse a path string to initial state object accepted by the container.
- * This is useful for deep linking when we need to handle the incoming URL.
- *
- * @example
- * ```js
- * getStateFromPath(
- *   '/chat/jane/42',
- *   {
- *     screens: {
- *       Chat: {
- *         path: 'chat/:author/:id',
- *         parse: { id: Number }
- *       }
- *     }
- *   }
- * )
- * ```
- * @param path Path string to parse and convert, e.g. /foo/bar?count=42.
- * @param options Extra options to fine-tune how to parse the path.
- */
-export default function getStateFromPath<ParamList extends object>(
-  path: string,
-  options?: Options<ParamList>
-): ResultState | undefined {
+export function getRouteMatchingConfig(options: Options<object>) {
   if (options) {
     validatePathConfig(options);
   }
@@ -129,6 +105,49 @@ export default function getStateFromPath<ParamList extends object>(
 
   // Assert any duplicates before we start parsing.
   assertConfigDuplicates(configs);
+
+  return { configs, initialRoutes };
+}
+
+/**
+ * Utility to parse a path string to initial state object accepted by the container.
+ * This is useful for deep linking when we need to handle the incoming URL.
+ *
+ * @example
+ * ```js
+ * getStateFromPath(
+ *   '/chat/jane/42',
+ *   {
+ *     screens: {
+ *       Chat: {
+ *         path: 'chat/:author/:id',
+ *         parse: { id: Number }
+ *       }
+ *     }
+ *   }
+ * )
+ * ```
+ * @param path Path string to parse and convert, e.g. /foo/bar?count=42.
+ * @param options Extra options to fine-tune how to parse the path.
+ */
+export default function getStateFromPath<ParamList extends object>(
+  path: string,
+  options?: Options<ParamList>
+): ResultState | undefined {
+  if (options) {
+    validatePathConfig(options);
+  }
+
+  const screens = options?.screens;
+  // Expo Router disallows usage without a linking config.
+  if (!screens) {
+    throw Error(
+      "You must pass a 'screens' object to 'getStateFromPath' to generate a path."
+    );
+  }
+
+  // This will be mutated...
+  const { initialRoutes, configs } = getRouteMatchingConfig(options);
 
   return getStateFromPathWithConfigs(path, configs, initialRoutes);
 }

@@ -127,10 +127,68 @@ function getDefaultInitialRoute(node: RouteNode, name: string) {
   );
 }
 
-function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
+function applyDefaultInitialRouteName(node: RouteNode): RouteNode[] {
   const groupName = matchGroupName(node.route);
   if (!node.children?.length) {
-    return node;
+    if (node.dynamic) {
+      const loaded = node.loadRoute();
+      if (loaded.getStaticPaths) {
+        if (typeof loaded.getStaticPaths !== "function") {
+          throw new Error(
+            `getStaticPaths() must be a function but received "${typeof loaded.getStaticPaths}".`
+          );
+        }
+        const { paths } = loaded.getStaticPaths();
+        if (paths.length) {
+          return [
+            node,
+            ...paths.map((path) => {
+              const route = node.dynamic!.reduce((route, dynamic, i) => {
+                const targetParam = path.params?.[dynamic.name];
+                if (!targetParam) {
+                  throw new Error(
+                    `getStaticPaths() must return a path for each dynamic segment. Expected "${
+                      dynamic.name
+                    }" but received "${Object.keys(path.params ?? {}).join(
+                      ", "
+                    )}".`
+                  );
+                }
+                if (
+                  (dynamic.deep && !Array.isArray(targetParam)) ||
+                  targetParam.length === 0
+                ) {
+                  throw new Error(
+                    `getStaticPaths() must return a path for each dynamic segment. Expected "${dynamic.name}" to be an array with at least one item but received "${targetParam}".`
+                  );
+                }
+
+                if (dynamic.deep) {
+                  return route.replace(
+                    `[...${dynamic.name}]`,
+                    path.params?.[dynamic.name].join("/")
+                  );
+                }
+                return route.replace(
+                  `[${dynamic.name}]`,
+                  path.params?.[dynamic.name]
+                );
+              }, node.route);
+
+              return {
+                ...node,
+                route: route,
+                dynamic: null,
+              };
+            }),
+          ];
+        }
+      }
+      // If the route is dynamic, we can't guess at the initial route name.
+      return [node];
+    }
+
+    return [node];
   }
 
   // Guess at the initial route based on the group name.
@@ -154,10 +212,12 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
     }
   }
 
-  return {
-    ...node,
-    initialRouteName,
-  };
+  return [
+    {
+      ...node,
+      initialRouteName,
+    },
+  ];
 }
 
 function cloneGroupRoute(
@@ -212,20 +272,20 @@ function treeNodeToRouteNode({
     };
 
     if (Array.isArray(clones)) {
-      return clones.map((clone) =>
-        applyDefaultInitialRouteName(cloneGroupRoute({ ...output }, clone))
-      );
+      return clones
+        .map((clone) =>
+          applyDefaultInitialRouteName(cloneGroupRoute({ ...output }, clone))
+        )
+        .flat();
     }
 
-    return [
-      applyDefaultInitialRouteName({
-        loadRoute: node.loadRoute,
-        route: name,
-        contextKey: node.contextKey,
-        children: getTreeNodesAsRouteNodes(children),
-        dynamic,
-      }),
-    ];
+    return applyDefaultInitialRouteName({
+      loadRoute: node.loadRoute,
+      route: name,
+      contextKey: node.contextKey,
+      children: getTreeNodesAsRouteNodes(children),
+      dynamic,
+    });
   }
 
   // Empty folder, skip it.
