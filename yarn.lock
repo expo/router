@@ -6728,6 +6728,14 @@ emittery@^0.7.1:
   resolved "https://registry.yarnpkg.com/emittery/-/emittery-0.7.2.tgz#25595908e13af0f5674ab419396e2fb394cdfa82"
   integrity sha512-A8OG5SR/ij3SsJdWDJdkkSYUjQdCUx6APQXem0SaEePBSRg4eymGYwBkKo1Y6DU+af/Jn2dBQqDBvjnr9Vi8nQ==
 
+emoji-mart@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/emoji-mart/-/emoji-mart-3.0.1.tgz#9ce86706e02aea0506345f98464814a662ca54c6"
+  integrity sha512-sxpmMKxqLvcscu6mFn9ITHeZNkGzIvD0BSNFE/LJESPbCA8s1jM6bCDPjWbV31xHq7JXaxgpHxLB54RCbBZSlg==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    prop-types "^15.6.0"
+
 emoji-regex@^7.0.1:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-7.0.3.tgz#933a04052860c85e83c122479c4748a8e4c72156"
@@ -13538,7 +13546,7 @@ promzard@^0.3.0:
   dependencies:
     read "1"
 
-prop-types@^15.7.0, prop-types@^15.7.2, prop-types@^15.8.1:
+prop-types@^15.6.0, prop-types@^15.7.0, prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==

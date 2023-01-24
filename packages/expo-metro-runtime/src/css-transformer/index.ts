@@ -38,16 +38,18 @@ export async function transform(props: {
       if (props.options.platform === "web") {
         const dev = props.options.dev;
         props.src = `module.exports = (() => {
-            const head = document.head || document.getElementsByTagName('head')[0];
-            const style = document.createElement('style');
-            const css = \`${props.src}\`;
-            ${dev ? getHotReplaceTemplate(props.filename) : ``}
-            style.setAttribute('data-expo-loader', 'css');
-            head.appendChild(style);
-            if (style.styleSheet){
-              style.styleSheet.cssText = css;
-            } else {
-              style.appendChild(document.createTextNode(css));
+            if (typeof document !== 'undefined') {
+              const head = document.head || document.getElementsByTagName('head')[0];
+              const style = document.createElement('style');
+              const css = \`${props.src}\`;
+              ${dev ? getHotReplaceTemplate(props.filename) : ``}
+              style.setAttribute('data-expo-loader', 'css');
+              head.appendChild(style);
+              if (style.styleSheet){
+                style.styleSheet.cssText = css;
+              } else {
+                style.appendChild(document.createTextNode(css));
+              }
             }
           })();`;
       } else {

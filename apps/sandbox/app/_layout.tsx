@@ -5,7 +5,15 @@ import "../theme.css";
 
 export default function Layout() {
   // if (Platform.OS !== "web") {
-  return <Tabs />;
+  return (
+    <Tabs>
+      <Tabs.Screen name="index" />
+      <Tabs.Screen name="web-lib" />
+      <Tabs.Screen name="posts" />
+      <Tabs.Screen name="nested/settings" />
+      <Tabs.Screen name="nested/[id]" />
+    </Tabs>
+  );
   // }
   return (
     <Navigator>

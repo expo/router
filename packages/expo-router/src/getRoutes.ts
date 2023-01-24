@@ -131,6 +131,7 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode[] {
   const groupName = matchGroupName(node.route);
   if (!node.children?.length) {
     if (node.dynamic) {
+      return [node];
       const loaded = node.loadRoute();
       if (loaded.getStaticPaths) {
         if (typeof loaded.getStaticPaths !== "function") {
