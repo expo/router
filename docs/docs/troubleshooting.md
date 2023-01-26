@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-description: Fixing common issues with Expo Router beta setup.
+description: Fixing common issues with Expo Router setup.
 sidebar_position: 99
 ---
 
