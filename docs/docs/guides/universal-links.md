@@ -15,7 +15,7 @@ Universal links require a 2-part verification process for both iOS and Android:
 
 The only step is to add a URI scheme to your app. Add a `scheme` to your Expo config (`app.json`/`app.config.js`), this makes the app available via deep link:
 
-```json
+```json title=app.json
 {
   "expo": {
     "scheme": "myapp"
@@ -29,7 +29,7 @@ Alternatively, you can use `npx uri-scheme` to generate a URI scheme for your na
 
 Add your website URL to the iOS [associated domains entitlement](https://docs.expo.dev/versions/latest/config/app/#associateddomains) in your Expo config:
 
-```json
+```json title=app.json
 {
   "expo": {
     "ios": {
@@ -43,7 +43,7 @@ Build your native app with EAS Build to ensure the entitlement is registered wit
 
 Next, create a `public/.well-known/apple-app-site-association` file and add the following:
 
-```json
+```json title=public/.well-known/apple-app-site-association
 {
   "applinks": {
     "apps": [],
@@ -69,7 +69,7 @@ Finally, install the app on your device and open the website in Safari. You shou
 
 Add your website URL to the Android [intent filters](https://docs.expo.dev/versions/latest/config/app/#intentfilters) in your Expo config:
 
-```json
+```json title=app.json
 {
   "expo": {
     "android": {
@@ -97,7 +97,7 @@ Create a JSON file for the website verification (aka [digital asset links](https
   1. After building an Android app with EAS Build, run `eas credentials -p android` and select the profile you wish to obtain the fingerprint for. The fingerprint will be listed under `SHA256 Fingerprint`.
   2. by visiting the [Play Console](https://play.google.com/console/) developer account under `Release > Setup > App Integrity`; if you do, then you'll also find the correct Digital Asset Links JSON snippet for your app on the same page. The value will look like `14:6D:E9:83...`
 
-```json
+```json title=public/.well-known/assetlinks.json
 [
   {
     "relation": ["delegate_permission/common.handle_all_urls"],
