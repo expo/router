@@ -41,7 +41,7 @@ type InitialRouteConfig = {
   parentScreens: string[];
 };
 
-type ResultState = PartialState<NavigationState> & {
+export type ResultState = PartialState<NavigationState> & {
   state?: ResultState;
 };
 
