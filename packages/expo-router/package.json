@@ -20,6 +20,10 @@
     "type": "git",
     "directory": "packages/expo-router"
   },
+  "bugs": {
+    "url": "https://github.com/expo/router/issues"
+  },
+  "homepage": "https://expo.github.io/router/docs/",
   "scripts": {
     "build": "expo-module build",
     "clean": "expo-module clean",
