@@ -114,16 +114,16 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
   };
 }
 
-function logFunc<T extends (...props: any[]) => any>(func: T): T {
-  const name = func.name;
-  // @ts-expect-error
-  return (...props: Parameters<T>) => {
-    console.group(name);
-    console.log(props);
-    const results = func(...props);
-    console.log(results);
+// function logFunc<T extends (...props: any[]) => any>(func: T): T {
+//   const name = func.name;
+//   // @ts-expect-error
+//   return (...props: Parameters<T>) => {
+//     console.group(name);
+//     console.log(props);
+//     const results = func(...props);
+//     console.log(results);
 
-    console.groupEnd();
-    return results as any;
-  };
-}
+//     console.groupEnd();
+//     return results as any;
+//   };
+// }
