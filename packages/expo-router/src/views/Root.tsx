@@ -11,13 +11,7 @@ function getGestureHandlerRootView() {
       require("react-native-gesture-handler") as typeof import("react-native-gesture-handler");
 
     return function GestureHandler(props: any) {
-      return (
-        <GestureHandlerRootView
-          testID="gesture-handler-root-view"
-          style={{ flex: 1 }}
-          {...props}
-        />
-      );
+      return <GestureHandlerRootView style={{ flex: 1 }} {...props} />;
     };
   } catch {
     return React.Fragment;
@@ -26,17 +20,19 @@ function getGestureHandlerRootView() {
 
 const GestureHandlerRootView = getGestureHandlerRootView();
 
-const SafeAreaProviderFallback =
-  typeof window === "undefined" ? React.Fragment : SafeAreaProvider;
+const INITIAL_METRICS = {
+  frame: { x: 0, y: 0, width: 0, height: 0 },
+  insets: { top: 0, left: 0, right: 0, bottom: 0 },
+};
 
 export function ExpoRoot({ context }: { context: RequireContext }) {
   return (
     <GestureHandlerRootView>
-      <SafeAreaProviderFallback>
+      <SafeAreaProvider initialMetrics={INITIAL_METRICS}>
         <ContextNavigator context={context} />
         {/* Users can override this by adding another StatusBar element anywhere higher in the component tree. */}
         <StatusBar style="auto" />
-      </SafeAreaProviderFallback>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
