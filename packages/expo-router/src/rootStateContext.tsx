@@ -3,6 +3,7 @@ import URL from "url-parse";
 
 import { State } from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
+import { useServerState } from "./useServerState";
 
 function useResolvedPromise<T>(promise: Promise<T> | undefined) {
   const [resolved, setResolved] = useState<T | undefined>();
@@ -17,6 +18,9 @@ function useResolvedPromise<T>(promise: Promise<T> | undefined) {
 }
 
 function useHackInitialRootState() {
+  // TODO: We probably don't need this
+  const serverState = useServerState();
+
   const linking = useLinkingContext();
   const url = useResolvedPromise(linking.getInitialURL() as Promise<string>);
   const [state, setState] = useState<State | null>(null);
@@ -31,7 +35,7 @@ function useHackInitialRootState() {
     }
   }, [url, linking]);
 
-  return state;
+  return state ?? serverState;
 }
 
 export const InitialRootStateContext = createContext<State | null>(null);

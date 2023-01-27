@@ -80,6 +80,16 @@ export function getReactNavigationScreensConfig(
   );
 }
 
+export function getNavigationConfig(routes: RouteNode): {
+  initialRouteName?: string;
+  screens: Record<string, Screen>;
+} {
+  return {
+    initialRouteName: routes.initialRouteName,
+    screens: getReactNavigationScreensConfig(routes.children),
+  };
+}
+
 export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
   return {
     prefixes: [
@@ -90,11 +100,8 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
       // i.e. iOS Safari banner.
       ...getAllWebRedirects(),
     ],
-    config: {
-      // @ts-expect-error
-      initialRouteName: routes.initialRouteName,
-      screens: getReactNavigationScreensConfig(routes.children),
-    },
+    // @ts-expect-error
+    config: getNavigationConfig(routes),
     // A custom getInitialURL is used on native to ensure the app always starts at
     // the root path if it's launched from something other than a deep link.
     // This helps keep the native functionality working like the web functionality.
