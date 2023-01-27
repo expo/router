@@ -32,10 +32,13 @@ function RootRouteNodeProvider({
 }
 
 export function ContextNavigator({ context }: { context: RequireContext }) {
-  const Tutorial = useTutorial(context);
-  if (Tutorial) {
-    SplashScreen.hideAsync();
-    return <Tutorial />;
+  if (process.env.NODE_ENV !== "production") {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const Tutorial = useTutorial(context);
+    if (Tutorial) {
+      SplashScreen.hideAsync();
+      return <Tutorial />;
+    }
   }
 
   return (
