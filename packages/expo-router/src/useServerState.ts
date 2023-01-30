@@ -11,7 +11,7 @@ export function useServerState() {
 
   const server = React.useContext<any>(ServerContext);
 
-  return React.useMemo(() => {
+  const serverState = React.useMemo(() => {
     const location =
       server?.location ??
       (typeof window !== "undefined" ? window.location : undefined);
@@ -24,6 +24,8 @@ export function useServerState() {
 
     return null;
   }, [server, getStateFromPath]);
+
+  return typeof document === "undefined" ? serverState : null;
 }
 
 function useGetStateFromPath() {

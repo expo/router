@@ -45,9 +45,7 @@ export function ContextNavigator({ context }: { context: RequireContext }) {
     <RootRouteNodeProvider context={context}>
       <ContextNavigationContainer>
         <InitialRootStateProvider>
-          <LocationProvider>
-            <RootRoute />
-          </LocationProvider>
+          <RootRoute />
         </InitialRootStateProvider>
       </ContextNavigationContainer>
     </RootRouteNodeProvider>
