@@ -1,5 +1,6 @@
 import React from "react";
 
+import { useRoute } from "@react-navigation/native";
 import { RootContainer } from "./ContextNavigationContainer";
 import getPathFromState, { State } from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
@@ -173,6 +174,11 @@ export function usePathname(): string {
 /** @returns Current URL Search Parameters. */
 export function useSearchParams(): SearchParams {
   return useLocation().params;
+}
+
+/** @returns Current URL Search Parameters that only update when the path matches the current route. */
+export function useLocalSearchParams(): SearchParams {
+  return useRoute()?.params ?? ({} as any);
 }
 
 /** @returns Array of selected segments. */

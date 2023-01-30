@@ -1,15 +1,14 @@
-import { useRouter, useSearchParams } from "expo-router";
+import { useRouter, useLocalSearchParams, useSearchParams } from "expo-router";
 import * as React from "react";
 import { Button, Text, View } from "react-native";
-import { items, lists } from "../../etc/data";
+import { items, lists } from "../../../etc/data";
 
-export default function List({ params }) {
+export default function List() {
   const router = useRouter();
-  const { listId } = useSearchParams();
-  console.log("listId", listId, params);
+  const { listId } = useLocalSearchParams();
+  console.log("listId", listId);
   if (!listId) {
     return <Text>Not Found</Text>;
-    // throw new Error("Missing 'listId' in search params");
   }
 
   const list = lists.find((l) => l.id === listId);
@@ -22,8 +21,8 @@ export default function List({ params }) {
           title={items.find((itm) => itm.id === itemId)!.name}
           onPress={() => {
             router.push({
-              pathname: "/item/[itemId]",
-              params: { itemId },
+              pathname: "[root]/item/[itemId]",
+              params: { root: "root", itemId },
             });
           }}
         />

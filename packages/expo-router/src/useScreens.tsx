@@ -131,9 +131,6 @@ export function getQualifiedRouteComponent(value: RouteNode) {
       const children = React.createElement(Component, {
         ...props,
         ref,
-        // Provide the local params which only update when the global URL
-        // matches the route.
-        params: route?.params ?? {},
         // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
         // the intention is to make it possible to deduce shared routes.
         segment: value.route,
