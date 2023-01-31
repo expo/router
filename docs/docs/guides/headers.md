@@ -70,7 +70,7 @@ export default function Home() {
 
       <Text>Home Screen</Text>
 
-      <Link to={{ screen: "details", params: { name: "Bacon" } }}>
+      <Link href={{ screen: "details", params: { name: "Bacon" } }}>
         Go to Details
       </Link>
     </View>
