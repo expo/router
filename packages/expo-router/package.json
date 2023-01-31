@@ -13,7 +13,8 @@
     "stack.d.ts",
     "tabs.js",
     "tabs.d.ts",
-    "node"
+    "node",
+    "_getRoutesManifest.js"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",
