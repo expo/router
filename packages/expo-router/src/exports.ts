@@ -2,7 +2,12 @@
 import { Navigator, Slot } from "./views/Layout";
 
 export { useRouter } from "./link/useRouter";
-export { usePathname, useSearchParams, useSegments } from "./LocationProvider";
+export {
+  usePathname,
+  useLocalSearchParams,
+  useSearchParams,
+  useSegments,
+} from "./LocationProvider";
 export { Link, Redirect } from "./link/Link";
 
 export { withLayoutContext } from "./layouts/withLayoutContext";

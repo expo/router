@@ -136,11 +136,12 @@ export function getQualifiedRouteComponent(value: RouteNode) {
         segment: value.route,
       });
 
-      const errorBoundary = ErrorBoundary ? (
-        <Try catch={ErrorBoundary}>{children}</Try>
-      ) : (
-        children
-      );
+      const errorBoundary = React.useMemo(() => {
+        if (ErrorBoundary) {
+          return <Try catch={ErrorBoundary}>{children}</Try>;
+        }
+        return children;
+      }, [ErrorBoundary, children]);
 
       return (
         <LocationProvider>

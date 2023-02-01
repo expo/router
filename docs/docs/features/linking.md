@@ -104,7 +104,7 @@ export default function Route() {
 
 ## `useSearchParams`
 
-Returns the URL search parameters for the currently selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`.
+Returns the URL search parameters for the globally selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`.
 
 > `/profile/baconbrix?extra=info`
 
@@ -124,6 +124,32 @@ Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `
 ```js
 {
   id: "123";
+}
+```
+
+## `useLocalSearchParams`
+
+Returns the URL search parameters for the contextually selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`. This is useful for stacks where the previous screen is still mounted.
+
+```title=File System
+app/
+  _layout.js
+  [first]/home.tsx
+  [second]/shop.tsx
+```
+
+When `/abc/home` pushes `/123/shop`, `useSearchParams` would return `{ first: undefined, second: '123' }` on `/app/[first]/home.tsx` because the global URL has changed. However, you may want the params to remain `{ first: 'abc' }` to reflect the context of the screen. In this case, you can use `useLocalSearchParams` to ensure the params `{ first: 'abc' }` are still returned in `/app/[first]/home.tsx`.
+
+> `/profile/baconbrix?extra=info`
+
+```js title=app/profile/[user].tsx
+import { Text } from "react-native";
+import { useSearchParams } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const { user, extra } = useLocalSearchParams();
+  return <Text>User: {user}</Text>;
 }
 ```
 
