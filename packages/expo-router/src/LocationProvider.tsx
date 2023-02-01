@@ -1,6 +1,6 @@
+import { useRoute } from "@react-navigation/native";
 import React from "react";
 
-import { useRoute } from "@react-navigation/native";
 import { RootContainer } from "./ContextNavigationContainer";
 import getPathFromState, { State } from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";

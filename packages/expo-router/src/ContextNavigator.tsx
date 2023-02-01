@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 
 import { ContextNavigationContainer } from "./ContextNavigationContainer";
-import { LocationProvider } from "./LocationProvider";
 import { RootRouteNodeContext, useRootRouteNodeContext } from "./context";
 import { getRoutes } from "./getRoutes";
 import { useTutorial } from "./onboard/useTutorial";
