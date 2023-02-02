@@ -153,59 +153,55 @@ function FileItem({
   return (
     <>
       {!route.internal && (
-        <Pressable>
-          {({ pressed, hovered }) => (
-            <Link
-              accessibilityLabel={route.contextKey}
-              href={href}
-              onPress={() => {
-                if (Platform.OS !== "web") {
-                  // Ensure the modal pops
-                  navigation.goBack();
-                }
-              }}
-              style={{ flex: 1, display: "flex" }}
-              disabled={disabled}
-              // Ensure we replace the history so you can't go back to this page.
-              replace
-            >
-              <View style={{ flex: 1 }}>
-                <View
-                  style={[
-                    styles.itemPressable,
-                    {
-                      paddingLeft: INDENT + level * INDENT,
-                      backgroundColor: hovered
-                        ? "rgba(255,255,255,0.1)"
-                        : "transparent",
-                    },
-                    pressed && { backgroundColor: "#323232" },
-                    disabled && { opacity: 0.4 },
-                  ]}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    {route.children.length ? <PkgIcon /> : <FileIcon />}
-                    <Text style={styles.filename}>{filename}</Text>
-                  </View>
+        <Link
+          accessibilityLabel={route.contextKey}
+          href={href}
+          onPress={() => {
+            if (Platform.OS !== "web") {
+              // Ensure the modal pops
+              navigation.goBack();
+            }
+          }}
+          style={{ flex: 1, display: "flex" }}
+          disabled={disabled}
+          asChild
+          // Ensure we replace the history so you can't go back to this page.
+          replace
+        >
+          <Pressable style={{ flex: 1 }}>
+            {({ pressed, hovered }) => (
+              <View
+                style={[
+                  styles.itemPressable,
+                  {
+                    paddingLeft: INDENT + level * INDENT,
+                    backgroundColor: hovered
+                      ? "rgba(255,255,255,0.1)"
+                      : "transparent",
+                  },
+                  pressed && { backgroundColor: "#323232" },
+                  disabled && { opacity: 0.4 },
+                ]}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  {route.children.length ? <PkgIcon /> : <FileIcon />}
+                  <Text style={styles.filename}>{filename}</Text>
+                </View>
 
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    {!!info && (
-                      <Text
-                        style={[
-                          styles.virtual,
-                          !disabled && { marginRight: 8 },
-                        ]}
-                      >
-                        {info}
-                      </Text>
-                    )}
-                    {!disabled && <ForwardIcon />}
-                  </View>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  {!!info && (
+                    <Text
+                      style={[styles.virtual, !disabled && { marginRight: 8 }]}
+                    >
+                      {info}
+                    </Text>
+                  )}
+                  {!disabled && <ForwardIcon />}
                 </View>
               </View>
-            </Link>
-          )}
-        </Pressable>
+            )}
+          </Pressable>
+        </Link>
       )}
       {route.children.map((child) => (
         <FileItem
