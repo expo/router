@@ -210,10 +210,17 @@ function routeToScreen(
             : staticOptions;
         const dynamicResult =
           typeof options === "function" ? options?.(args) : options;
-        return {
+        const output = {
           ...staticResult,
           ...dynamicResult,
         };
+
+        // Prevent generated screens from showing up in the tab bar.
+        if (route.generated) {
+          output.tabBarButton = () => null;
+        }
+
+        return output;
       }}
       getComponent={() => getQualifiedRouteComponent(route)}
     />
