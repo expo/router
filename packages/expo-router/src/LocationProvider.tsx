@@ -69,6 +69,10 @@ function useUrlObject(): UrlObject {
 
   const maybeUpdateRouteInfo = React.useCallback(
     (state: State) => {
+      // The state can be undefined when hot reloading a Layout Route on native.
+      if (!state) {
+        return;
+      }
       // Prevent unnecessary updates
       const newRouteInfo = getRouteInfoFromState(getPathFromState, state);
       if (!compareRouteInfo(routeInfoRef.current, newRouteInfo)) {
