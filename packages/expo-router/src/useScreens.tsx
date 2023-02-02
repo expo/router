@@ -17,10 +17,10 @@ export type ScreenProps<
   /** Name is required when used inside a Layout component. */
   name?: string;
   /**
-   * Redirect to the nearest or provided sibling route.
+   * Redirect to the nearest sibling route.
    * If all children are redirect={true}, the layout will render `null` as there are no children to render.
    */
-  redirect?: boolean | string;
+  redirect?: boolean;
   initialParams?: { [key: string]: any };
   options?: TOptions;
 
