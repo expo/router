@@ -1,1 +1,3 @@
-export * from "./build/head/Head";
+import Head from "./build/head/Head";
+
+export default Head;
