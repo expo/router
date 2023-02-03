@@ -47,9 +47,25 @@ function compareUrlSearchParams(a: SearchParams, b: SearchParams): boolean {
   return aKeys.every((key) => a[key] === b[key]);
 }
 
-function useUrlObject(): UrlObject {
+function useSafeInitialRootState() {
   const serverState = useServerState();
   const initialRootState = useInitialRootStateContext();
+
+  return React.useMemo(() => {
+    if (serverState) {
+      return serverState;
+    }
+
+    // Check if "is ready" to prevent `console.error`s
+    if (RootContainer.getRef().isReady()) {
+      return RootContainer.getRef().getRootState() ?? initialRootState;
+    }
+
+    return initialRootState;
+  }, []);
+}
+
+function useUrlObject(): UrlObject {
   const getPathFromState = useGetPathFromState();
 
   const [routeInfo, setRouteInfo] = React.useState<UrlObject>(
@@ -57,7 +73,7 @@ function useUrlObject(): UrlObject {
       getPathFromState,
       // If the root state (from upstream) is not ready, use the hacky initial state.
       // Initial state can be generate because it assumes the linking configuration never changes.
-      serverState ?? RootContainer.getRef().getRootState() ?? initialRootState
+      useSafeInitialRootState()
     )
   );
 
