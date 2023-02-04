@@ -22,7 +22,7 @@ function getGestureHandlerRootView() {
 const GestureHandlerRootView = getGestureHandlerRootView();
 
 // We add this elsewhere for rendering
-const EnsureHelmetProvider =
+const HeadProvider =
   typeof window === "undefined" ? React.Fragment : Head.Provider;
 
 const INITIAL_METRICS = {
@@ -32,8 +32,8 @@ const INITIAL_METRICS = {
 
 export function ExpoRoot({ context }: { context: RequireContext }) {
   return (
-    <GestureHandlerRootView>
-      <EnsureHelmetProvider>
+    <HeadProvider>
+      <GestureHandlerRootView>
         <SafeAreaProvider
           // SSR support
           initialMetrics={INITIAL_METRICS}
@@ -42,7 +42,7 @@ export function ExpoRoot({ context }: { context: RequireContext }) {
           {/* Users can override this by adding another StatusBar element anywhere higher in the component tree. */}
           <StatusBar style="auto" />
         </SafeAreaProvider>
-      </EnsureHelmetProvider>
-    </GestureHandlerRootView>
+      </GestureHandlerRootView>
+    </HeadProvider>
   );
 }

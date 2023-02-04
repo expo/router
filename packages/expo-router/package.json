@@ -16,7 +16,9 @@
     "head.js",
     "head.d.ts",
     "node",
-    "_getRoutesManifest.js"
+    "_getRoutesManifest.js",
+    "_root.js",
+    "_root.d.ts"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",
