@@ -23,7 +23,6 @@ export function useInitialRootState() {
 
   useEffect(() => {
     if (url) {
-      // @ts-expect-error
       const parsed = URL(url);
       // TODO: Add hashes to the path
       const urlWithoutOrigin = parsed.pathname + parsed.query;

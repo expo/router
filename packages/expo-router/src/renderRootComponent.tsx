@@ -1,8 +1,8 @@
-import { SplashScreen } from "expo-router";
 import React from "react";
 import { Platform, View } from "react-native";
 
 import registerRootComponent from "./fork/expo/registerRootComponent";
+import { SplashScreen } from "./views/Splash";
 
 function isBaseObject(obj) {
   if (Object.prototype.toString.call(obj) !== "[object Object]") {
