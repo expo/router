@@ -16,14 +16,14 @@ app/
     page.js
 ```
 
-```tsx title=app/tabs/page.tsx
-import { useNavigation } from "expo-router";
+```js title=app/tabs/page.tsx
+import { useNavigation, useRootNavigation } from "expo-router";
 
 export default function Page() {
   // This navigation prop controls the direct parent `/tabs/_layout.js`.
   const navigation = useNavigation();
   // This navigation prop controls the direct parent `/_layout.js`.
-  const rootNavigation = useNavigation("/");
+  const rootNavigation = useRootNavigation();
 
   // ...
 }

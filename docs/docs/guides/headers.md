@@ -78,24 +78,26 @@ export default function Home() {
 }
 ```
 
-You can use the imperative API `navigation.setParams` to configure the route dynamically.
+You can use the imperative API `router.setParams()` function to configure the route dynamically.
 
 ```js title=app/details.tsx
 import { View, Text } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, useSearchParams, useRouter } from "expo-router";
 
-export default function Details({ navigation, route }) {
+export default function Details() {
+  const router = useRouter();
+  const params = useSearchParams();
+
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      {/* NOTE(EvanBacon): Preferred way to use route to update navigation options. */}
       <Stack.Screen
         option={{
-          title: route?.params?.name,
+          title: params.name,
         }}
       />
       <Text
         onPress={() => {
-          navigation.setParams({ name: "Updated" });
+          router.setParams({ name: "Updated" });
         }}
       >
         Update the title
