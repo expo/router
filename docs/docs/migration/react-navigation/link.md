@@ -9,7 +9,7 @@ The Expo Router `Link` component is a wrapper around the React Navigation `Link`
 
 Instead of the [`to`](https://reactnavigation.org/docs/use-link-props#to) property, Expo Router uses the `href` property.
 
-```tsx
+```js
 import { Link } from "expo-router";
 
 function MyLink() {
