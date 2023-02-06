@@ -73,7 +73,7 @@ export default function Page() {
 
 - **push**: _`(href: Href) => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', params: { id: '123' } }`.
 - **replace**: _`(href: Href) => void`_ Same API as `push` but replaces the current route in the history instead of pushing a new one. This is useful for redirects.
-- **back**: _`() => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', params: { id: '123' } }`.
+- **back**: _`() => void`_ Navigate back to previous route.
 - **setParams**: _`(params: Record<string, string>) => void`_ Update the query params for the currently selected route.
 
 ### `Href` type
