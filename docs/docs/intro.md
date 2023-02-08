@@ -12,7 +12,7 @@ Expo Router brings the best routing concepts from the web to native iOS and Andr
 Run the following to create a project with `expo-router` setup:
 
 ```bash
-npx create-react-native-app -t with-router
+npx create-expo-app -e with-router
 ```
 
 > [Template source](https://github.com/expo/examples/tree/master/with-router).

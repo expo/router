@@ -14,7 +14,7 @@ Repo for the new File-based router for React Native apps. Please open a discussi
 The easiest way to try **Expo Router** is by creating a new project:
 
 ```
-npx create-react-native-app -t with-router
+npx create-expo-app -e with-router
 ```
 
 See the [setup guide for more](https://expo.github.io/router/docs/).
