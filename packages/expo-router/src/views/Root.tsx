@@ -6,7 +6,6 @@ import {
 } from "react-native-safe-area-context";
 import { Platform, Dimensions } from "react-native";
 import { ContextNavigator } from "../ContextNavigator";
-import Head from "../head/Head";
 import { RequireContext } from "../types";
 
 function getGestureHandlerRootView() {
@@ -24,10 +23,6 @@ function getGestureHandlerRootView() {
 
 const GestureHandlerRootView = getGestureHandlerRootView();
 
-// We add this elsewhere for rendering
-const EnsureHelmetProvider =
-  typeof window === "undefined" ? React.Fragment : Head.Provider;
-
 const { width = 0, height = 0 } = Dimensions.get("window");
 
 // To support SSR on web, we need to have empty insets for initial values
@@ -44,13 +39,14 @@ const INITIAL_METRICS =
 export function ExpoRoot({ context }: { context: RequireContext }) {
   return (
     <GestureHandlerRootView>
-      <EnsureHelmetProvider>
-        <SafeAreaProvider initialMetrics={INITIAL_METRICS}>
-          <ContextNavigator context={context} />
-          {/* Users can override this by adding another StatusBar element anywhere higher in the component tree. */}
-          <StatusBar style="auto" />
-        </SafeAreaProvider>
-      </EnsureHelmetProvider>
+      <SafeAreaProvider
+        // SSR support
+        initialMetrics={INITIAL_METRICS}
+      >
+        <ContextNavigator context={context} />
+        {/* Users can override this by adding another StatusBar element anywhere higher in the component tree. */}
+        <StatusBar style="auto" />
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
