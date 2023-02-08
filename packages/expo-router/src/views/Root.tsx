@@ -1,10 +1,11 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
+import { Platform, Dimensions } from "react-native";
 import {
   SafeAreaProvider,
   initialWindowMetrics,
 } from "react-native-safe-area-context";
-import { Platform, Dimensions } from "react-native";
+
 import { ContextNavigator } from "../ContextNavigator";
 import { RequireContext } from "../types";
 
