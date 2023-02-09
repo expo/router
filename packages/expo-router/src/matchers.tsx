@@ -19,6 +19,16 @@ export function getNameFromFilePath(name: string): string {
   return removeSupportedExtensions(removeFileSystemDots(name));
 }
 
+export function getContextKey(name: string): string {
+  // The root path is `` (empty string) so always prepend `/` to ensure
+  // there is some value.
+  const normal = "/" + getNameFromFilePath(name);
+  if (!normal.endsWith("_layout")) {
+    return normal;
+  }
+  return normal.replace(/\/?_layout$/, "");
+}
+
 /** Remove `.js`, `.ts`, `.jsx`, `.tsx` */
 function removeSupportedExtensions(name: string): string {
   return name.replace(/\.[jt]sx?$/g, "");
