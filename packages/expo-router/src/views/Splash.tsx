@@ -1,4 +1,4 @@
-import SplashModule from "expo-splash-screen";
+import * as SplashModule from "expo-splash-screen";
 import { nanoid } from "nanoid/non-secure";
 import * as React from "react";
 import { Platform } from "react-native";
