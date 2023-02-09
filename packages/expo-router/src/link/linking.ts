@@ -51,7 +51,7 @@ export async function getInitialURL(): Promise<string> {
 
 let _rootURL: string | undefined;
 
-export function getRootURL() {
+export function getRootURL(): string {
   if (_rootURL === undefined) {
     _rootURL = Linking.createURL("/");
   }

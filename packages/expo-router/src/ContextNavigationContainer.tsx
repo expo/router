@@ -4,13 +4,13 @@ import {
 } from "@react-navigation/native";
 import React from "react";
 
-import { useRootRouteNodeContext } from "./context";
 import { getLinkingConfig } from "./getLinkingConfig";
 import {
   RootNavigationRef,
   useRootNavigation,
   useRootNavigationState,
 } from "./useRootNavigation";
+import { useRootRouteNodeContext } from "./useRootRouteNodeContext";
 import { SplashScreen } from "./views/Splash";
 
 const navigationRef = createNavigationContainerRef();

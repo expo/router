@@ -1,11 +1,14 @@
 import React, { useMemo } from "react";
 
 import { ContextNavigationContainer } from "./ContextNavigationContainer";
-import { RootRouteNodeContext, useRootRouteNodeContext } from "./context";
 import { getRoutes } from "./getRoutes";
 import { useTutorial } from "./onboard/useTutorial";
-import { InitialRootStateProvider } from "./rootStateContext";
+import { InitialRootStateProvider } from "./useInitialRootStateContext";
 import { RequireContext } from "./types";
+import {
+  RootRouteNodeContext,
+  useRootRouteNodeContext,
+} from "./useRootRouteNodeContext";
 import { getQualifiedRouteComponent } from "./useScreens";
 import { SplashScreen } from "./views/Splash";
 

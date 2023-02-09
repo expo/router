@@ -1,5 +1,5 @@
 // Expo Router API
-import { Navigator, Slot } from "./views/Layout";
+import { Navigator, Slot } from "./views/Navigator";
 
 export { useRouter } from "./link/useRouter";
 export {
@@ -21,16 +21,8 @@ export { ErrorBoundary } from "./views/ErrorBoundary";
 
 // Platform
 export { SplashScreen } from "./views/Splash";
-export * as Linking from "./link/linking";
 
 // React Navigation
 export { useNavigation } from "./useNavigation";
 export { useRootNavigation, useRootNavigationState } from "./useRootNavigation";
 export { useFocusEffect } from "./useFocusEffect";
-
-// Deprecated (doesn't matter in beta)
-
-/** @deprecated use `<Navigator />` */
-export const Layout = Navigator;
-/** @deprecated use `<Slot />` */
-export const Children = Slot;

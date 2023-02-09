@@ -4,8 +4,8 @@ import React from "react";
 import { RootContainer } from "./ContextNavigationContainer";
 import getPathFromState, { State } from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
-import { useInitialRootStateContext } from "./rootStateContext";
-import { useServerState } from "./useServerState";
+import { useInitialRootStateContext } from "./useInitialRootStateContext";
+import { useServerState } from "./static/useServerState";
 
 type SearchParams = Record<string, string>;
 

@@ -7,7 +7,7 @@ import {
   stripGroupSegmentsFromPath,
 } from "./matchers";
 import { RequireContext } from "./types";
-import { DefaultNavigator } from "./views/Layout";
+import { DefaultNavigator } from "./views/Navigator";
 
 export type FileNode = Pick<RouteNode, "contextKey" | "loadRoute"> & {
   /** Like `(tab)/index` */

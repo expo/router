@@ -1,6 +1,6 @@
 import React, { ReactNode, useContext } from "react";
 
-import { RootRouteNodeContext } from "./context";
+import { RootRouteNodeContext } from "./useRootRouteNodeContext";
 import { getNameFromFilePath, matchGroupName } from "./matchers";
 
 /** The list of input keys will become optional, everything else will remain the same. */

@@ -1,5 +1,5 @@
 import { useLinkingContext } from "./link/useLinkingContext";
-import { useServerState } from "./useServerState";
+import { useServerState } from "./static/useServerState";
 
 export function useInitialRootState() {
   // Node.js environments

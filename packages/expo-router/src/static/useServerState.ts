@@ -1,31 +1,29 @@
 //  TODO: This is fragile and only works on web
 import ServerContext from "@react-navigation/native/lib/module/ServerContext";
-// import ServerContext from "@react-navigation/native/src/ServerContext";
 import React from "react";
 
-import getStateFromPath from "./fork/getStateFromPath";
-import { useLinkingContext } from "./link/useLinkingContext";
+import getStateFromPath from "../fork/getStateFromPath";
+import { useLinkingContext } from "../link/useLinkingContext";
 
 export function useServerState() {
   const getStateFromPath = useGetStateFromPath();
 
   const server = React.useContext<any>(ServerContext);
 
-  const serverState = React.useMemo(() => {
+  const pathname = React.useMemo(() => {
     const location =
       server?.location ??
       (typeof window !== "undefined" ? window.location : undefined);
 
-    const path = location ? location.pathname + location.search : undefined;
+    return location ? location.pathname + location.search : undefined;
+  }, [server]);
 
-    if (path) {
-      return getStateFromPath(path);
-    }
+  const state = React.useMemo(() => {
+    // TODO: useEffect is not called on the server, so we don't need these checks.
+    return pathname ? getStateFromPath(pathname) : null;
+  }, [pathname, getStateFromPath]);
 
-    return null;
-  }, [server, getStateFromPath]);
-
-  return typeof document === "undefined" ? serverState : null;
+  return typeof document === "undefined" ? state : null;
 }
 
 function useGetStateFromPath() {
