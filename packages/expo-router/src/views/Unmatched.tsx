@@ -1,13 +1,13 @@
 import { StyleSheet, Text, View } from "@bacons/react-views";
 import { createURL } from "expo-linking";
-import React, { forwardRef } from "react";
+import React from "react";
 
 import { usePathname } from "../LocationProvider";
 import { Link } from "../link/Link";
 import { useNavigation } from "../useNavigation";
 
 /** Default screen for unmatched routes. */
-export const Unmatched = forwardRef((props, ref) => {
+export function Unmatched() {
   const navigation = useNavigation();
   const pathname = usePathname();
   const url = createURL(pathname);
@@ -19,8 +19,7 @@ export const Unmatched = forwardRef((props, ref) => {
   }, [navigation]);
 
   return (
-    // @ts-ignore
-    <View ref={ref} style={styles.container}>
+    <View style={styles.container}>
       <Text
         accessibilityRole="header"
         accessibilityLevel={1}
@@ -48,7 +47,7 @@ export const Unmatched = forwardRef((props, ref) => {
       </Link>
     </View>
   );
-});
+}
 
 const styles = StyleSheet.create({
   container: {

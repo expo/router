@@ -2,8 +2,16 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { ContextNavigator } from "../ContextNavigator";
-import { RequireContext } from "../types";
+import { ContextNavigationContainer } from "./ContextNavigationContainer";
+import { useTutorial } from "./onboard/useTutorial";
+import { RequireContext } from "./types";
+import { InitialRootStateProvider } from "./useInitialRootStateContext";
+import {
+  RootRouteNodeProvider,
+  useRootRouteNodeContext,
+} from "./useRootRouteNodeContext";
+import { getQualifiedRouteComponent } from "./useScreens";
+import { SplashScreen } from "./views/Splash";
 
 function getGestureHandlerRootView() {
   try {
@@ -38,4 +46,30 @@ export function ExpoRoot({ context }: { context: RequireContext }) {
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
+}
+
+function ContextNavigator({ context }: { context: RequireContext }) {
+  if (process.env.NODE_ENV !== "production") {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const Tutorial = useTutorial(context);
+    if (Tutorial) {
+      SplashScreen.hideAsync();
+      return <Tutorial />;
+    }
+  }
+
+  return (
+    <RootRouteNodeProvider context={context}>
+      <ContextNavigationContainer>
+        <InitialRootStateProvider>
+          <RootRoute />
+        </InitialRootStateProvider>
+      </ContextNavigationContainer>
+    </RootRouteNodeProvider>
+  );
+}
+
+function RootRoute() {
+  const Component = getQualifiedRouteComponent(useRootRouteNodeContext());
+  return <Component />;
 }

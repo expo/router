@@ -14,7 +14,7 @@ export { withLayoutContext } from "./layouts/withLayoutContext";
 export { Navigator, Slot };
 
 // Expo Router Views
-export { ExpoRoot } from "./views/Root";
+export { ExpoRoot } from "./ExpoRoot";
 export { Unmatched } from "./views/Unmatched";
 export { ErrorBoundaryProps } from "./views/Try";
 export { ErrorBoundary } from "./views/ErrorBoundary";
