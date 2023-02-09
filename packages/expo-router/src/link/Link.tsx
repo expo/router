@@ -24,7 +24,7 @@ type Props = {
   onPress?: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => void;
-} & (Omit<TextProps, "href"> & { children?: React.ReactNode });
+} & (Omit<TextProps, "href" | "hoverStyle"> & { children?: React.ReactNode });
 
 /** Redirects to the href as soon as the component is mounted. */
 export function Redirect({ href }: { href: Href }) {

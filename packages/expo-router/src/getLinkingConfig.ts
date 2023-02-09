@@ -109,11 +109,27 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
     // then `/index` would be used on web and `/settings` would be used on native.
     getInitialURL,
     subscribe: addEventListener,
-    getStateFromPath,
+    getStateFromPath: getStateFromPathMemoized,
     getPathFromState,
 
     // Add all functions to ensure the types never need to fallback.
     // This is a convenience for usage in the package.
     getActionFromState,
   };
+}
+
+const stateCache = new Map<string, any>();
+
+/** We can reduce work by memoizing the state by the pathname. This only works because the options (linking config) theoretically never change.  */
+function getStateFromPathMemoized(
+  path: string,
+  options: Parameters<typeof getStateFromPath>[1]
+) {
+  const cached = stateCache.get(path);
+  if (cached) {
+    return cached;
+  }
+  const result = getStateFromPath(path, options);
+  stateCache.set(path, result);
+  return result;
 }
