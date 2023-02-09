@@ -1,7 +1,7 @@
 import React, { ReactNode, useContext } from "react";
 
-import { RootRouteNodeContext } from "./useRootRouteNodeContext";
 import { getNameFromFilePath, matchGroupName } from "./matchers";
+import { RootRouteNodeContext } from "./useRootRouteNodeContext";
 
 /** The list of input keys will become optional, everything else will remain the same. */
 export type PickPartial<T, K extends keyof T> = Omit<T, K> &
@@ -12,7 +12,6 @@ export type DynamicConvention = { name: string; deep: boolean };
 export type RouteNode = {
   /** Load a route into memory. Returns the exports from a route. */
   loadRoute: () => any;
-
   /** Loaded initial route name. */
   initialRouteName?: string;
   /** nested routes */
@@ -25,7 +24,6 @@ export type RouteNode = {
   contextKey: string;
   /** Added in-memory */
   generated?: boolean;
-
   /** Internal screens like the directory or the auto 404 should be marked as internal. */
   internal?: boolean;
 };

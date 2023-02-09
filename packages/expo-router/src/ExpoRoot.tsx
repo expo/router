@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { ContextNavigationContainer } from "./ContextNavigationContainer";
+import { NavigationContainer } from "./NavigationContainer";
 import { useTutorial } from "./onboard/useTutorial";
 import { RequireContext } from "./types";
 import { InitialRootStateProvider } from "./useInitialRootStateContext";
@@ -60,11 +60,11 @@ function ContextNavigator({ context }: { context: RequireContext }) {
 
   return (
     <RootRouteNodeProvider context={context}>
-      <ContextNavigationContainer>
+      <NavigationContainer>
         <InitialRootStateProvider>
           <RootRoute />
         </InitialRootStateProvider>
-      </ContextNavigationContainer>
+      </NavigationContainer>
     </RootRouteNodeProvider>
   );
 }

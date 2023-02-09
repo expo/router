@@ -1,11 +1,11 @@
 import { useRoute } from "@react-navigation/native";
 import React from "react";
 
-import { RootContainer } from "./ContextNavigationContainer";
+import { getNavigationContainerRef } from "./NavigationContainer";
 import getPathFromState, { State } from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
-import { useInitialRootStateContext } from "./useInitialRootStateContext";
 import { useServerState } from "./static/useServerState";
+import { useInitialRootStateContext } from "./useInitialRootStateContext";
 
 type SearchParams = Record<string, string>;
 
@@ -57,8 +57,8 @@ function useSafeInitialRootState() {
     }
 
     // Check if "is ready" to prevent `console.error`s
-    if (RootContainer.getRef().isReady()) {
-      return RootContainer.getRef().getRootState() ?? initialRootState;
+    if (getNavigationContainerRef().isReady()) {
+      return getNavigationContainerRef().getRootState() ?? initialRootState;
     }
 
     return initialRootState;
@@ -102,7 +102,7 @@ function useUrlObject(): UrlObject {
   );
 
   React.useEffect(() => {
-    const rootNavigation = RootContainer.getRef();
+    const rootNavigation = getNavigationContainerRef();
 
     return rootNavigation.addListener("state", ({ data }) => {
       // Attempt to use the complete state from the root, otherwise this will default to
