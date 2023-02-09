@@ -6,8 +6,7 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "deploy": "EXPO_USE_STATIC=1 nexpo export -p web --output-dir .vercel/output && vc deploy --prebuilt"
+    "web": "expo start --web"
   },
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
