@@ -1,19 +1,63 @@
 import {
   createNavigationContainerRef,
   NavigationContainer as UpstreamNavigationContainer,
+  NavigationContainerRefWithCurrent,
 } from "@react-navigation/native";
 import React from "react";
 
+import { State } from "./fork/getPathFromState";
 import { getLinkingConfig } from "./getLinkingConfig";
-import { RootNavigationRef } from "./useRootNavigation";
 import { useRootRouteNodeContext } from "./useRootRouteNodeContext";
 import { SplashScreen } from "./views/Splash";
-
-const navigationRef = createNavigationContainerRef();
 
 type NavigationContainerProps = React.ComponentProps<
   typeof UpstreamNavigationContainer
 >;
+
+const navigationRef = createNavigationContainerRef();
+
+const RootNavigationRef = React.createContext<{
+  ref: NavigationContainerRefWithCurrent<ReactNavigation.RootParamList> | null;
+}>({ ref: null });
+
+if (process.env.NODE_ENV !== "production") {
+  RootNavigationRef.displayName = "RootNavigationRef";
+}
+
+/** Get the root navigation container ref. */
+export function getNavigationContainerRef() {
+  return navigationRef;
+}
+
+export function useRootNavigation() {
+  const context = React.useContext(RootNavigationRef);
+  if (!context) {
+    throw new Error(
+      "useRootNavigation must be used within a NavigationContainerContext"
+    );
+  }
+  return context.ref;
+}
+
+export function useRootNavigationState(): State | undefined {
+  const navigation = useRootNavigation();
+  const [state, setState] = React.useState(navigation?.getRootState());
+  React.useEffect(() => {
+    if (navigation) {
+      setState(navigation.getRootState());
+      const unsubscribe = navigation.addListener("state", ({ data }) => {
+        setState(
+          // @ts-expect-error: idk
+          data.state
+        );
+      });
+      return unsubscribe;
+    }
+    return undefined;
+  }, [navigation]);
+
+  return state;
+}
 
 /** react-navigation `NavigationContainer` with automatic `linking` prop generated from the routes context. */
 export function NavigationContainer(props: NavigationContainerProps) {
@@ -45,9 +89,4 @@ export function NavigationContainer(props: NavigationContainerProps) {
       />
     </RootNavigationRef.Provider>
   );
-}
-
-/** Get the root navigation container ref. */
-export function getNavigationContainerRef() {
-  return navigationRef;
 }

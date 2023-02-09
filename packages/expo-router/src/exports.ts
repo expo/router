@@ -24,5 +24,8 @@ export { SplashScreen } from "./views/Splash";
 
 // React Navigation
 export { useNavigation } from "./useNavigation";
-export { useRootNavigation, useRootNavigationState } from "./useRootNavigation";
+export {
+  useRootNavigation,
+  useRootNavigationState,
+} from "./NavigationContainer";
 export { useFocusEffect } from "./useFocusEffect";
