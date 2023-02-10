@@ -9,6 +9,7 @@ if (process.env.NODE_ENV !== "production") {
   InitialRootStateContext.displayName = "InitialRootStateContext";
 }
 
+/** Fetch the initial root navigation state instantly on web and slightly delayed on native. */
 export function useInitialRootStateContext() {
   const state = useContext(InitialRootStateContext);
   if (!state) {
@@ -19,6 +20,10 @@ export function useInitialRootStateContext() {
   return state;
 }
 
+/**
+ * Unlike React Navigation, we statically know the config and always assume a URL is available.
+ * This enables us to always know the root state.
+ */
 export function InitialRootStateProvider({
   children,
 }: {

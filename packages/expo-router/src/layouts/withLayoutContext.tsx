@@ -1,10 +1,9 @@
 import React from "react";
 
 import { useContextKey } from "../Route";
+import { PickPartial } from "../types";
 import { useSortedScreens, ScreenProps } from "../useScreens";
 import { Screen } from "../views/Screen";
-
-type PickPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 
 export function useFilterScreenChildren(
   children: React.ReactNode,
