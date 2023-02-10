@@ -1,6 +1,6 @@
 {
   "name": "expo-router",
-  "version": "1.0.0-rc5",
+  "version": "1.0.0-rc6",
   "main": "build/index.js",
   "files": [
     "entry.js",
