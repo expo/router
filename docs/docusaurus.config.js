@@ -75,9 +75,9 @@ const config = {
       },
 
       announcementBar: {
-        id: "beta_notice_1",
+        id: "rc_notice_1",
         content:
-          'This project is in <b>beta</b>, API is subject to breaking changes. <a target="_blank" rel="noopener noreferrer" href="https://github.com/expo/router/discussions/1">Join the discussion</a>.',
+          'Expo Router v1 is in <b>release candidate</b>. We\'re actively refining and fixing bugs for the existing API. <a target="_blank" rel="noopener noreferrer" href="https://blog.expo.dev/announcing-the-expo-router-v1-release-candidate-c5680b88a18c">Learn more</a>.',
         backgroundColor: "#242526",
         textColor: "#fff",
         isCloseable: true,

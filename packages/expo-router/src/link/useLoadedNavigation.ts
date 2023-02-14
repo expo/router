@@ -1,13 +1,13 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useCallback, useState, useEffect, useRef } from "react";
 
-import { RootContainer } from "../ContextNavigationContainer";
+import { getNavigationContainerRef } from "../NavigationContainer";
 
 type GenericNavigation = NavigationProp<ReactNavigation.RootParamList>;
 
 /** Returns a callback which is invoked when the navigation state has loaded. */
 export function useLoadedNavigation() {
-  const root = RootContainer.useRef();
+  const root = getNavigationContainerRef();
   const navigation = useNavigation();
   const isMounted = useRef(true);
   const pending = useRef<((navigation: GenericNavigation) => void)[]>([]);

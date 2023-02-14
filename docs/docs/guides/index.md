@@ -37,15 +37,17 @@ Now create a second child route to navigate to:
 
 ```js title=app/details.js
 import { View, Text } from "react-native";
+import { useRouter } from "expo-router";
 
-export default function Details({ navigation }) {
+export default function Details() {
+  const router = useRouter();
   return (
     <View>
       <Text
         onPress={() => {
           // Go back to the previous screen using the imperative API.
           // highlight-next-line
-          navigation.goBack();
+          router.back();
         }}
       >
         Details Screen

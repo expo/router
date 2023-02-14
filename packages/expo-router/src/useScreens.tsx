@@ -19,10 +19,10 @@ export type ScreenProps<
   /** Name is required when used inside a Layout component. */
   name?: string;
   /**
-   * Redirect to the nearest or provided sibling route.
+   * Redirect to the nearest sibling route.
    * If all children are redirect={true}, the layout will render `null` as there are no children to render.
    */
-  redirect?: boolean | string;
+  redirect?: boolean;
   initialParams?: { [key: string]: any };
   options?: TOptions;
 
@@ -234,10 +234,17 @@ function routeToScreen(
             : staticOptions;
         const dynamicResult =
           typeof options === "function" ? options?.(args) : options;
-        return {
+        const output = {
           ...staticResult,
           ...dynamicResult,
         };
+
+        // Prevent generated screens from showing up in the tab bar.
+        if (route.generated) {
+          output.tabBarButton = () => null;
+        }
+
+        return output;
       }}
       getComponent={() => getQualifiedRouteComponent(route)}
     />

@@ -1,9 +1,11 @@
+import { useRoute } from "@react-navigation/native";
 import React from "react";
 
-import { RootContainer } from "./ContextNavigationContainer";
+import { getNavigationContainerRef } from "./NavigationContainer";
 import getPathFromState, { State } from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
-import { useInitialRootStateContext } from "./rootStateContext";
+import { useServerState } from "./static/useServerState";
+import { useInitialRootStateContext } from "./useInitialRootStateContext";
 
 type SearchParams = Record<string, string>;
 
@@ -45,8 +47,25 @@ function compareUrlSearchParams(a: SearchParams, b: SearchParams): boolean {
   return aKeys.every((key) => a[key] === b[key]);
 }
 
-function useUrlObject(): UrlObject {
+function useSafeInitialRootState() {
+  const serverState = useServerState();
   const initialRootState = useInitialRootStateContext();
+
+  return React.useMemo(() => {
+    if (serverState) {
+      return serverState;
+    }
+
+    // Check if "is ready" to prevent `console.error`s
+    if (getNavigationContainerRef().isReady()) {
+      return getNavigationContainerRef().getRootState() ?? initialRootState;
+    }
+
+    return initialRootState;
+  }, []);
+}
+
+function useUrlObject(): UrlObject {
   const getPathFromState = useGetPathFromState();
 
   const [routeInfo, setRouteInfo] = React.useState<UrlObject>(
@@ -54,7 +73,7 @@ function useUrlObject(): UrlObject {
       getPathFromState,
       // If the root state (from upstream) is not ready, use the hacky initial state.
       // Initial state can be generate because it assumes the linking configuration never changes.
-      RootContainer.getRef().getRootState() ?? initialRootState
+      useSafeInitialRootState()
     )
   );
 
@@ -66,6 +85,10 @@ function useUrlObject(): UrlObject {
 
   const maybeUpdateRouteInfo = React.useCallback(
     (state: State) => {
+      // The state can be undefined when hot reloading a Layout Route on native.
+      if (!state) {
+        return;
+      }
       // Prevent unnecessary updates
       const newRouteInfo = getRouteInfoFromState(getPathFromState, state);
       if (!compareRouteInfo(routeInfoRef.current, newRouteInfo)) {
@@ -79,7 +102,7 @@ function useUrlObject(): UrlObject {
   );
 
   React.useEffect(() => {
-    const rootNavigation = RootContainer.getRef();
+    const rootNavigation = getNavigationContainerRef();
 
     return rootNavigation.addListener("state", ({ data }) => {
       // Attempt to use the complete state from the root, otherwise this will default to
@@ -171,6 +194,11 @@ export function usePathname(): string {
 /** @returns Current URL Search Parameters. */
 export function useSearchParams(): SearchParams {
   return useLocation().params;
+}
+
+/** @returns Current URL Search Parameters that only update when the path matches the current route. */
+export function useLocalSearchParams(): SearchParams {
+  return useRoute()?.params ?? ({} as any);
 }
 
 /** @returns Array of selected segments. */

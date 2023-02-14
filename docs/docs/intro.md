@@ -5,12 +5,6 @@ sidebar_position: 1
 slug: /
 ---
 
-:::warning Beta Release
-
-Expo Router is in the earliest stage of development. The API is subject to breaking changes. The documentation is incomplete and may be inaccurate. The project is not yet ready for production use. Please [contribute to the discussion](https://github.com/expo/router/discussions) if you have any ideas or suggestions on how we can improve the convention.
-
-:::
-
 Expo Router brings the best routing concepts from the web to native iOS and Android apps. Every file in the **app** directory automatically becomes a route in your mobile navigation, making it easier than ever to build, maintain, and scale your project. It's built on top of our powerful [React Navigation suite](https://reactnavigation.org/) enabling truly native navigation. The entire deep linking system is automatically generated live, so users can share links to any route in your app.
 
 ## Quick Start
@@ -18,7 +12,7 @@ Expo Router brings the best routing concepts from the web to native iOS and Andr
 Run the following to create a project with `expo-router` setup:
 
 ```bash
-npx create-react-native-app -t with-router
+npx create-expo-app -e with-router
 ```
 
 > [Template source](https://github.com/expo/examples/tree/master/with-router).

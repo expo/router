@@ -70,7 +70,7 @@ export function Provider(props) {
 
 Now we can use this context to control the access to the routes, we'll do this by using a Layout Route that wraps all the screens which require authentication.
 
-```tsx title=app/_layout.js
+```js title=app/_layout.js
 import { Slot } from "expo-router";
 import { Provider } from "../context/auth";
 
