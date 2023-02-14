@@ -313,8 +313,32 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
   };
 }
 
+/**
+ * Asserts if the require.context has files that share the same name but have different extensions. Exposed for testing.
+ * @private
+ */
+export function assertDuplicateRoutes(filenames: string[]) {
+  if (process.env.NODE_ENV === "production") {
+    return;
+  }
+
+  const duplicates = filenames
+    .map((filename) => filename.split(".")[0])
+    .reduce((acc, filename) => {
+      acc[filename] = acc[filename] ? acc[filename] + 1 : 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+  Object.entries(duplicates).forEach(([filename, count]) => {
+    if (count > 1) {
+      throw new Error(`Multiple files match the route name "${filename}".`);
+    }
+  });
+}
+
 /** Given a Metro context module, return an array of nested routes. */
 export function getRoutes(contextModule: RequireContext): RouteNode | null {
+  assertDuplicateRoutes(contextModule.keys());
   const files = contextModuleToFileNodes(contextModule);
   const treeNodes = getRecursiveTree(files);
   const route = treeNodesToRootRoute(treeNodes);
