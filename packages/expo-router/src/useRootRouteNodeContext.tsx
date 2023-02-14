@@ -21,6 +21,29 @@ export function useRootRouteNodeContext() {
   return routes;
 }
 
+/**
+ * Asserts if the require.context has files that share the same name but have different extensions. Exposed for testing.
+ * @private
+ */
+export function assertDuplicateRoutes(filenames: string[]) {
+  if (process.env.NODE_ENV === "production") {
+    return;
+  }
+
+  const duplicates = filenames
+    .map((filename) => filename.split(".")[0])
+    .reduce((acc, filename) => {
+      acc[filename] = acc[filename] ? acc[filename] + 1 : 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+  Object.entries(duplicates).forEach(([filename, count]) => {
+    if (count > 1) {
+      throw new Error(`Multiple files match the route name "${filename}".`);
+    }
+  });
+}
+
 /** Provide the require context as normalized routes. */
 export function RootRouteNodeProvider({
   context,
@@ -30,7 +53,11 @@ export function RootRouteNodeProvider({
   children: React.ReactNode;
 }) {
   // TODO: Is this an optimal hook dependency?
-  const keys = useMemo(() => context.keys(), [context]);
+  const keys = useMemo(() => {
+    const keys = context.keys();
+    assertDuplicateRoutes(keys);
+    return keys;
+  }, [context]);
   const routes = useMemo(() => getRoutes(context), [keys]);
   return (
     <RootRouteNodeContext.Provider value={routes}>
