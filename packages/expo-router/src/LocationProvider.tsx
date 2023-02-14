@@ -2,7 +2,10 @@ import { useRoute } from "@react-navigation/native";
 import React from "react";
 
 import { getNavigationContainerRef } from "./NavigationContainer";
-import getPathFromState, { State } from "./fork/getPathFromState";
+import getPathFromState, {
+  getPathDataFromState,
+  State,
+} from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
 import { useServerState } from "./static/useServerState";
 import { useInitialRootStateContext } from "./useInitialRootStateContext";
@@ -16,10 +19,13 @@ type UrlObject = {
 };
 
 function getRouteInfoFromState(
-  getPathFromState: (state: State, asPath: boolean) => string,
+  getPathFromState: (
+    state: State,
+    asPath: boolean
+  ) => { path: string; params: any },
   state: State
 ): UrlObject {
-  const path = getPathFromState(state, false);
+  const { path } = getPathFromState(state, false);
   const qualified = getPathFromState(state, true);
   return {
     pathname: path.split("?")["0"],
@@ -122,9 +128,9 @@ function useGetPathFromState() {
 
   return React.useCallback(
     (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
-      return linking.getPathFromState(state, {
+      return getPathDataFromState(state, {
+        // return linking.getPathFromState(state, {
         ...linking.config,
-        // @ts-expect-error
         preserveDynamicRoutes: asPath,
         preserveGroups: asPath,
       });
@@ -134,30 +140,28 @@ function useGetPathFromState() {
 }
 
 // TODO: Split up getPathFromState to return all this info at once.
-function getNormalizedStatePath(
-  statePath: string
-): Omit<UrlObject, "pathname"> {
-  const [pathname, querystring] = statePath.split("?");
-
+export function getNormalizedStatePath({
+  path: statePath,
+  params,
+}: {
+  path: string;
+  params: any;
+}): Omit<UrlObject, "pathname"> {
+  const [pathname] = statePath.split("?");
   return {
     // Strip empty path at the start
-    segments: pathname.split("/").filter(Boolean),
+    segments: pathname.split("/").filter(Boolean).map(decodeURIComponent),
     // TODO: This is not efficient, we should generate based on the state instead
     // of converting to string then back to object
-    params: queryStringToObject(querystring),
+    params: Object.entries(params).reduce((prev, [key, value]) => {
+      if (Array.isArray(value)) {
+        prev[key] = value.map(decodeURIComponent);
+      } else {
+        prev[key] = decodeURIComponent(value as string);
+      }
+      return prev;
+    }, {}),
   };
-}
-
-function queryStringToObject(queryString?: string): SearchParams {
-  return (
-    queryString
-      ?.split("&")
-      .map((pair) => pair.split("="))
-      .reduce((acc, [key, value]) => {
-        acc[key] = decodeURIComponent(value);
-        return acc;
-      }, {} as SearchParams) ?? {}
-  );
 }
 
 const LocationContext = React.createContext<UrlObject | undefined>(undefined);

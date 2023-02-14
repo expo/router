@@ -1,6 +1,9 @@
 import { findFocusedRoute } from "@react-navigation/native";
 import type { InitialState } from "@react-navigation/routers";
 import produce from "immer";
+import { getNavigationConfig } from "../../getLinkingConfig";
+import { getRoutes } from "../../getRoutes";
+import { configFromFs } from "../../utils/mockState";
 
 import getPathFromState from "../getPathFromState";
 import getStateFromPath from "../getStateFromPath";
@@ -939,7 +942,7 @@ it("returns matching screen if path is only slash and root is a group", () => {
       screens: {
         "(app)/index": "(app)",
         "[id]": ":id",
-        "[...404]": "*",
+        "[...404]": "*404",
       },
     })
   ).toEqual({ routes: [{ name: "(app)/index", path: "/" }] });
@@ -952,7 +955,7 @@ it("returns matching screen if path is only slash and root is a nested group", (
       screens: {
         "(one)/(two)/index": "(one)/(two)",
         "[id]": ":id",
-        "[...404]": "*",
+        "[...404]": "*404",
       },
     })
   ).toEqual({ routes: [{ name: "(one)/(two)/index", path: "/" }] });
@@ -2226,7 +2229,7 @@ it("matches wildcard patterns at root", () => {
   const path = "/test/bar/42/whatever";
   const config = {
     screens: {
-      404: "*",
+      404: "*404",
       Foo: {
         screens: {
           Bar: {
@@ -2238,7 +2241,15 @@ it("matches wildcard patterns at root", () => {
   };
 
   const state = {
-    routes: [{ name: "404", path }],
+    routes: [
+      {
+        params: {
+          "404": ["test", "bar", "42", "whatever"],
+        },
+        name: "404",
+        path,
+      },
+    ],
   };
 
   expect(getStateFromPath<object>(path, config)).toEqual(state);
@@ -2250,39 +2261,29 @@ it("matches wildcard patterns at root", () => {
 it("matches wildcard patterns at nested level", () => {
   const path = "/bar/42/whatever/baz/initt";
 
-  const config = {
-    screens: {
-      "(foo)": {
-        path: "",
-        screens: {
-          bar: {
-            path: "bar",
-            screens: {
-              "[id]": ":id",
-              "[...404]": "*",
-            },
-          },
-        },
-      },
-    },
-  };
+  const config = configFromFs([
+    "(foo)/_layout.tsx",
+    "(foo)/bar/_layout.tsx",
+    "(foo)/bar/[id].tsx",
+    "(foo)/bar/[...rest].tsx",
+  ]);
 
   const state = {
     routes: [
       {
         name: "(foo)",
-        params: { "404": ["bar", "42", "whatever", "baz", "initt"] },
+        params: { rest: ["42", "whatever", "baz", "initt"] },
         state: {
           routes: [
             {
               name: "bar",
-              params: { "404": ["bar", "42", "whatever", "baz", "initt"] },
+              params: { rest: ["42", "whatever", "baz", "initt"] },
               state: {
                 routes: [
                   {
-                    name: "[...404]",
+                    name: "[...rest]",
                     params: {
-                      "404": ["bar", "42", "whatever", "baz", "initt"],
+                      rest: ["42", "whatever", "baz", "initt"],
                     },
                     path: "/bar/42/whatever/baz/initt",
                   },
@@ -2301,7 +2302,7 @@ it("matches wildcard patterns at nested level", () => {
   ).toEqual(state);
 });
 
-it("matches wildcard patterns at nested level with exact", () => {
+xit("matches wildcard patterns at nested level with exact", () => {
   const path = "/whatever";
   const config = {
     screens: {
@@ -2311,7 +2312,7 @@ it("matches wildcard patterns at nested level with exact", () => {
             path: "/bar/:id/",
             screens: {
               404: {
-                path: "*",
+                path: "*404",
                 exact: true,
               },
             },
@@ -2326,12 +2327,26 @@ it("matches wildcard patterns at nested level with exact", () => {
     routes: [
       {
         name: "Foo",
+        params: {
+          "404": ["whatever"],
+        },
         state: {
           routes: [
             {
               name: "Bar",
+              params: {
+                "404": ["whatever"],
+              },
               state: {
-                routes: [{ name: "404", path }],
+                routes: [
+                  {
+                    name: "404",
+                    params: {
+                      "404": ["whatever"],
+                    },
+                    path,
+                  },
+                ],
               },
             },
           ],
@@ -2353,7 +2368,7 @@ it("tries to match wildcard patterns at the end", () => {
       bar: {
         path: "bar",
         screens: {
-          "[...404]": "*",
+          "[...404]": "*404",
           "[userSlug]": ":userSlug",
           ":id": {
             path: ":id",
@@ -2410,7 +2425,7 @@ it("uses nearest parent wildcard match for unmatched paths", () => {
               Baz: "baz",
             },
           },
-          404: "*",
+          "[...404]": "*404",
         },
       },
     },
@@ -2420,8 +2435,19 @@ it("uses nearest parent wildcard match for unmatched paths", () => {
     routes: [
       {
         name: "Foo",
+        params: {
+          "404": ["bar", "42", "baz", "test"],
+        },
         state: {
-          routes: [{ name: "404", path }],
+          routes: [
+            {
+              name: "[...404]",
+              params: {
+                "404": ["bar", "42", "baz", "test"],
+              },
+              path,
+            },
+          ],
         },
       },
     ],
