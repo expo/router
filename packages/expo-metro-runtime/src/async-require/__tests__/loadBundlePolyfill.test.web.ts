@@ -3,6 +3,20 @@ import LoadingView from "../../LoadingView";
 import { fetchThenEvalAsync } from "../fetchThenEval";
 import { loadBundleAsync } from "../loadBundlePolyfill";
 
+const originalLocation = location;
+
+function mockOrigin(value: string) {
+  Object.defineProperty(global, "location", {
+    value: {
+      origin: value,
+    },
+  });
+}
+
+afterAll(() => {
+  location = originalLocation;
+});
+
 jest.mock("../../getDevServer", () =>
   jest.fn(() => ({
     bundleLoadedFromServer: true,
@@ -23,10 +37,11 @@ jest.mock("../../LoadingView", () => ({
 }));
 
 it("loads a bundle", async () => {
+  mockOrigin("http://localhost:19000");
   await loadBundleAsync("Second");
   expect(LoadingView.showMessage).toBeCalledWith("Downloading...", "load");
   expect(LoadingView.hide).toBeCalledWith();
-  const url = `/Second.bundle?modulesOnly=true&runModule=false&platform=web&runtimeBytecodeVersion=`;
+  const url = `http://localhost:19000/Second.bundle?modulesOnly=true&runModule=false&platform=web&runtimeBytecodeVersion=`;
   expect(HMRClient.registerBundle).toBeCalledWith(url);
   expect(fetchThenEvalAsync).toBeCalledWith(url);
 });

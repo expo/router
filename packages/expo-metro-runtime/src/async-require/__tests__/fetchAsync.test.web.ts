@@ -1,8 +1,6 @@
 /* eslint-env jest browser */
 import { fetchAsync } from "../fetchAsync";
 
-declare const global: any;
-
 const originalFetch = global.fetch;
 
 beforeAll(() => {
