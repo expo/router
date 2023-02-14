@@ -30,7 +30,7 @@ export function getContextKey(name: string): string {
 }
 
 /** Remove `.js`, `.ts`, `.jsx`, `.tsx` */
-function removeSupportedExtensions(name: string): string {
+export function removeSupportedExtensions(name: string): string {
   return name.replace(/\.[jt]sx?$/g, "");
 }
 

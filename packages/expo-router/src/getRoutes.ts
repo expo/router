@@ -4,6 +4,7 @@ import {
   matchDeepDynamicRouteName,
   matchDynamicName,
   matchGroupName,
+  removeSupportedExtensions,
   stripGroupSegmentsFromPath,
 } from "./matchers";
 import { RequireContext } from "./types";
@@ -323,7 +324,7 @@ export function assertDuplicateRoutes(filenames: string[]) {
   }
 
   const duplicates = filenames
-    .map((filename) => filename.split(".")[0])
+    .map((filename) => removeSupportedExtensions(filename))
     .reduce((acc, filename) => {
       acc[filename] = acc[filename] ? acc[filename] + 1 : 1;
       return acc;
