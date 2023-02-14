@@ -111,11 +111,7 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
     getInitialURL,
     subscribe: addEventListener,
     getStateFromPath: getStateFromPathMemoized,
-    getPathFromState: (...props) => {
-      const path = getPathFromState(...props);
-      console.log("getPathFromState", props, path);
-      return path;
-    },
+    getPathFromState,
 
     // Add all functions to ensure the types never need to fallback.
     // This is a convenience for usage in the package.
@@ -134,9 +130,7 @@ function getStateFromPathMemoized(
   if (cached) {
     return cached;
   }
-  console.log("getStateFromPathMemoized", path, options);
   const result = getStateFromPath(path, options);
-  console.log("getStateFromPathMemoized:out", result);
   stateCache.set(path, result);
   return result;
 }

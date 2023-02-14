@@ -401,44 +401,21 @@ function matchAgainstConfigs(
       const params: Record<string, any> = {};
 
       segments
-        .filter((p) => p.startsWith(":"))
+        .filter((p) => p.match(/^[:*]/))
         .forEach((p) => {
-          const paramName = p;
-          const value = matchedParams[paramName];
+          let value = matchedParams[p];
           if (value) {
-            const key = paramName.replace(/^:/, "").replace(/\?$/, "");
+            if (p.match(/^\*/)) {
+              // Convert to an array before providing as a route.
+              value = value?.split("/").filter(Boolean);
+            }
+
+            const key = p.replace(/^[:*]/, "").replace(/\?$/, "");
             params[key] = config.parse?.[key]
               ? config.parse[key](value)
               : value;
           }
         });
-
-      segments
-        .filter((p) => p.startsWith("*"))
-        .forEach((p) => {
-          // Get the expo-router-specific wildcard param name.
-          const paramName = p;
-          // Convert to an array before providing as a route.
-          const value = matchedParams[paramName].split("/").filter(Boolean);
-          if (value) {
-            const key = paramName.replace(/^\*/, "").replace(/\?$/, "");
-            params[key] = config.parse?.[key]
-              ? config.parse[key](value)
-              : value;
-          }
-        });
-
-      // if (segments.some((segment) => segment.startsWith('*'))) {
-      //   // Get the expo-router-specific wildcard param name.
-      //   const key = matchDeepDynamicRouteName(name);
-      //   if (key) {
-      //     // Convert to an array before providing as a route.
-      //     const parsed = matchedParams["*"].split("/").filter(Boolean);
-      //     params[key] = config.parse?.[key]
-      //       ? config.parse[key](parsed)
-      //       : parsed;
-      //   }
-      // }
 
       if (params && Object.keys(params).length) {
         return { name, params };
@@ -584,8 +561,7 @@ function formatRegexPattern(it: string): string {
     return `(?:${escape(it)}\\/)?`;
   }
 
-  return `${escape(it)}\\/`;
-  // return `${it.startsWith("*") ? ".*" : escape(it)}\\/`;
+  return escape(it) + `\\/`;
 }
 
 const createConfigItem = (
