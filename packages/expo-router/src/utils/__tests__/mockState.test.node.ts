@@ -23,8 +23,6 @@ describe(configFromFs, () => {
             },
           },
         },
-        "[...404]": "*404",
-        _sitemap: "_sitemap",
       },
     });
   });

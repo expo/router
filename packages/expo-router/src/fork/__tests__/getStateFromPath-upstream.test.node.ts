@@ -2227,35 +2227,20 @@ it("ignores extra slashes in the pattern", () => {
 
 it("matches wildcard patterns at root", () => {
   const path = "/test/bar/42/whatever";
-  const config = {
-    screens: {
-      404: "*404",
-      Foo: {
-        screens: {
-          Bar: {
-            path: "/bar/:id/",
-          },
-        },
-      },
-    },
-  };
-
+  const config = configFromFs(["[...404].js", "foo/bar.js", "index.js"]);
   const state = {
     routes: [
       {
         params: {
           "404": ["test", "bar", "42", "whatever"],
         },
-        name: "404",
+        name: "[...404]",
         path,
       },
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("matches wildcard patterns at nested level", () => {
@@ -2669,3 +2654,10 @@ it("throws when invalid properties are specified in the config", () => {
     See https://reactnavigation.org/docs/configuring-links for more details on how to specify a linking configuration."
   `);
 });
+
+function testConversions(path: string, config: any, state: any) {
+  expect(getStateFromPath<object>(path, config)).toEqual(state);
+  expect(
+    getStateFromPath<object>(getPathFromState<object>(state, config), config)
+  ).toEqual(state);
+}

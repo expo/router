@@ -1,5 +1,5 @@
 import { getNavigationConfig } from "../getLinkingConfig";
-import { getRoutes } from "../getRoutes";
+import { getExactRoutes } from "../getRoutes";
 import { RequireContext } from "../types";
 
 export function createMockContextModule(
@@ -24,5 +24,5 @@ export function configFromFs(map: (string | [string, object])[] = []) {
     return acc;
   }, {} as Record<string, Record<string, any>>);
 
-  return getNavigationConfig(getRoutes(createMockContextModule(ctx))!);
+  return getNavigationConfig(getExactRoutes(createMockContextModule(ctx))!);
 }
