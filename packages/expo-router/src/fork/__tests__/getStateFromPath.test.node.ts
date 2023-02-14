@@ -1,3 +1,4 @@
+import { configFromFs } from "../../utils/mockState";
 import getStateFromPath from "../getStateFromPath";
 
 it(`supports spaces`, () => {
@@ -15,38 +16,42 @@ it(`supports spaces`, () => {
       },
     ],
   });
+
+  expect(
+    getStateFromPath("/hello%20world", configFromFs(["[hello world].js"]))
+  ).toEqual({
+    routes: [
+      {
+        name: "[hello world]",
+        params: {
+          "hello world": "hello%20world",
+        },
+        path: "/hello%20world",
+      },
+    ],
+  });
+
+  // TODO: Test rest params
 });
 
 it(`matches unmatched existing groups against 404`, () => {
   expect(
-    getStateFromPath("/(app)/(explore)", {
-      screens: {
-        // Should match 404... maybe
-        "[...404]": "*",
+    getStateFromPath(
+      "/(app)/(explore)",
+      configFromFs([
+        "[...404].js",
 
-        "(app)": {
-          path: "(app)",
-          screens: {
-            "(explore)": {
-              path: "(explore)",
-              screens: {
-                "[user]/index": ":user",
-                explore: "explore",
-              },
-              initialRouteName: "explore",
-            },
-            "([user])": {
-              path: "([user])",
-              screens: {
-                "[user]/index": ":user",
-                explore: "explore",
-              },
-              initialRouteName: "[user]/index",
-            },
-          },
-        },
-      },
-    } as any)
+        "(app)/_layout.tsx",
+
+        "(app)/(explore)/_layout.tsx",
+        "(app)/(explore)/[user]/index.tsx",
+        "(app)/(explore)/explore.tsx",
+
+        "(app)/([user])/_layout.tsx",
+        "(app)/([user])/[user]/index.tsx",
+        "(app)/([user])/explore.tsx",
+      ])
+    )
   ).toEqual({
     routes: [
       {
@@ -77,26 +82,16 @@ it(`matches unmatched existing groups against 404`, () => {
 it(`adds dynamic route params from all levels of the path`, () => {
   // A route at `app/[foo]/bar/[baz]/other` should get all of the params from the path.
   expect(
-    getStateFromPath("/foo/bar/baz/other", {
-      screens: {
-        "[foo]": {
-          path: ":foo",
-          screens: {
-            bar: {
-              path: "bar",
-              screens: {
-                "[baz]": {
-                  path: ":baz",
-                  screens: {
-                    other: "other",
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    } as any)
+    getStateFromPath(
+      "/foo/bar/baz/other",
+
+      configFromFs([
+        "[foo]/_layout.tsx",
+        "[foo]/bar/_layout.tsx",
+        "[foo]/bar/[baz]/_layout.tsx",
+        "[foo]/bar/[baz]/other.tsx",
+      ])
+    )
   ).toEqual({
     routes: [
       {

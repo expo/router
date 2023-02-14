@@ -20,7 +20,10 @@ export function configFromFs(map: (string | [string, object])[] = []) {
       acc[value] = { default: () => {} };
       return acc;
     }
-    acc[value[0]] = value[1];
+    acc[value[0]] = {
+      default: () => {},
+      ...value[1],
+    };
     return acc;
   }, {} as Record<string, Record<string, any>>);
 
