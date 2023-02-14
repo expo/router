@@ -11,11 +11,7 @@ import type {
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
-import {
-  matchDeepDynamicRouteName,
-  matchGroupName,
-  stripGroupSegmentsFromPath,
-} from "../matchers";
+import { matchGroupName, stripGroupSegmentsFromPath } from "../matchers";
 
 type Options<ParamList extends object> = {
   initialRouteName?: string;
