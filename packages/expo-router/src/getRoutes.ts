@@ -339,11 +339,7 @@ export function assertDuplicateRoutes(filenames: string[]) {
 
 /** Given a Metro context module, return an array of nested routes. */
 export function getRoutes(contextModule: RequireContext): RouteNode | null {
-  assertDuplicateRoutes(contextModule.keys());
-  const files = contextModuleToFileNodes(contextModule);
-  const treeNodes = getRecursiveTree(files);
-  const route = treeNodesToRootRoute(treeNodes);
-
+  const route = getExactRoutes(contextModule);
   if (!route) {
     return null;
   }
@@ -354,6 +350,17 @@ export function getRoutes(contextModule: RequireContext): RouteNode | null {
   appendUnmatchedRoute(route);
 
   return route;
+}
+
+/** Get routes without unmatched or sitemap. */
+export function getExactRoutes(
+  contextModule: RequireContext
+): RouteNode | null {
+  assertDuplicateRoutes(contextModule.keys());
+  const files = contextModuleToFileNodes(contextModule);
+  const treeNodes = getRecursiveTree(files);
+  const route = treeNodesToRootRoute(treeNodes);
+  return route || null;
 }
 
 function appendSitemapRoute(routes: RouteNode) {

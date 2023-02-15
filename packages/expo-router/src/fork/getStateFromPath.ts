@@ -11,11 +11,7 @@ import type {
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
-import {
-  matchDeepDynamicRouteName,
-  matchGroupName,
-  stripGroupSegmentsFromPath,
-} from "../matchers";
+import { matchGroupName, stripGroupSegmentsFromPath } from "../matchers";
 
 type Options<ParamList extends object> = {
   initialRouteName?: string;
@@ -157,8 +153,8 @@ function assertConfigDuplicates(configs: RouteConfig[]) {
         const last = config.pattern.split("/").pop();
         const routeType = last?.startsWith(":")
           ? "dynamic route"
-          : last === "*"
-          ? "deep dynamic route"
+          : last?.startsWith("*")
+          ? "dynamic-rest route"
           : "route";
         throw new Error(
           `The ${routeType} pattern '${
@@ -228,8 +224,8 @@ function sortConfigs(a: RouteConfig, b: RouteConfig): number {
     if (bParts[i] == null) {
       return -1;
     }
-    const aWildCard = aParts[i] === "*";
-    const bWildCard = bParts[i] === "*";
+    const aWildCard = aParts[i].startsWith("*");
+    const bWildCard = bParts[i].startsWith("*");
     // if both are wildcard we compare next component
     if (aWildCard && bWildCard) {
       continue;
@@ -304,7 +300,9 @@ function getStateFromEmptyPathWithConfigs(
     ) ??
     // NOTE(EvanBacon): Test leaf node deep dynamic routes that match a slash.
     // This should be done last to enable dynamic routes having a higher priority.
-    leafNodes.find((config) => config.path === "*" && config.regex!.test("/"));
+    leafNodes.find(
+      (config) => config.path.startsWith("*") && config.regex!.test("/")
+    );
 
   if (!match) {
     return undefined;
@@ -373,12 +371,12 @@ function matchAgainstConfigs(
     // TODO: Add support for wildcard routes
     const matchedParams = config.pattern
       ?.split("/")
-      .filter((p) => p.startsWith(":") || p === "*")
+      .filter((p) => p.match(/^[:*]/))
       .reduce<Record<string, any>>((acc, p, i) => {
-        if (p === "*") {
+        if (p.match(/^\*/)) {
           return {
             ...acc,
-            [p]: match[i],
+            [p]: match![(i + 1) * 2], //?.replace(/\//, ""),
           };
         }
         return Object.assign(acc, {
@@ -399,29 +397,21 @@ function matchAgainstConfigs(
       const params: Record<string, any> = {};
 
       segments
-        .filter((p) => p.startsWith(":"))
+        .filter((p) => p.match(/^[:*]/))
         .forEach((p) => {
-          const paramName = p;
-          const value = matchedParams[paramName];
+          let value = matchedParams[p];
           if (value) {
-            const key = paramName.replace(/^:/, "").replace(/\?$/, "");
+            if (p.match(/^\*/)) {
+              // Convert to an array before providing as a route.
+              value = value?.split("/").filter(Boolean);
+            }
+
+            const key = p.replace(/^[:*]/, "").replace(/\?$/, "");
             params[key] = config.parse?.[key]
               ? config.parse[key](value)
               : value;
           }
         });
-
-      if (segments.some((segment) => segment === "*")) {
-        // Get the expo-router-specific wildcard param name.
-        const key = matchDeepDynamicRouteName(name);
-        if (key) {
-          // Convert to an array before providing as a route.
-          const parsed = matchedParams["*"].split("/").filter(Boolean);
-          params[key] = config.parse?.[key]
-            ? config.parse[key](parsed)
-            : parsed;
-        }
-      }
 
       if (params && Object.keys(params).length) {
         return { name, params };
@@ -549,12 +539,15 @@ const createNormalizedConfigs = (
 };
 
 function formatRegexPattern(it: string): string {
-  if (it.startsWith(":")) {
-    return `(([^/]+\\/)${it.endsWith("?") ? "?" : ""})`;
-  }
-
   // Allow spaces in file path names.
   it = it.replace(" ", "%20");
+
+  if (it.startsWith(":")) {
+    // TODO: Remove unused match group
+    return `(([^/]+\\/)${it.endsWith("?") ? "?" : ""})`;
+  } else if (it.startsWith("*")) {
+    return `((.*\\/)${it.endsWith("?") ? "?" : ""})`;
+  }
 
   // Strip groups from the matcher
   if (matchGroupName(it) != null) {
@@ -564,7 +557,7 @@ function formatRegexPattern(it: string): string {
     return `(?:${escape(it)}\\/)?`;
   }
 
-  return `${it === "*" ? ".*" : escape(it)}\\/`;
+  return escape(it) + `\\/`;
 }
 
 const createConfigItem = (
