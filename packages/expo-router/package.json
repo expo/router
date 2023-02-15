@@ -47,7 +47,7 @@
   },
   "peerDependencies": {
     "@react-navigation/drawer": "^6.5.8",
-    "expo": "~46.0.2 || ~47.0.0-beta || ~47.0.0",
+    "expo": "~46.0.2 || ~47.0.0-beta || ~47.0.0 || ~48.0.0-beta || ~48.0.0",
     "expo-constants": "*",
     "expo-linking": "*",
     "expo-status-bar": "*",
