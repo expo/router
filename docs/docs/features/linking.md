@@ -12,7 +12,7 @@ import { Link } from "expo-router";
 export default function Page() {
   return (
     <View>
-      {/* highlight-next-line */}
+      {/* // highlight-next-line */}
       <Link href="/">Home</Link>
     </View>
   );
