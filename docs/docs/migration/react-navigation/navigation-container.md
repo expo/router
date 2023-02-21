@@ -25,7 +25,7 @@ function Example() {
     <Text
       onPress={() => {
         // Go to the initial route of the application.
-        router.replace("/");
+        router.resetRoot();
       }}
     >
       Reset App
