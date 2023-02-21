@@ -1,24 +1,19 @@
 {
   "name": "expo-router",
   "version": "1.0.0-rc7",
-  "main": "build/index.js",
+  "main": "src/index.tsx",
+  "types": "src/index.tsx",
   "files": [
+    "src",
+    "node",
     "entry.js",
-    "build",
+    "_root.tsx",
     "babel.js",
     "assets",
-    "drawer.js",
-    "drawer.d.ts",
-    "stack.js",
-    "stack.d.ts",
-    "tabs.js",
-    "tabs.d.ts",
-    "head.js",
-    "head.d.ts",
-    "node",
-    "_getRoutesManifest.js",
-    "_root.js",
-    "_root.d.ts"
+    "drawer.ts",
+    "stack.ts",
+    "tabs.ts",
+    "head.ts"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",
@@ -30,7 +25,7 @@
   },
   "homepage": "https://expo.github.io/router/docs/",
   "scripts": {
-    "build": "expo-module build",
+    "build": "expo-module typecheck",
     "clean": "expo-module clean",
     "lint": "expo-module lint",
     "test": "expo-module test",
