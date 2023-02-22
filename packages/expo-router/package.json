@@ -1,6 +1,6 @@
 {
   "name": "expo-router",
-  "version": "1.0.0-rc8",
+  "version": "1.0.1",
   "main": "src/index.tsx",
   "types": "src/index.tsx",
   "files": [

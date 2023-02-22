@@ -1,6 +1,6 @@
 # Expo Router
 
-> Version 1 release candidate is out now! [Learn more](https://blog.expo.dev/announcing-the-expo-router-v1-release-candidate-c5680b88a18c).
+> Stable Version 1 is out now!
 
 Repo for the new File-based router for React Native apps. Please open a discussion if you have any questions or feedback.
 
@@ -14,7 +14,7 @@ Repo for the new File-based router for React Native apps. Please open a discussi
 The easiest way to try **Expo Router** is by creating a new project:
 
 ```
-npx create-expo-app -e with-router
+npx create-expo-app@latest -e with-router
 ```
 
 See the [setup guide for more](https://expo.github.io/router/docs/).
