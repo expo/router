@@ -50,7 +50,13 @@ function compareUrlSearchParams(a: SearchParams, b: SearchParams): boolean {
     return false;
   }
 
-  return aKeys.every((key) => a[key] === b[key]);
+  return aKeys.every((key) => {
+    if (!aKeys.length) {
+      return a[key] === b[key];
+    } else {
+      return aKeys.every((paramKey) => aKeys[paramKey] === bKeys[paramKey]);
+    }
+  });
 }
 
 function useSafeInitialRootState() {
@@ -129,7 +135,6 @@ function useGetPathFromState() {
   return React.useCallback(
     (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
       return getPathDataFromState(state, {
-        // return linking.getPathFromState(state, {
         ...linking.config,
         preserveDynamicRoutes: asPath,
         preserveGroups: asPath,
