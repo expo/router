@@ -3,6 +3,7 @@ import React from "react";
 
 import { getNavigationContainerRef } from "./NavigationContainer";
 import getPathFromState, {
+  deepEqual,
   getPathDataFromState,
   State,
 } from "./fork/getPathFromState";
@@ -10,7 +11,7 @@ import { useLinkingContext } from "./link/useLinkingContext";
 import { useServerState } from "./static/useServerState";
 import { useInitialRootStateContext } from "./useInitialRootStateContext";
 
-type SearchParams = Record<string, string>;
+type SearchParams = Record<string, string | string[]>;
 
 type UrlObject = {
   pathname: string;
@@ -42,21 +43,11 @@ function compareRouteInfo(a: UrlObject, b: UrlObject) {
   );
 }
 
-function compareUrlSearchParams(a: SearchParams, b: SearchParams): boolean {
-  const aKeys = Object.keys(a);
-  const bKeys = Object.keys(b);
-
-  if (aKeys.length !== bKeys.length) {
-    return false;
-  }
-
-  return aKeys.every((key) => {
-    if (!aKeys.length) {
-      return a[key] === b[key];
-    } else {
-      return aKeys.every((paramKey) => aKeys[paramKey] === bKeys[paramKey]);
-    }
-  });
+export function compareUrlSearchParams(
+  a: SearchParams,
+  b: SearchParams
+): boolean {
+  return deepEqual(a, b);
 }
 
 function useSafeInitialRootState() {
