@@ -16,7 +16,8 @@ config.transformer = {
 
 config.server = {
   ...config.server,
-  experimentalImportBundleSupport: true,
+  // experimentalImportBundleSupport: process.env.NODE_ENV === "development",
+  experimentalImportBundleSupport: process.env.NODE_ENV !== "production",
 };
 
 config.watcher = {

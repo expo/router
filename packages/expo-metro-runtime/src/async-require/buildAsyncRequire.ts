@@ -47,6 +47,15 @@ type AsyncRequire = {
 export function buildAsyncRequire(metroRequire: MetroRequire): AsyncRequire {
   const importBundlePromises: ImportBundlePromises = Object.create(null);
 
+  if (process.env.NODE_ENV === "production") {
+    // TODO: Don't disable in production
+    // @ts-expect-error
+    return function (moduleID: any): Promise<any> {
+      // @ts-expect-error
+      return Promise.resolve().then(() => require.importAll(moduleID));
+    };
+  }
+
   function asyncRequire<TModule>(
     moduleID: number,
     moduleName: string,
