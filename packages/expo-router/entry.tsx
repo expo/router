@@ -2,6 +2,7 @@ import "@expo/metro-runtime";
 
 import { ExpoRoot } from "expo-router";
 import Head from "expo-router/head";
+import React from "react";
 
 import { renderRootComponent } from "./src/renderRootComponent";
 
@@ -9,7 +10,7 @@ import { renderRootComponent } from "./src/renderRootComponent";
 const HeadProvider =
   typeof window === "undefined" ? React.Fragment : Head.Provider;
 
-// const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT);
+// @ts-expect-error
 const ctx = require.context(
   process.env.EXPO_ROUTER_APP_ROOT,
   true,
