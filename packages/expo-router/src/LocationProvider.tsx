@@ -201,13 +201,17 @@ export function usePathname(): string {
 }
 
 /** @returns Current URL Search Parameters. */
-export function useSearchParams(): SearchParams {
-  return useLocation().params;
+export function useSearchParams<
+  TParams extends SearchParams = SearchParams
+>(): Partial<TParams> {
+  return useLocation().params as Partial<TParams>;
 }
 
 /** @returns Current URL Search Parameters that only update when the path matches the current route. */
-export function useLocalSearchParams(): SearchParams {
-  return useRoute()?.params ?? ({} as any);
+export function useLocalSearchParams<
+  TParams extends SearchParams = SearchParams
+>(): Partial<TParams> {
+  return (useRoute()?.params ?? ({} as any)) as Partial<TParams>;
 }
 
 /** @returns Array of selected segments. */
