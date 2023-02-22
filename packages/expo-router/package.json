@@ -1,24 +1,19 @@
 {
   "name": "expo-router",
-  "version": "1.0.0-rc6",
-  "main": "build/index.js",
+  "version": "1.0.0-rc8",
+  "main": "src/index.tsx",
+  "types": "src/index.tsx",
   "files": [
+    "src",
+    "node",
     "entry.js",
-    "build",
+    "_root.tsx",
     "babel.js",
     "assets",
-    "drawer.js",
-    "drawer.d.ts",
-    "stack.js",
-    "stack.d.ts",
-    "tabs.js",
-    "tabs.d.ts",
-    "head.js",
-    "head.d.ts",
-    "node",
-    "_getRoutesManifest.js",
-    "_root.js",
-    "_root.d.ts"
+    "drawer.ts",
+    "stack.ts",
+    "tabs.ts",
+    "head.ts"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",
@@ -30,7 +25,7 @@
   },
   "homepage": "https://expo.github.io/router/docs/",
   "scripts": {
-    "build": "expo-module build",
+    "build": "expo-module typecheck",
     "clean": "expo-module clean",
     "lint": "expo-module lint",
     "test": "expo-module test",
@@ -47,7 +42,7 @@
   },
   "peerDependencies": {
     "@react-navigation/drawer": "^6.5.8",
-    "expo": "~46.0.2 || ~47.0.0-beta || ~47.0.0",
+    "expo": "~46.0.2 || ~47.0.0-beta || ~47.0.0 || ~48.0.0-beta || ~48.0.0",
     "expo-constants": "*",
     "expo-linking": "*",
     "expo-status-bar": "*",

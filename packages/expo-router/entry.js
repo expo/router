@@ -3,7 +3,7 @@ import "@expo/metro-runtime";
 import { ExpoRoot } from "expo-router";
 import Head from "expo-router/head";
 
-import { renderRootComponent } from "./build/renderRootComponent";
+import { renderRootComponent } from "./src/renderRootComponent";
 
 // We add this elsewhere for rendering
 const HeadProvider =

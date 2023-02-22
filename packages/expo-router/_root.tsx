@@ -1,11 +1,12 @@
 import "@expo/metro-runtime";
+import React from "react";
 
 import { ExpoRoot } from "expo-router";
 
-import { getNavigationConfig } from "./build/getLinkingConfig";
-import { getRoutes } from "./build/getRoutes";
+import { getNavigationConfig } from "./src/getLinkingConfig";
+import { getRoutes } from "./src/getRoutes";
 
-// const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT);
+// @ts-expect-error: Not sure
 const ctx = require.context(
   process.env.EXPO_ROUTER_APP_ROOT,
   true,

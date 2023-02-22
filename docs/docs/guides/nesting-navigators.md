@@ -37,7 +37,7 @@ export default function Root() {
 }
 ```
 
-This is nested in the `home.js` layout, so it will be rendered as a tab.
+This is nested in the `home/_layout.js` layout, so it will be rendered as a tab.
 
 ```js title=app/home/feed.js
 import { View, Text } from "react-native";

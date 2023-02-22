@@ -124,6 +124,17 @@ export default function getPathFromState<ParamList extends object>(
     preserveDynamicRoutes?: boolean;
   } = {}
 ): string {
+  return getPathDataFromState(state, _options).path;
+}
+
+export function getPathDataFromState<ParamList extends object>(
+  state: State,
+  // @ts-expect-error: non-standard options
+  _options?: Options<ParamList> & {
+    preserveGroups?: boolean;
+    preserveDynamicRoutes?: boolean;
+  } = {}
+) {
   if (state == null) {
     throw Error(
       "Got 'undefined' for the navigation state. You must pass a valid state object."
@@ -162,7 +173,12 @@ function processParamsWithUserSettings(
     Object.entries(params).map(([key, value]) => [
       key,
       // TODO: Strip nullish values here.
-      stringify?.[key] ? stringify[key](value) : String(value),
+      stringify?.[key]
+        ? stringify[key](value)
+        : // Preserve rest params
+        Array.isArray(value)
+        ? value
+        : String(value),
     ])
   );
 }
@@ -241,7 +257,6 @@ function walkConfigItems(
 
     if (route.params) {
       const params = processParamsWithUserSettings(configItem, route.params);
-
       // TODO: Does this need to be a null check?
       if (pattern) {
         Object.assign(collectedParams, params);
@@ -404,7 +419,6 @@ function getPathFromResolvedState(
         }
 
         const query = queryString.stringify(focusedParams, { sort: false });
-
         if (query) {
           path += `?${query}`;
         }
@@ -412,7 +426,8 @@ function getPathFromResolvedState(
       break;
     }
   }
-  return basicSanitizePath(path);
+
+  return { path: basicSanitizePath(path), params: allParams };
 }
 
 function getPathWithConventionsCollapsed({
@@ -438,7 +453,13 @@ function getPathWithConventionsCollapsed({
       // We don't know what to show for wildcard patterns
       // Showing the route name seems ok, though whatever we show here will be incorrect
       // Since the page doesn't actually exist
-      if (p === "*") {
+      if (p.startsWith("*")) {
+        if (preserveDynamicRoutes) {
+          return `[...${name}]`;
+        }
+        if (params[name]) {
+          return params[name].join("/");
+        }
         if (i === 0) {
           // This can occur when a wildcard matches all routes and the given path was `/`.
           return routePath;
@@ -509,7 +530,7 @@ function getParamsWithConventionsCollapsed({
     });
 
   // Deep Dynamic Routes
-  if (segments.some((segment) => segment === "*")) {
+  if (segments.some((segment) => segment.startsWith("*"))) {
     // NOTE(EvanBacon): Drop the param name matching the wildcard route name -- this is specific to Expo Router.
     const name = matchDeepDynamicRouteName(routeName) ?? routeName;
     delete processedParams[name];
@@ -562,7 +583,7 @@ function isInvalidParams(
 }
 
 const getParamName = (pattern: string) =>
-  pattern.replace(/^:/, "").replace(/\?$/, "");
+  pattern.replace(/^[:*]/, "").replace(/\?$/, "");
 
 const joinPaths = (...paths: string[]): string =>
   ([] as string[])

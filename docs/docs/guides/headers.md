@@ -70,7 +70,7 @@ export default function Home() {
 
       <Text>Home Screen</Text>
 
-      <Link href={{ screen: "details", params: { name: "Bacon" } }}>
+      <Link href={{ pathname: "details", params: { name: "Bacon" } }}>
         Go to Details
       </Link>
     </View>
@@ -91,7 +91,7 @@ export default function Details() {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Stack.Screen
-        option={{
+        options={{
           title: params.name,
         }}
       />

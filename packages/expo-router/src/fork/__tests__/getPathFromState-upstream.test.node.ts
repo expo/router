@@ -10,6 +10,37 @@ type State = PartialState<NavigationState>;
 [
   [
     {
+      stale: false,
+      type: "stack",
+      key: "stack-My6VVqpqe-qaR8yuSpqY_",
+      index: 1,
+      routeNames: ["index", "_sitemap", "[...blog]"],
+      routes: [
+        {
+          name: "index",
+          path: "/",
+          key: "index-T5frP65vdKFCNT4aJr3r_",
+        },
+        {
+          key: "[...blog]-HCj6P0JDBIoBwswJpNfpF",
+          name: "[...blog]",
+          params: {
+            blog: ["1", "2"],
+          },
+        },
+      ],
+    },
+    {
+      screens: {
+        "[...blog]": "*blog",
+        index: "",
+        _sitemap: "_sitemap",
+      },
+    },
+    "/1/2",
+  ],
+  [
+    {
       index: 0,
       routes: [
         {
@@ -73,7 +104,7 @@ type State = PartialState<NavigationState>;
           },
         },
 
-        "[...404]": "*",
+        "[...404]": "*404",
       },
     },
     "/evanbacon",
@@ -146,7 +177,7 @@ type State = PartialState<NavigationState>;
             },
           },
         },
-        "[...404]": "*",
+        "[...404]": "*404",
       },
     },
     "/evanbacon",
@@ -200,7 +231,7 @@ it(`supports resolving nonexistent, nested synthetic states into paths that cann
                   two: "two",
                 },
               },
-              "[...missing]": "*",
+              "[...missing]": "*missing",
               modal: "modal",
             },
             initialRouteName: "(tabs)",
@@ -1739,7 +1770,7 @@ it("matches wildcard patterns at root", () => {
   const path = "/test/bar/42/whatever";
   const config = {
     screens: {
-      404: "*",
+      404: "*404",
       Foo: {
         screens: {
           Bar: {
@@ -1773,7 +1804,7 @@ it("matches wildcard patterns at nested level", () => {
           Bar: {
             path: "/bar/:id/",
             screens: {
-              404: "*",
+              404: "*404",
             },
           },
         },
@@ -1820,7 +1851,7 @@ it("matches wildcard patterns at nested level with exact", () => {
             path: "/bar/:id/",
             screens: {
               404: {
-                path: "*",
+                path: "*404",
                 exact: true,
               },
             },
@@ -1868,7 +1899,7 @@ it("tries to match wildcard patterns at the end", () => {
           Bar: {
             path: "/bar/:id/",
             screens: {
-              404: "*",
+              404: "*404",
               Test: "test",
             },
           },
@@ -1917,7 +1948,7 @@ it("uses nearest parent wildcard match for unmatched paths", () => {
               Baz: "baz",
             },
           },
-          404: "*",
+          "[...404]": "*404",
         },
       },
     },
@@ -1927,8 +1958,13 @@ it("uses nearest parent wildcard match for unmatched paths", () => {
     routes: [
       {
         name: "Foo",
+
         state: {
-          routes: [{ name: "404" }],
+          routes: [
+            {
+              name: "[...404]",
+            },
+          ],
         },
       },
     ],
