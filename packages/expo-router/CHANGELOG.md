@@ -11,3 +11,5 @@
 ### 🐛 Bug fixes
 
 ### 💡 Others
+
+- Make `react-native-gesture-handler` non-optional as Metro doesn't support optional dependencies correctly.
