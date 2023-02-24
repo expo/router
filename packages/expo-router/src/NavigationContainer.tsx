@@ -1,17 +1,11 @@
-import {
-  createNavigationContainerRef,
-  NavigationContainer as UpstreamNavigationContainer,
-} from "@react-navigation/native";
+import { createNavigationContainerRef } from "@react-navigation/native";
 import React from "react";
 
+import UpstreamNavigationContainer from "./fork/NavigationContainer";
 import { getLinkingConfig } from "./getLinkingConfig";
 import { RootNavigationRef } from "./useRootNavigation";
 import { useRootRouteNodeContext } from "./useRootRouteNodeContext";
 import { SplashScreen } from "./views/Splash";
-
-type NavigationContainerProps = React.ComponentProps<
-  typeof UpstreamNavigationContainer
->;
 
 const navigationRef = createNavigationContainerRef();
 
@@ -21,16 +15,12 @@ export function getNavigationContainerRef() {
 }
 
 /** react-navigation `NavigationContainer` with automatic `linking` prop generated from the routes context. */
-export function NavigationContainer(props: NavigationContainerProps) {
+export function NavigationContainer(props: { children: React.ReactNode }) {
   const [isReady, setReady] = React.useState(false);
   const [isSplashReady, setSplashReady] = React.useState(false);
   const ref = React.useMemo(() => (isReady ? navigationRef : null), [isReady]);
   const root = useRootRouteNodeContext();
   const linking = React.useMemo(() => getLinkingConfig(root), [root]);
-
-  React.useEffect(() => {
-    props.onReady?.();
-  }, [!!props?.onReady]);
 
   return (
     <RootNavigationRef.Provider value={{ ref }}>
