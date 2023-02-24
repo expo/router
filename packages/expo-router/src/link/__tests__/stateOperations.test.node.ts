@@ -2,7 +2,112 @@ import {
   isMovingToSiblingRoute,
   findTopRouteForTarget,
   getQualifiedStateForTopOfTargetState,
+  getEarliestMismatchedRoute,
 } from "../stateOperations";
+
+describe(getEarliestMismatchedRoute, () => {
+  it(`finds earliest mismatched route`, () => {
+    expect(
+      getEarliestMismatchedRoute(
+        {
+          type: "tab",
+          index: 0,
+          routes: [
+            {
+              name: "root",
+              state: {
+                type: "stack",
+                index: 0,
+                routes: [
+                  {
+                    name: "(auth)/sign-in",
+                  },
+                ],
+              },
+            },
+            {
+              name: "_sitemap",
+            },
+            {
+              name: "[...404]",
+            },
+          ],
+        },
+        {
+          name: "root",
+          path: "",
+          initial: true,
+          screen: "root",
+          params: {
+            initial: true,
+            screen: "(app)",
+            path: "",
+            params: {
+              initial: true,
+              screen: "index",
+              path: "/root",
+            },
+          },
+        }
+      )
+    ).toEqual({
+      name: "(app)",
+      type: "stack",
+      params: {
+        initial: true,
+        path: "/root",
+        screen: "index",
+      },
+    });
+  });
+
+  it(`returns top-level match`, () => {
+    expect(
+      getEarliestMismatchedRoute(
+        {
+          type: "tab",
+          index: 1,
+          routes: [
+            {
+              name: "root",
+            },
+            {
+              name: "_sitemap",
+            },
+            {
+              name: "[...404]",
+            },
+          ],
+        },
+        {
+          name: "root",
+          path: "",
+          initial: true,
+          screen: "root",
+          params: {
+            initial: true,
+            screen: "(app)",
+            path: "",
+            params: {
+              initial: true,
+              screen: "index",
+              path: "/root",
+            },
+          },
+        }
+      )
+    ).toEqual({
+      name: "root",
+      params: {
+        initial: true,
+        params: { initial: true, path: "/root", screen: "index" },
+        path: "",
+        screen: "(app)",
+      },
+      type: "tab",
+    });
+  });
+});
 
 describe(findTopRouteForTarget, () => {
   it(`finds the top route`, () => {
