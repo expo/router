@@ -53,9 +53,6 @@
     "react-native-screens": "*"
   },
   "peerDependenciesMeta": {
-    "react-native-gesture-handler": {
-      "optional": true
-    },
     "react-native-reanimated": {
       "optional": true
     },
