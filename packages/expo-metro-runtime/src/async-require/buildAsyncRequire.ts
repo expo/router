@@ -47,21 +47,18 @@ type AsyncRequire = {
 export function buildAsyncRequire(metroRequire: MetroRequire): AsyncRequire {
   const importBundlePromises: ImportBundlePromises = Object.create(null);
 
-  if (process.env.NODE_ENV === "production") {
-    // TODO: Don't disable in production
-    // @ts-expect-error
-    return function (moduleID: any): Promise<any> {
-      // @ts-expect-error
-      return Promise.resolve().then(() => require.importAll(moduleID));
-    };
-  }
-
   function asyncRequire<TModule>(
     moduleID: number,
     moduleName: string,
     paths: ImportBundleNames,
     options: { isPrefetchOnly: boolean } = { isPrefetchOnly: false }
   ): Promise<TModule | void> | TModule {
+    if (process.env.NODE_ENV === "production") {
+      // TODO: Don't disable in production
+
+      return Promise.resolve().then(() => metroRequire.importAll(moduleID));
+    }
+
     if (options.isPrefetchOnly) {
       return Promise.resolve();
     }
@@ -88,6 +85,10 @@ export function buildAsyncRequire(metroRequire: MetroRequire): AsyncRequire {
     moduleName: string,
     paths: ImportBundleNames
   ): void {
+    // TODO: Don't disable in production
+    if (process.env.NODE_ENV === "production") {
+      return;
+    }
     const result = asyncRequire(moduleID, moduleName, paths, {
       isPrefetchOnly: true,
     });
