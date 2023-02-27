@@ -37,7 +37,7 @@ function Index() {
 
 function useQueriedNotes() {
   const notes = useNotes();
-  const { q } = useSearchParams();
+  const { q } = useSearchParams<{ q: string }>();
 
   return useMemo(
     () =>
@@ -45,7 +45,7 @@ function useQueriedNotes() {
         if (!q) {
           return true;
         }
-        return item.text.toLowerCase().includes(q.toLowerCase());
+        return item.text.toLowerCase().includes(q?.toLowerCase());
       }),
     [q, notes.notes]
   );
@@ -215,7 +215,7 @@ function Footer() {
 }
 
 function ListEmptyComponent() {
-  const { q } = useSearchParams();
+  const { q } = useSearchParams<{ q?: string }>();
 
   const message = React.useMemo(() => {
     return q != null ? "No items found: " + q : "Create an item to get started";

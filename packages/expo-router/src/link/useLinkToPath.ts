@@ -11,10 +11,19 @@ import * as React from "react";
 import { resolve } from "./path";
 import {
   findTopRouteForTarget,
+  getEarliestMismatchedRoute,
   getQualifiedStateForTopOfTargetState,
   isMovingToSiblingRoute,
 } from "./stateOperations";
 import { useLinkingContext } from "./useLinkingContext";
+
+type NavStateParams = {
+  params?: NavStateParams;
+  path: string;
+  initial: boolean;
+  screen: string;
+  state: unknown;
+};
 
 function isRemoteHref(href: string): boolean {
   return /:\/\//.test(href);
@@ -102,6 +111,39 @@ export function useLinkToPath() {
 
       const action = getActionFromState(state, linking!.config);
       if (action) {
+        // Here we have a navigation action to a nested screen, where we should ideally replace.
+        // This request can only be fulfilled if the target is an initial route.
+        // First, check if the action is fully initial routes.
+        // Then find the nearest mismatched route in the existing state.
+        // Finally, use the correct navigator-based action to replace the nested screens.
+        // NOTE(EvanBacon): A future version of this will involve splitting the navigation request so we replace as much as possible, then push the remaining screens to fulfill the request.
+        if (
+          event === "REPLACE" &&
+          action.type === "NAVIGATE" &&
+          isAbsoluteInitialRoute(action)
+        ) {
+          const earliest = getEarliestMismatchedRoute(
+            // @ts-expect-error
+            rootState,
+            action.payload
+          );
+          if (earliest) {
+            if (earliest.type === "stack") {
+              navigation.dispatch(
+                StackActions.replace(earliest.name, earliest.params)
+              );
+            } else {
+              navigation.dispatch(
+                TabActions.jumpTo(earliest.name, earliest.params)
+              );
+            }
+            return;
+          } else {
+            // This should never happen because moving to the same route would be handled earlier
+            // in the sibling operations.
+          }
+        }
+
         // Ignore the replace event here since replace across
         // navigators is not supported.
         navigation.dispatch(action);
@@ -113,4 +155,34 @@ export function useLinkToPath() {
   );
 
   return linkTo;
+}
+
+/** @returns `true` if the action is moving to the first screen of all the navigators in the action. */
+export function isAbsoluteInitialRoute(
+  action: ReturnType<typeof getActionFromState>
+) {
+  if (action?.type !== "NAVIGATE") {
+    return false;
+  }
+
+  let next = action.payload.params;
+  // iterate all child screens and bail out if any are not initial.
+  while (next) {
+    if (!isNavigationState(next)) {
+      // Not sure when this would happen
+      return false;
+    }
+    if (next.initial === true) {
+      next = next.params;
+      // return true;
+    } else if (next.initial === false) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isNavigationState(obj: any): obj is NavStateParams {
+  return "initial" in obj;
 }
