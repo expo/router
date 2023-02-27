@@ -6,13 +6,8 @@
 
 ### 🎉 New features
 
-- Parse any URL prefix to enable automatic Android App Links handling.
-- Support replacement to nested initial screens.
+- Update `asyncRequireModulePath` to support `metro@0.75.0`
 
 ### 🐛 Bug fixes
 
-- Drop legacy `Linking.removeEventListener` method.
-
 ### 💡 Others
-
-- Make `react-native-gesture-handler` non-optional as Metro doesn't support optional dependencies correctly.
