@@ -8,7 +8,7 @@
  * Based on this but with web support:
  * https://github.com/facebook/react-native/blob/086714b02b0fb838dee5a66c5bcefe73b53cf3df/Libraries/Utilities/HMRClient.js
  */
-import prettyFormat from "pretty-format";
+import prettyFormat, { plugins } from "pretty-format";
 
 import LoadingView from "./LoadingView";
 import LogBox from "./error-overlay/LogBox";
@@ -118,7 +118,7 @@ const HMRClient: HMRClientNativeInterface = {
         JSON.stringify({
           type: "log",
           level,
-          mode: global.RN$Bridgeless === true ? "NOBRIDGE" : "BRIDGE",
+          mode: "NOBRIDGE",
           data: data.map((item) =>
             typeof item === "string"
               ? item
@@ -127,7 +127,7 @@ const HMRClient: HMRClientNativeInterface = {
                   highlight: true,
                   maxDepth: 3,
                   min: true,
-                  plugins: [prettyFormat.plugins.ReactElement],
+                  plugins: [plugins.ReactElement],
                 })
           ),
         })
