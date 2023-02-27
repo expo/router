@@ -118,7 +118,7 @@ const HMRClient: HMRClientNativeInterface = {
         JSON.stringify({
           type: "log",
           level,
-          mode: "NOBRIDGE",
+          mode: "BRIDGE",
           data: data.map((item) =>
             typeof item === "string"
               ? item
