@@ -59,7 +59,6 @@ export function fetchThenEvalAsync(
       reject(error);
     };
     document.head.appendChild(script);
-    document.head.appendChild(script);
   });
 }
 
