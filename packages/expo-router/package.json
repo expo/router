@@ -62,9 +62,6 @@
   },
   "devDependencies": {
     "@react-navigation/drawer": "^6.6.2",
-    "@types/jest": "^26",
-    "jest": "^26.6.3",
-    "expo-module-scripts": "^2.0.0",
     "expo-splash-screen": "~0.18.1",
     "expo-status-bar": "~1.4.4",
     "react-native-gesture-handler": "~2.9.0",
