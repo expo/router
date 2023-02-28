@@ -1,64 +1,43 @@
-import { Link } from "expo-router";
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import React from "react";
 import Animated from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { BouncingLink } from "../etc/BouncingLink";
+import { transition } from "../etc/transition";
 
 export default function Page() {
   return (
-    <View style={styles.container}>
-      <Link asChild href="/next">
-        <Pressable>
-          <Animated.View
-            sharedTransitionTag="img"
+    <Animated.ScrollView
+      style={{
+        flex: 1,
+        backgroundColor: "black",
+      }}
+      contentContainerStyle={{
+        paddingTop: 128,
+        paddingBottom: useSafeAreaInsets().bottom,
+        flexWrap: "wrap",
+        flexDirection: "row",
+        justifyContent: "space-around",
+        rowGap: 24,
+      }}
+    >
+      {new Array(12).fill("0").map((v, i) => (
+        <BouncingLink href={"/next?i=" + i}>
+          <Animated.Image
+            sharedTransitionStyle={transition}
+            sharedTransitionTag={"img-" + i}
+            source={require("../assets/poster.jpg")}
+            resizeMode="cover"
             style={{
-              width: "45%",
+              height: 250,
+              // width: "45%",
               aspectRatio: "2/3",
               borderRadius: 48,
               overflow: "hidden",
-              borderCurve: "continuous",
             }}
-          >
-            <Image
-              source={require("../assets/poster.jpg")}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                bottom: 0,
-                right: 0,
-
-                flex: 1,
-              }}
-            />
-          </Animated.View>
-        </Pressable>
-      </Link>
-    </View>
+          />
+        </BouncingLink>
+      ))}
+    </Animated.ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 56,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "black",
-  },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-    backgroundColor: "green",
-  },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-  },
-});

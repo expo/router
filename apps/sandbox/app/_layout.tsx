@@ -8,7 +8,8 @@ export default function Layout() {
       <StatusBar style="light" />
       <Stack
         screenOptions={{
-          animation: "fade",
+          //   animation: "fade",
+          animation: "none",
           customAnimationOnGesture: true,
           headerTintColor: "white",
           headerShown: true,
@@ -31,6 +32,10 @@ export default function Layout() {
         }}
       >
         <Stack.Screen name="index" options={{ title: "Home" }} />
+        <Stack.Screen
+          name="next"
+          options={{ presentation: "transparentModal" }}
+        />
       </Stack>
     </>
   );
