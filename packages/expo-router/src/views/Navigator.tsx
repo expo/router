@@ -10,12 +10,14 @@ import { useContextKey } from "../Route";
 import { useFilterScreenChildren } from "../layouts/withLayoutContext";
 import { useSortedScreens } from "../useScreens";
 
+type NavigatorTypes = ReturnType<typeof useNavigationBuilder>;
+
 // TODO: This might already exist upstream, maybe something like `useCurrentRender` ?
 export const NavigatorContext = React.createContext<{
   contextKey: string;
-  state: any;
-  navigation: any;
-  descriptors: any;
+  state: NavigatorTypes["state"];
+  navigation: NavigatorTypes["navigation"];
+  descriptors: NavigatorTypes["descriptors"];
   router: RouterFactory<any, any, any>;
 } | null>(null);
 

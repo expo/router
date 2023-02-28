@@ -10,7 +10,7 @@ import React from "react";
 import { StyleProp, StyleSheet, Text, TextStyle, View } from "react-native";
 
 // Afterglow theme from https://iterm2colorschemes.com/
-const COLORS = {
+const COLORS: Record<string, string> = {
   "ansi-black": "rgb(27, 27, 27)",
   "ansi-red": "rgb(187, 86, 83)",
   "ansi-green": "rgb(144, 157, 98)",
@@ -57,7 +57,7 @@ export function Ansi({
     }
   });
 
-  const getText = (content, key) => {
+  const getText = (content: string, key: number) => {
     if (key === 1) {
       // Remove the vertical bar after line numbers
       return content.replace(/\| $/, " ");

@@ -156,7 +156,7 @@ export function getNormalizedStatePath({
         prev[key] = decodeURIComponent(value as string);
       }
       return prev;
-    }, {}),
+    }, {} as SearchParams),
   };
 }
 
