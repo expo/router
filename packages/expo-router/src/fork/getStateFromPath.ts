@@ -472,6 +472,7 @@ const createNormalizedConfigs = (
 
   parentScreens.push(screen);
 
+  // @ts-expect-error
   const config = routeConfig[screen];
 
   if (typeof config === "string") {

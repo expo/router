@@ -36,7 +36,7 @@ export function isMovingToSiblingRoute(
   let currentRoot: InitialState | undefined = rootState;
 
   while (current?.routes?.[current?.routes?.length - 1].state != null) {
-    const nextRoute = current?.routes?.[current?.routes?.length - 1];
+    const nextRoute: any = current?.routes?.[current?.routes?.length - 1];
 
     if (
       // Has more
@@ -74,9 +74,9 @@ export function getQualifiedStateForTopOfTargetState(
   let currentRoot: InitialState | undefined = rootState;
 
   while (current?.routes?.[current?.routes?.length - 1].state != null) {
-    const nextRoute = current?.routes?.[current?.routes?.length - 1];
+    const nextRoute: any = current?.routes?.[current?.routes?.length - 1];
 
-    const nextCurrentRoot = currentRoot?.routes?.find(
+    const nextCurrentRoot: InitialState | undefined = currentRoot?.routes?.find(
       (route) => route.name === nextRoute.name
     )?.state;
 

@@ -165,7 +165,7 @@ export function createGetIdForRoute(
   if (!route.dynamic?.length) {
     return undefined;
   }
-  return ({ params }) => {
+  return ({ params }: { params?: Record<string, any> }) => {
     const getPreferredId = (segment: DynamicConvention) => {
       // Params can be undefined when there are no params in the route.
       const preferredId = params?.[segment.name];

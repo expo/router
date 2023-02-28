@@ -1,4 +1,5 @@
 //  TODO: This is fragile and only works on web
+// @ts-expect-error
 import ServerContext from "@react-navigation/native/lib/module/ServerContext";
 import React from "react";
 
