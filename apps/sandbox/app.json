@@ -9,6 +9,9 @@
     },
     "web": {
       "bundler": "metro"
+    },
+    "ios": {
+      "bundleIdentifier": "com.bacon.expo-router-sandbox"
     }
   }
 }
