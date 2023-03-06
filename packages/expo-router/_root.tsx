@@ -11,7 +11,7 @@ const ctx = require.context(
   process.env.EXPO_ROUTER_APP_ROOT,
   true,
   /.*/,
-  "lazy"
+  "sync"
 );
 
 // Must be exported or Fast Refresh won't update the context >:[
