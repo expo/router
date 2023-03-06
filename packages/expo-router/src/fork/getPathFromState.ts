@@ -183,7 +183,7 @@ function processParamsWithUserSettings(
   );
 }
 
-function deepEqual(a: any, b: any) {
+export function deepEqual(a: any, b: any) {
   if (a === b) {
     return true;
   }
@@ -515,7 +515,7 @@ function getParamsWithConventionsCollapsed({
   routeName: string;
   params: object;
 }): Record<string, string> {
-  const processedParams = { ...params };
+  const processedParams: Record<string, string> = { ...params };
 
   // Remove the params present in the pattern since we'll only use the rest for query string
 

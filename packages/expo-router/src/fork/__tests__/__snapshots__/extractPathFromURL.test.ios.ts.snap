@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`extractExpoPathFromURL parses "custom://" 1`] = `""`;
+
+exports[`extractExpoPathFromURL parses "custom:///" 1`] = `""`;
+
+exports[`extractExpoPathFromURL parses "custom:///?shouldBeEscaped=x%252By%2540xxx.com" 1`] = `"?shouldBeEscaped=x+y@xxx.com"`;
+
+exports[`extractExpoPathFromURL parses "custom:///test/path?foo=bar" 1`] = `"test/path?foo=bar"`;
+
+exports[`extractExpoPathFromURL parses "custom://?hello=bar" 1`] = `"?hello=bar"`;
+
+exports[`extractExpoPathFromURL parses "exp://127.0.0.1:19000/" 1`] = `""`;
+
+exports[`extractExpoPathFromURL parses "exp://127.0.0.1:19000/--/test/path?query=param" 1`] = `"test/path?query=param"`;
+
+exports[`extractExpoPathFromURL parses "exp://127.0.0.1:19000?query=param" 1`] = `"?query=param"`;
+
+exports[`extractExpoPathFromURL parses "exp://exp.host/@test/test/--/test/path" 1`] = `"test/path"`;
+
+exports[`extractExpoPathFromURL parses "exp://exp.host/@test/test/--/test/path/--/foobar" 1`] = `"test/path/--/foobar"`;
+
+exports[`extractExpoPathFromURL parses "exp://exp.host/@test/test/--/test/path?query=param" 1`] = `"test/path?query=param"`;
+
+exports[`extractExpoPathFromURL parses "https://example.com/test/path" 1`] = `"test/path"`;
+
+exports[`extractExpoPathFromURL parses "https://example.com/test/path?missingQueryValue=" 1`] = `"test/path?missingQueryValue="`;
+
+exports[`extractExpoPathFromURL parses "https://example.com/test/path?query=do+not+escape" 1`] = `"test/path?query=do not escape"`;
+
+exports[`extractExpoPathFromURL parses "https://example.com/test/path?query=param" 1`] = `"test/path?query=param"`;
+
+exports[`extractExpoPathFromURL parses "https://example.com:8000/test/path" 1`] = `"test/path"`;
+
+exports[`extractExpoPathFromURL parses "https://example.com:8000/test/path+with+plus" 1`] = `"with+plus"`;
+
+exports[`extractExpoPathFromURL parses "invalid" 1`] = `"invalid"`;

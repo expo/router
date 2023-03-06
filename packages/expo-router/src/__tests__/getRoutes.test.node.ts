@@ -76,7 +76,7 @@ describe(assertDuplicateRoutes, () => {
     expect(() =>
       assertDuplicateRoutes(["a.js", "a.tsx", "b.js"])
     ).toThrowErrorMatchingInlineSnapshot(
-      `"Multiple files match the route name \\"a\\"."`
+      `"Multiple files match the route name "a"."`
     );
   });
 

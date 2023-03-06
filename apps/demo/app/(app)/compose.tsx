@@ -1,15 +1,11 @@
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
-import { useWindowDimensions } from "react-native";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 
@@ -45,7 +41,6 @@ export default function Compose() {
               backgroundColor: "#D1D1D6",
               borderRadius: 8,
               paddingHorizontal: 16,
-              outline: "none",
               marginBottom: 16,
               minWidth: width / 2,
             }}

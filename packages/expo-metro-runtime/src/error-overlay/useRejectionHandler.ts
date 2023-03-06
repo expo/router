@@ -2,7 +2,7 @@ import React from "react";
 
 import ExceptionsManager from "./modules/ExceptionsManager";
 
-function useStackTraceLimit(limit) {
+function useStackTraceLimit(limit: number) {
   const current = React.useRef(0);
   React.useEffect(() => {
     try {

@@ -25,7 +25,7 @@ type Props = {
 export function LogBoxInspectorSourceMapStatus(props: Props) {
   const [state, setState] = useState<{
     animation: null | Animated.CompositeAnimation;
-    rotate: null | Animated.AnimatedInterpolation;
+    rotate: null | Animated.AnimatedInterpolation<string>;
   }>({
     animation: null,
     rotate: null,

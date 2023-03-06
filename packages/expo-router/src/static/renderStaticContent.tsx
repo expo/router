@@ -8,6 +8,7 @@ import { ServerContainer, ServerContainerRef } from "@react-navigation/native";
 import App, { getManifest } from "expo-router/_root";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
+// @ts-expect-error
 import { AppRegistry } from "react-native-web";
 
 import Head from "../head/Head";
@@ -113,7 +114,7 @@ function StyleReset() {
 }
 
 // TODO(EvanBacon): Expose this to the developer
-export function Root({ children }) {
+export function Root({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" style={{ height: "100%" }}>
       <head>

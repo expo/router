@@ -3,7 +3,9 @@
   "compilerOptions": {
     "outDir": "./build",
     "target": "es2019",
-    "module": "commonjs"
+    "module": "commonjs",
+    "types": ["node", "jest"],
+    "strict": true
   },
   "include": ["./src"],
   "exclude": ["**/__mocks__/*", "**/__tests__/*"]

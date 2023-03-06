@@ -1,12 +1,10 @@
 import { LinkingOptions, getActionFromState } from "@react-navigation/native";
 
 import { RouteNode } from "./Route";
-import { getAllWebRedirects } from "./aasa";
 import {
   addEventListener,
   getInitialURL,
   getPathFromState,
-  getRootURL,
   getStateFromPath,
 } from "./link/linking";
 import { matchDeepDynamicRouteName, matchDynamicName } from "./matchers";
@@ -93,14 +91,7 @@ export function getNavigationConfig(routes: RouteNode): {
 
 export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
   return {
-    prefixes: [
-      /* your linking prefixes */
-      getRootURL(),
-
-      // This ensures that we can redirect correctly when the user comes from an associated domain
-      // i.e. iOS Safari banner.
-      ...getAllWebRedirects(),
-    ],
+    prefixes: [],
     // @ts-expect-error
     config: getNavigationConfig(routes),
     // A custom getInitialURL is used on native to ensure the app always starts at

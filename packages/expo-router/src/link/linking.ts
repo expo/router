@@ -76,20 +76,11 @@ export function addEventListener(listener: (url: string) => void) {
   } else {
     callback = ({ url }: { url: string }) => listener(url);
   }
-  const subscription = Linking.addEventListener("url", callback) as
-    | { remove(): void }
-    | undefined;
-
-  // Storing this in a local variable stops Jest from complaining about import after teardown
-  const removeEventListener = Linking.removeEventListener?.bind(Linking);
+  const subscription = Linking.addEventListener("url", callback);
 
   return () => {
     // https://github.com/facebook/react-native/commit/6d1aca806cee86ad76de771ed3a1cc62982ebcd7
-    if (subscription?.remove) {
-      subscription.remove();
-    } else {
-      removeEventListener?.("url", callback);
-    }
+    subscription.remove?.();
   };
 }
 

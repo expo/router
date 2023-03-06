@@ -12,7 +12,7 @@ import * as LogBoxStyle from "../UI/LogBoxStyle";
 
 type Props = {
   heading: string;
-  children;
+  children: React.ReactNode;
   action?: any;
 };
 

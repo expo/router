@@ -1,2 +1,3 @@
 // Assumes Metro handles this import.
-module.exports = require("../src/static/renderStaticContent");
+// NOTE(EvanBacon): No relative imports!
+module.exports = require("expo-router/src/static/renderStaticContent");

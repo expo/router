@@ -4,7 +4,7 @@ import { Platform, View } from "react-native";
 import registerRootComponent from "./fork/expo/registerRootComponent";
 import { SplashScreen } from "./views/Splash";
 
-function isBaseObject(obj) {
+function isBaseObject(obj: any) {
   if (Object.prototype.toString.call(obj) !== "[object Object]") {
     return false;
   }
@@ -15,7 +15,7 @@ function isBaseObject(obj) {
   return proto === Object.prototype;
 }
 
-function isErrorShaped(error) {
+function isErrorShaped(error: any): error is Error {
   return (
     error &&
     typeof error === "object" &&
@@ -28,7 +28,7 @@ function isErrorShaped(error) {
  * After we throw this error, any number of tools could handle it.
  * This check ensures the error is always in a reason state before surfacing it to the runtime.
  */
-function convertError(error) {
+function convertError(error: any) {
   if (isErrorShaped(error)) {
     return error;
   }

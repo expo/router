@@ -8,7 +8,7 @@
  * Based on this but with web support:
  * https://github.com/facebook/react-native/blob/086714b02b0fb838dee5a66c5bcefe73b53cf3df/Libraries/Utilities/HMRClient.js
  */
-import prettyFormat from "pretty-format";
+import prettyFormat, { plugins } from "pretty-format";
 
 import LoadingView from "./LoadingView";
 import LogBox from "./error-overlay/LogBox";
@@ -17,13 +17,15 @@ import getDevServer from "./getDevServer";
 const MetroHMRClient = require("metro-runtime/src/modules/HMRClient");
 const pendingEntryPoints: string[] = [];
 
-let hmrClient: {
+type HMRClientType = {
   send: (msg: string) => void;
   isEnabled: () => boolean;
   disable: () => void;
   enable: () => void;
   hasPendingUpdates: () => boolean;
-} | null = null;
+};
+
+let hmrClient: HMRClientType | null = null;
 let hmrUnavailableReason: string | null = null;
 let currentCompileErrorMessage: string | null = null;
 let didConnect: boolean = false;
@@ -118,7 +120,7 @@ const HMRClient: HMRClientNativeInterface = {
         JSON.stringify({
           type: "log",
           level,
-          mode: global.RN$Bridgeless === true ? "NOBRIDGE" : "BRIDGE",
+          mode: "BRIDGE",
           data: data.map((item) =>
             typeof item === "string"
               ? item
@@ -127,7 +129,7 @@ const HMRClient: HMRClientNativeInterface = {
                   highlight: true,
                   maxDepth: 3,
                   min: true,
-                  plugins: [prettyFormat.plugins.ReactElement],
+                  plugins: [plugins.ReactElement],
                 })
           ),
         })
@@ -157,7 +159,7 @@ const HMRClient: HMRClientNativeInterface = {
       fullBundleUrl
     );
 
-    client.on("connection-error", (e) => {
+    client.on("connection-error", (e: Error) => {
       let error = `Cannot connect to Metro.
  
  Try the following to fix the issue:
@@ -171,27 +173,33 @@ const HMRClient: HMRClientNativeInterface = {
       setHMRUnavailableReason(error);
     });
 
-    client.on("update-start", ({ isInitialUpdate }) => {
-      currentCompileErrorMessage = null;
-      didConnect = true;
+    client.on(
+      "update-start",
+      ({ isInitialUpdate }: { isInitialUpdate?: boolean }) => {
+        currentCompileErrorMessage = null;
+        didConnect = true;
 
-      if (client.isEnabled() && !isInitialUpdate) {
-        LoadingView.showMessage("Refreshing...", "refresh");
+        if (client.isEnabled() && !isInitialUpdate) {
+          LoadingView.showMessage("Refreshing...", "refresh");
+        }
       }
-    });
+    );
 
-    client.on("update", ({ isInitialUpdate }) => {
-      if (client.isEnabled() && !isInitialUpdate) {
-        dismissRedbox();
-        LogBox.clearAllLogs();
+    client.on(
+      "update",
+      ({ isInitialUpdate }: { isInitialUpdate?: boolean }) => {
+        if (client.isEnabled() && !isInitialUpdate) {
+          dismissRedbox();
+          LogBox.clearAllLogs();
+        }
       }
-    });
+    );
 
     client.on("update-done", () => {
       LoadingView.hide();
     });
 
-    client.on("error", (data) => {
+    client.on("error", (data: { type: string; message: string }) => {
       LoadingView.hide();
 
       if (data.type === "GraphNotFoundError") {
@@ -212,7 +220,7 @@ const HMRClient: HMRClientNativeInterface = {
       }
     });
 
-    client.on("close", (closeEvent) => {
+    client.on("close", (closeEvent: { code: number; reason: string }) => {
       LoadingView.hide();
 
       // https://www.rfc-editor.org/rfc/rfc6455.html#section-7.4.1
@@ -248,7 +256,7 @@ To reconnect:
   },
 };
 
-function setHMRUnavailableReason(reason) {
+function setHMRUnavailableReason(reason: string) {
   assert(hmrClient, "Expected HMRClient.setup() call at startup.");
   if (hmrUnavailableReason !== null) {
     // Don't show more than one warning.
@@ -265,7 +273,7 @@ function setHMRUnavailableReason(reason) {
   }
 }
 
-function registerBundleEntryPoints(client) {
+function registerBundleEntryPoints(client: HMRClientType | null) {
   if (hmrUnavailableReason != null) {
     // "Bundle Splitting – Metro disconnected"
     window.location.reload();
@@ -273,7 +281,7 @@ function registerBundleEntryPoints(client) {
   }
 
   if (pendingEntryPoints.length > 0) {
-    client.send(
+    client?.send(
       JSON.stringify({
         type: "register-entrypoints",
         entryPoints: pendingEntryPoints,

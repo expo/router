@@ -3,6 +3,7 @@ import React from "react";
 
 import { getNavigationContainerRef } from "./NavigationContainer";
 import getPathFromState, {
+  deepEqual,
   getPathDataFromState,
   State,
 } from "./fork/getPathFromState";
@@ -10,7 +11,7 @@ import { useLinkingContext } from "./link/useLinkingContext";
 import { useServerState } from "./static/useServerState";
 import { useInitialRootStateContext } from "./useInitialRootStateContext";
 
-type SearchParams = Record<string, string>;
+type SearchParams = Record<string, string | string[]>;
 
 type UrlObject = {
   pathname: string;
@@ -42,15 +43,11 @@ function compareRouteInfo(a: UrlObject, b: UrlObject) {
   );
 }
 
-function compareUrlSearchParams(a: SearchParams, b: SearchParams): boolean {
-  const aKeys = Object.keys(a);
-  const bKeys = Object.keys(b);
-
-  if (aKeys.length !== bKeys.length) {
-    return false;
-  }
-
-  return aKeys.every((key) => a[key] === b[key]);
+export function compareUrlSearchParams(
+  a: SearchParams,
+  b: SearchParams
+): boolean {
+  return deepEqual(a, b);
 }
 
 function useSafeInitialRootState() {
@@ -129,7 +126,6 @@ function useGetPathFromState() {
   return React.useCallback(
     (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
       return getPathDataFromState(state, {
-        // return linking.getPathFromState(state, {
         ...linking.config,
         preserveDynamicRoutes: asPath,
         preserveGroups: asPath,
@@ -160,7 +156,7 @@ export function getNormalizedStatePath({
         prev[key] = decodeURIComponent(value as string);
       }
       return prev;
-    }, {}),
+    }, {} as SearchParams),
   };
 }
 
@@ -196,13 +192,17 @@ export function usePathname(): string {
 }
 
 /** @returns Current URL Search Parameters. */
-export function useSearchParams(): SearchParams {
-  return useLocation().params;
+export function useSearchParams<
+  TParams extends SearchParams = SearchParams
+>(): Partial<TParams> {
+  return useLocation().params as Partial<TParams>;
 }
 
 /** @returns Current URL Search Parameters that only update when the path matches the current route. */
-export function useLocalSearchParams(): SearchParams {
-  return useRoute()?.params ?? ({} as any);
+export function useLocalSearchParams<
+  TParams extends SearchParams = SearchParams
+>(): Partial<TParams> {
+  return (useRoute()?.params ?? ({} as any)) as Partial<TParams>;
 }
 
 /** @returns Array of selected segments. */
