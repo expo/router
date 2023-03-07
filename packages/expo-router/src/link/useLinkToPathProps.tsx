@@ -5,20 +5,26 @@ import { useLinkToPath } from "./useLinkToPath";
 import { stripGroupSegmentsFromPath } from "../matchers";
 
 function eventShouldPreventDefault(
-  e?: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
+  e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
 ): boolean {
+  if (e?.defaultPrevented) {
+    return false;
+  }
+
   if (
-    !!e &&
-    !e.defaultPrevented && // onPress prevented default
-    // @ts-expect-error: these properties exist on web, but not in React Native
-    !(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) && // ignore clicks with modifier keys
-    // @ts-expect-error: these properties exist on web, but not in React Native
-    (e.button == null || e.button === 0) && // ignore everything but left clicks
-    // @ts-expect-error: these properties exist on web, but not in React Native
-    [undefined, null, "", "self"].includes(e.currentTarget?.target) // let browser handle "target=_blank" etc.
+    // Only check MouseEvents
+    "button" in e &&
+    // ignore clicks with modifier keys
+    !e.metaKey &&
+    !e.altKey &&
+    !e.ctrlKey &&
+    !e.shiftKey &&
+    (e.button == null || e.button === 0) && // Only accept left clicks
+    [undefined, null, "", "self"].includes(e.currentTarget.target) // let browser handle "target=_blank" etc.
   ) {
     return true;
   }
+
   return false;
 }
 
