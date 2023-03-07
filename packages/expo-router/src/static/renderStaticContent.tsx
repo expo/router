@@ -31,12 +31,15 @@ export function getStaticContent(location: URL): string {
     // TODO: Use RNW view after they fix hydration for React 18
     // https://github.com/necolas/react-native-web/blob/e8098fd029102d7801c32c1ede792bce01808c00/packages/react-native-web/src/exports/render/index.js#L10
     // Otherwise this wraps the app with two extra divs
-    children: (
-      // Inject the root tag
-      <div id="root">
+    children:
+      // Inject the root tag using createElement to prevent any transforms like the ones in `@expo/html-elements`.
+      React.createElement(
+        "div",
+        {
+          id: "root",
+        },
         <App />
-      </div>
-    ),
+      ),
   });
 
   const html = ReactDOMServer.renderToString(
