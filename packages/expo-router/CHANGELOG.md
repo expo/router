@@ -8,6 +8,8 @@
 
 ### 🐛 Bug fixes
 
+- Use `createElement` for static `div`.
+
 ### 💡 Others
 
 ## [Tue, 28 Feb 2023 12:13:09 -0600](https://github.com/expo/router/commit/a61fe6dfed89f52d69fdd226278f58ec3a8dfa19)
