@@ -6,15 +6,14 @@ export default {
     if (currentRoot) {
       return;
     }
-    const ErrorOverlay = require("../../ErrorOverlay")
-      .default as typeof import("../../ErrorOverlay").default;
+    const ErrorOverlay: React.ComponentType =
+      require("../../ErrorOverlay").default;
     // Create a new div with ID `error-overlay` element and render LogBoxInspector into it.
     const div = document.createElement("div");
     div.id = "error-overlay";
     document.body.appendChild(div);
 
     currentRoot = ReactDOM.createRoot(div);
-    // @ts-expect-error
     currentRoot.render(<ErrorOverlay />);
   },
   hide() {

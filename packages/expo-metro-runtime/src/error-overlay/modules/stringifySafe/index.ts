@@ -23,8 +23,7 @@ export function createStringifySafeWithLimits(limits: {
     maxObjectKeysLimit = Number.POSITIVE_INFINITY,
   } = limits;
   const stack: any[] = [];
-  function replacer(key: string, value: any): any {
-    // @ts-expect-error
+  function replacer(this: unknown, _key: string, value: any): any {
     while (stack.length && this !== stack[0]) {
       stack.shift();
     }

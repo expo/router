@@ -365,7 +365,10 @@ export function observe(observer: Observer): Subscription {
 export function withSubscription(
   WrappedComponent: React.FC<object>
 ): React.Component<object> {
-  class LogBoxStateSubscription extends React.Component<Props, State> {
+  class LogBoxStateSubscription extends React.Component<
+    React.PropsWithChildren<Props>,
+    State
+  > {
     static getDerivedStateFromError() {
       return { hasError: true };
     }
@@ -378,9 +381,8 @@ export function withSubscription(
 
     _subscription?: Subscription;
 
-    // @ts-expect-error
     state = {
-      logs: new Set(),
+      logs: new Set<LogBoxLog>(),
       isDisabled: false,
       hasError: false,
       selectedLogIndex: -1,
@@ -398,11 +400,9 @@ export function withSubscription(
           value={{
             selectedLogIndex: this.state.selectedLogIndex,
             isDisabled: this.state.isDisabled,
-            // @ts-expect-error
             logs: Array.from(this.state.logs),
           }}
         >
-          {/* @ts-expect-error */}
           {this.props.children}
           <WrappedComponent />
         </LogContext.Provider>
@@ -434,7 +434,6 @@ export function withSubscription(
           setSelectedLog(selectedLogIndex - 1);
         }
 
-        // @ts-expect-error
         dismiss(logsArray[selectedLogIndex]);
       }
     };
