@@ -1,3 +1,5 @@
+import type { BabelTransformerArgs } from "metro-babel-transformer";
+
 export function pathToHtmlSafeName(path: string) {
   return path.replace(/[^a-zA-Z0-9_]/g, "_");
 }
@@ -19,15 +21,9 @@ export function matchCssModule(filename: string): boolean {
   return !!filename.match(/\.module(\.(native|ios|android|web))?\.css$/);
 }
 
-export async function transform(props: {
-  filename: string;
-  src: string;
-  options: {
-    platform: string;
-    dev: boolean;
-    hot: boolean;
-  };
-}) {
+export async function transform(
+  props: BabelTransformerArgs
+): Promise<BabelTransformerArgs> {
   if (props.filename.endsWith(".css")) {
     // Is a CSS module
     if (props.filename.match(/\.module(\.(native|ios|android|web))?\.css$/)) {
