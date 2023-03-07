@@ -2,7 +2,7 @@
 title: Styling
 ---
 
-> This guide refers to upcoming Expo Router features.
+> This guide refers to upcoming Expo Router features, all of which are experimental.
 
 Expo Router adds first-class support for a number of CSS features which can be leveraged to create more optimized web experiences.
 
