@@ -42,17 +42,28 @@ module.exports = function ({
     },
   };
 
-  // 1. Watch all files within the monorepo
-  if (workspaceRoot) {
-    config.watchFolders = [workspaceRoot];
+  const isMonorepo = workspaceRoot && workspaceRoot !== projectRoot;
+
+  if (isMonorepo) {
+    // 1.Watch all files within the monorepo
+    if (workspaceRoot) {
+      config.watchFolders = [...config.watchFolders, workspaceRoot];
+    }
+
+    // 2. Let Metro know where to resolve packages and in what order
+    config.resolver.nodeModulesPaths = [
+      ...config.resolver.nodeModulesPaths,
+      path.resolve(projectRoot, "node_modules"),
+      path.resolve(workspaceRoot, "node_modules"),
+    ];
+    // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
+    config.resolver.disableHierarchicalLookup = true;
+  } else {
+    config.resolver.nodeModulesPaths = [
+      ...config.resolver.nodeModulesPaths,
+      path.resolve(projectRoot, "node_modules"),
+    ];
   }
-  // 2. Let Metro know where to resolve packages and in what order
-  config.resolver.nodeModulesPaths = [
-    path.resolve(projectRoot, "node_modules"),
-    workspaceRoot && path.resolve(workspaceRoot, "node_modules"),
-  ].filter(Boolean);
-  // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
-  config.resolver.disableHierarchicalLookup = true;
 
   config.cacheStores = [
     // Ensure the cache isn't shared between projects
