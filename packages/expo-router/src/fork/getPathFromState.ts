@@ -39,6 +39,8 @@ type CustomRoute = Route<string> & {
   state?: State;
 };
 
+const DEFAULT_SCREENS: Options<ParamList>["screens"] = {};
+
 const getActiveRoute = (state: State): { name: string; params?: object } => {
   const route =
     typeof state.index === "number"
@@ -118,22 +120,20 @@ function encodeURIComponentPreservingBrackets(str: string) {
  */
 export default function getPathFromState<ParamList extends object>(
   state: State,
-  // @ts-expect-error: non-standard options
   _options?: Options<ParamList> & {
     preserveGroups?: boolean;
     preserveDynamicRoutes?: boolean;
-  } = {}
+  }
 ): string {
   return getPathDataFromState(state, _options).path;
 }
 
 export function getPathDataFromState<ParamList extends object>(
   state: State,
-  // @ts-expect-error: non-standard options
-  _options?: Options<ParamList> & {
+  _options: Options<ParamList> & {
     preserveGroups?: boolean;
     preserveDynamicRoutes?: boolean;
-  } = {}
+  } = { screens: DEFAULT_SCREENS }
 ) {
   if (state == null) {
     throw Error(
@@ -143,13 +143,10 @@ export function getPathDataFromState<ParamList extends object>(
 
   const { preserveGroups, preserveDynamicRoutes, ...options } = _options;
 
-  if (_options) {
-    validatePathConfig(options);
-  }
+  validatePathConfig(options);
 
-  const screens = options?.screens;
   // Expo Router disallows usage without a linking config.
-  if (!screens) {
+  if (Object.is(options.screens, DEFAULT_SCREENS)) {
     throw Error(
       "You must pass a 'screens' object to 'getPathFromState' to generate a path."
     );
@@ -158,7 +155,7 @@ export function getPathDataFromState<ParamList extends object>(
   return getPathFromResolvedState(
     state,
     // Create a normalized configs object which will be easier to use
-    createNormalizedConfigs(screens),
+    createNormalizedConfigs(options.screens),
     { preserveGroups, preserveDynamicRoutes }
   );
 }
