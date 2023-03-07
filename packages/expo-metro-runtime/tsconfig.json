@@ -1,11 +1,10 @@
 {
-  "extends": "expo-module-scripts/tsconfig.base",
+  "extends": "../../tsconfig.base",
   "compilerOptions": {
     "outDir": "./build",
     "target": "es2019",
     "module": "commonjs",
-    "types": ["node", "jest"],
-    "strict": true
+    "typeRoots": ["ts-declarations", "node_modules/@types"]
   },
   "include": ["./src"],
   "exclude": ["**/__mocks__/*", "**/__tests__/*"]
