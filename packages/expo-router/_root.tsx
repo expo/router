@@ -1,13 +1,14 @@
+/// <reference path="metro-require.d.ts" />
+
 import "@expo/metro-runtime";
-import React from "react";
 
 import { ExpoRoot } from "expo-router";
+import React from "react";
 
 import { getNavigationConfig } from "./src/getLinkingConfig";
 import { getRoutes } from "./src/getRoutes";
 
-// @ts-expect-error: Not sure
-const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT);
+const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT!);
 
 // Must be exported or Fast Refresh won't update the context >:[
 export default function ExpoRouterRoot() {
