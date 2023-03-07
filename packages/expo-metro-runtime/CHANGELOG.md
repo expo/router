@@ -6,7 +6,7 @@
 
 ### 🎉 New features
 
-- Add experimental support for global CSS stylesheets on web.
+- Add experimental support for global CSS on web.
 
 ### 🐛 Bug fixes
 
