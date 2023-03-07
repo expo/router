@@ -1,5 +1,5 @@
-import { usePathname, useSearchParams, useSegments } from "../LocationProvider";
 import { HrefObject } from "./href";
+import { usePathname, useSearchParams, useSegments } from "../LocationProvider";
 
 /** @deprecated */
 type RouteInfo = Omit<Required<HrefObject>, "query"> & {

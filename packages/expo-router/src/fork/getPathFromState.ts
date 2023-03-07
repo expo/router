@@ -39,6 +39,8 @@ type CustomRoute = Route<string> & {
   state?: State;
 };
 
+const DEFAULT_SCREENS: PathConfigMap<object> = {};
+
 const getActiveRoute = (state: State): { name: string; params?: object } => {
   const route =
     typeof state.index === "number"
@@ -118,12 +120,21 @@ function encodeURIComponentPreservingBrackets(str: string) {
  */
 export default function getPathFromState<ParamList extends object>(
   state: State,
-  // @ts-expect-error: non-standard options
   _options?: Options<ParamList> & {
     preserveGroups?: boolean;
     preserveDynamicRoutes?: boolean;
-  } = {}
+  }
 ): string {
+  return getPathDataFromState(state, _options).path;
+}
+
+export function getPathDataFromState<ParamList extends object>(
+  state: State,
+  _options: Options<ParamList> & {
+    preserveGroups?: boolean;
+    preserveDynamicRoutes?: boolean;
+  } = { screens: DEFAULT_SCREENS }
+) {
   if (state == null) {
     throw Error(
       "Got 'undefined' for the navigation state. You must pass a valid state object."
@@ -132,13 +143,10 @@ export default function getPathFromState<ParamList extends object>(
 
   const { preserveGroups, preserveDynamicRoutes, ...options } = _options;
 
-  if (_options) {
-    validatePathConfig(options);
-  }
+  validatePathConfig(options);
 
-  const screens = options?.screens;
   // Expo Router disallows usage without a linking config.
-  if (!screens) {
+  if (Object.is(options.screens, DEFAULT_SCREENS)) {
     throw Error(
       "You must pass a 'screens' object to 'getPathFromState' to generate a path."
     );
@@ -147,7 +155,7 @@ export default function getPathFromState<ParamList extends object>(
   return getPathFromResolvedState(
     state,
     // Create a normalized configs object which will be easier to use
-    createNormalizedConfigs(screens),
+    createNormalizedConfigs(options.screens),
     { preserveGroups, preserveDynamicRoutes }
   );
 }
@@ -162,12 +170,17 @@ function processParamsWithUserSettings(
     Object.entries(params).map(([key, value]) => [
       key,
       // TODO: Strip nullish values here.
-      stringify?.[key] ? stringify[key](value) : String(value),
+      stringify?.[key]
+        ? stringify[key](value)
+        : // Preserve rest params
+        Array.isArray(value)
+        ? value
+        : String(value),
     ])
   );
 }
 
-function deepEqual(a: any, b: any) {
+export function deepEqual(a: any, b: any) {
   if (a === b) {
     return true;
   }
@@ -241,7 +254,6 @@ function walkConfigItems(
 
     if (route.params) {
       const params = processParamsWithUserSettings(configItem, route.params);
-
       // TODO: Does this need to be a null check?
       if (pattern) {
         Object.assign(collectedParams, params);
@@ -404,7 +416,6 @@ function getPathFromResolvedState(
         }
 
         const query = queryString.stringify(focusedParams, { sort: false });
-
         if (query) {
           path += `?${query}`;
         }
@@ -412,7 +423,8 @@ function getPathFromResolvedState(
       break;
     }
   }
-  return basicSanitizePath(path);
+
+  return { path: basicSanitizePath(path), params: allParams };
 }
 
 function getPathWithConventionsCollapsed({
@@ -438,7 +450,13 @@ function getPathWithConventionsCollapsed({
       // We don't know what to show for wildcard patterns
       // Showing the route name seems ok, though whatever we show here will be incorrect
       // Since the page doesn't actually exist
-      if (p === "*") {
+      if (p.startsWith("*")) {
+        if (preserveDynamicRoutes) {
+          return `[...${name}]`;
+        }
+        if (params[name]) {
+          return params[name].join("/");
+        }
         if (i === 0) {
           // This can occur when a wildcard matches all routes and the given path was `/`.
           return routePath;
@@ -494,7 +512,7 @@ function getParamsWithConventionsCollapsed({
   routeName: string;
   params: object;
 }): Record<string, string> {
-  const processedParams = { ...params };
+  const processedParams: Record<string, string> = { ...params };
 
   // Remove the params present in the pattern since we'll only use the rest for query string
 
@@ -509,7 +527,7 @@ function getParamsWithConventionsCollapsed({
     });
 
   // Deep Dynamic Routes
-  if (segments.some((segment) => segment === "*")) {
+  if (segments.some((segment) => segment.startsWith("*"))) {
     // NOTE(EvanBacon): Drop the param name matching the wildcard route name -- this is specific to Expo Router.
     const name = matchDeepDynamicRouteName(routeName) ?? routeName;
     delete processedParams[name];
@@ -562,7 +580,7 @@ function isInvalidParams(
 }
 
 const getParamName = (pattern: string) =>
-  pattern.replace(/^:/, "").replace(/\?$/, "");
+  pattern.replace(/^[:*]/, "").replace(/\?$/, "");
 
 const joinPaths = (...paths: string[]): string =>
   ([] as string[])

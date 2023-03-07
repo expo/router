@@ -21,7 +21,7 @@
 
 // https://github.com/browserify/path-browserify/blob/master/index.js
 
-function assertPath(path) {
+function assertPath(path: string) {
   if (typeof path !== "string") {
     throw new TypeError(
       "Path must be a string. Received " + JSON.stringify(path)
@@ -30,7 +30,7 @@ function assertPath(path) {
 }
 
 // Resolves . and .. elements in a path with directory names
-function normalizeStringPosix(path, allowAboveRoot) {
+function normalizeStringPosix(path: string, allowAboveRoot?: boolean) {
   let res = "";
   let lastSegmentLength = 0;
   let lastSlash = -1;
@@ -98,7 +98,7 @@ function normalizeStringPosix(path, allowAboveRoot) {
 }
 
 // path.resolve([from ...], to)
-export function resolve(...segments) {
+export function resolve(...segments: string[]) {
   let resolvedPath = "";
   let resolvedAbsolute = false;
 

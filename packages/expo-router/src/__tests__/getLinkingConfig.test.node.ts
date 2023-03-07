@@ -81,7 +81,7 @@ describe(getReactNavigationScreensConfig, () => {
       "(group)": {
         initialRouteName: undefined,
         path: "(group)",
-        screens: { "[...deep]": "*", "[dynamic]": ":dynamic", index: "" },
+        screens: { "[...deep]": "*deep", "[dynamic]": ":dynamic", index: "" },
       },
       "(second-group)": {
         initialRouteName: undefined,
@@ -89,7 +89,7 @@ describe(getReactNavigationScreensConfig, () => {
         screens: { people: "people" },
       },
       _sitemap: "_sitemap",
-      "other/nested/[...screen]": "other/nested/*",
+      "other/nested/[...screen]": "other/nested/*screen",
     });
   });
 });

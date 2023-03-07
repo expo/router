@@ -19,7 +19,7 @@ All of the `children` of a `<Navigator />` component will be rendered as-is.
 
 Custom layouts have an internal context that is ignored when using the `<Slot />` component without a `<Navigator />` component wrapping it.
 
-```tsx
+```js
 import { View } from "react-native";
 import { TabRouter } from "@react-navigation/native";
 

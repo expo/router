@@ -60,10 +60,11 @@ Now we'll create a modal which adds a back button when the modal has lost its pr
 
 ```js title=app/modal.js
 import { View } from "react-native";
-import { Link } from "expo-router";
+import { Link, useNavigation } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-export default function Modal({ navigation }) {
+export default function Modal() {
+  const navigation = useNavigation();
   // If the page was reloaded or navigated to directly, then the modal should be presented as
   // a full screen page. You may need to change the UI to account for this.
   const isPresented = navigation.canGoBack();

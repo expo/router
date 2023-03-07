@@ -6,6 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+// @ts-expect-error
 import UTFSequence from "react-native/Libraries/UTFSequence";
 
 import type { LogBoxLogData } from "./LogBoxLog";
@@ -52,10 +53,10 @@ export type ComponentStack = CodeFrame[];
 
 const SUBSTITUTION = UTFSequence.BOM + "%s";
 
-export function parseInterpolation(args: readonly any[]): readonly {
+export function parseInterpolation(args: readonly any[]): {
   category: Category;
   message: Message;
-}[] {
+} {
   const categoryParts: string[] = [];
   const contentParts: string[] = [];
   const substitutionOffsets: { length: number; offset: number }[] = [];
@@ -119,7 +120,6 @@ export function parseInterpolation(args: readonly any[]): readonly {
   contentParts.push(...remainingArgs);
 
   return {
-    // @ts-expect-error
     category: categoryParts.join(" "),
     message: {
       content: contentParts.join(" "),
@@ -277,7 +277,6 @@ export function parseLogBoxException(
 
   const componentStack = error.componentStack;
   if (error.isFatal || error.isComponentError) {
-    // @ts-expect-error
     return {
       level: "fatal",
       stack: error.stack,
@@ -290,7 +289,6 @@ export function parseLogBoxException(
 
   if (componentStack != null) {
     // It is possible that console errors have a componentStack.
-    // @ts-expect-error
     return {
       level: "error",
       stack: error.stack,
@@ -354,7 +352,6 @@ export function parseLogBoxLog(args: readonly any[]): {
     }
   }
 
-  // @ts-expect-error
   return {
     ...parseInterpolation(argsWithoutComponentStack),
     componentStack,

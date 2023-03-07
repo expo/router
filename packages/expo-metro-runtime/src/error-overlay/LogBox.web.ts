@@ -36,8 +36,8 @@ if (__DEV__) {
     parseInterpolation,
   } = require("./Data/parseLogBoxLog");
 
-  let originalConsoleError;
-  let consoleErrorImpl;
+  let originalConsoleError: typeof console.error | undefined;
+  let consoleErrorImpl: typeof console.error | undefined;
 
   let isLogBoxInstalled: boolean = false;
 
@@ -60,7 +60,7 @@ if (__DEV__) {
         originalConsoleError = console.error.bind(console);
 
         console.error = (...args) => {
-          consoleErrorImpl(...args);
+          consoleErrorImpl?.(...args);
         };
       }
 
@@ -119,10 +119,10 @@ if (__DEV__) {
     return typeof args[0] === "string" && args[0].startsWith("Warning: ");
   };
 
-  const registerError = (...args): void => {
+  const registerError = (...args: Parameters<typeof console.error>): void => {
     // Let errors within LogBox itself fall through.
     if (LogBoxData.isLogBoxErrorMessage(args[0])) {
-      originalConsoleError(...args);
+      originalConsoleError?.(...args);
       return;
     }
 
@@ -135,7 +135,7 @@ if (__DEV__) {
         //
         // The 'warning' module needs to be handled here because React internally calls
         // `console.error('Warning: ')` with the component stack already included.
-        originalConsoleError(...args);
+        originalConsoleError?.(...args);
         return;
       }
 
@@ -145,7 +145,7 @@ if (__DEV__) {
         // Interpolate the message so they are formatted for adb and other CLIs.
         // This is different than the message.content above because it includes component stacks.
         const interpolated = parseInterpolation(args);
-        originalConsoleError(interpolated.message.content);
+        originalConsoleError?.(interpolated.message.content);
       }
     } catch (err) {
       LogBoxData.reportUnexpectedLogBoxError(err);

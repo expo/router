@@ -10,18 +10,24 @@ import { Platform } from "react-native";
 // @ts-expect-error
 import Networking from "react-native/Libraries/Network/RCTNetworking";
 
+type Subscriber = { remove: () => void };
+
 export function fetchAsync(
   url: string
 ): Promise<{ body: string; headers: Record<string, string> }> {
   let id: string | null = null;
   let responseText: string | null = null;
   let headers: Record<string, string> = {};
-  let dataListener: { remove: () => void } | null = null;
-  let completeListener: { remove: () => void } | null = null;
-  let responseListener: { remove: () => void } | null = null;
+  let dataListener: Subscriber | null = null;
+  let completeListener: Subscriber | null = null;
+  let responseListener: Subscriber | null = null;
   return new Promise<{ body: string; headers: Record<string, string> }>(
     (resolve, reject) => {
-      dataListener = Networking.addListener(
+      const addListener = Networking.addListener as (
+        event: string,
+        callback: (props: [string, any, any]) => any
+      ) => Subscriber;
+      dataListener = addListener(
         "didReceiveNetworkData",
         ([requestId, response]) => {
           if (requestId === id) {
@@ -29,7 +35,7 @@ export function fetchAsync(
           }
         }
       );
-      responseListener = Networking.addListener(
+      responseListener = addListener(
         "didReceiveNetworkResponse",
         ([requestId, status, responseHeaders]) => {
           if (requestId === id) {
@@ -37,7 +43,7 @@ export function fetchAsync(
           }
         }
       );
-      completeListener = Networking.addListener(
+      completeListener = addListener(
         "didCompleteNetworkResponse",
         ([requestId, error]) => {
           if (requestId === id) {
@@ -49,7 +55,7 @@ export function fetchAsync(
           }
         }
       );
-      Networking.sendRequest(
+      (Networking.sendRequest as any)(
         "GET",
         "asyncRequest",
         url,
@@ -60,7 +66,7 @@ export function fetchAsync(
         "text",
         false,
         0,
-        (requestId) => {
+        (requestId: string) => {
           id = requestId;
         },
         true

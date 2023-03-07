@@ -1,11 +1,17 @@
+import { useRoute } from "@react-navigation/native";
 import React from "react";
 
-import { RootContainer } from "./ContextNavigationContainer";
-import getPathFromState, { State } from "./fork/getPathFromState";
+import { getNavigationContainerRef } from "./NavigationContainer";
+import getPathFromState, {
+  deepEqual,
+  getPathDataFromState,
+  State,
+} from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
-import { useInitialRootStateContext } from "./rootStateContext";
+import { useServerState } from "./static/useServerState";
+import { useInitialRootStateContext } from "./useInitialRootStateContext";
 
-type SearchParams = Record<string, string>;
+type SearchParams = Record<string, string | string[]>;
 
 type UrlObject = {
   pathname: string;
@@ -14,10 +20,13 @@ type UrlObject = {
 };
 
 function getRouteInfoFromState(
-  getPathFromState: (state: State, asPath: boolean) => string,
+  getPathFromState: (
+    state: State,
+    asPath: boolean
+  ) => { path: string; params: any },
   state: State
 ): UrlObject {
-  const path = getPathFromState(state, false);
+  const { path } = getPathFromState(state, false);
   const qualified = getPathFromState(state, true);
   return {
     pathname: path.split("?")["0"],
@@ -34,19 +43,32 @@ function compareRouteInfo(a: UrlObject, b: UrlObject) {
   );
 }
 
-function compareUrlSearchParams(a: SearchParams, b: SearchParams): boolean {
-  const aKeys = Object.keys(a);
-  const bKeys = Object.keys(b);
+export function compareUrlSearchParams(
+  a: SearchParams,
+  b: SearchParams
+): boolean {
+  return deepEqual(a, b);
+}
 
-  if (aKeys.length !== bKeys.length) {
-    return false;
-  }
+function useSafeInitialRootState() {
+  const serverState = useServerState();
+  const initialRootState = useInitialRootStateContext();
 
-  return aKeys.every((key) => a[key] === b[key]);
+  return React.useMemo(() => {
+    if (serverState) {
+      return serverState;
+    }
+
+    // Check if "is ready" to prevent `console.error`s
+    if (getNavigationContainerRef().isReady()) {
+      return getNavigationContainerRef().getRootState() ?? initialRootState;
+    }
+
+    return initialRootState;
+  }, []);
 }
 
 function useUrlObject(): UrlObject {
-  const initialRootState = useInitialRootStateContext();
   const getPathFromState = useGetPathFromState();
 
   const [routeInfo, setRouteInfo] = React.useState<UrlObject>(
@@ -54,7 +76,7 @@ function useUrlObject(): UrlObject {
       getPathFromState,
       // If the root state (from upstream) is not ready, use the hacky initial state.
       // Initial state can be generate because it assumes the linking configuration never changes.
-      RootContainer.getRef().getRootState() ?? initialRootState
+      useSafeInitialRootState()
     )
   );
 
@@ -66,6 +88,10 @@ function useUrlObject(): UrlObject {
 
   const maybeUpdateRouteInfo = React.useCallback(
     (state: State) => {
+      // The state can be undefined when hot reloading a Layout Route on native.
+      if (!state) {
+        return;
+      }
       // Prevent unnecessary updates
       const newRouteInfo = getRouteInfoFromState(getPathFromState, state);
       if (!compareRouteInfo(routeInfoRef.current, newRouteInfo)) {
@@ -79,7 +105,7 @@ function useUrlObject(): UrlObject {
   );
 
   React.useEffect(() => {
-    const rootNavigation = RootContainer.getRef();
+    const rootNavigation = getNavigationContainerRef();
 
     return rootNavigation.addListener("state", ({ data }) => {
       // Attempt to use the complete state from the root, otherwise this will default to
@@ -99,9 +125,8 @@ function useGetPathFromState() {
 
   return React.useCallback(
     (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
-      return linking.getPathFromState(state, {
+      return getPathDataFromState(state, {
         ...linking.config,
-        // @ts-expect-error
         preserveDynamicRoutes: asPath,
         preserveGroups: asPath,
       });
@@ -111,30 +136,28 @@ function useGetPathFromState() {
 }
 
 // TODO: Split up getPathFromState to return all this info at once.
-function getNormalizedStatePath(
-  statePath: string
-): Omit<UrlObject, "pathname"> {
-  const [pathname, querystring] = statePath.split("?");
-
+export function getNormalizedStatePath({
+  path: statePath,
+  params,
+}: {
+  path: string;
+  params: any;
+}): Omit<UrlObject, "pathname"> {
+  const [pathname] = statePath.split("?");
   return {
     // Strip empty path at the start
-    segments: pathname.split("/").filter(Boolean),
+    segments: pathname.split("/").filter(Boolean).map(decodeURIComponent),
     // TODO: This is not efficient, we should generate based on the state instead
     // of converting to string then back to object
-    params: queryStringToObject(querystring),
+    params: Object.entries(params).reduce((prev, [key, value]) => {
+      if (Array.isArray(value)) {
+        prev[key] = value.map(decodeURIComponent);
+      } else {
+        prev[key] = decodeURIComponent(value as string);
+      }
+      return prev;
+    }, {} as SearchParams),
   };
-}
-
-function queryStringToObject(queryString?: string): SearchParams {
-  return (
-    queryString
-      ?.split("&")
-      .map((pair) => pair.split("="))
-      .reduce((acc, [key, value]) => {
-        acc[key] = decodeURIComponent(value);
-        return acc;
-      }, {} as SearchParams) ?? {}
-  );
 }
 
 const LocationContext = React.createContext<UrlObject | undefined>(undefined);
@@ -169,8 +192,17 @@ export function usePathname(): string {
 }
 
 /** @returns Current URL Search Parameters. */
-export function useSearchParams(): SearchParams {
-  return useLocation().params;
+export function useSearchParams<
+  TParams extends SearchParams = SearchParams
+>(): Partial<TParams> {
+  return useLocation().params as Partial<TParams>;
+}
+
+/** @returns Current URL Search Parameters that only update when the path matches the current route. */
+export function useLocalSearchParams<
+  TParams extends SearchParams = SearchParams
+>(): Partial<TParams> {
+  return (useRoute()?.params ?? ({} as any)) as Partial<TParams>;
 }
 
 /** @returns Array of selected segments. */

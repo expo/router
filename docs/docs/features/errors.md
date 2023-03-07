@@ -7,7 +7,7 @@ sidebar_position: 4
 
 Expo Router enables fine-tuned error handling to enable a more opinionated data loading strategy in the future. You can export a nested `ErrorBoundary` component from any route to intercept and format component-level errors using [React Error Boundaries](https://reactjs.org/docs/error-boundaries.html):
 
-```tsx title=app/home.tsx
+```js title=app/home.tsx
 import { View, Text } from 'react-native';
 
 // highlight-next-line
@@ -25,7 +25,7 @@ export default function Page() { ... }
 
 When you export an `ErrorBoundary` the route will be wrapped with a React Error Boundary effectively:
 
-```tsx title="virtual"
+```js title="virtual"
 function Route({ ErrorBoundary, Component }) {
   return (
     <Try catch={ErrorBoundary}>
@@ -50,7 +50,7 @@ Each `ErrorBoundary` is passed the following props:
 
 You can also use the default `ErrorBoundary` component for a quick UI:
 
-```tsx title=app/home.tsx
+```js title=app/home.tsx
 // Re-export the default UI
 export { ErrorBoundary } from "expo-router";
 ```

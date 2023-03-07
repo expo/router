@@ -73,15 +73,6 @@ const config = {
 
         //... other Algolia params
       },
-
-      announcementBar: {
-        id: "beta_notice_1",
-        content:
-          'This project is in <b>beta</b>, API is subject to breaking changes. <a target="_blank" rel="noopener noreferrer" href="https://github.com/expo/router/discussions/1">Join the discussion</a>.',
-        backgroundColor: "#242526",
-        textColor: "#fff",
-        isCloseable: true,
-      },
       image: "img/og-image.png",
       navbar: {
         title: "Expo Router",

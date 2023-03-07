@@ -5,10 +5,10 @@ import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
-import { useFocusEffect } from "../useFocusEffect";
 import { Href, resolveHref } from "./href";
 import useLinkToPathProps from "./useLinkToPathProps";
 import { useRouter } from "./useRouter";
+import { useFocusEffect } from "../useFocusEffect";
 
 type Props = {
   /** Path to route to. */
@@ -24,7 +24,7 @@ type Props = {
   onPress?: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => void;
-} & (Omit<TextProps, "href"> & { children: React.ReactNode });
+} & (Omit<TextProps, "href" | "hoverStyle"> & { children?: React.ReactNode });
 
 /** Redirects to the href as soon as the component is mounted. */
 export function Redirect({ href }: { href: Href }) {
@@ -44,7 +44,12 @@ export function Redirect({ href }: { href: Href }) {
  * @param props.asChild Forward props to child component. Useful for custom buttons.
  * @param props.children Child elements to render the content.
  */
-export const Link = React.forwardRef(ExpoRouterLink);
+export const Link = React.forwardRef(ExpoRouterLink) as {
+  /** Helper method to resolve an Href object into a string. */
+  resolveHref: typeof resolveHref;
+} & React.ForwardRefExoticComponent<Props>;
+
+Link.resolveHref = resolveHref;
 
 function ExpoRouterLink(
   {
@@ -56,7 +61,6 @@ function ExpoRouterLink(
   }: Props,
   ref: React.ForwardedRef<Text>
 ) {
-  // TODO: Auto use router's client-side event.
   const resolvedHref = React.useMemo(() => {
     if (href == null) {
       throw new Error("Link: href is required");

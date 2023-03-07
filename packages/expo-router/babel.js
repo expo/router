@@ -90,6 +90,22 @@ module.exports = function (api) {
           return;
         }
 
+        // Enable static rendering
+        // TODO: Use a serializer or something to ensure this changes without
+        // needing to clear the cache.
+        if (
+          t.isIdentifier(parent.node.property, {
+            name: "EXPO_PUBLIC_USE_STATIC",
+          }) &&
+          !parent.parentPath.isAssignmentExpression() &&
+          process.env.EXPO_PUBLIC_USE_STATIC
+        ) {
+          parent.replaceWith(
+            t.stringLiteral(process.env.EXPO_PUBLIC_USE_STATIC)
+          );
+          return;
+        }
+
         // Surfaces the `app.json` (config) as an environment variable which is then parsed by
         // `expo-constants` https://docs.expo.dev/versions/latest/sdk/constants/
         if (

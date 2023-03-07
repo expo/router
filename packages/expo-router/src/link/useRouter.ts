@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 
-import { RootContainer } from "../ContextNavigationContainer";
 import { Href, resolveHref } from "./href";
 import { useLinkToPath } from "./useLinkToPath";
 import { useLoadedNavigation } from "./useLoadedNavigation";
+import { getNavigationContainerRef } from "../NavigationContainer";
 
 // Wraps useLinkTo to provide an API which is similar to the Link component.
 export function useLink() {
@@ -23,7 +23,7 @@ type Router = {
 };
 
 export function useRouter(): Router {
-  const root = RootContainer.useRef();
+  const root = getNavigationContainerRef();
 
   const pending = useLoadedNavigation();
   const linkTo = useLinkToPath();
@@ -47,11 +47,8 @@ export function useRouter(): Router {
     push,
     back,
     replace,
-    setParams: (params) => {
-      root?.current?.setParams(
-        // @ts-expect-error
-        params
-      );
+    setParams: (params = {}) => {
+      root?.current?.setParams(params);
     },
     // TODO(EvanBacon): add `reload`
     // TODO(EvanBacon): add `canGoBack` but maybe more like a `hasContext`

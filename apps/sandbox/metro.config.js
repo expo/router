@@ -40,4 +40,12 @@ config.resolver.nodeModulesPaths = [
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true;
 
+const { FileStore } = require("metro-cache");
+config.cacheStores = [
+  // Ensure the cache isn't shared between projects
+  // this ensures the transform-time environment variables are changed to reflect
+  // the current project.
+  new FileStore({ root: path.join(projectRoot, "node_modules/.cache/metro") }),
+];
+
 module.exports = config;

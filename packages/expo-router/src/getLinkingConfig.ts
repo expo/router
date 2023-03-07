@@ -1,12 +1,10 @@
 import { LinkingOptions, getActionFromState } from "@react-navigation/native";
 
 import { RouteNode } from "./Route";
-import { getAllWebRedirects } from "./aasa";
 import {
   addEventListener,
   getInitialURL,
   getPathFromState,
-  getRootURL,
   getStateFromPath,
 } from "./link/linking";
 import { matchDeepDynamicRouteName, matchDynamicName } from "./matchers";
@@ -27,8 +25,9 @@ function convertDynamicRouteToReactNavigation(segment: string): string {
     return "";
   }
 
-  if (matchDeepDynamicRouteName(segment) != null) {
-    return "*";
+  const rest = matchDeepDynamicRouteName(segment);
+  if (rest != null) {
+    return "*" + rest;
   }
   const dynamicName = matchDynamicName(segment);
 
@@ -80,21 +79,21 @@ export function getReactNavigationScreensConfig(
   );
 }
 
+export function getNavigationConfig(routes: RouteNode): {
+  initialRouteName?: string;
+  screens: Record<string, Screen>;
+} {
+  return {
+    initialRouteName: routes.initialRouteName,
+    screens: getReactNavigationScreensConfig(routes.children),
+  };
+}
+
 export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
   return {
-    prefixes: [
-      /* your linking prefixes */
-      getRootURL(),
-
-      // This ensures that we can redirect correctly when the user comes from an associated domain
-      // i.e. iOS Safari banner.
-      ...getAllWebRedirects(),
-    ],
-    config: {
-      // @ts-expect-error
-      initialRouteName: routes.initialRouteName,
-      screens: getReactNavigationScreensConfig(routes.children),
-    },
+    prefixes: [],
+    // @ts-expect-error
+    config: getNavigationConfig(routes),
     // A custom getInitialURL is used on native to ensure the app always starts at
     // the root path if it's launched from something other than a deep link.
     // This helps keep the native functionality working like the web functionality.
@@ -102,10 +101,27 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
     // then `/index` would be used on web and `/settings` would be used on native.
     getInitialURL,
     subscribe: addEventListener,
-    getStateFromPath,
+    getStateFromPath: getStateFromPathMemoized,
     getPathFromState,
+
     // Add all functions to ensure the types never need to fallback.
     // This is a convenience for usage in the package.
     getActionFromState,
   };
+}
+
+const stateCache = new Map<string, any>();
+
+/** We can reduce work by memoizing the state by the pathname. This only works because the options (linking config) theoretically never change.  */
+function getStateFromPathMemoized(
+  path: string,
+  options: Parameters<typeof getStateFromPath>[1]
+) {
+  const cached = stateCache.get(path);
+  if (cached) {
+    return cached;
+  }
+  const result = getStateFromPath(path, options);
+  stateCache.set(path, result);
+  return result;
 }

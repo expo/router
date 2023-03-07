@@ -4,11 +4,14 @@
     "target": "es2019",
     "module": "commonjs",
     "outDir": "./build",
+    "noEmit": true,
     "typeRoots": ["./ts-declarations", "../../node_modules/@types", "./node_modules/@types"],
     "types": [
       "jest",
       "node"
-    ]
+    ],
+    "skipLibCheck": true,
+    "strict": true
   },
   "include": ["./src"],
   "exclude": ["**/__mocks__/*", "**/__tests__/*"]

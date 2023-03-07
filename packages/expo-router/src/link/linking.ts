@@ -1,5 +1,6 @@
 import Constants, { ExecutionEnvironment } from "expo-constants";
 import * as Linking from "expo-linking";
+import { Platform } from "react-native";
 
 import getPathFromState from "../fork/getPathFromState";
 import getStateFromPath from "../fork/getStateFromPath";
@@ -10,7 +11,14 @@ import getStateFromPath from "../fork/getStateFromPath";
 // For example, if you had a root navigator where the first screen was `/settings` and the second was `/index`
 // then `/index` would be used on web and `/settings` would be used on native.
 export async function getInitialURL(): Promise<string> {
-  const url = await Promise.race<string>([
+  if (Platform.OS === "web") {
+    if (typeof window === "undefined") {
+      return "";
+    } else if (typeof window.location?.href === "string") {
+      return window.location.href;
+    }
+  }
+  return Promise.race<string>([
     (async () => {
       const url = await Linking.getInitialURL();
 
@@ -39,12 +47,11 @@ export async function getInitialURL(): Promise<string> {
       setTimeout(() => resolve(getRootURL()), 150)
     ),
   ]);
-  return url;
 }
 
 let _rootURL: string | undefined;
 
-export function getRootURL() {
+export function getRootURL(): string {
   if (_rootURL === undefined) {
     _rootURL = Linking.createURL("/");
   }
@@ -69,20 +76,11 @@ export function addEventListener(listener: (url: string) => void) {
   } else {
     callback = ({ url }: { url: string }) => listener(url);
   }
-  const subscription = Linking.addEventListener("url", callback) as
-    | { remove(): void }
-    | undefined;
-
-  // Storing this in a local variable stops Jest from complaining about import after teardown
-  const removeEventListener = Linking.removeEventListener?.bind(Linking);
+  const subscription = Linking.addEventListener("url", callback);
 
   return () => {
     // https://github.com/facebook/react-native/commit/6d1aca806cee86ad76de771ed3a1cc62982ebcd7
-    if (subscription?.remove) {
-      subscription.remove();
-    } else {
-      removeEventListener?.("url", callback);
-    }
+    subscription.remove?.();
   };
 }
 

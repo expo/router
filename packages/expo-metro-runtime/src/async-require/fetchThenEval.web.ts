@@ -1,3 +1,9 @@
+/**
+ * Copyright © 2022 650 Industries.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 // Basically `__webpack_require__.l`.
 export function fetchThenEvalAsync(
   url: string,
@@ -58,7 +64,6 @@ export function fetchThenEvalAsync(
       script.parentNode && script.parentNode.removeChild(script);
       reject(error);
     };
-    document.head.appendChild(script);
     document.head.appendChild(script);
   });
 }

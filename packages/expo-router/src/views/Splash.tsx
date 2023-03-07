@@ -1,18 +1,9 @@
-import { NativeModulesProxy } from "expo-modules-core";
+import * as SplashModule from "expo-splash-screen";
 import { nanoid } from "nanoid/non-secure";
 import * as React from "react";
 import { Platform } from "react-native";
+
 const globalStack: string[] = [];
-
-let SplashModule: typeof import("expo-splash-screen") | null = null;
-
-try {
-  if (NativeModulesProxy.ExpoSplashScreen) {
-    SplashModule = require("expo-splash-screen");
-  }
-} catch (e) {
-  // Ignore
-}
 
 /**
  * A stack based component for keeping the splash screen visible.
@@ -53,7 +44,7 @@ function useGlobalSplash() {
 }
 
 SplashScreen.hideAsync = () => {
-  SplashModule?.hideAsync();
+  SplashModule.hideAsync();
   globalStack.length = 0;
 };
 
@@ -66,14 +57,14 @@ SplashScreen.preventAutoHideAsync = () => {
   }
   _preventAutoHideAsyncInvoked = true;
   // Append error handling to ensure any uncaught exceptions result in the splash screen being hidden.
-  if (Platform.OS !== "web" && ErrorUtils && ErrorUtils.getGlobalHandler) {
+  if (Platform.OS !== "web" && ErrorUtils?.getGlobalHandler) {
     const originalHandler = ErrorUtils.getGlobalHandler();
     ErrorUtils.setGlobalHandler((error, isFatal) => {
       SplashScreen.hideAsync();
       originalHandler(error, isFatal);
     });
   }
-  SplashModule?.preventAutoHideAsync();
+  SplashModule.preventAutoHideAsync();
 };
 
 SplashScreen._pushEntry = (): any => {

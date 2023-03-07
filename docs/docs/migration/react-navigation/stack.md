@@ -12,7 +12,7 @@ Follow the [installation guide](https://reactnavigation.org/docs/stack-navigator
 
 Contextualize the stack navigator to support the Expo Router file convention:
 
-```ts title=./CustomStack.tsx
+```js title=./CustomStack.tsx
 import {
   // Import the creation function
   createStackNavigator,

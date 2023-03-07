@@ -1,3 +1,9 @@
+/**
+ * Copyright © 2022 650 Industries.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 import { fetchAsync } from "./fetchAsync";
 
 declare let global: {
@@ -12,8 +18,8 @@ declare let global: {
 export function fetchThenEvalAsync(url: string): Promise<void> {
   return fetchAsync(url).then(({ body, headers }) => {
     if (
-      headers["Content-Type"] != null &&
-      headers["Content-Type"].indexOf("application/json") >= 0
+      headers.has("Content-Type") != null &&
+      headers.get("Content-Type")!.includes("application/json")
     ) {
       // Errors are returned as JSON.
       throw new Error(

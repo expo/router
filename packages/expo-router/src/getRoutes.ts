@@ -4,10 +4,10 @@ import {
   matchDeepDynamicRouteName,
   matchDynamicName,
   matchGroupName,
+  removeSupportedExtensions,
   stripGroupSegmentsFromPath,
 } from "./matchers";
 import { RequireContext } from "./types";
-import { DefaultNavigator } from "./views/Layout";
 
 export type FileNode = Pick<RouteNode, "contextKey" | "loadRoute"> & {
   /** Like `(tab)/index` */
@@ -299,22 +299,47 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
   }
 
   return {
-    loadRoute: () => ({ default: DefaultNavigator }),
+    loadRoute: () => ({
+      default: (
+        require("./views/Navigator") as typeof import("./views/Navigator")
+      ).DefaultNavigator,
+    }),
     // Generate a fake file name for the directory
     contextKey: "./_layout.tsx",
     route: "",
+
     generated: true,
     dynamic: null,
     children: routes,
   };
 }
 
+/**
+ * Asserts if the require.context has files that share the same name but have different extensions. Exposed for testing.
+ * @private
+ */
+export function assertDuplicateRoutes(filenames: string[]) {
+  if (process.env.NODE_ENV === "production") {
+    return;
+  }
+
+  const duplicates = filenames
+    .map((filename) => removeSupportedExtensions(filename))
+    .reduce((acc, filename) => {
+      acc[filename] = acc[filename] ? acc[filename] + 1 : 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+  Object.entries(duplicates).forEach(([filename, count]) => {
+    if (count > 1) {
+      throw new Error(`Multiple files match the route name "${filename}".`);
+    }
+  });
+}
+
 /** Given a Metro context module, return an array of nested routes. */
 export function getRoutes(contextModule: RequireContext): RouteNode | null {
-  const files = contextModuleToFileNodes(contextModule);
-  const treeNodes = getRecursiveTree(files);
-  const route = treeNodesToRootRoute(treeNodes);
-
+  const route = getExactRoutes(contextModule);
   if (!route) {
     return null;
   }
@@ -325,6 +350,17 @@ export function getRoutes(contextModule: RequireContext): RouteNode | null {
   appendUnmatchedRoute(route);
 
   return route;
+}
+
+/** Get routes without unmatched or sitemap. */
+export function getExactRoutes(
+  contextModule: RequireContext
+): RouteNode | null {
+  assertDuplicateRoutes(contextModule.keys());
+  const files = contextModuleToFileNodes(contextModule);
+  const treeNodes = getRecursiveTree(files);
+  const route = treeNodesToRootRoute(treeNodes);
+  return route || null;
 }
 
 function appendSitemapRoute(routes: RouteNode) {

@@ -17,10 +17,10 @@ export type ScreenProps<
   /** Name is required when used inside a Layout component. */
   name?: string;
   /**
-   * Redirect to the nearest or provided sibling route.
+   * Redirect to the nearest sibling route.
    * If all children are redirect={true}, the layout will render `null` as there are no children to render.
    */
-  redirect?: boolean | string;
+  redirect?: boolean;
   initialParams?: { [key: string]: any };
   options?: TOptions;
 
@@ -136,11 +136,12 @@ export function getQualifiedRouteComponent(value: RouteNode) {
         segment: value.route,
       });
 
-      const errorBoundary = ErrorBoundary ? (
-        <Try catch={ErrorBoundary}>{children}</Try>
-      ) : (
-        children
-      );
+      const errorBoundary = React.useMemo(() => {
+        if (ErrorBoundary) {
+          return <Try catch={ErrorBoundary}>{children}</Try>;
+        }
+        return children;
+      }, [ErrorBoundary, children]);
 
       return (
         <LocationProvider>
@@ -164,7 +165,7 @@ export function createGetIdForRoute(
   if (!route.dynamic?.length) {
     return undefined;
   }
-  return ({ params }) => {
+  return ({ params }: { params?: Record<string, any> }) => {
     const getPreferredId = (segment: DynamicConvention) => {
       // Params can be undefined when there are no params in the route.
       const preferredId = params?.[segment.name];
@@ -209,10 +210,17 @@ function routeToScreen(
             : staticOptions;
         const dynamicResult =
           typeof options === "function" ? options?.(args) : options;
-        return {
+        const output = {
           ...staticResult,
           ...dynamicResult,
         };
+
+        // Prevent generated screens from showing up in the tab bar.
+        if (route.generated) {
+          output.tabBarButton = () => null;
+        }
+
+        return output;
       }}
       getComponent={() => getQualifiedRouteComponent(route)}
     />

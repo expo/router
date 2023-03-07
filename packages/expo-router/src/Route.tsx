@@ -1,18 +1,12 @@
 import React, { ReactNode, useContext } from "react";
 
-import { RootRouteNodeContext } from "./context";
-import { getNameFromFilePath, matchGroupName } from "./matchers";
-
-/** The list of input keys will become optional, everything else will remain the same. */
-export type PickPartial<T, K extends keyof T> = Omit<T, K> &
-  Partial<Pick<T, K>>;
+import { getContextKey, matchGroupName } from "./matchers";
 
 export type DynamicConvention = { name: string; deep: boolean };
 
 export type RouteNode = {
   /** Load a route into memory. Returns the exports from a route. */
   loadRoute: () => any;
-
   /** Loaded initial route name. */
   initialRouteName?: string;
   /** nested routes */
@@ -25,18 +19,14 @@ export type RouteNode = {
   contextKey: string;
   /** Added in-memory */
   generated?: boolean;
-
   /** Internal screens like the directory or the auto 404 should be marked as internal. */
   internal?: boolean;
 };
 
-const CurrentRoutePathContext = React.createContext<string | null>(null);
-
 const CurrentRouteContext = React.createContext<RouteNode | null>(null);
 
 if (process.env.NODE_ENV !== "production") {
-  CurrentRoutePathContext.displayName = "RoutePath";
-  CurrentRouteContext.displayName = "Route";
+  CurrentRouteContext.displayName = "RouteNode";
 }
 
 /** Return the RouteNode at the current contextual boundary. */
@@ -45,11 +35,11 @@ export function useRouteNode(): RouteNode | null {
 }
 
 export function useContextKey(): string {
-  const filename = useContext(CurrentRoutePathContext);
-  if (filename == null) {
+  const node = useRouteNode();
+  if (node == null) {
     throw new Error("No filename found. This is likely a bug in expo-router.");
   }
-  return filename;
+  return getContextKey(node.contextKey);
 }
 
 /** Provides the matching routes and filename to the children. */
@@ -60,27 +50,11 @@ export function Route({
   children: ReactNode;
   node: RouteNode;
 }) {
-  const normalName = React.useMemo(() => {
-    // The root path is `` (empty string) so always prepend `/` to ensure
-    // there is some value.
-    const normal = "/" + getNameFromFilePath(node.contextKey);
-    if (!normal.endsWith("_layout")) {
-      return normal;
-    }
-    return normal.replace(/\/?_layout$/, "");
-  }, [node.contextKey]);
-
   return (
-    <CurrentRoutePathContext.Provider value={normalName}>
-      <CurrentRouteContext.Provider value={node}>
-        {children}
-      </CurrentRouteContext.Provider>
-    </CurrentRoutePathContext.Provider>
+    <CurrentRouteContext.Provider value={node}>
+      {children}
+    </CurrentRouteContext.Provider>
   );
-}
-
-export function useRootRoute(): RouteNode | null {
-  return useContext(RootRouteNodeContext);
 }
 
 export function sortRoutesWithInitial(initialRouteName?: string) {

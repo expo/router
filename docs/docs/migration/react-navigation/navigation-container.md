@@ -75,9 +75,6 @@ Use the [`usePathname()`](/docs/features/linking#usepathname), [`useSegments()`]
 - If you're attempting to track screen changes, follow the [Screen Tracking guide](/docs/migration/react-navigation/screen-tracking).
 - React Navigation recommends avoiding [`onStateChange`](https://reactnavigation.org/docs/navigation-container/#onstatechange).
 
-<!-- - If you need to see when the root navigation state changes (discouraged as the state format can change between versions), use the `RootContainer.useState()` hook instead.
-- If you want to get the navigation state as a callback, then get the `navigation` object with `useNavigation` and invoke `navigation.addListener("state", ({ data: { state } }) => { })`. -->
-
 ### `onReady`
 
 In React Navigation, [`onReady`](https://reactnavigation.org/docs/navigation-container/#onready) is most often used to determine when the splash screen should hide or when to track screens using analytics. Expo Router has special handling for both these use cases. Assume the navigation is always ready in for navigation events in Expo Router.

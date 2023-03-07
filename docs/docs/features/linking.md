@@ -12,7 +12,7 @@ import { Link } from "expo-router";
 export default function Page() {
   return (
     <View>
-      {/* highlight-next-line */}
+      // highlight-next-line
       <Link href="/">Home</Link>
     </View>
   );
@@ -31,7 +31,7 @@ import { Link } from 'expo-router';
 
 function Home() {
   return (
-    {/* highlight-next-line */}
+    // highlight-next-line
     <Link href="/other" asChild >
       <Pressable>
         {({ hovered, pressed }) => (
@@ -73,7 +73,7 @@ export default function Page() {
 
 - **push**: _`(href: Href) => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', params: { id: '123' } }`.
 - **replace**: _`(href: Href) => void`_ Same API as `push` but replaces the current route in the history instead of pushing a new one. This is useful for redirects.
-- **back**: _`() => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', params: { id: '123' } }`.
+- **back**: _`() => void`_ Navigate back to previous route.
 - **setParams**: _`(params: Record<string, string>) => void`_ Update the query params for the currently selected route.
 
 ### `Href` type
@@ -104,7 +104,7 @@ export default function Route() {
 
 ## `useSearchParams`
 
-Returns the URL search parameters for the currently selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`.
+Returns the URL search parameters for the globally selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`.
 
 > `/profile/baconbrix?extra=info`
 
@@ -124,6 +124,32 @@ Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `
 ```js
 {
   id: "123";
+}
+```
+
+## `useLocalSearchParams`
+
+Returns the URL search parameters for the contextually selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`. This is useful for stacks where the previous screen is still mounted.
+
+```title=File System
+app/
+  _layout.js
+  [first]/home.tsx
+  [second]/shop.tsx
+```
+
+When `/abc/home` pushes `/123/shop`, `useSearchParams` would return `{ first: undefined, second: '123' }` on `/app/[first]/home.tsx` because the global URL has changed. However, you may want the params to remain `{ first: 'abc' }` to reflect the context of the screen. In this case, you can use `useLocalSearchParams` to ensure the params `{ first: 'abc' }` are still returned in `/app/[first]/home.tsx`.
+
+> `/profile/baconbrix?extra=info`
+
+```js title=app/profile/[user].tsx
+import { Text } from "react-native";
+import { useSearchParams } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const { user, extra } = useLocalSearchParams();
+  return <Text>User: {user}</Text>;
 }
 ```
 

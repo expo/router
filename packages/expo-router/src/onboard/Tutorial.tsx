@@ -56,26 +56,10 @@ export function Tutorial() {
   }, []);
 
   return (
-    <View
-      style={{
-        backgroundColor: "black",
-        flex: 1,
-        backgroundImage:
-          "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)",
-        backgroundPosition: "-3px -3px",
-        backgroundSize: "40px 40px",
-      }}
-    >
+    <View style={styles.background}>
       <StatusBar barStyle="light-content" />
 
-      <SafeAreaView
-        style={{
-          flex: 1,
-          maxWidth: 960,
-          marginHorizontal: "auto",
-          alignItems: "stretch",
-        }}
-      >
+      <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
           <Header />
           <Text
@@ -114,18 +98,7 @@ function Button() {
       {({ pressed, hovered }) => (
         <View
           style={[
-            {
-              transitionDuration: "200ms",
-              backgroundColor: Platform.select({
-                web: "transparent",
-                default: "white",
-              }),
-
-              borderColor: "white",
-              borderWidth: 2,
-              paddingVertical: 12,
-              paddingHorizontal: 24,
-            },
+            styles.buttonContainer,
             hovered && {
               backgroundColor: "white",
             },
@@ -136,19 +109,7 @@ function Button() {
         >
           <Text
             selectable={false}
-            style={[
-              {
-                fontSize: 18,
-                transitionDuration: "200ms",
-                fontWeight: "bold",
-                color: Platform.select({
-                  web: "white",
-                  default: "black",
-                }),
-              },
-              styles.code,
-              hovered && { color: "black" },
-            ]}
+            style={[styles.code, hovered && { color: "black" }]}
           >
             <Text style={{ color: "#BCC3CD" }}>$</Text> touch app/index.js
           </Text>
@@ -159,6 +120,20 @@ function Button() {
 }
 
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: "black",
+    flex: 1,
+    backgroundImage:
+      "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)",
+    backgroundPosition: "-3px -3px",
+    backgroundSize: "40px 40px",
+  },
+  safeArea: {
+    flex: 1,
+    maxWidth: 960,
+    marginHorizontal: "auto",
+    alignItems: "stretch",
+  },
   container: {
     flex: 1,
     padding: 24,
@@ -171,10 +146,29 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     fontWeight: "bold",
   },
+  buttonContainer: {
+    transitionDuration: "200ms",
+    backgroundColor: Platform.select({
+      web: "transparent",
+      default: "white",
+    }),
+
+    borderColor: "white",
+    borderWidth: 2,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
   buttonText: {
     color: "black",
   },
   code: {
+    fontSize: 18,
+    transitionDuration: "200ms",
+    fontWeight: "bold",
+    color: Platform.select({
+      web: "white",
+      default: "black",
+    }),
     fontFamily: Platform.select({
       default: "Courier",
       ios: "Courier New",
