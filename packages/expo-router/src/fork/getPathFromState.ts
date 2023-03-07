@@ -39,7 +39,7 @@ type CustomRoute = Route<string> & {
   state?: State;
 };
 
-const DEFAULT_SCREENS: Options<ParamList>["screens"] = {};
+const DEFAULT_SCREENS: PathConfigMap<object> = {};
 
 const getActiveRoute = (state: State): { name: string; params?: object } => {
   const route =
