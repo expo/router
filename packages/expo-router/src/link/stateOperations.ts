@@ -1,4 +1,4 @@
-import { InitialState } from "@react-navigation/native";
+import { InitialState, NavigationState } from "@react-navigation/native";
 
 import { ResultState } from "../fork/getStateFromPath";
 
@@ -95,7 +95,8 @@ export function getQualifiedStateForTopOfTargetState(
   return currentRoot;
 }
 
-type SubState = {
+type SubState = NavigationState & {
+  key?: string;
   type: string;
   routes?: { name: string; state?: SubState }[];
   index?: number;

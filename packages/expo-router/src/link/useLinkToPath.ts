@@ -54,7 +54,6 @@ export function useLinkToPath() {
       if (href.startsWith(".")) {
         let base = linking.getPathFromState?.(navigation.getRootState(), {
           ...linking.config,
-          // @ts-expect-error: non-standard option
           preserveGroups: true,
         });
 
@@ -123,8 +122,8 @@ export function useLinkToPath() {
           isAbsoluteInitialRoute(action)
         ) {
           const earliest = getEarliestMismatchedRoute(
-            // @ts-expect-error
             rootState,
+            // @ts-expect-error
             action.payload
           );
           if (earliest) {
