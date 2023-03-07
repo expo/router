@@ -2,8 +2,8 @@
 
 exports[`getHotReplaceTemplate should generate the correct template 1`] = `
 "
-  style.setAttribute('data-expo-css-hmr', \\"foo\\");
-  const previousStyle = document.querySelector(\`[data-expo-css-hmr=\\"\${\\"foo\\"}\\"]\`);
+  style.setAttribute('data-expo-css-hmr', "foo");
+  const previousStyle = document.querySelector(\`[data-expo-css-hmr="\${"foo"}"]\`);
   if (previousStyle) {
       previousStyle.parentNode.removeChild(previousStyle);
   }"
@@ -23,8 +23,8 @@ exports[`transform should transform css in dev mode 1`] = `
   const head = document.head || document.getElementsByTagName('head')[0];
   const style = document.createElement('style');
   
-  style.setAttribute('data-expo-css-hmr', \\"test_css\\");
-  const previousStyle = document.querySelector(\`[data-expo-css-hmr=\\"\${\\"test_css\\"}\\"]\`);
+  style.setAttribute('data-expo-css-hmr', "test_css");
+  const previousStyle = document.querySelector(\`[data-expo-css-hmr="\${"test_css"}"]\`);
   if (previousStyle) {
       previousStyle.parentNode.removeChild(previousStyle);
   }

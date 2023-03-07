@@ -14,7 +14,7 @@ describe(transform, () => {
         platform: "web",
         dev: true,
         hot: true,
-      },
+      } as any,
     });
 
     expect(result.src).toMatchSnapshot();
@@ -30,7 +30,7 @@ describe(transform, () => {
         platform: "web",
         dev: false,
         hot: false,
-      },
+      } as any,
     });
 
     expect(result.src).toMatchSnapshot();
@@ -46,7 +46,7 @@ describe(transform, () => {
         platform: "web",
         dev: false,
         hot: false,
-      },
+      } as any,
     });
 
     expect(result.src).toEqual("module.exports = {}");
@@ -60,7 +60,7 @@ describe(transform, () => {
         platform: "ios",
         dev: false,
         hot: false,
-      },
+      } as any,
     });
 
     expect(result.src).toEqual("");
@@ -73,7 +73,7 @@ describe(transform, () => {
         platform: "ios",
         dev: true,
         hot: false,
-      },
+      } as any,
     });
 
     expect(result.src).toMatchSnapshot();
