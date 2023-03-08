@@ -6,6 +6,8 @@
 
 ### 🎉 New features
 
+- Add experimental support for global CSS on web.
+
 ### 🐛 Bug fixes
 
 ### 💡 Others
