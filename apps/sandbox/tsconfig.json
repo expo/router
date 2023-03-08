@@ -1,8 +1,5 @@
 {
   "extends": "expo/tsconfig.base",
-  "compilerOptions": {
-    "typeRoots": [
-      "expo-router/ts-declarations"
-    ]
-  },
+  "compilerOptions": {},
+  "include": ["global.d.ts", "**/*.ts", "**/*.tsx"]
 }
