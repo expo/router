@@ -10,7 +10,9 @@ The preferred way to style your application is to use the `StyleSheet` API. This
 
 ## Global Styles
 
-> Global styles are web-only, usage will cause your application to diverge visually on native.
+> First available in `expo-router@1.2.2`.
+
+> Warning: Global styles are web-only, usage will cause your application to diverge visually on native.
 
 You can import a CSS file from any component. The CSS will be applied to the entire page.
 
