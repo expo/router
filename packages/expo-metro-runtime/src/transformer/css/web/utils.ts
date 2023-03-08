@@ -4,12 +4,46 @@
 */
 
 import path from "path";
+import postcss from "postcss";
 
 import modulesValues from "postcss-modules-values";
 import localByDefault from "postcss-modules-local-by-default";
 import extractImports from "postcss-modules-extract-imports";
 import modulesScope from "postcss-modules-scope";
 import { unescape, escape } from "./unescape";
+
+export type PostCssOptions = {
+  isSupportDataURL?: boolean;
+  isSupportAbsoluteURL?: boolean;
+  filter?: (
+    url: string,
+    decl?: postcss.Declaration
+  ) => boolean | Promise<boolean>;
+
+  resolver?: (
+    url: string,
+    context: string,
+    decl?: postcss.Declaration
+  ) => string | Promise<string>;
+  rootContext?: string;
+  context?: string;
+  imports?: {
+    type: string;
+    importName: string;
+    url: string;
+    index: number;
+  }[];
+  replacements?: {
+    replacementName: string;
+    importName: string;
+    hash: string;
+    needQuotes: boolean;
+  }[];
+  urlHandler?: (
+    url: string,
+    decl?: postcss.Declaration
+  ) => string | Promise<string>;
+};
 
 export const METRO_IGNORE_COMMENT_REGEXP = /metroIgnore:(\s+)?(true|false)/;
 
@@ -364,7 +398,10 @@ export async function resolveRequests(resolve, context, possibleRequests) {
     });
 }
 
-export function isURLRequestable(url: string, options: any = {}) {
+export function isURLRequestable(
+  url: string,
+  options: { isSupportDataURL?: boolean; isSupportAbsoluteURL?: boolean } = {}
+) {
   // Protocol-relative URLs
   if (/^\/\//.test(url)) {
     return { requestable: false, needResolve: false };

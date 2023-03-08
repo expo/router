@@ -5,7 +5,14 @@
 
 import path from "path";
 import postcss from "postcss";
+
 import CssSyntaxError from "./CssSyntaxError";
+import {
+  normalizeSourceMap,
+  getExportCode,
+  getImportCode,
+  getModuleCode,
+} from "./getModuleCode";
 import { icssParser, importParser, urlParser } from "./plugins";
 import {
   normalizeOptions,
@@ -18,13 +25,6 @@ import {
   sort,
   combineRequests,
 } from "./utils";
-
-import {
-  normalizeSourceMap,
-  getExportCode,
-  getImportCode,
-  getModuleCode,
-} from "./getModuleCode";
 
 export async function transformAsync(
   content: string,

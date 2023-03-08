@@ -1,7 +1,7 @@
+import { BabelTransformerArgs } from "metro-babel-transformer";
+
 import { transformAsync } from "./web";
 import { transformAsync as transformStyleAsync } from "./web/style-loader";
-
-import type { BabelTransformerArgs } from "metro-babel-transformer";
 
 export function matchCssModule(filename: string): boolean {
   return !!filename.match(/\.module(\.(native|ios|android|web))?\.css$/);
@@ -13,8 +13,6 @@ export async function transform(
   if (props.filename.endsWith(".css")) {
     // Is a CSS module
     if (props.filename.match(/\.module(\.(native|ios|android|web))?\.css$/)) {
-      // TODO: Support CSS modules
-
       if (props.options.platform === "web") {
         props.src = await transformAsync(
           props.src,

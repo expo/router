@@ -5,6 +5,7 @@ import {
   resolveRequests,
   isURLRequestable,
   METRO_IGNORE_COMMENT_REGEXP,
+  PostCssOptions,
 } from "../utils";
 import { normalizeUrl } from "../normalizeUrl";
 import { requestify } from "../requestify";
@@ -48,8 +49,13 @@ function getWebpackIgnoreCommentValue(index, nodes, inBetween) {
   return matched && matched[2] === "true";
 }
 
-function shouldHandleURL(url, declaration, result, options) {
-  if (url.length === 0) {
+function shouldHandleURL(
+  url: string,
+  declaration,
+  result,
+  options: PostCssOptions
+) {
+  if (!url) {
     result.warn(`Unable to find uri in '${declaration.toString()}'`, {
       node: declaration,
     });
@@ -60,7 +66,12 @@ function shouldHandleURL(url, declaration, result, options) {
   return isURLRequestable(url, options);
 }
 
-function parseDeclaration(declaration, key, result, options) {
+function parseDeclaration(
+  declaration: postcss.DeclarationNewProps,
+  key: string,
+  result,
+  options: PostCssOptions
+) {
   if (!needParseDeclaration.test(declaration[key])) {
     return;
   }
@@ -71,7 +82,7 @@ function parseDeclaration(declaration, key, result, options) {
       : declaration[key]
   );
 
-  let inBetween;
+  let inBetween: boolean | undefined;
 
   if (declaration.raws && declaration.raws.between) {
     const lastCommentIndex = declaration.raws.between.lastIndexOf("/*");
@@ -293,50 +304,14 @@ function parseDeclaration(declaration, key, result, options) {
   return parsedURLs;
 }
 
-const plugin = (
-  options: {
-    isSupportDataURL?: boolean;
-    isSupportAbsoluteURL?: boolean;
-    filter?: (
-      url: string,
-      // @ts-expect-error
-      decl?: postcss.Declaration
-    ) => boolean | Promise<boolean>;
-
-    resolver?: (
-      url: string,
-      context: string,
-      // @ts-expect-error
-      decl?: postcss.Declaration
-    ) => string | Promise<string>;
-    rootContext?: string;
-    context?: string;
-    imports?: {
-      type: string;
-      importName: string;
-      url: string;
-      index: number;
-    }[];
-    replacements?: {
-      replacementName: string;
-      importName: string;
-      hash: string;
-      needQuotes: boolean;
-    }[];
-    urlHandler?: (
-      url: string,
-      // @ts-expect-error
-      decl?: postcss.Declaration
-    ) => string | Promise<string>;
-  } = {}
-) => {
+const plugin = (options: PostCssOptions = {}) => {
   return {
     postcssPlugin: "postcss-url-parser",
     prepare(result) {
       const parsedDeclarations: any[] = [];
 
       return {
-        Declaration(declaration) {
+        Declaration(declaration: postcss.Declaration): void {
           const { isSupportDataURL, isSupportAbsoluteURL } = options;
           const parsedURL = parseDeclaration(declaration, "value", result, {
             isSupportDataURL,
@@ -427,7 +402,7 @@ const plugin = (
               options.imports?.push({
                 type: "get_url_import",
                 importName: "___CSS_LOADER_GET_URL_IMPORT___",
-                // @ts-expect-error
+
                 url: options.urlHandler?.(
                   require.resolve("../runtime/getUrl.js")
                 ),
@@ -472,11 +447,8 @@ const plugin = (
               });
             }
 
-            // eslint-disable-next-line no-param-reassign
             item.node.type = "word";
-            // eslint-disable-next-line no-param-reassign
             item.node.value = replacementName;
-            // eslint-disable-next-line no-param-reassign
             item.declaration.value = item.parsed.toString();
           }
         },
