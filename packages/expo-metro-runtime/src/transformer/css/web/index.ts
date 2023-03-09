@@ -178,7 +178,7 @@ export default async function loader(this: any, content, map) {
           }
         : false,
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error.file) {
       // this.addDependency(error.file);
       console.error("addDependency", error.file);
