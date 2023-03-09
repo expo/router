@@ -6,7 +6,17 @@
 
 ### 🎉 New features
 
-- Add experimental support for global CSS on web.
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## [Wed, 8 Mar 2023 13:44:31 -0600](https://github.com/expo/router/commit/847d4e0e958af928a8ed679ae7df8e352ffa00cb)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- Add experimental support for global CSS on web. ([#223](https://github.com/expo/router/issues/223))
 
 ### 🐛 Bug fixes
 

@@ -35,7 +35,9 @@ export default function App() {
 
 ## Global Styles
 
-> Global styles are web-only, use CSS Modules for native support, usage will cause your application to diverge visually on native.
+> First available in `expo-router@1.2.2`.
+
+> Warning: Global styles are web-only, usage will cause your application to diverge visually on native. Use CSS Modules for native support.
 
 You can import a CSS file from any component. The CSS will be applied to the entire page.
 

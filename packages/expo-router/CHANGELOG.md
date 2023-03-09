@@ -8,7 +8,20 @@
 
 ### 🐛 Bug fixes
 
-- Use `createElement` for static `div`.
+### 💡 Others
+
+## [Wed, 8 Mar 2023 13:44:31 -0600](https://github.com/expo/router/commit/847d4e0e958af928a8ed679ae7df8e352ffa00cb)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+- Use `createElement` for static `div`. ([#358](https://github.com/expo/router/issues/358))
+- refactor: remove ts-expect-error from link ([#356](https://github.com/expo/router/issues/356))
+- refactor: remove ts-expect-error from getPathFromState ([#354](https://github.com/expo/router/issues/354))
+- refactor: remove ts-expect-error from error-overlay ([#355](https://github.com/expo/router/issues/355))
 
 ### 💡 Others
 
