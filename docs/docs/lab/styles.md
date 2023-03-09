@@ -8,9 +8,34 @@ Expo Router adds first-class support for a number of CSS features which can be l
 
 The preferred way to style your application is to use the `StyleSheet` API. This API is available on both web and native.
 
+## CSS Modules
+
+CSS Modules are a way to scope CSS to a specific component. This is useful for avoiding naming collisions and for ensuring that styles are only applied to the intended component.
+
+In Expo, CSS Modules are defined by creating a file with the `.module.css` extension. The file can be imported from any component. The exported value is an object with the class names as keys and the React Native style objects as values.
+
+> You cannot pass styles to the `className` prop of a React component. Instead, you must use the `style` prop.
+
+```js title=App.js
+import styles from "./styles.module.css";
+
+export default function App() {
+  return <View style={styles.container}>Hello World</View>;
+}
+```
+
+```css title=styles.module.css
+.container {
+  background-color: red;
+}
+```
+
+- On web, all CSS values are available. CSS is not processed or auto-prefixed like it is with the React Native Web `StyleSheet` API.
+- On native, only a subset of CSS values are supported. See the [React Native StyleSheet API](https://reactnative.dev/docs/stylesheet) for more information.
+
 ## Global Styles
 
-> Global styles are web-only, usage will cause your application to diverge visually on native.
+> Global styles are web-only, use CSS Modules for native support, usage will cause your application to diverge visually on native.
 
 You can import a CSS file from any component. The CSS will be applied to the entire page.
 
