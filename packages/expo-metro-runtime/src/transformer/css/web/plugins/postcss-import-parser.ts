@@ -219,7 +219,7 @@ const plugin = (
                 isSupportAbsoluteURL,
                 isSupportDataURL,
               });
-            } catch (error) {
+            } catch (error: any) {
               result.warn(error.message, { node: error.node });
             }
 

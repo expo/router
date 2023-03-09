@@ -18,7 +18,7 @@ function getNodeFromUrlFunc(node) {
   return node.nodes?.[0];
 }
 
-function getWebpackIgnoreCommentValue(index, nodes, inBetween) {
+function getWebpackIgnoreCommentValue(index: number, nodes, inBetween) {
   if (index === 0 && typeof inBetween !== "undefined") {
     return inBetween;
   }

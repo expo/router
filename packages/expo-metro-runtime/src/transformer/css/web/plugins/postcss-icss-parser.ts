@@ -3,11 +3,12 @@ import { extractICSS, replaceValueSymbols, replaceSymbols } from "icss-utils";
 import { resolveRequests } from "../utils";
 import { normalizeUrl } from "../normalizeUrl";
 import { requestify } from "../requestify";
+import postcss from "postcss";
 
 const plugin = (options: any = {}) => {
   return {
     postcssPlugin: "postcss-icss-parser",
-    async OnceExit(root) {
+    async OnceExit(root: postcss.Container) {
       const importReplacements = Object.create(null);
       const { icssImports, icssExports } = extractICSS(root);
       const imports = new Map();

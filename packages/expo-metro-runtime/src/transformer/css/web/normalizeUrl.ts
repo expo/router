@@ -2,11 +2,11 @@ import { unescape } from "./unescape";
 
 const NATIVE_WIN32_PATH = /^[A-Z]:[/\\]|^\\\\/i;
 
-function fixedEncodeURIComponent(str) {
+function fixedEncodeURIComponent(str: string): string {
   return str.replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16)}`);
 }
 
-function isDataUrl(url) {
+function isDataUrl(url: string) {
   if (/^data:/i.test(url)) {
     return true;
   }
@@ -14,7 +14,7 @@ function isDataUrl(url) {
   return false;
 }
 
-export function normalizeUrl(url, isStringValue) {
+export function normalizeUrl(url: string = "", isStringValue?: boolean) {
   let normalizedUrl = url
     .replace(/^( |\t\n|\r\n|\r|\f)*/g, "")
     .replace(/( |\t\n|\r\n|\r|\f)*$/g, "");
