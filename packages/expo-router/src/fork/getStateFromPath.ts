@@ -472,8 +472,7 @@ const createNormalizedConfigs = (
 
   parentScreens.push(screen);
 
-  // @ts-expect-error
-  const config = routeConfig[screen];
+  const config = (routeConfig as any)[screen];
 
   if (typeof config === "string") {
     // If a string is specified as the value of the key(e.g. Foo: '/path'), use it as the pattern
