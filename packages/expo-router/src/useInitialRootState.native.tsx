@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import URL from "url-parse";
 
+import { extractExpoPathFromURL } from "./fork/extractPathFromURL";
 import { State } from "./fork/getPathFromState";
 import { useLinkingContext } from "./link/useLinkingContext";
 
@@ -23,10 +23,8 @@ export function useInitialRootState() {
 
   useEffect(() => {
     if (url) {
-      const parsed = URL(url);
       // TODO: Add hashes to the path
-      const urlWithoutOrigin = parsed.pathname + parsed.query;
-
+      const urlWithoutOrigin = extractExpoPathFromURL(url);
       setState(linking.getStateFromPath(urlWithoutOrigin, linking.config)!);
     }
   }, [url, linking]);
