@@ -4,11 +4,6 @@
     "target": "es2019",
     "module": "commonjs",
     "types": ["node", "jest"],
-    "typeRoots": ["./ts-declarations", "./node_modules/@types"],
-    "baseUrl": ".",
-    "paths": {
-      "*": ["ts-declarations/*", "node_modules/*"]
-    },
     "strict": true
   }
 }
