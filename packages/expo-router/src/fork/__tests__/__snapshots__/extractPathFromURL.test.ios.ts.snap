@@ -4,11 +4,11 @@ exports[`extractExpoPathFromURL parses "custom://" 1`] = `""`;
 
 exports[`extractExpoPathFromURL parses "custom:///" 1`] = `""`;
 
-exports[`extractExpoPathFromURL parses "custom:///?shouldBeEscaped=x%252By%2540xxx.com" 1`] = `"?shouldBeEscaped=x+y@xxx.com"`;
-
-exports[`extractExpoPathFromURL parses "custom:///test/path?foo=bar" 1`] = `"test/path?foo=bar"`;
-
 exports[`extractExpoPathFromURL parses "custom://?hello=bar" 1`] = `"?hello=bar"`;
+
+exports[`extractExpoPathFromURL parses "custom://?shouldBeEscaped=x%252By%2540xxx.com" 1`] = `"?shouldBeEscaped=x+y@xxx.com"`;
+
+exports[`extractExpoPathFromURL parses "custom://test/path?foo=bar" 1`] = `"test/path?foo=bar"`;
 
 exports[`extractExpoPathFromURL parses "exp://127.0.0.1:19000/" 1`] = `""`;
 
@@ -35,3 +35,5 @@ exports[`extractExpoPathFromURL parses "https://example.com:8000/test/path" 1`] 
 exports[`extractExpoPathFromURL parses "https://example.com:8000/test/path+with+plus" 1`] = `"with+plus"`;
 
 exports[`extractExpoPathFromURL parses "invalid" 1`] = `"invalid"`;
+
+exports[`extractExpoPathFromURL parses "invalid" 2`] = `"invalid"`;

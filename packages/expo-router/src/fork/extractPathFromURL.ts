@@ -13,10 +13,16 @@ export function extractExpoPathFromURL(url: string) {
   }
 
   const res = Linking.parse(url);
+  const isAppUrl = Constants.expoConfig?.scheme === res.scheme;
+
   const qs = !res.queryParams
     ? ""
     : Object.entries(res.queryParams)
         .map(([k, v]) => `${k}=${v}`)
         .join("&");
-  return (res.path || "") + (qs ? "?" + qs : "");
+  return (
+    (isAppUrl && res.hostname ? res.hostname + "/" : "") +
+    (res.path || "") +
+    (qs ? "?" + qs : "")
+  );
 }
