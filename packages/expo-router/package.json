@@ -2,9 +2,10 @@
   "name": "expo-router",
   "version": "1.2.2",
   "main": "src/index.tsx",
-  "types": "src/index.tsx",
+  "types": "build/index.d.ts",
   "files": [
     "src",
+    "build",
     "node",
     "entry.js",
     "_root.tsx",
@@ -31,7 +32,7 @@
     "lint": "expo-module lint",
     "test": "expo-module test",
     "prepare": "expo-module prepare",
-    "prepublishOnly": "expo-module prepublishOnly",
+    "prepublishOnly": "tsc --noEmit false && expo-module prepublishOnly",
     "expo-module": "expo-module"
   },
   "keywords": [

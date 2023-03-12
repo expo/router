@@ -1,9 +1,13 @@
 {
   "extends": "../../tsconfig.base",
   "compilerOptions": {
+    "outDir": "./build",
+    "rootDir": "./src",
+    "baseUrl": ".",
     "noEmit": true,
+    "emitDeclarationOnly": true,
     "skipLibCheck": true
   },
-  "include": ["./src"],
+  "include": ["src/"],
   "exclude": ["**/__mocks__/*", "**/__tests__/*"]
 }
