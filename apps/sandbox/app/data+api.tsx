@@ -6,7 +6,6 @@ export function GET(req) {
 }
 
 export function POST(req) {
-  // curl -d "param1=value1&param2=value2" -X POST http://localhost:19000/other
-  console.log(">>", req);
+  // curl -d "param1=value1&param2=value2" -X POST http://localhost:19000/data
   return Response.json({ hello: "universe" });
 }

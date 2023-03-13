@@ -15,7 +15,9 @@
     "tabs.ts",
     "head.ts",
     "metro-require.d.ts",
-    "server.ts"
+    "server.ts",
+    "match-node.ts",
+    "routes-manifest.ts"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",

@@ -262,7 +262,9 @@ function contextModuleToFileNodes(
       // In development, check if the file exports a default component
       // this helps keep things snappy when creating files. In production we load all screens lazily.
       try {
-        if (!contextModule(key)?.default) {
+        const isApi = key.match(/\+api\.[jt]sx?$/);
+
+        if (!isApi && !contextModule(key)?.default) {
           return null;
         }
       } catch (error) {
@@ -363,6 +365,21 @@ export function getRoutes(
 
   // Auto add not found route if it doesn't exist
   appendUnmatchedRoute(route);
+
+  return route;
+}
+
+export function getApiRoutes(contextModule: RequireContext): RouteNode | null {
+  const route = getExactRoutes(contextModule, { preserveApiRoutes: true });
+
+  if (!route) {
+    return null;
+  }
+
+  // appendSitemapRoute(route);
+
+  // // Auto add not found route if it doesn't exist
+  // appendUnmatchedRoute(route);
 
   return route;
 }

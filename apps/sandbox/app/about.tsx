@@ -1,20 +1,14 @@
-import { Link } from "expo-router";
-import { useEffect } from "react";
+import { Link, useSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Page() {
-  useEffect(() => {
-    fetch("/batman")
-      .then((res) => res.json())
-      .then(console.log);
-  }, []);
-
+  const params = useSearchParams();
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Hello World!!</Text>
-        <Link href="/about" style={styles.subtitle}>
-          This is the first page of your app.
+        <Text style={styles.title}>About!!</Text>
+        <Link href="/" style={styles.subtitle}>
+          This is the first page of your app.: {JSON.stringify(params)}
         </Link>
       </View>
     </View>

@@ -8,6 +8,7 @@ import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
 import { findFocusedRoute } from "./findFocusedRoute";
+import { RouteNode } from "../Route";
 import { matchGroupName, stripGroupSegmentsFromPath } from "../matchers";
 
 type Options<ParamList extends object> = {
@@ -27,7 +28,7 @@ type RouteConfig = {
   parse?: ParseConfig;
   hasChildren: boolean;
   userReadableName: string;
-  _route?: any;
+  _route?: RouteNode;
 };
 
 type InitialRouteConfig = {
@@ -80,6 +81,14 @@ export default function getStateFromPath<ParamList extends object>(
   path: string,
   options?: Options<ParamList>
 ): ResultState | undefined {
+  const { initialRoutes, configs } = getMatchableRouteConfigs(options);
+
+  return getStateFromPathWithConfigs(path, configs, initialRoutes);
+}
+
+export function getMatchableRouteConfigs<ParamList extends object>(
+  options?: Options<ParamList>
+) {
   if (options) {
     // validatePathConfig(options);
   }
@@ -124,7 +133,7 @@ export default function getStateFromPath<ParamList extends object>(
   // Assert any duplicates before we start parsing.
   assertConfigDuplicates(configs);
 
-  return getStateFromPathWithConfigs(path, configs, initialRoutes);
+  return { configs, initialRoutes };
 }
 
 function assertConfigDuplicates(configs: RouteConfig[]) {
@@ -329,11 +338,13 @@ function getStateFromPathWithConfigs(
   // This makes sure matches such as wildcard will catch any unmatched routes, even if nested
   const routes = matchAgainstConfigs(
     pathname,
-    configs.map((c) => ({
-      ...c,
-      // Add `$` to the regex to make sure it matches till end of the path and not just beginning
-      regex: c.regex ? new RegExp(c.regex.source + "$") : undefined,
-    }))
+    // NOTE !!!! This could cause weird issues
+    configs
+    // configs.map((c) => ({
+    //   ...c,
+    //   // Add `$` to the regex to make sure it matches till end of the path and not just beginning
+    //   regex: c.regex ? new RegExp(c.regex.source + "$") : undefined,
+    // }))
   );
   console.log("r", routes);
 
@@ -582,7 +593,7 @@ const createConfigItem = (
   pattern = pattern.split("/").filter(Boolean).join("/");
 
   const regex = pattern
-    ? new RegExp(`^(${pattern.split("/").map(formatRegexPattern).join("")})`)
+    ? new RegExp(`^(${pattern.split("/").map(formatRegexPattern).join("")})$`)
     : undefined;
 
   return {

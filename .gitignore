@@ -64,3 +64,6 @@ apps/*/ios/*
 apps/*/android/*
 apps/*/web-build/*
 lerna-debug.log
+
+# Local Netlify folder
+.netlify

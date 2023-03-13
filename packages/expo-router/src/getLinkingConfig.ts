@@ -1,5 +1,6 @@
 import { getActionFromState, LinkingOptions } from "@react-navigation/native";
 
+import { RouteNode } from "./Route";
 import { getReactNavigationConfig, Screen } from "./getReactNavigationConfig";
 import {
   addEventListener,
@@ -7,7 +8,6 @@ import {
   getPathFromState,
   getStateFromPath,
 } from "./link/linking";
-import { RouteNode } from "./Route";
 
 export function getNavigationConfig(routes: RouteNode): {
   initialRouteName?: string;
