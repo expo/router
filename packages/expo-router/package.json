@@ -14,7 +14,8 @@
     "stack.ts",
     "tabs.ts",
     "head.ts",
-    "metro-require.d.ts"
+    "metro-require.d.ts",
+    "server.ts"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",

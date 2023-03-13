@@ -1,4 +1,4 @@
-import { DynamicConvention, RouteNode } from "./Route";
+import type { DynamicConvention, RouteNode } from "./Route";
 import {
   getNameFromFilePath,
   matchDeepDynamicRouteName,
@@ -7,7 +7,7 @@ import {
   removeSupportedExtensions,
   stripGroupSegmentsFromPath,
 } from "./matchers";
-import { RequireContext } from "./types";
+import type { RequireContext } from "./types";
 
 export type FileNode = Pick<RouteNode, "contextKey" | "loadRoute"> & {
   /** Like `(tab)/index` */
