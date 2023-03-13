@@ -246,29 +246,39 @@ function treeNodeToRouteNode({
 }
 
 function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
-  const nodes = contextModule.keys().map((key) => {
+  const fileNames = new Map<string, FileNode>();
+
+  /**
+   * Sorting the keys is important, as it enforces our filename priority order.
+   * For example, if we have a files named index.tsx, index.js & index.ts the sorted order
+   * will be [index.js, index.ts, index.tsx] and the last one will be picked.
+   *
+   * Same for platform extensions: index.native.tsx vs index.ts
+   * The plaform extension will always comes after the non-platform filename
+   */
+  for (const key of contextModule.keys().sort()) {
     // In development, check if the file exports a default component
     // this helps keep things snappy when creating files. In production we load all screens lazily.
     try {
       if (!contextModule(key)?.default) {
-        return null;
+        continue;
       }
     } catch (error) {
       // Probably this won't stop metro from freaking out but it's worth a try.
       console.warn('Error loading route "' + key + '"', error);
-      return null;
+      continue;
     }
 
-    const node: FileNode = {
+    const normalizedName = getNameFromFilePath(key);
+
+    fileNames.set(normalizedName, {
       loadRoute: () => contextModule(key),
-      normalizedName: getNameFromFilePath(key),
+      normalizedName,
       contextKey: key,
-    };
+    });
+  }
 
-    return node;
-  });
-
-  return nodes.filter(Boolean) as FileNode[];
+  return [...fileNames.values()];
 }
 
 function hasCustomRootLayoutNode(routes: RouteNode[]) {
