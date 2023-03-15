@@ -4,11 +4,7 @@ import {
   TextChange,
   UserPreferences,
 } from "typescript";
-import {
-  getImportTextChange,
-  getReplaceLineSpan,
-  mergeChanges,
-} from "../code-fixes";
+import { getImportTextChange, getReplaceLineSpan } from "../code-fixes";
 import { EXPO_TS_CODES } from "../errors";
 import { RuleContext } from "../rules/context";
 import { SuggestionContext } from "./suggestion";
@@ -42,7 +38,7 @@ export function typedSettingSuggestion(
 }
 
 export function typedSettingCodeAction(
-  { prior, source, ts, Log }: SuggestionContext,
+  { prior, source, ts }: SuggestionContext,
   fileName: string,
   start: number,
   _end: number,
@@ -60,13 +56,6 @@ export function typedSettingCodeAction(
     module: "expo-router",
     identifier: "RouterSettings",
   });
-
-  ts.getLineAndCharacterOfPosition;
-
-  Log.info(
-    "typedSettingCodeAction",
-    (ts as any).getTokenAtPosition(source, start).getStart()
-  );
 
   const textChanges = [
     importChange,
