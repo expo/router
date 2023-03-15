@@ -1,5 +1,10 @@
 import { StyleSheet, Text, View } from "react-native";
 
+export const unstable_settings = {
+  // Ensure any route can link back to `/`
+  initialRouteName: "index",
+};
+
 export default function Page() {
   return (
     <View style={styles.container}>

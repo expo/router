@@ -1,0 +1,39 @@
+{
+  "name": "@expo/typescript-plugin",
+  "version": "0.0.0",
+  "main": "build/index.js",
+  "files": [
+    "build"
+  ],
+  "repository": {
+    "url": "https://github.com/expo/router.git",
+    "type": "git",
+    "directory": "packages/expo-router"
+  },
+  "bugs": {
+    "url": "https://github.com/expo/router/issues"
+  },
+  "homepage": "https://expo.github.io/router/docs/",
+  "scripts": {
+    "build": "expo-module typecheck",
+    "clean": "expo-module clean",
+    "lint": "expo-module lint",
+    "test": "expo-module test",
+    "prepare": "expo-module prepare",
+    "prepublishOnly": "expo-module prepublishOnly",
+    "expo-module": "expo-module"
+  },
+  "keywords": [
+    "react-native",
+    "expo"
+  ],
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "peerDependencies": {
+    "expo-module-scripts": "^3.0.7"
+  },
+  "peerDependencies": {
+    "typescript": "^4.5.2"
+  }
+}
