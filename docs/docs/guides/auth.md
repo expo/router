@@ -16,7 +16,7 @@ app/
 
 First, we'll setup a [React Context provider](https://reactjs.org/docs/context.html) that we can use to protect routes. This provider will use a mock implementation, you can replace it with your own [authentication provider](https://docs.expo.dev/guides/authentication/).
 
-```js title=auth/provider.js
+```js title=context/auth.js
 import { useRouter, useSegments } from "expo-router";
 import React from "react";
 
