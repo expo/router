@@ -14,7 +14,7 @@
   status = 404
 
 [functions]
-  included_files = ["dist/**"]
+  included_files = ["dist/**/*"]
 
 [[headers]]
   for = "/dist/functions/*"

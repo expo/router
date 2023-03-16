@@ -38,7 +38,7 @@ export function createRoutesManifest(files: string[]): RoutesManifest | null {
       type: isApi ? "dynamic" : "static",
       file: config._route!.contextKey,
       regex: config.regex?.source ?? /^\/$/.source,
-      src: isApi ? "./.expo/functions/" + src : "./" + src,
+      src: isApi ? "./_expo/functions/" + src : "./" + src,
     };
   });
 
