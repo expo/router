@@ -13,7 +13,7 @@ export function extractExpoPathFromURL(url: string) {
   }
 
   const res = Linking.parse(url);
-  const isAppUrl = Constants.expoConfig?.scheme === res.scheme;
+  const isAppDeepLink = res.scheme && !["https", "https"].includes(res.scheme);
 
   const qs = !res.queryParams
     ? ""
@@ -21,7 +21,7 @@ export function extractExpoPathFromURL(url: string) {
         .map(([k, v]) => `${k}=${v}`)
         .join("&");
   return (
-    (isAppUrl && res.hostname ? res.hostname + "/" : "") +
+    (isAppDeepLink && res.hostname ? res.hostname + "/" : "") +
     (res.path || "") +
     (qs ? "?" + qs : "")
   );
