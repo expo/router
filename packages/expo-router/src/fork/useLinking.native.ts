@@ -12,7 +12,7 @@ import type { LinkingOptions } from "@react-navigation/native";
 import * as React from "react";
 import { Linking, Platform } from "react-native";
 
-import { extractExpoPathFromURL } from "./extractPathFromURL";
+import { extractPathFromURL } from "./extractPathFromURL";
 
 type ResultState = ReturnType<typeof getStateFromPathDefault>;
 
@@ -129,7 +129,7 @@ export default function useLinking(
       }
 
       // NOTE(EvanBacon): This is the important part.
-      const path = extractExpoPathFromURL(url);
+      const path = extractPathFromURL(url);
 
       return path !== undefined
         ? getStateFromPathRef.current(path, configRef.current)

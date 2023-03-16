@@ -1,10 +1,10 @@
 import Constants, { ExecutionEnvironment } from "expo-constants";
 
-import { extractExpoPathFromURL } from "../extractPathFromURL";
+import { extractPathFromURL } from "../extractPathFromURL";
 
 jest.mock("expo-constants");
 
-describe(extractExpoPathFromURL, () => {
+describe(extractPathFromURL, () => {
   const originalExecutionEnv = Constants.executionEnvironment;
   const originalExpoConfig = Constants.expoConfig;
 
@@ -30,7 +30,7 @@ describe(extractExpoPathFromURL, () => {
   ])(`parses %p`, (url) => {
     Constants.executionEnvironment = ExecutionEnvironment.StoreClient;
 
-    const res = extractExpoPathFromURL(url);
+    const res = extractPathFromURL(url);
     expect(res).toMatchSnapshot();
     // Ensure the Expo Go handling never breaks
     expect(res).not.toMatch(/^--\//);
@@ -49,7 +49,7 @@ describe(extractExpoPathFromURL, () => {
       scheme: "custom",
     }
 
-    const res = extractExpoPathFromURL(url);
+    const res = extractPathFromURL(url);
     expect(res).toMatchSnapshot();
     // Ensure the Expo Go handling never breaks
     expect(res).not.toMatch(/^--\//);
@@ -58,7 +58,7 @@ describe(extractExpoPathFromURL, () => {
   it(`only handles Expo Go URLs in Expo Go`, () => {
     Constants.executionEnvironment = ExecutionEnvironment.Bare;
 
-    const res = extractExpoPathFromURL("exp://127.0.0.1:19000/--/test");
+    const res = extractPathFromURL("exp://127.0.0.1:19000/--/test");
     expect(res).toEqual("--/test");
   });
 });

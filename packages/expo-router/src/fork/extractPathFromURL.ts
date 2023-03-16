@@ -2,7 +2,7 @@ import Constants, { ExecutionEnvironment } from "expo-constants";
 import * as Linking from "expo-linking";
 
 // This is only run on native.
-export function extractExpoPathFromURL(url: string) {
+export function extractPathFromURL(url: string) {
   // Handle special URLs used in Expo Go: `/--/pathname` -> `pathname`
   if (Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {
     const pathname = url.match(/exps?:\/\/.*?\/--\/(.*)/)?.[1];
