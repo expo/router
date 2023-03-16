@@ -27,12 +27,12 @@
   },
   "homepage": "https://expo.github.io/router/docs/",
   "scripts": {
-    "build": "expo-module typecheck",
+    "build": "expo-module typecheck --noEmit false",
     "clean": "expo-module clean",
     "lint": "expo-module lint",
     "test": "expo-module test",
     "prepare": "expo-module prepare",
-    "prepublishOnly": "tsc --noEmit false && expo-module prepublishOnly",
+    "prepublishOnly": "expo-module prepublishOnly && expo-module typecheck --noEmit false",
     "expo-module": "expo-module"
   },
   "keywords": [
