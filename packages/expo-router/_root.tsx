@@ -2,9 +2,9 @@
 
 import "@expo/metro-runtime";
 
-import { ExpoRoot } from "expo-router";
 import React from "react";
 
+import { ExpoRoot } from "./src";
 import { getNavigationConfig } from "./src/getLinkingConfig";
 import { getRoutes } from "./src/getRoutes";
 
