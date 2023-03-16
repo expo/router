@@ -13,7 +13,12 @@ export function extractPathFromURL(url: string) {
   }
 
   const res = Linking.parse(url);
-  const isAppDeepLink = res.scheme && !["https", "https"].includes(res.scheme);
+  const isAppDeepLink =
+    /**
+     * needs to explicitely exclude expo urls as well, as the above regex
+     * only deals with the ones that contain "--"
+     */
+    res.scheme && !["https", "https", "exp", "exps"].includes(res.scheme);
 
   const qs = !res.queryParams
     ? ""

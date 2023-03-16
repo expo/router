@@ -35,5 +35,3 @@ exports[`extractPathFromURL parses "https://example.com:8000/test/path" 1`] = `"
 exports[`extractPathFromURL parses "https://example.com:8000/test/path+with+plus" 1`] = `"with+plus"`;
 
 exports[`extractPathFromURL parses "invalid" 1`] = `"invalid"`;
-
-exports[`extractPathFromURL parses "invalid" 2`] = `"invalid"`;
