@@ -1,8 +1,16 @@
 import type { Request } from "expo-router/server";
 
+const path = require("path");
+import fs from "node:fs/promises";
+
 /** @type {import('expo-router/server').RequestHandler} */
 export function GET(req) {
-  return Response.json({ hello: "universe" });
+  console.log("fs", fs);
+  return Response.json({
+    hello: "universe!",
+
+    ex: path.join("foo", "bar"),
+  });
 }
 
 export function POST(req) {
