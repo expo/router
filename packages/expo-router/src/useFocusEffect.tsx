@@ -15,11 +15,11 @@ type EffectCallback = () => undefined | void | (() => void);
  */
 export function useFocusEffect(
   effect: EffectCallback,
-  do_not_pass_a_second_prop?: any
+  do_not_pass_a_second_prop?: never
 ) {
   const navigation = useOptionalNavigation();
 
-  if (do_not_pass_a_second_prop !== undefined) {
+  if (do_not_pass_a_second_prop) {
     const message =
       "You passed a second argument to 'useFocusEffect', but it only accepts one argument. " +
       "If you want to pass a dependency array, you can use 'React.useCallback':\n\n" +
