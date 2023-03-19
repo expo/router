@@ -230,11 +230,14 @@ function treeNodeToRouteNode(
             dynamic,
           }),
           ...staticParams.map((params) => {
+            const newRoute = dynamic
+              .map((query) => params[query.name])
+              .join("/");
             // const nextNode = cloneGroupRoute(node!, clone);
             return applyDefaultInitialRouteName({
               loadRoute: node.loadRoute,
               // Convert the dynamic route to a static route.
-              route: dynamic.map((query) => params[query.name]).join("/"),
+              route: newRoute,
               contextKey: node.contextKey,
               children: getTreeNodesAsRouteNodes(children, {
                 ...props,
@@ -441,18 +444,7 @@ export function getRoutes(
 }
 
 export function getApiRoutes(contextModule: RequireContext): RouteNode | null {
-  const route = getExactRoutes(contextModule, { preserveApiRoutes: true });
-
-  if (!route) {
-    return null;
-  }
-
-  // appendSitemapRoute(route);
-
-  // // Auto add not found route if it doesn't exist
-  // appendUnmatchedRoute(route);
-
-  return route;
+  return getExactRoutes(contextModule, { preserveApiRoutes: true });
 }
 
 /** Get routes without unmatched or sitemap. */

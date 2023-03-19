@@ -7,6 +7,7 @@ import {
   assertDuplicateRoutes,
 } from "../getRoutes";
 import { RequireContext } from "../types";
+import { getNavigationConfig } from "../getLinkingConfig";
 
 function createMockContextModule(
   map: Record<string, Record<string, any>> = {}
@@ -341,23 +342,21 @@ describe(getRoutes, () => {
             "./[color]/[shape].tsx": {
               default() {},
               generateStaticParams({ params }) {
-                return [
-                  { ...params, shape: "square" },
-                  { ...params, shape: "triangle" },
-                ];
+                return ["square", "triangle"].map((shape) => ({
+                  ...params,
+                  shape,
+                }));
               },
             },
             "./[color]/_layout.tsx": {
               default() {},
-              generateStaticParams({ params }) {
-                return [
-                  { ...params, color: "red" },
-                  { ...params, color: "blue" },
-                ];
+              generateStaticParams() {
+                return ["red", "blue"].map((color) => ({ color }));
               },
             },
           }),
           {
+            preserveApiRoutes: false,
             loadData: true,
           }
         )!

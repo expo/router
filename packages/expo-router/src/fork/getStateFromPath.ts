@@ -346,7 +346,6 @@ function getStateFromPathWithConfigs(
     //   regex: c.regex ? new RegExp(c.regex.source + "$") : undefined,
     // }))
   );
-  console.log("r", routes);
 
   if (routes == null) {
     return undefined;
