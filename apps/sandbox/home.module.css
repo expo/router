@@ -1,0 +1,25 @@
+:root {
+    --accent-color: hotpink;
+}
+
+.container {
+    background-color: var(--accent-color);
+    animation: pulse 2s infinite;
+}
+
+.betterContainer {
+    composes: container;
+    border-radius: 50px;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

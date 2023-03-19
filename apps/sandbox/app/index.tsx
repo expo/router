@@ -1,8 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import css from "../home.module.css";
+
 export default function Page() {
+  console.log("css", css);
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, css.betterContainer]}>
       <View style={styles.main}>
         <Text style={styles.title}>Hello World</Text>
         <Text style={styles.subtitle}>This is the first page of your app.</Text>
