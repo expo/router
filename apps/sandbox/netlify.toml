@@ -14,9 +14,9 @@
   status = 404
 
 [functions]
-  included_files = ["dist/**/*"]
+  included_files = ["dist/_expo/**/*"]
 
 [[headers]]
-  for = "/dist/functions/*"
+  for = "/dist/_expo/functions/*"
   [headers.values]
     "Cache-Control" = "public, max-age=31536000, s-maxage=31536000"
