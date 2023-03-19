@@ -19,7 +19,7 @@ export function useFocusEffect(
 ) {
   const navigation = useOptionalNavigation();
 
-  if (do_not_pass_a_second_prop) {
+  if (do_not_pass_a_second_prop !== undefined) {
     const message =
       "You passed a second argument to 'useFocusEffect', but it only accepts one argument. " +
       "If you want to pass a dependency array, you can use 'React.useCallback':\n\n" +
