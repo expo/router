@@ -36,6 +36,7 @@ function getExpoRouterAppRoot(projectRoot) {
 
   return appRoot;
 }
+// TODO: Strip the function `generateStaticParams` when bundling for node.js environments.
 
 module.exports = function (api) {
   const { types: t } = api;

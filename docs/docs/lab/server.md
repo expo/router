@@ -15,6 +15,8 @@ EXPO_USE_ROUTE_HANDLERS=1 npx expo
 
 ## Route Handlers
 
+> While in beta, server code may leak into the client bundle. This won't happen in the stable release.
+
 Route handlers are functions that are executed when a route is matched. They can be used to securely handle sensitive data, such as API keys, or to implement custom server logic.
 
 Route Handlers are defined by creating files in the `app` directory with the `+api.js` extension. For example, the following route handler will be executed when the route `/api/hello` is matched.
