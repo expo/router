@@ -6,7 +6,7 @@ export function generateStaticParams({
 }: {
   params: {
     // Parent params
-    alpha: string;
+    shape: string;
   };
 }) {
   return ["red"].map((color) => ({
