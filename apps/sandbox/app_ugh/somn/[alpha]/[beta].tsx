@@ -1,14 +1,28 @@
 import { Link, useSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
+export function generateStaticParams({
+  params,
+}: {
+  params: {
+    // Parent params
+    alpha: string;
+  };
+}) {
+  return ["foo", "bar", "baz"].map((beta) => ({
+    beta,
+    alpha: params.alpha + "-modified",
+  }));
+}
+
 export default function Page() {
   const params = useSearchParams();
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Dynamic Page!!</Text>
+        <Text style={styles.title}>Statics vvv</Text>
         <Link href="/" style={styles.subtitle}>
-          This is the first page of your app.: {JSON.stringify(params)}
+          Static page: {JSON.stringify(params)}
         </Link>
       </View>
     </View>

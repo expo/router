@@ -47,7 +47,7 @@ function parseRouteSegments(segments: string): string {
   );
 }
 
-function convertRouteNodeToScreen(node: RouteNode, metaOnly?: boolean): Screen {
+function convertRouteNodeToScreen(node: RouteNode, metaOnly: boolean): Screen {
   const path = parseRouteSegments(node.route);
   if (!node.children.length) {
     const screen: Screen = {
@@ -60,7 +60,7 @@ function convertRouteNodeToScreen(node: RouteNode, metaOnly?: boolean): Screen {
     }
     return screen;
   }
-  const screens = getReactNavigationScreensConfig(node.children);
+  const screens = getReactNavigationScreensConfig(node.children, metaOnly);
 
   const screen: Screen = {
     path,
@@ -81,7 +81,7 @@ function convertRouteNodeToScreen(node: RouteNode, metaOnly?: boolean): Screen {
 
 export function getReactNavigationScreensConfig(
   nodes: RouteNode[],
-  metaOnly?: boolean
+  metaOnly: boolean
 ): Record<string, Screen> {
   return Object.fromEntries(
     nodes.map(
@@ -92,7 +92,7 @@ export function getReactNavigationScreensConfig(
 
 export function getReactNavigationConfig(
   routes: RouteNode,
-  metaOnly?: boolean
+  metaOnly: boolean
 ): {
   initialRouteName?: string;
   screens: Record<string, Screen>;

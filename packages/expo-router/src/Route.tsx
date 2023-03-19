@@ -6,7 +6,11 @@ export type DynamicConvention = { name: string; deep: boolean };
 
 export type RouteNode = {
   /** Load a route into memory. Returns the exports from a route. */
-  loadRoute: () => any;
+  loadRoute: () => {
+    default?: any;
+    unstable_settings?: any;
+    generateStaticParams?: (props: { params?: any }) => any[];
+  };
   /** Loaded initial route name. */
   initialRouteName?: string;
   /** nested routes */

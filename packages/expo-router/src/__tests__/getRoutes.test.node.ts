@@ -332,6 +332,142 @@ describe(getRoutes, () => {
     );
   });
 
+  it(`generateStaticParams with dynamic routes`, () => {
+    expect(
+      dropFunctions(
+        getRoutes(
+          createMockContextModule({
+            "./_layout.tsx": { default() {} },
+            "./[color]/[shape].tsx": {
+              default() {},
+              generateStaticParams({ params }) {
+                return [
+                  { ...params, shape: "square" },
+                  { ...params, shape: "triangle" },
+                ];
+              },
+            },
+            "./[color]/_layout.tsx": {
+              default() {},
+              generateStaticParams({ params }) {
+                return [
+                  { ...params, color: "red" },
+                  { ...params, color: "blue" },
+                ];
+              },
+            },
+          }),
+          {
+            loadData: true,
+          }
+        )!
+      )
+    ).toEqual(
+      expect.objectContaining({
+        children: [
+          {
+            children: [
+              {
+                children: [],
+                contextKey: "./[color]/[shape].tsx",
+                dynamic: [{ deep: false, name: "shape" }],
+                route: "[shape]",
+              },
+              {
+                children: [],
+                contextKey: "./[color]/[shape].tsx",
+                dynamic: null,
+                route: "square",
+              },
+              {
+                children: [],
+                contextKey: "./[color]/[shape].tsx",
+                dynamic: null,
+                route: "triangle",
+              },
+            ],
+            contextKey: "./[color]/_layout.tsx",
+            dynamic: [{ deep: false, name: "color" }],
+            initialRouteName: undefined,
+            route: "[color]",
+          },
+          {
+            children: [
+              {
+                children: [],
+                contextKey: "./[color]/[shape].tsx",
+                dynamic: [{ deep: false, name: "shape" }],
+                route: "[shape]",
+              },
+              {
+                children: [],
+                contextKey: "./[color]/[shape].tsx",
+                dynamic: null,
+                route: "square",
+              },
+              {
+                children: [],
+                contextKey: "./[color]/[shape].tsx",
+                dynamic: null,
+                route: "triangle",
+              },
+            ],
+            contextKey: "./[color]/_layout.tsx",
+            dynamic: null,
+            initialRouteName: undefined,
+            route: "red",
+          },
+          {
+            children: [
+              {
+                children: [],
+                contextKey: "./[color]/[shape].tsx",
+                dynamic: [{ deep: false, name: "shape" }],
+                route: "[shape]",
+              },
+              {
+                children: [],
+                contextKey: "./[color]/[shape].tsx",
+                dynamic: null,
+                route: "square",
+              },
+              {
+                children: [],
+                contextKey: "./[color]/[shape].tsx",
+                dynamic: null,
+                route: "triangle",
+              },
+            ],
+            contextKey: "./[color]/_layout.tsx",
+            dynamic: null,
+            initialRouteName: undefined,
+            route: "blue",
+          },
+          {
+            children: [],
+            contextKey: "./_sitemap.tsx",
+            dynamic: null,
+            generated: true,
+            internal: true,
+            route: "_sitemap",
+          },
+          {
+            children: [],
+            contextKey: "./[...404].tsx",
+            dynamic: [{ deep: true, name: "404" }],
+            generated: true,
+            internal: true,
+            route: "[...404]",
+          },
+        ],
+        contextKey: "./_layout.tsx",
+        dynamic: null,
+        initialRouteName: undefined,
+        route: "",
+      })
+    );
+  });
+
   function dropFunctions({ loadRoute, ...node }: RouteNode) {
     return {
       ...node,
