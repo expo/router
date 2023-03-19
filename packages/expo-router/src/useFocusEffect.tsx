@@ -15,7 +15,7 @@ type EffectCallback = () => undefined | void | (() => void);
  */
 export function useFocusEffect(
   effect: EffectCallback,
-  do_not_pass_a_second_prop?: any
+  do_not_pass_a_second_prop?: never
 ) {
   const navigation = useOptionalNavigation();
 
