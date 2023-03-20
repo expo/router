@@ -19,7 +19,7 @@ const style = document.createElement('style');
 ${dev ? getHotReplaceTemplate(props.filename) : ``}
 style.setAttribute('data-expo-loader', 'css');
 head.appendChild(style);
-const css = \`${props.src}\`;
+const css = \`${props.src.replace(/`/g, "\\`")}\`;
 if (style.styleSheet){
   style.styleSheet.cssText = css;
 } else {
