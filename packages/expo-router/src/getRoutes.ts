@@ -197,7 +197,7 @@ function treeNodeToRouteNode(
 
         if (!Array.isArray(staticParams)) {
           throw new Error(
-            `generateStaticParams must return an array of params, received ${staticParams}`
+            `generateStaticParams() must return an array of params, received ${staticParams}`
           );
         }
         // Assert that at least one param from each matches the dynamic route.
@@ -208,7 +208,7 @@ function treeNodeToRouteNode(
           });
           if (!matches) {
             throw new Error(
-              `generateStaticParams must return an array of params that match the dynamic route. Received ${JSON.stringify(
+              `generateStaticParams() must return an array of params that match the dynamic route. Received ${JSON.stringify(
                 params
               )}`
             );
@@ -230,14 +230,27 @@ function treeNodeToRouteNode(
             dynamic,
           }),
           ...staticParams.map((params) => {
-            const newRoute = dynamic
-              .map((query) => params[query.name])
-              .join("/");
+            let parsedRoute = name;
+
+            dynamic.map((query) => {
+              if (query.deep) {
+                parsedRoute = parsedRoute.replace(
+                  `[...${query.name}]`,
+                  params[query.name]
+                );
+              } else {
+                parsedRoute = parsedRoute.replace(
+                  `[${query.name}]`,
+                  params[query.name]
+                );
+              }
+            });
+
             // const nextNode = cloneGroupRoute(node!, clone);
             return applyDefaultInitialRouteName({
               loadRoute: node.loadRoute,
               // Convert the dynamic route to a static route.
-              route: newRoute,
+              route: parsedRoute,
               contextKey: node.contextKey,
               children: getTreeNodesAsRouteNodes(children, {
                 ...props,

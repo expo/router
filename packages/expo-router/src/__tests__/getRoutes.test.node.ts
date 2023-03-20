@@ -5,6 +5,7 @@ import {
   getRecursiveTree,
   FileNode,
   assertDuplicateRoutes,
+  getExactRoutes,
 } from "../getRoutes";
 import { RequireContext } from "../types";
 import { getNavigationConfig } from "../getLinkingConfig";
@@ -465,6 +466,46 @@ describe(getRoutes, () => {
         route: "",
       })
     );
+  });
+
+  it(`generateStaticParams with nested dynamic segments`, () => {
+    expect(
+      dropFunctions(
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return [{ post: "123" }];
+              },
+            },
+          }),
+          {
+            preserveApiRoutes: false,
+            loadData: true,
+          }
+        )!
+      )
+    ).toEqual({
+      children: [
+        {
+          children: [],
+          contextKey: "./post/[post].tsx",
+          dynamic: [{ deep: false, name: "post" }],
+          route: "post/[post]",
+        },
+        {
+          children: [],
+          contextKey: "./post/[post].tsx",
+          dynamic: null,
+          route: "post/123",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      route: "",
+    });
   });
 
   function dropFunctions({ loadRoute, ...node }: RouteNode) {
