@@ -1,4 +1,5 @@
 import {
+  transformCssModuleNative,
   convertLightningCssToReactNativeWebStyleSheet,
   transformCssModuleWeb,
 } from "../css-modules";
@@ -76,5 +77,19 @@ describe(transformCssModuleWeb, () => {
     } as any);
     expect(src).toMatch(/import { StyleSheet } from 'react-native';/);
     expect(src).toMatch(/export default StyleSheet\.create/);
+  });
+});
+
+describe(transformCssModuleNative, () => {
+  it(`transforms A`, async () => {
+    const { src } = await transformCssModuleNative({
+      filename: "acme.css",
+      src: fixtureA,
+      options: {
+        projectRoot: "/",
+        minify: false,
+      },
+    } as any);
+    expect(src).toMatchSnapshot();
   });
 });

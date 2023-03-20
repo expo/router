@@ -61,13 +61,12 @@ export function convertLightningCssToReactNativeWebStyleSheet(
 export async function transformCssModuleNative(
   props: BabelTransformerArgs
 ): Promise<BabelTransformerArgs> {
-  const transform = require("css-to-react-native-transform")
-    .default as typeof import("css-to-react-native-transform").default;
+  const transform = await import("css-to-react-native-transform");
   // TODO: Native
   props.src =
-    "module.exports = " +
+    "export default " +
     JSON.stringify(
-      transform(props.src, {
+      transform.default(props.src, {
         parseMediaQueries: true,
       })
     );
