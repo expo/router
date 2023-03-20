@@ -479,6 +479,12 @@ describe(getRoutes, () => {
                 return [{ post: "123" }];
               },
             },
+            "./a/[b]/c/[d]/[e].tsx": {
+              default() {},
+              generateStaticParams() {
+                return [{ b: "b", d: "d", e: "e" }];
+              },
+            },
           }),
           {
             preserveApiRoutes: false,
@@ -499,6 +505,133 @@ describe(getRoutes, () => {
           contextKey: "./post/[post].tsx",
           dynamic: null,
           route: "post/123",
+        },
+        {
+          children: [],
+          contextKey: "./a/[b]/c/[d]/[e].tsx",
+          dynamic: [
+            {
+              deep: false,
+              name: "b",
+            },
+            {
+              deep: false,
+              name: "d",
+            },
+            {
+              deep: false,
+              name: "e",
+            },
+          ],
+          route: "a/[b]/c/[d]/[e]",
+        },
+        {
+          children: [],
+          contextKey: "./a/[b]/c/[d]/[e].tsx",
+          dynamic: null,
+          route: "a/b/c/d/e",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      route: "",
+    });
+  });
+  it(`generateStaticParams throws when deep dynamic segments return invalid type`, () => {
+    expect(
+      () =>
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[...post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return [{ post: "123" }];
+              },
+            },
+          }),
+          {
+            preserveApiRoutes: false,
+            loadData: true,
+          }
+        )!
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" to be of type Array."`
+    );
+  });
+  it(`generateStaticParams throws when dynamic segments return invalid type`, () => {
+    expect(
+      () =>
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return [{ post: ["123"] }];
+              },
+            },
+          }),
+          {
+            preserveApiRoutes: false,
+            loadData: true,
+          }
+        )!
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" to not be of type Array."`
+    );
+  });
+  it(`generateStaticParams throws when required parameter is missing`, () => {
+    expect(
+      () =>
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return [{}];
+              },
+            },
+          }),
+          {
+            preserveApiRoutes: false,
+            loadData: true,
+          }
+        )!
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() must return an array of params that match the dynamic route. Received {}"`
+    );
+  });
+  it(`generateStaticParams with nested deep dynamic segments`, () => {
+    expect(
+      dropFunctions(
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[...post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return [{ post: ["123", "456"] }];
+              },
+            },
+          }),
+          {
+            preserveApiRoutes: false,
+            loadData: true,
+          }
+        )!
+      )
+    ).toEqual({
+      children: [
+        {
+          children: [],
+          contextKey: "./post/[...post].tsx",
+          dynamic: [{ deep: true, name: "post" }],
+          route: "post/[...post]",
+        },
+        {
+          children: [],
+          contextKey: "./post/[...post].tsx",
+          dynamic: null,
+          route: "post/123/456",
         },
       ],
       contextKey: "./_layout.tsx",

@@ -213,6 +213,24 @@ function treeNodeToRouteNode(
               )}`
             );
           }
+
+          dynamic.forEach((dynamic) => {
+            const value = params[dynamic.name];
+            if (dynamic.deep) {
+              if (!Array.isArray(value)) {
+                throw new Error(
+                  `generateStaticParams() for route "${node.contextKey}" expected param "${dynamic.name}" to be of type Array.`
+                );
+              }
+            } else {
+              if (Array.isArray(value)) {
+                throw new Error(
+                  `generateStaticParams() for route "${node.contextKey}" expected param "${dynamic.name}" to not be of type Array.`
+                );
+              }
+            }
+            return value !== undefined && value !== null;
+          });
         });
 
         return [
@@ -233,16 +251,17 @@ function treeNodeToRouteNode(
             let parsedRoute = name;
 
             dynamic.map((query) => {
+              const param = params[query.name];
+              const formattedParameter = Array.isArray(param)
+                ? param.join("/")
+                : param;
               if (query.deep) {
                 parsedRoute = parsedRoute.replace(
                   `[...${query.name}]`,
-                  params[query.name]
+                  formattedParameter
                 );
               } else {
-                parsedRoute = parsedRoute.replace(
-                  `[${query.name}]`,
-                  params[query.name]
-                );
+                parsedRoute = parsedRoute.replace(`[${query.name}]`, param);
               }
             });
 
