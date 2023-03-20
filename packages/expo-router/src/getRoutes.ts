@@ -181,155 +181,15 @@ function cloneGroupRoute(
   };
 }
 
-function treeNodeToRouteNode(
-  { name, node, children }: TreeNode,
-  props: { loadData?: boolean; parentParams?: Record<string, any> }
+type TreeNodeResolutionOptions = {
+  loadData?: boolean;
+  parentParams?: Record<string, any>;
+};
+
+function folderNodeToRouteNode(
+  { name, children }: TreeNode,
+  props: TreeNodeResolutionOptions
 ): RouteNode[] | null {
-  const dynamic = generateDynamic(name);
-
-  if (node) {
-    if (dynamic && props?.loadData) {
-      const loaded = node?.loadRoute();
-      if (loaded?.generateStaticParams) {
-        const staticParams = loaded.generateStaticParams({
-          params: props.parentParams || {},
-        });
-
-        if (!Array.isArray(staticParams)) {
-          throw new Error(
-            `generateStaticParams() must return an array of params, received ${staticParams}`
-          );
-        }
-        // Assert that at least one param from each matches the dynamic route.
-        staticParams.forEach((params) => {
-          const matches = dynamic.every((dynamic) => {
-            const value = params[dynamic.name];
-            return value !== undefined && value !== null;
-          });
-          if (!matches) {
-            throw new Error(
-              `generateStaticParams() must return an array of params that match the dynamic route. Received ${JSON.stringify(
-                params
-              )}`
-            );
-          }
-
-          dynamic.forEach((dynamic) => {
-            const value = params[dynamic.name];
-            if (dynamic.deep) {
-              if (!Array.isArray(value)) {
-                throw new Error(
-                  `generateStaticParams() for route "${node.contextKey}" expected param "${dynamic.name}" to be of type Array.`
-                );
-              }
-            } else {
-              if (Array.isArray(value)) {
-                throw new Error(
-                  `generateStaticParams() for route "${node.contextKey}" expected param "${dynamic.name}" to not be of type Array.`
-                );
-              }
-            }
-            return value !== undefined && value !== null;
-          });
-        });
-
-        return [
-          applyDefaultInitialRouteName({
-            loadRoute: node.loadRoute,
-            route: name,
-            contextKey: node.contextKey,
-            children: getTreeNodesAsRouteNodes(children, {
-              ...props,
-              parentParams: {
-                ...props.parentParams,
-                ...staticParams,
-              },
-            }),
-            dynamic,
-          }),
-          ...staticParams.map((params) => {
-            let parsedRoute = name;
-
-            dynamic.map((query) => {
-              const param = params[query.name];
-              const formattedParameter = Array.isArray(param)
-                ? param.join("/")
-                : param;
-              if (query.deep) {
-                parsedRoute = parsedRoute.replace(
-                  `[...${query.name}]`,
-                  formattedParameter
-                );
-              } else {
-                parsedRoute = parsedRoute.replace(`[${query.name}]`, param);
-              }
-            });
-
-            // const nextNode = cloneGroupRoute(node!, clone);
-            return applyDefaultInitialRouteName({
-              loadRoute: node.loadRoute,
-              // Convert the dynamic route to a static route.
-              route: parsedRoute,
-              contextKey: node.contextKey,
-              children: getTreeNodesAsRouteNodes(children, {
-                ...props,
-                parentParams: {
-                  ...props.parentParams,
-                  ...staticParams,
-                },
-              }),
-              dynamic: null,
-            });
-          }),
-        ];
-      }
-    }
-
-    const groupName = matchGroupName(name);
-    const multiGroup = groupName?.includes(",");
-
-    const clones = multiGroup
-      ? groupName!.split(",").map((v) => ({ name: v.trim() }))
-      : null;
-
-    // Assert duplicates:
-    if (clones) {
-      const names = new Set<string>();
-      for (const clone of clones) {
-        if (names.has(clone.name)) {
-          throw new Error(
-            `Array syntax cannot contain duplicate group name "${clone.name}" in "${node.contextKey}".`
-          );
-        }
-        names.add(clone.name);
-      }
-    }
-
-    const output = {
-      loadRoute: node.loadRoute,
-      route: name,
-      contextKey: node.contextKey,
-      children: getTreeNodesAsRouteNodes(children, props),
-      dynamic,
-    };
-
-    if (Array.isArray(clones)) {
-      return clones.map((clone) =>
-        applyDefaultInitialRouteName(cloneGroupRoute({ ...output }, clone))
-      );
-    }
-
-    return [
-      applyDefaultInitialRouteName({
-        loadRoute: node.loadRoute,
-        route: name,
-        contextKey: node.contextKey,
-        children: getTreeNodesAsRouteNodes(children, props),
-        dynamic,
-      }),
-    ];
-  }
-
   // Empty folder, skip it.
   if (!children.length) {
     return null;
@@ -346,6 +206,169 @@ function treeNodeToRouteNode(
     }),
     props
   );
+}
+
+function fileNodeToRouteNode(
+  tree: TreeNode,
+  props: TreeNodeResolutionOptions
+): RouteNode[] | null {
+  const { name, node, children } = tree;
+
+  if (!node) throw new Error("node must be defined");
+
+  const dynamic = generateDynamic(name);
+
+  if (dynamic && props?.loadData) {
+    const loaded = node?.loadRoute();
+    if (loaded?.generateStaticParams) {
+      const staticParams = loaded.generateStaticParams({
+        params: props.parentParams || {},
+      });
+
+      if (!Array.isArray(staticParams)) {
+        throw new Error(
+          `generateStaticParams() must return an array of params, received ${staticParams}`
+        );
+      }
+      // Assert that at least one param from each matches the dynamic route.
+      staticParams.forEach((params) => {
+        const matches = dynamic.every((dynamic) => {
+          const value = params[dynamic.name];
+          return value !== undefined && value !== null;
+        });
+        if (!matches) {
+          throw new Error(
+            `generateStaticParams() must return an array of params that match the dynamic route. Received ${JSON.stringify(
+              params
+            )}`
+          );
+        }
+
+        dynamic.forEach((dynamic) => {
+          const value = params[dynamic.name];
+          if (dynamic.deep) {
+            if (!Array.isArray(value)) {
+              throw new Error(
+                `generateStaticParams() for route "${node.contextKey}" expected param "${dynamic.name}" to be of type Array.`
+              );
+            }
+          } else {
+            if (Array.isArray(value)) {
+              throw new Error(
+                `generateStaticParams() for route "${node.contextKey}" expected param "${dynamic.name}" to not be of type Array.`
+              );
+            }
+          }
+          return value !== undefined && value !== null;
+        });
+      });
+
+      return [
+        applyDefaultInitialRouteName({
+          loadRoute: node.loadRoute,
+          route: name,
+          contextKey: node.contextKey,
+          children: getTreeNodesAsRouteNodes(children, {
+            ...props,
+            parentParams: {
+              ...props.parentParams,
+              ...staticParams,
+            },
+          }),
+          dynamic,
+        }),
+        ...staticParams.map((params) => {
+          let parsedRoute = name;
+
+          dynamic.map((query) => {
+            const param = params[query.name];
+            const formattedParameter = Array.isArray(param)
+              ? param.join("/")
+              : param;
+            if (query.deep) {
+              parsedRoute = parsedRoute.replace(
+                `[...${query.name}]`,
+                formattedParameter
+              );
+            } else {
+              parsedRoute = parsedRoute.replace(`[${query.name}]`, param);
+            }
+          });
+
+          // const nextNode = cloneGroupRoute(node!, clone);
+          return applyDefaultInitialRouteName({
+            loadRoute: node.loadRoute,
+            // Convert the dynamic route to a static route.
+            route: parsedRoute,
+            contextKey: node.contextKey,
+            children: getTreeNodesAsRouteNodes(children, {
+              ...props,
+              parentParams: {
+                ...props.parentParams,
+                ...staticParams,
+              },
+            }),
+            dynamic: null,
+          });
+        }),
+      ];
+    }
+  }
+
+  const groupName = matchGroupName(name);
+  const multiGroup = groupName?.includes(",");
+
+  const clones = multiGroup
+    ? groupName!.split(",").map((v) => ({ name: v.trim() }))
+    : null;
+
+  // Assert duplicates:
+  if (clones) {
+    const names = new Set<string>();
+    for (const clone of clones) {
+      if (names.has(clone.name)) {
+        throw new Error(
+          `Array syntax cannot contain duplicate group name "${clone.name}" in "${node.contextKey}".`
+        );
+      }
+      names.add(clone.name);
+    }
+  }
+
+  const output = {
+    loadRoute: node.loadRoute,
+    route: name,
+    contextKey: node.contextKey,
+    children: getTreeNodesAsRouteNodes(children, props),
+    dynamic,
+  };
+
+  if (Array.isArray(clones)) {
+    return clones.map((clone) =>
+      applyDefaultInitialRouteName(cloneGroupRoute({ ...output }, clone))
+    );
+  }
+
+  return [
+    applyDefaultInitialRouteName({
+      loadRoute: node.loadRoute,
+      route: name,
+      contextKey: node.contextKey,
+      children: getTreeNodesAsRouteNodes(children, props),
+      dynamic,
+    }),
+  ];
+}
+
+function treeNodeToRouteNode(
+  tree: TreeNode,
+  props: TreeNodeResolutionOptions
+): RouteNode[] | null {
+  if (tree.node) {
+    return fileNodeToRouteNode(tree, props);
+  }
+
+  return folderNodeToRouteNode(tree, props);
 }
 
 function contextModuleToFileNodes(
