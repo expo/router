@@ -31,8 +31,8 @@
     "clean": "expo-module clean",
     "lint": "expo-module lint",
     "test": "expo-module test",
-    "prepare": "expo-module prepare",
-    "prepublishOnly": "expo-module prepublishOnly && expo-module typecheck --noEmit false",
+    "prepare": "EXPO_NONINTERACTIVE=1 expo-module prepare",
+    "prepublishOnly": "expo-module prepublishOnly",
     "expo-module": "expo-module"
   },
   "keywords": [
