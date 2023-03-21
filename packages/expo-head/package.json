@@ -26,12 +26,9 @@
   "author": "evanbacon <bacon@expo.io> (https://github.com/EvanBacon)",
   "license": "MIT",
   "homepage": "https://github.com/EvanBacon/@bacons/head#readme",
-  "dependencies": {
-    "react-helmet": "6.1.0"
-  },
+ 
   "devDependencies": {
-    "expo-module-scripts": "^2.1.1",
-    "expo-modules-core": "^0.11.4"
+    "expo-module-scripts": "^2.1.1"
   },
   "peerDependencies": {
     "expo": "*",

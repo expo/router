@@ -9,6 +9,12 @@
     },
     "web": {
       "bundler": "metro"
+    },
+    "ios": {
+      "bundleIdentifier": "app.expo.router.sandbox",
+      "infoPlist": {
+        "CoreSpotlightContinuation": true
+      }
     }
   }
 }

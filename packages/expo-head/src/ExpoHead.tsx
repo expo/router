@@ -1,3 +1,3 @@
-export { default as Head } from "react-helmet";
+export function Head() {}
 
 export function setWebUrl(url: string) {}
