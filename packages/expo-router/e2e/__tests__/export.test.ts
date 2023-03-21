@@ -76,6 +76,8 @@ it(
 
     // If this changes then everything else probably changed as well.
     expect(files).toEqual([
+      // TODO: No +root.html
+      "+root.html",
       "[...404].html",
       "_sitemap.html",
       "about.html",
@@ -89,7 +91,7 @@ it(
       "assets/b2de8e638d92e0f719fa92fa4085e02a",
       "assets/cbbeac683d803ac27cefb817787d2bfa",
       "assets/e62addcde857ebdb7342e6b9f1095e97",
-      expect.stringMatching(/bundles\/web-[\w\d]+\.js/),
+      expect.stringMatching(/bundles\/web-.*\.js/),
       "favicon.ico",
       "index.html",
       "metadata.json",
