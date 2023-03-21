@@ -245,8 +245,11 @@ function treeNodeToRouteNode({
   );
 }
 
-function contextModuleToFileNodes(contextModule: RequireContext): FileNode[] {
-  const nodes = contextModule.keys().map((key) => {
+function contextModuleToFileNodes(
+  contextModule: RequireContext,
+  files: string[] = contextModule.keys()
+): FileNode[] {
+  const nodes = files.map((key) => {
     // In development, check if the file exports a default component
     // this helps keep things snappy when creating files. In production we load all screens lazily.
     try {
@@ -314,6 +317,14 @@ function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
   };
 }
 
+function processKeys(files: string[], options: Options): string[] {
+  const { ignore } = options;
+
+  return files.filter((file) => {
+    return !ignore.some((pattern) => pattern.test(file));
+  });
+}
+
 /**
  * Asserts if the require.context has files that share the same name but have different extensions. Exposed for testing.
  * @private
@@ -338,8 +349,11 @@ export function assertDuplicateRoutes(filenames: string[]) {
 }
 
 /** Given a Metro context module, return an array of nested routes. */
-export function getRoutes(contextModule: RequireContext): RouteNode | null {
-  const route = getExactRoutes(contextModule);
+export function getRoutes(
+  contextModule: RequireContext,
+  options: Options = { ignore: [] }
+): RouteNode | null {
+  const route = getExactRoutes(contextModule, options);
   if (!route) {
     return null;
   }
@@ -352,12 +366,21 @@ export function getRoutes(contextModule: RequireContext): RouteNode | null {
   return route;
 }
 
+type Options = {
+  ignore: RegExp[];
+};
+
 /** Get routes without unmatched or sitemap. */
 export function getExactRoutes(
-  contextModule: RequireContext
+  contextModule: RequireContext,
+  options: Options = { ignore: [] }
 ): RouteNode | null {
-  assertDuplicateRoutes(contextModule.keys());
-  const files = contextModuleToFileNodes(contextModule);
+  const allowed = processKeys(contextModule.keys(), {
+    ...options,
+    ignore: [/^\.\/\+root\.[tj]sx?$/, ...options.ignore],
+  });
+  assertDuplicateRoutes(allowed);
+  const files = contextModuleToFileNodes(contextModule, allowed);
   const treeNodes = getRecursiveTree(files);
   const route = treeNodesToRootRoute(treeNodes);
   return route || null;
