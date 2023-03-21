@@ -209,7 +209,7 @@ public class ExpoHeadModule: Module {
 //         let activity = NSUserActivity(activityType: value.activityType)
       activity.persistentIdentifier = value.id
       activity.isEligibleForHandoff = true
-      activity.isEligibleForPublicIndexing = true
+      activity.isEligibleForPublicIndexing = false
       activity.isEligibleForSearch = value.eligibleForSearch
       activity.isEligibleForPrediction = true;
       activity.title = value.title
