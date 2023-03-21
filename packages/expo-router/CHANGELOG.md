@@ -8,6 +8,8 @@
 
 ### 🐛 Bug fixes
 
+- fix deep linking on native.
+
 ### 💡 Others
 
 ## [Mon, 20 Mar 2023 11:23:51 -0500](https://github.com/expo/router/commit/ebba591b2e1cc30279da1309a8a77ce044dc18b9)
