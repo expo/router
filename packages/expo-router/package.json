@@ -8,14 +8,16 @@
     "build",
     "node",
     "entry.js",
-    "_root.tsx",
+    "_entry.tsx",
     "babel.js",
     "assets",
     "drawer.ts",
     "stack.ts",
     "tabs.ts",
     "head.ts",
-    "metro-require.d.ts"
+    "metro-require.d.ts",
+    "_root-ctx.tsx",
+    "root.tsx"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",
