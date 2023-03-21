@@ -48,24 +48,17 @@ describe(extractExpoPathFromURL, () => {
       });
     });
   }
-  it(`decodes query params`, () => {
+  it(`decodes query params in bare`, () => {
     Constants.executionEnvironment = ExecutionEnvironment.Bare;
-    expect(extractExpoPathFromURL(`custom:///?x=x%252By%2540xxx.com`)).toEqual(
-      "?x=x+y@xxx.com"
-    );
-
+    expect(extractExpoPathFromURL(`custom:///?x=%20%2B%2F`)).toEqual("?x= +/");
+  });
+  it(`decodes query params in Expo Go`, () => {
     Constants.executionEnvironment = ExecutionEnvironment.StoreClient;
-    expect(extractExpoPathFromURL(`custom:///?x=x%252By%2540xxx.com`)).toEqual(
-      "?x=x+y@xxx.com"
-    );
+    expect(extractExpoPathFromURL(`custom:///?x=%20%2B%2F`)).toEqual("?x= +/");
     expect(
-      extractExpoPathFromURL(
-        `exp://127.0.0.1:19000/--/test/path?x=x%252By%2540xxx.com`
-      )
-    ).toEqual("test/path?x=x+y@xxx.com");
-    expect(extractExpoPathFromURL(`exp://x?y=x%252By%2540xxx.com`)).toEqual(
-      "?y=x+y@xxx.com"
-    );
+      extractExpoPathFromURL(`exp://127.0.0.1:19000/--/test/path?x=%20%2B%2F`)
+    ).toEqual("test/path?x= +/");
+    expect(extractExpoPathFromURL(`exp://x?y=%20%2B%2F`)).toEqual("?y= +/");
   });
 
   it(`only handles Expo Go URLs in Expo Go`, () => {
