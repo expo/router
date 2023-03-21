@@ -25,7 +25,13 @@ struct MetadataOptions: Record {
   @Field
   var id: String!
   @Field
-  var eligibleForSearch: Bool = true
+  var isEligibleForHandoff: Bool = true
+  @Field
+  var isEligibleForPrediction: Bool = true
+  @Field
+  var isEligibleForPublicIndexing: Bool = false
+  @Field
+  var isEligibleForSearch: Bool = true
   @Field
   var title: String?
   @Field
@@ -44,11 +50,8 @@ struct MetadataOptions: Record {
   var userInfo: [String: AnyHashable]?
   @Field
   var description: String?
-
   @Field
   var phrase: String?
-
-
 }
 
 let INDEXED_ROUTE = Bundle.main.bundleIdentifier! + ".expo.index_route"
@@ -164,7 +167,10 @@ public class ExpoHeadModule: Module {
           "activityType": activity.activityType,
           "description": activity.contentAttributeSet?.contentDescription,
           "id": activity.persistentIdentifier, 
-          "eligibleForSearch": activity.isEligibleForSearch, 
+          "isEligibleForHandoff": activity.isEligibleForHandoff,
+          "isEligibleForPrediction": activity.isEligibleForPrediction,
+          "isEligibleForPublicIndexing": activity.isEligibleForPublicIndexing,
+          "isEligibleForSearch": activity.isEligibleForSearch,
           "title": activity.title, 
           "webpageURL": activity.webpageURL, 
 //          "imageData": activity.contentAttributeSet?.thumbnailData,
@@ -208,10 +214,10 @@ public class ExpoHeadModule: Module {
     // TODO: https://gist.github.com/alexruperez/ea81aa3e371f7d0d7ea5e594d7e9ad08
 //         let activity = NSUserActivity(activityType: value.activityType)
       activity.persistentIdentifier = value.id
-      activity.isEligibleForHandoff = true
-      activity.isEligibleForPublicIndexing = false
-      activity.isEligibleForSearch = value.eligibleForSearch
-      activity.isEligibleForPrediction = true;
+      activity.isEligibleForHandoff = value.isEligibleForHandoff
+      activity.isEligibleForPrediction = value.isEligibleForPrediction;
+      activity.isEligibleForPublicIndexing = value.isEligibleForPublicIndexing
+      activity.isEligibleForSearch = value.isEligibleForSearch
       activity.title = value.title
 
       if let keywords = value.keywords {
