@@ -232,8 +232,8 @@ public class ExpoHeadModule: Module {
       if (value.webpageURL != nil) {
         // If you’re using all three APIs, it works well to use the URL of the relevant webpage as the value for uniqueIdentifier, relatedUniqueIdentifier, and webpageURL.
         // https://developer.apple.com/library/archive/documentation/General/Conceptual/AppSearch/CombiningAPIs.html#//apple_ref/doc/uid/TP40016308-CH10-SW1
-        activity.webpageURL = value.webpageURL
-        // activity.uniqueIdentifier = value.webpageURL?.absoluteString
+          activity.webpageURL = value.webpageURL
+          att.relatedUniqueIdentifier = value.webpageURL?.absoluteString
 //        att.relatedUniqueIdentifier = value.webpageURL?.absoluteString
       }
 
