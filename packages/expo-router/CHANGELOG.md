@@ -6,6 +6,8 @@
 
 ### 🎉 New features
 
+- add client-side redirects API for native (and temporarily for web).
+
 ### 🐛 Bug fixes
 
 - fix deep linking on native.

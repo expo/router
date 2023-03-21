@@ -1,5 +1,5 @@
 import { LinkingOptions, getActionFromState } from "@react-navigation/native";
-
+import { openURL } from "expo-linking";
 import { RouteNode } from "./Route";
 import {
   addEventListener,
@@ -8,6 +8,11 @@ import {
   getStateFromPath,
 } from "./link/linking";
 import { matchDeepDynamicRouteName, matchDynamicName } from "./matchers";
+import {
+  getRuntimeRedirects,
+  matchRedirect,
+  nextRedirect,
+} from "./static/redirects";
 
 type Screen =
   | string
@@ -121,7 +126,21 @@ function getStateFromPathMemoized(
   if (cached) {
     return cached;
   }
-  const result = getStateFromPath(path, options);
+  // TODO: Native-only, web should use server-side redirects.
+  const nextPath = nextRedirect(path);
+
+  if (nextPath.match(/.*:\/\//)) {
+    // If the path is a URL, don't try to match it as a path.
+    openURL(nextPath);
+    return null;
+  }
+
+  const result = getStateFromPath(nextPath, options);
+
   stateCache.set(path, result);
+  if (path !== nextPath) {
+    stateCache.set(nextPath, result);
+  }
+
   return result;
 }

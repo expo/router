@@ -9,6 +9,20 @@
     },
     "web": {
       "bundler": "metro"
+    },
+    "extra": {
+      "router": {
+        "redirects": [
+          {
+            "from": "/about",
+            "to": "/about-us"
+          },
+          {
+            "from": "/source",
+            "to": "https://github.com/"
+          }
+        ]
+      }
     }
   }
 }
