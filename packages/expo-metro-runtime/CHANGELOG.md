@@ -6,6 +6,8 @@
 
 ### 🎉 New features
 
+- Polyfill `window.location` and `fetch` on native to support relative requests.
+
 ### 🐛 Bug fixes
 
 ### 💡 Others

@@ -1,10 +1,28 @@
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect } from "react";
+import {
+  StyleSheet,
+  TurboModuleRegistry,
+  Text,
+  View,
+  Image,
+} from "react-native";
 
 export default function Page() {
+  console.log("this:", window.location.origin + "/hello.json");
+
+  useEffect(() => {
+    fetch("/hello.json", {})
+      .then((res) => res.json())
+      .then(console.log);
+  }, []);
   return (
     <View style={styles.container}>
       <View style={styles.main}>
-        <Text style={styles.title}>Hello World</Text>
+        <Image
+          source={{ uri: location.origin + "/snack.png" }}
+          style={{ width: 250, height: 250, backgroundColor: "blue" }}
+        />
+        <Text style={styles.title}>Hello Worl@d</Text>
         <Text style={styles.subtitle}>This is the first page of your app.</Text>
       </View>
     </View>
