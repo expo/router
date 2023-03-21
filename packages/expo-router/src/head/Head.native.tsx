@@ -1,77 +1,79 @@
 import React from "react";
 
-import { useNavigation } from "../useNavigation";
+import { Head } from "@bacons/head";
 
-function formatLikeConsoleLog(args: any) {
-  if (typeof args === "string") {
-    return args;
-  }
+// import { useNavigation } from "../useNavigation";
 
-  let str = "";
-  if (Array.isArray(args)) {
-    for (const arg of args) {
-      if (str.length > 0) {
-        str += " ";
-      }
+// function formatLikeConsoleLog(args: any) {
+//   if (typeof args === "string") {
+//     return args;
+//   }
 
-      if (typeof arg === "string") {
-        str += arg;
-      } else if (Array.isArray(arg)) {
-        str += formatLikeConsoleLog(arg);
-      } else {
-        str += JSON.stringify(arg);
-      }
-    }
-  }
+//   let str = "";
+//   if (Array.isArray(args)) {
+//     for (const arg of args) {
+//       if (str.length > 0) {
+//         str += " ";
+//       }
 
-  return str;
-}
+//       if (typeof arg === "string") {
+//         str += arg;
+//       } else if (Array.isArray(arg)) {
+//         str += formatLikeConsoleLog(arg);
+//       } else {
+//         str += JSON.stringify(arg);
+//       }
+//     }
+//   }
 
-function Head({
-  children,
-}: {
-  children?: React.ReactNode;
-}): React.ReactElement {
-  const navigation = useNavigation();
+//   return str;
+// }
 
-  const { renderableChildren, metaChildren } = React.useMemo(() => {
-    const renderableChildren: any[] = [];
-    const metaChildren: any[] = [];
+// function Head({
+//   children,
+// }: {
+//   children?: React.ReactNode;
+// }): React.ReactElement {
+//   const navigation = useNavigation();
 
-    React.Children.forEach(children, (child) => {
-      if (!React.isValidElement(child)) {
-        return;
-      }
-      if (typeof child.type === "string") {
-        metaChildren.push(child);
-      } else {
-        renderableChildren.push(child);
-      }
-    });
+//   const { renderableChildren, metaChildren } = React.useMemo(() => {
+//     const renderableChildren: any[] = [];
+//     const metaChildren: any[] = [];
 
-    return { renderableChildren, metaChildren };
-  }, [children]);
+//     React.Children.forEach(children, (child) => {
+//       if (!React.isValidElement(child)) {
+//         return;
+//       }
+//       if (typeof child.type === "string") {
+//         metaChildren.push(child);
+//       } else {
+//         renderableChildren.push(child);
+//       }
+//     });
 
-  const title = React.useMemo(() => {
-    for (const child of metaChildren) {
-      if (child.type === "title") {
-        return child.props.children;
-      }
-    }
+//     return { renderableChildren, metaChildren };
+//   }, [children]);
 
-    return undefined;
-  }, [metaChildren]);
+//   const title = React.useMemo(() => {
+//     for (const child of metaChildren) {
+//       if (child.type === "title") {
+//         return child.props.children;
+//       }
+//     }
 
-  React.useEffect(() => {
-    if (title !== undefined) {
-      navigation.setOptions({
-        title: formatLikeConsoleLog(title),
-      });
-    }
-  }, [title]);
+//     return undefined;
+//   }, [metaChildren]);
 
-  return <>{renderableChildren}</>;
-}
+//   React.useEffect(() => {
+//     if (title !== undefined) {
+//       navigation.setOptions({
+//         title: formatLikeConsoleLog(title),
+//       });
+//     }
+//   }, [title]);
+
+//   return <>{renderableChildren}</>;
+// }
 
 Head.Provider = React.Fragment;
 
