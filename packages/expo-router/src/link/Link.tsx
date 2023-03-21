@@ -7,39 +7,71 @@ import { GestureResponderEvent, Platform } from "react-native";
 
 import { Href, resolveHref } from "./href";
 import useLinkToPathProps from "./useLinkToPathProps";
+import { useRouter } from "./useRouter";
+import { useFocusEffect } from "../useFocusEffect";
 
-type Props = {
-  /** Add a property which is familiar to  */
+export interface LinkProps extends Omit<TextProps, "href" | "hoverStyle"> {
+  /** Path to route to. */
   href: Href;
 
   // TODO(EvanBacon): This may need to be extracted for React Native style support.
   /** Forward props to child component. Useful for custom buttons. */
   asChild?: boolean;
 
-  /** Should replace the current screen without adding to the history. */
+  /** Should replace the current route without adding to the history. */
   replace?: boolean;
 
   onPress?: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => void;
-} & (TextProps & { children: React.ReactNode });
+}
+
+/** Redirects to the href as soon as the component is mounted. */
+export function Redirect({ href }: { href: Href }) {
+  const router = useRouter();
+  useFocusEffect(() => {
+    router.replace(href);
+  });
+  return null;
+}
+
+export interface LinkComponent {
+  (props: React.PropsWithChildren<LinkProps>): JSX.Element;
+  /** Helper method to resolve an Href object into a string. */
+  resolveHref: typeof resolveHref;
+}
 
 /**
- * Component to render link to another screen using a path.
+ * Component to render link to another route using a path.
  * Uses an anchor tag on the web.
  *
- * @param props.href Absolute path to screen (e.g. `/feeds/hot`).
+ * @param props.href Absolute path to route (e.g. `/feeds/hot`).
+ * @param props.replace Should replace the current route without adding to the history.
  * @param props.asChild Forward props to child component. Useful for custom buttons.
  * @param props.children Child elements to render the content.
  */
-export const Link = React.forwardRef(ExpoRouterLink);
+export const Link = React.forwardRef(
+  ExpoRouterLink
+) as unknown as LinkComponent;
+
+Link.resolveHref = resolveHref;
 
 function ExpoRouterLink(
-  { href, replace, asChild, ...rest }: Props,
+  {
+    href,
+    replace,
+    // TODO: This does not prevent default on the anchor tag.
+    asChild,
+    ...rest
+  }: LinkProps,
   ref: React.ForwardedRef<Text>
 ) {
-  // TODO: Auto use router's client-side event.
-  const resolvedHref = React.useMemo(() => resolveHref(href), [href]);
+  const resolvedHref = React.useMemo(() => {
+    if (href == null) {
+      throw new Error("Link: href is required");
+    }
+    return resolveHref(href);
+  }, [href]);
 
   const props = useLinkToPathProps({ href: resolvedHref, replace });
 

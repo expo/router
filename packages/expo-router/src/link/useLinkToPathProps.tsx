@@ -2,6 +2,31 @@ import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
 import { useLinkToPath } from "./useLinkToPath";
+import { stripGroupSegmentsFromPath } from "../matchers";
+
+function eventShouldPreventDefault(
+  e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
+): boolean {
+  if (e?.defaultPrevented) {
+    return false;
+  }
+
+  if (
+    // Only check MouseEvents
+    "button" in e &&
+    // ignore clicks with modifier keys
+    !e.metaKey &&
+    !e.altKey &&
+    !e.ctrlKey &&
+    !e.shiftKey &&
+    (e.button == null || e.button === 0) && // Only accept left clicks
+    [undefined, null, "", "self"].includes(e.currentTarget.target) // let browser handle "target=_blank" etc.
+  ) {
+    return true;
+  }
+
+  return false;
+}
 
 export default function useLinkToPathProps(props: {
   href: string;
@@ -16,15 +41,7 @@ export default function useLinkToPathProps(props: {
 
     if (Platform.OS !== "web" || !e) {
       shouldHandle = e ? !e.defaultPrevented : true;
-    } else if (
-      !e.defaultPrevented && // onPress prevented default
-      // @ts-expect-error: these properties exist on web, but not in React Native
-      !(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) && // ignore clicks with modifier keys
-      // @ts-expect-error: these properties exist on web, but not in React Native
-      (e.button == null || e.button === 0) && // ignore everything but left clicks
-      // @ts-expect-error: these properties exist on web, but not in React Native
-      [undefined, null, "", "self"].includes(e.currentTarget?.target) // let browser handle "target=_blank" etc.
-    ) {
+    } else if (eventShouldPreventDefault(e)) {
       e.preventDefault();
       shouldHandle = true;
     }
@@ -35,7 +52,7 @@ export default function useLinkToPathProps(props: {
   };
 
   return {
-    href: props.href,
+    href: stripGroupSegmentsFromPath(props.href),
     accessibilityRole: "link" as const,
     onPress,
   };

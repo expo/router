@@ -1,15 +1,25 @@
 import { StyleSheet, Text, View } from "@bacons/react-views";
 import { createURL } from "expo-linking";
-import React, { forwardRef } from "react";
+import React from "react";
 
+import { usePathname } from "../LocationProvider";
 import { Link } from "../link/Link";
+import { useNavigation } from "../useNavigation";
 
 /** Default screen for unmatched routes. */
-export const Unmatched = forwardRef((props, ref) => {
-  const url = createURL("");
+export function Unmatched() {
+  const navigation = useNavigation();
+  const pathname = usePathname();
+  const url = createURL(pathname);
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      title: "Not Found",
+    });
+  }, [navigation]);
+
   return (
-    // @ts-ignore
-    <View ref={ref} style={styles.container}>
+    <View style={styles.container}>
       <Text
         accessibilityRole="header"
         accessibilityLevel={1}
@@ -23,23 +33,21 @@ export const Unmatched = forwardRef((props, ref) => {
         style={styles.subtitle}
       >
         Page could not be found.{" "}
-        <Link href="/" style={styles.link}>
+        <Link href="/" replace style={styles.link}>
           Go back.
         </Link>
       </Text>
 
-      <Link href="/" style={styles.link}>
+      <Link href={pathname} replace style={styles.link}>
         {url}
       </Link>
 
-      {process.env.NODE_ENV === "development" && (
-        <Link href="/__index" style={styles.link}>
-          Sitemap
-        </Link>
-      )}
+      <Link href="/_sitemap" replace style={[styles.link, { marginTop: 8 }]}>
+        Sitemap
+      </Link>
     </View>
   );
-});
+}
 
 const styles = StyleSheet.create({
   container: {

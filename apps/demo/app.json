@@ -2,8 +2,12 @@
   "expo": {
     "name": "Router Demo",
     "slug": "expo-router",
-    "scheme": "bacontext",
     "icon": "https://icogen.vercel.app/api/icon?icon=2795&color_hex=1e90ff",
+    "scheme": "bacontext",
+    "splash": {
+      "image": "./splash.png",
+      "backgroundColor": "#1c2026"
+    },
     "web": {
       "bundler": "metro"
     },

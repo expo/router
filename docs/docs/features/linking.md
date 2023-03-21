@@ -3,106 +3,253 @@ title: Linking
 sidebar_position: 2
 ---
 
-:::warning Beta Release
+Use the `<Link />` component to navigate between pages. This is conceptually similar to the `<a>` element in HTML.
 
-Expo Router is in the earliest stage of development. The API is subject to breaking changes. The documentation is incomplete and may be inaccurate. The project is not yet ready for production use. Please [contribute to the discussion](https://github.com/expo/router/discussions/1) if you have any ideas or suggestions on how we can improve the convention.
-
-:::
-
-The `expo-router` `Link` component supports client-side navigation to a route. It is similar to the `Link` component in `react-router-dom` and `next/link`.
-
-When JavaScript is disabled or the client is offline, the `Link` component will render a regular `<a>` element. Otherwise, the default behavior will be intercepted and the client-side router will navigate to the route (faster and smoother).
-
-Meaning you get the best of both worlds: a fast client-side navigation experience, and a fallback for when JavaScript is disabled or hasn't loaded yet.
-
-```tsx
+```js
+// highlight-next-line
 import { Link } from "expo-router";
 
 export default function Page() {
   return (
     <View>
+      // highlight-next-line
       <Link href="/">Home</Link>
     </View>
   );
 }
 ```
 
-Try to use the `Link` component whenever possible as it renders the correct semantic HTML element on web. This is important for accessibility and SEO.
+- `href` accepts relative paths like `../settings` or full paths like `/profile/settings`. Relative paths are useful for shared routes.
+- `href` can also accept an object like `{ pathname: 'profile', params: { id: '123' } }` to navigate to dynamic routes.
+- Use the `replace` prop to replace the current route in the history instead of pushing a new route.
 
-## Imperative API
-
-For more advanced use cases, you can use the imperative `useLink` hook to navigate imperatively.
+The Link component renders a `<Text>` component by default. You can customize the component by passing `asChild` which will forward all props to the first child of the Link component. The child component must support the `onPress` and `onClick` props, `href` and `accessibilityRole` will also be passed down.
 
 ```js
-import { View, Text } from "react-native";
-import { useLink } from "expo-router";
+import { Pressable, Text } from 'react-native';
+import { Link } from 'expo-router';
 
-export default function Page() {
-  const link = useLink();
-
+function Home() {
   return (
-    <View>
-      <Text onPress={() => link.push("/profile/settings")}>Settings</Text>
-    </View>
-  );
+    // highlight-next-line
+    <Link href="/other" asChild >
+      <Pressable>
+        {({ hovered, pressed }) => (
+          <Text>Home</Text>
+        )}
+      </Pressable>
+    </Link>
+  )
 }
 ```
 
-Prefer the `useLink` hook to `useNavigation` from React Navigation as `useLink` works much closer to the `<Link />` component.
+## `useRouter`
 
-## `useLink` API
-
-- **push**: _`(href: Href) => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', query: { id: '123' } }`.
-- **replace**: _`(href: Href) => void`_ Same API as `push` but replaces the current route in the history instead of pushing a new one. This is useful for redirects.
-- **back**: _`() => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', query: { id: '123' } }`.
-
-> This API is similar to Next.js's `useRouter` hook, but adjusted to work around the state management requirements of native.
-
-## `Href` type
-
-The `Href` type is a union of the following types:
-
-- **string**: A full path like `/profile/settings` or a relative path like `../settings`.
-- **object**: An object with a `pathname` and optional `query` object. The `pathname` can be a full path like `/profile/settings` or a relative path like `../settings`. The `query` can be an object of key/value pairs.
-
-## Navigation prop
-
-You can also use the [`navigation` object](https://reactnavigation.org/docs/navigation-prop) from React Navigation to imperatively navigate using screen names:
+For more advanced use cases, you can use the imperative `useRouter()` hook to navigate imperatively.
 
 ```js
-export default function Route({ navigation }) {
+import { View, Text } from "react-native";
+// highlight-next-line
+import { useRouter } from "expo-router";
+
+export default function Page() {
+  // highlight-next-line
+  const router = useRouter();
+
   return (
     <View>
       <Text
         onPress={() => {
-          // Go back to the previous screen using the imperative API.
-          navigation.goBack();
+          // highlight-next-line
+          router.push("/profile/settings");
         }}
       >
-        Details Screen
+        Settings
       </Text>
     </View>
   );
 }
 ```
 
-Alternatively, you can access the `navigation` prop from any component using the hook:
+- **push**: _`(href: Href) => void`_ Navigate to a route. You can provide a full path like `/profile/settings` or a relative path like `../settings`. Navigate to dynamic routes by passing an object like `{ pathname: 'profile', params: { id: '123' } }`.
+- **replace**: _`(href: Href) => void`_ Same API as `push` but replaces the current route in the history instead of pushing a new one. This is useful for redirects.
+- **back**: _`() => void`_ Navigate back to previous route.
+- **setParams**: _`(params: Record<string, string>) => void`_ Update the query params for the currently selected route.
 
-```js
-import { useNavigation } from "@react-navigation/native";
+### `Href` type
 
-function MyBackButton() {
-  const navigation = useNavigation();
+The `Href` type is a union of the following types:
 
-  return <Button title="Go back" onPress={() => navigation.goBack()} />;
+- **string**: A full path like `/profile/settings` or a relative path like `../settings`.
+- **object**: An object with a `pathname` and optional `params` object. The `pathname` can be a full path like `/profile/settings` or a relative path like `../settings`. The `params` can be an object of key/value pairs.
+
+## `usePathname`
+
+Returns the currently selected route location without search parameters. e.g. `/acme?foo=bar` -> `/acme`. Segments will be normalized: `/[id]?id=normal` -> `/normal`
+
+> `/profile/baconbrix?extra=info`
+
+```js title=app/profile/[user].tsx
+import { Text } from "react-native";
+// highlight-next-line
+import { usePathname } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const pathname = usePathname();
+  // pathname = "/profile/baconbrix"
+  return <Text>User: {user}</Text>;
 }
 ```
 
-The navigation prop is useful for layout-specific functionality like `navigation.openDrawer()` in a Drawer layout. [Learn more](https://reactnavigation.org/docs/navigation-prop#navigator-dependent-functions).
+## `useSearchParams`
+
+Returns the URL search parameters for the globally selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`.
+
+> `/profile/baconbrix?extra=info`
+
+```js title=app/profile/[user].tsx
+import { Text } from "react-native";
+import { useSearchParams } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const { user, extra } = useSearchParams();
+  return <Text>User: {user}</Text>;
+}
+```
+
+Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `/profile/123`, the results of `useSearchParams` would be as follows:
+
+```js
+{
+  id: "123";
+}
+```
+
+## `useLocalSearchParams`
+
+Returns the URL search parameters for the contextually selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`. This is useful for stacks where the previous screen is still mounted.
+
+```title=File System
+app/
+  _layout.js
+  [first]/home.tsx
+  [second]/shop.tsx
+```
+
+When `/abc/home` pushes `/123/shop`, `useSearchParams` would return `{ first: undefined, second: '123' }` on `/app/[first]/home.tsx` because the global URL has changed. However, you may want the params to remain `{ first: 'abc' }` to reflect the context of the screen. In this case, you can use `useLocalSearchParams` to ensure the params `{ first: 'abc' }` are still returned in `/app/[first]/home.tsx`.
+
+> `/profile/baconbrix?extra=info`
+
+```js title=app/profile/[user].tsx
+import { Text } from "react-native";
+import { useSearchParams } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const { user, extra } = useLocalSearchParams();
+  return <Text>User: {user}</Text>;
+}
+```
+
+## `useSegments`
+
+Returns a list of segments for the currently selected route. Segments are not normalized, so they will be the same as the file path. e.g. `/[id]?id=normal` -> `["[id]"]`
+
+```js title=app/profile/[user].tsx
+import { Text } from "react-native";
+// highlight-next-line
+import { useSegments } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const segments = useSegments();
+  // segments = ["profile", "[user]"]
+  return <Text>Hello</Text>;
+}
+```
+
+## `useNavigation`
+
+Access the underlying React Navigation [`navigation` prop](https://reactnavigation.org/docs/navigation-prop) to imperatively access layout-specific functionality like `navigation.openDrawer()` in a Drawer layout. [Learn more](https://reactnavigation.org/docs/navigation-prop/#navigator-dependent-functions).
+
+```js
+// highlight-next-line
+import { useNavigation } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const navigation = useNavigation();
+  return (
+    <View>
+      <Text
+        onPress={() => {
+          // highlight-next-line
+          navigation.openDrawer();
+        }}
+      >
+        Open Drawer
+      </Text>
+    </View>
+  );
+}
+```
+
+## Redirect
+
+You can immediately redirect from a particular screen by using the `Redirect` component:
+
+```js
+import { View, Text } from "react-native";
+// highlight-next-line
+import { Redirect } from "expo-router";
+
+export default function Page() {
+  // Some logic to determine if the user is logged in.
+  const { user } = useAuth();
+
+  if (!user) {
+    // Redirect to the login screen if the user is not authenticated.
+    // highlight-next-line
+    return <Redirect href="/login" />;
+  }
+
+  return (
+    <View>
+      <Text>Welcome Back!</Text>
+    </View>
+  );
+}
+```
+
+You can also redirect imperatively using the `useRouter` hook:
+
+```js
+import { Text } from "react-native";
+import { useRouter, useFocusEffect } from "expo-router";
+
+function MyScreen() {
+  const router = useRouter();
+
+  useFocusEffect(() => {
+    // Call the replace method to redirect to a new route without adding to the history.
+    // We do this in a useFocusEffect to ensure the redirect happens every time the screen
+    // is focused.
+    router.replace("/profile/settings");
+  });
+
+  return <Text>My Screen</Text>;
+}
+```
 
 ## Testing
 
-On native, you can use the `uri-scheme` CLI to test opening native links on a device.
+On native, you can use the [`uri-scheme`](https://www.npmjs.com/package/uri-scheme) CLI to test opening native links on a device.
+
+For example, if you want to launch the Expo Go app on iOS to the `/form-sheet` route, you can run:
+
+> Replace `192.168.87.39:19000` with the IP address shown when running `npx expo start`.
 
 ```bash
 npx uri-scheme open exp://192.168.87.39:19000/--/form-sheet --ios
@@ -110,10 +257,10 @@ npx uri-scheme open exp://192.168.87.39:19000/--/form-sheet --ios
 
 You can also search for links directly in a browser like Safari or Chrome to test deep linking on physical devices. Learn more about [testing deep links](https://reactnavigation.org/docs/deep-linking).
 
-## Dev mode
+## Sitemap
 
 ![](/img/directory.png)
 
-We currently inject a `/__index` file which provides a list of all routes in the app. This is useful for debugging and development. This screen is only injected during development, and won't be available in production.
+We currently inject a `/_sitemap` file which provides a list of all routes in the app. This is useful for debugging and development. This screen is only injected during development, and won't be available in production.
 
 We may remove this feature for the official release, but it's useful for now.

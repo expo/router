@@ -1,6 +1,6 @@
 ---
-title: Unmatched Routes
-sidebar_position: 8
+title: 404s
+sidebar_position: 3
 ---
 
 ![](/img/unmatched.png)
@@ -9,7 +9,7 @@ Native apps don't have a server so there are technically no 404s. However, if yo
 
 You can elevate the not found screen to a top-level route by adding a `Unmatched` component to your app in a [**deep dynamic route**](/docs/features/routes#deep-dynamic-routes):
 
-```tsx title=app/[...unmatched].js
+```js title=app/[...unmatched].js
 import { Unmatched } from "expo-router";
 
 export default Unmatched;

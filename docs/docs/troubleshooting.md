@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-description: Fixing common issues with Expo Router beta setup.
+description: Fixing common issues with Expo Router setup.
 sidebar_position: 99
 ---
 
@@ -31,6 +31,8 @@ export function App() {
 
 registerRootComponent(App);
 ```
+
+> Do not use this to change the root directory (app) as it won't account for usage in any other places.
 
 ## `require.context` not enabled
 

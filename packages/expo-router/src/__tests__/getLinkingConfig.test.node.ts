@@ -1,4 +1,4 @@
-import { treeToReactNavigationLinkingRoutes } from "../getLinkingConfig";
+import { getReactNavigationScreensConfig } from "../getLinkingConfig";
 
 const mockRoutes = [
   {
@@ -7,99 +7,89 @@ const mockRoutes = [
         children: [],
         dynamic: null,
         route: "people",
-        contextKey: "./(second-fragment)/people.tsx",
+        contextKey: "./(second-group)/people.tsx",
       },
     ],
     dynamic: null,
-    route: "(second-fragment)",
-    contextKey: "./(second-fragment).tsx",
+    route: "(second-group)",
+    contextKey: "./(second-group)/_layout.tsx",
   },
   {
     children: [
       {
         children: [],
-        dynamic: {
-          name: "deep",
-          deep: true,
-        },
+        dynamic: [
+          {
+            name: "deep",
+            deep: true,
+          },
+        ],
         route: "[...deep]",
-        contextKey: "./(fragment)/[...deep].tsx",
+        contextKey: "./(group)/[...deep].tsx",
       },
       {
         children: [],
-        dynamic: {
-          name: "dynamic",
-          deep: false,
-        },
+        dynamic: [
+          {
+            name: "dynamic",
+            deep: false,
+          },
+        ],
         route: "[dynamic]",
-        contextKey: "./(fragment)/[dynamic].tsx",
+        contextKey: "./(group)/[dynamic].tsx",
       },
       {
         children: [],
         dynamic: null,
         route: "index",
-        contextKey: "./(fragment)/index.tsx",
+        contextKey: "./(group)/index.tsx",
       },
     ],
     dynamic: null,
-    route: "(fragment)",
-    contextKey: "./(fragment).tsx",
+    route: "(group)",
+    contextKey: "./(group)/_layout.tsx",
   },
   {
-    children: [
+    children: [],
+    dynamic: [
       {
-        children: [
-          {
-            children: [],
-            dynamic: {
-              name: "screen",
-              deep: true,
-            },
-            route: "[...screen]",
-            contextKey: "./other/nested/[...screen].js",
-          },
-        ],
-        dynamic: null,
-        route: "nested",
-        contextKey: "./other/nested.tsx",
-        generated: true,
+        name: "screen",
+        deep: true,
       },
     ],
-    dynamic: null,
-    route: "other",
-    contextKey: "./other.tsx",
-    generated: true,
+    route: "other/nested/[...screen]",
+    contextKey: "./other/nested/[...screen].js",
   },
   {
     children: [],
     dynamic: null,
-    route: "__index",
-    contextKey: "./__index.tsx",
+    route: "_sitemap",
+    contextKey: "./_sitemap.tsx",
     generated: true,
     internal: true,
   },
 ];
 
-describe(treeToReactNavigationLinkingRoutes, () => {
+describe(getReactNavigationScreensConfig, () => {
   it("should return a valid linking config", () => {
     expect(
-      treeToReactNavigationLinkingRoutes(
+      getReactNavigationScreensConfig(
         // @ts-expect-error
         mockRoutes
       )
     ).toEqual({
-      "(fragment)": {
-        path: "",
-        screens: { "[...deep]": "*", "[dynamic]": ":dynamic", index: "" },
+      "(group)": {
+        initialRouteName: undefined,
+        path: "(group)",
+        screens: { "[...deep]": "*deep", "[dynamic]": ":dynamic", index: "" },
       },
-      "(second-fragment)": { path: "", screens: { people: "people" } },
-      __index: "__index",
-      other: {
-        path: "other",
-        screens: {
-          nested: { path: "nested", screens: { "[...screen]": "*" } },
-        },
+      "(second-group)": {
+        initialRouteName: undefined,
+        path: "(second-group)",
+        screens: { people: "people" },
       },
+      _sitemap: "_sitemap",
+      "other/nested/[...screen]": "other/nested/*screen",
     });
   });
 });

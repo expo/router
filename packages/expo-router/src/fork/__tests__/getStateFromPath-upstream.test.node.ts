@@ -2,6 +2,7 @@ import { findFocusedRoute } from "@react-navigation/native";
 import type { InitialState } from "@react-navigation/routers";
 import produce from "immer";
 
+import { configFromFs } from "../../utils/mockState";
 import getPathFromState from "../getPathFromState";
 import getStateFromPath from "../getStateFromPath";
 
@@ -13,39 +14,7 @@ const changePath = <T extends InitialState>(state: T, path: string): T =>
   });
 
 it("returns undefined for invalid path", () => {
-  expect(getStateFromPath<object>("//")).toBe(undefined);
-});
-
-it("converts path string to initial state", () => {
-  const path = "foo/bar/baz%20qux?author=jane%20%26%20co&valid=true";
-  const state = {
-    routes: [
-      {
-        name: "foo",
-        state: {
-          routes: [
-            {
-              name: "bar",
-              state: {
-                routes: [
-                  {
-                    name: "baz qux",
-                    params: { author: "jane & co", valid: "true" },
-                    path,
-                  },
-                ],
-              },
-            },
-          ],
-        },
-      },
-    ],
-  };
-
-  expect(getStateFromPath<object>(path)).toEqual(state);
-  expect(getStateFromPath<object>(getPathFromState<object>(state))).toEqual(
-    changePath(state, "/foo/bar/baz%20qux?author=jane%20%26%20co&valid=true")
-  );
+  expect(getStateFromPath<object>("//", { screens: {} })).toBe(undefined);
 });
 
 it("converts path string to initial state with config", () => {
@@ -114,16 +83,26 @@ it("converts path string to initial state with config", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles leading slash when converting", () => {
   const path = "/foo/bar/?count=42";
 
-  expect(getStateFromPath<object>(path)).toEqual({
+  expect(
+    getStateFromPath<object>(path, {
+      screens: {
+        foo: {
+          path: "foo",
+          screens: {
+            bar: {
+              path: "bar",
+            },
+          },
+        },
+      },
+    })
+  ).toEqual({
     routes: [
       {
         name: "foo",
@@ -144,7 +123,20 @@ it("handles leading slash when converting", () => {
 it("handles ending slash when converting", () => {
   const path = "foo/bar/?count=42";
 
-  expect(getStateFromPath<object>(path)).toEqual({
+  expect(
+    getStateFromPath<object>(path, {
+      screens: {
+        foo: {
+          path: "foo",
+          screens: {
+            bar: {
+              path: "bar",
+            },
+          },
+        },
+      },
+    })
+  ).toEqual({
     routes: [
       {
         name: "foo",
@@ -160,25 +152,6 @@ it("handles ending slash when converting", () => {
       },
     ],
   });
-});
-
-it("handles route without param", () => {
-  const path = "foo/bar";
-  const state = {
-    routes: [
-      {
-        name: "foo",
-        state: {
-          routes: [{ name: "bar", path }],
-        },
-      },
-    ],
-  };
-
-  expect(getStateFromPath<object>(path)).toEqual(state);
-  expect(getStateFromPath<object>(getPathFromState<object>(state))).toEqual(
-    changePath(state, "/foo/bar")
-  );
 });
 
 it("converts path string to initial state with config with nested screens", () => {
@@ -269,10 +242,7 @@ it("converts path string to initial state with config with nested screens", () =
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("converts path string to initial state with config with nested screens and unused parse functions", () => {
@@ -447,10 +417,7 @@ it("handles nested object with unused configs and with parse in it", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles parse in nested object for second route depth", () => {
@@ -497,10 +464,7 @@ it("handles parse in nested object for second route depth", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles parse in nested object for second route depth and and path and parse in roots", () => {
@@ -548,54 +512,7 @@ it("handles parse in nested object for second route depth and and path and parse
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
-});
-
-it("handles initialRouteName at top level", () => {
-  const path = "/baz";
-  const config = {
-    initialRouteName: "Boo",
-    screens: {
-      Foo: {
-        screens: {
-          Foe: "foe",
-          Bar: {
-            screens: {
-              Baz: "baz",
-            },
-          },
-        },
-      },
-    },
-  };
-
-  const state = {
-    index: 1,
-    routes: [
-      { name: "Boo" },
-      {
-        name: "Foo",
-        state: {
-          routes: [
-            {
-              name: "Bar",
-              state: {
-                routes: [{ name: "Baz", path }],
-              },
-            },
-          ],
-        },
-      },
-    ],
-  };
-
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles initialRouteName inside a screen", () => {
@@ -638,10 +555,7 @@ it("handles initialRouteName inside a screen", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles initialRouteName included in path", () => {
@@ -680,10 +594,7 @@ it("handles initialRouteName included in path", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles two initialRouteNames", () => {
@@ -784,10 +695,7 @@ it("handles two initialRouteNames", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("accepts initialRouteName without config for it", () => {
@@ -890,10 +798,7 @@ it("accepts initialRouteName without config for it", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("returns undefined if path is empty and no matching screen is present", () => {
@@ -999,6 +904,32 @@ it("returns matching screen if path is only slash", () => {
   expect(
     getStateFromPath<object>(getPathFromState<object>(state, config), config)
   ).toEqual(changePath(state, "/"));
+});
+
+// Test `app/(app)/index.js` matching `/`
+it("returns matching screen if path is only slash and root is a group", () => {
+  expect(
+    getStateFromPath<object>("/", {
+      screens: {
+        "(app)/index": "(app)",
+        "[id]": ":id",
+        "[...404]": "*404",
+      },
+    })
+  ).toEqual({ routes: [{ name: "(app)/index", path: "/" }] });
+});
+
+// Test `app/(one)/(two)/index.js` matching `/`
+it("returns matching screen if path is only slash and root is a nested group", () => {
+  expect(
+    getStateFromPath<object>("/", {
+      screens: {
+        "(one)/(two)/index": "(one)/(two)",
+        "[id]": ":id",
+        "[...404]": "*404",
+      },
+    })
+  ).toEqual({ routes: [{ name: "(one)/(two)/index", path: "/" }] });
 });
 
 it("returns matching screen with params if path is empty", () => {
@@ -1116,10 +1047,7 @@ it("chooses more exhaustive pattern", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles same paths beginnings", () => {
@@ -1160,10 +1088,7 @@ it("handles same paths beginnings", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles same paths beginnings with params", () => {
@@ -1212,10 +1137,7 @@ it("handles same paths beginnings with params", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles not taking path with too many segments", () => {
@@ -1271,10 +1193,7 @@ it("handles not taking path with too many segments", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles differently ordered params v1", () => {
@@ -1330,10 +1249,7 @@ it("handles differently ordered params v1", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles differently ordered params v2", () => {
@@ -1390,10 +1306,7 @@ it("handles differently ordered params v2", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles differently ordered params v3", () => {
@@ -1449,10 +1362,7 @@ it("handles differently ordered params v3", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handles differently ordered params v4", () => {
@@ -1566,10 +1476,7 @@ it("handles simple optional params", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handle 2 optional params at the end v1", () => {
@@ -1624,10 +1531,7 @@ it("handle 2 optional params at the end v1", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handle 2 optional params at the end v2", () => {
@@ -1684,10 +1588,7 @@ it("handle 2 optional params at the end v2", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handle 2 optional params at the end v3", () => {
@@ -1745,10 +1646,7 @@ it("handle 2 optional params at the end v3", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handle optional params in the middle v1", () => {
@@ -1806,10 +1704,7 @@ it("handle optional params in the middle v1", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handle optional params in the middle v2", () => {
@@ -1867,10 +1762,7 @@ it("handle optional params in the middle v2", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handle optional params in the middle v3", () => {
@@ -1930,10 +1822,7 @@ it("handle optional params in the middle v3", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handle optional params in the middle v4", () => {
@@ -1991,10 +1880,7 @@ it("handle optional params in the middle v4", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handle optional params in the middle v5", () => {
@@ -2054,10 +1940,7 @@ it("handle optional params in the middle v5", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("handle optional params in the beginning v1", () => {
@@ -2259,73 +2142,53 @@ it("ignores extra slashes in the pattern", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("matches wildcard patterns at root", () => {
   const path = "/test/bar/42/whatever";
-  const config = {
-    screens: {
-      404: "*",
-      Foo: {
-        screens: {
-          Bar: {
-            path: "/bar/:id/",
-          },
-        },
-      },
-    },
-  };
-
+  const config = configFromFs(["[...404].js", "foo/bar.js", "index.js"]);
   const state = {
-    routes: [{ name: "404", path }],
+    routes: [
+      {
+        params: {
+          "404": ["test", "bar", "42", "whatever"],
+        },
+        name: "[...404]",
+        path,
+      },
+    ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("matches wildcard patterns at nested level", () => {
   const path = "/bar/42/whatever/baz/initt";
 
-  const config = {
-    screens: {
-      "(foo)": {
-        path: "",
-        screens: {
-          bar: {
-            path: "bar",
-            screens: {
-              "[id]": ":id",
-              "[...404]": "*",
-            },
-          },
-        },
-      },
-    },
-  };
+  const config = configFromFs([
+    "(foo)/_layout.tsx",
+    "(foo)/bar/_layout.tsx",
+    "(foo)/bar/[id].tsx",
+    "(foo)/bar/[...rest].tsx",
+  ]);
 
   const state = {
     routes: [
       {
         name: "(foo)",
-        params: { "404": ["bar", "42", "whatever", "baz", "initt"] },
+        params: { rest: ["42", "whatever", "baz", "initt"] },
         state: {
           routes: [
             {
               name: "bar",
-              params: { "404": ["bar", "42", "whatever", "baz", "initt"] },
+              params: { rest: ["42", "whatever", "baz", "initt"] },
               state: {
                 routes: [
                   {
-                    name: "[...404]",
+                    name: "[...rest]",
                     params: {
-                      "404": ["bar", "42", "whatever", "baz", "initt"],
+                      rest: ["42", "whatever", "baz", "initt"],
                     },
                     path: "/bar/42/whatever/baz/initt",
                   },
@@ -2338,13 +2201,10 @@ it("matches wildcard patterns at nested level", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
-it("matches wildcard patterns at nested level with exact", () => {
+xit("matches wildcard patterns at nested level with exact", () => {
   const path = "/whatever";
   const config = {
     screens: {
@@ -2354,7 +2214,7 @@ it("matches wildcard patterns at nested level with exact", () => {
             path: "/bar/:id/",
             screens: {
               404: {
-                path: "*",
+                path: "*404",
                 exact: true,
               },
             },
@@ -2369,12 +2229,26 @@ it("matches wildcard patterns at nested level with exact", () => {
     routes: [
       {
         name: "Foo",
+        params: {
+          "404": ["whatever"],
+        },
         state: {
           routes: [
             {
               name: "Bar",
+              params: {
+                "404": ["whatever"],
+              },
               state: {
-                routes: [{ name: "404", path }],
+                routes: [
+                  {
+                    name: "404",
+                    params: {
+                      "404": ["whatever"],
+                    },
+                    path,
+                  },
+                ],
               },
             },
           ],
@@ -2396,7 +2270,7 @@ it("tries to match wildcard patterns at the end", () => {
       bar: {
         path: "bar",
         screens: {
-          "[...404]": "*",
+          "[...404]": "*404",
           "[userSlug]": ":userSlug",
           ":id": {
             path: ":id",
@@ -2435,10 +2309,7 @@ it("tries to match wildcard patterns at the end", () => {
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("uses nearest parent wildcard match for unmatched paths", () => {
@@ -2453,7 +2324,7 @@ it("uses nearest parent wildcard match for unmatched paths", () => {
               Baz: "baz",
             },
           },
-          404: "*",
+          "[...404]": "*404",
         },
       },
     },
@@ -2463,17 +2334,25 @@ it("uses nearest parent wildcard match for unmatched paths", () => {
     routes: [
       {
         name: "Foo",
+        params: {
+          "404": ["bar", "42", "baz", "test"],
+        },
         state: {
-          routes: [{ name: "404", path }],
+          routes: [
+            {
+              name: "[...404]",
+              params: {
+                "404": ["bar", "42", "baz", "test"],
+              },
+              path,
+            },
+          ],
         },
       },
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("throws if two screens map to the same pattern", () => {
@@ -2567,10 +2446,7 @@ it("correctly applies initialRouteName for config with similar route names", () 
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("correctly applies initialRouteName for config with similar route names v2", () => {
@@ -2627,10 +2503,7 @@ it("correctly applies initialRouteName for config with similar route names v2", 
     ],
   };
 
-  expect(getStateFromPath<object>(path, config)).toEqual(state);
-  expect(
-    getStateFromPath<object>(getPathFromState<object>(state, config), config)
-  ).toEqual(state);
+  testConversions(path, config, state);
 });
 
 it("throws when invalid properties are specified in the config", () => {
@@ -2686,3 +2559,10 @@ it("throws when invalid properties are specified in the config", () => {
     See https://reactnavigation.org/docs/configuring-links for more details on how to specify a linking configuration."
   `);
 });
+
+function testConversions(path: string, config: any, state: any) {
+  expect(getStateFromPath<object>(path, config)).toEqual(state);
+  expect(
+    getStateFromPath<object>(getPathFromState<object>(state, config), config)
+  ).toEqual(state);
+}

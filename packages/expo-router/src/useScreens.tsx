@@ -1,19 +1,15 @@
 import React from "react";
 
-import { Route, RouteNode, sortRoutes, useRoutes } from "./Route";
+import { LocationProvider } from "./LocationProvider";
+import {
+  DynamicConvention,
+  Route,
+  RouteNode,
+  sortRoutesWithInitial,
+  useRouteNode,
+} from "./Route";
 import { Screen } from "./primitives";
 import { Try } from "./views/Try";
-
-/**
- * @returns React Navigation screens for the route.
- */
-export function useScreens(): React.ReactNode[] {
-  const children = useRoutes();
-  return React.useMemo(
-    () => children.map((value) => routeToScreen(value)),
-    [children]
-  );
-}
 
 export type ScreenProps<
   TOptions extends Record<string, any> = Record<string, any>
@@ -21,25 +17,31 @@ export type ScreenProps<
   /** Name is required when used inside a Layout component. */
   name?: string;
   /**
-   * Redirect to the nearest or provided sibling route.
+   * Redirect to the nearest sibling route.
    * If all children are redirect={true}, the layout will render `null` as there are no children to render.
    */
-  redirect?: boolean | string;
+  redirect?: boolean;
   initialParams?: { [key: string]: any };
   options?: TOptions;
+
+  // TODO: types
+  listeners?: any;
 };
 
 function getSortedChildren(
   children: RouteNode[],
-  order?: ScreenProps[]
-): { route: RouteNode; props: any }[] {
+  order?: ScreenProps[],
+  initialRouteName?: string
+): { route: RouteNode; props: Partial<ScreenProps> }[] {
   if (!order?.length) {
-    return children.sort(sortRoutes).map((route) => ({ route, props: {} }));
+    return children
+      .sort(sortRoutesWithInitial(initialRouteName))
+      .map((route) => ({ route, props: {} }));
   }
   const entries = [...children];
 
   const ordered = order
-    .map(({ name, redirect, initialParams, options }) => {
+    .map(({ name, redirect, initialParams, listeners, options }) => {
       if (!entries.length) {
         console.warn(
           `[Layout children]: Too many screens defined. Route "${name}" is extraneous.`
@@ -68,7 +70,7 @@ function getSortedChildren(
           return null;
         }
 
-        return { route: match, props: { initialParams, options } };
+        return { route: match, props: { initialParams, listeners, options } };
       }
     })
     .filter(Boolean) as {
@@ -78,7 +80,9 @@ function getSortedChildren(
 
   // Add any remaining children
   ordered.push(
-    ...entries.sort(sortRoutes).map((route) => ({ route, props: {} }))
+    ...entries
+      .sort(sortRoutesWithInitial(initialRouteName))
+      .map((route) => ({ route, props: {} }))
   );
 
   return ordered;
@@ -88,8 +92,11 @@ function getSortedChildren(
  * @returns React Navigation screens sorted by the `route` property.
  */
 export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
-  const children = useRoutes();
-  const sorted = getSortedChildren(children, order);
+  const node = useRouteNode();
+
+  const sorted = node?.children?.length
+    ? getSortedChildren(node.children, order, node.initialRouteName)
+    : [];
   return React.useMemo(
     () => sorted.map((value) => routeToScreen(value.route, value.props)),
     [sorted]
@@ -101,30 +108,46 @@ export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
 const qualifiedStore = new WeakMap<RouteNode, React.ComponentType<any>>();
 
 /** Wrap the component with various enhancements and add access to child routes. */
-function getQualifiedRouteComponent(value: RouteNode) {
+export function getQualifiedRouteComponent(value: RouteNode) {
   if (qualifiedStore.has(value)) {
     return qualifiedStore.get(value)!;
   }
 
-  const Component = value.getComponent();
-
-  const { ErrorBoundary } = value.getExtras();
+  const { default: Component, ErrorBoundary } = value.loadRoute();
 
   const QualifiedRoute = React.forwardRef(
-    (props: { route: any; navigation: any }, ref: any) => {
-      // Surface dynamic name as props to the view
+    (
+      {
+        // Remove these React Navigation props to
+        // enforce usage of expo-router hooks (where the query params are correct).
+        route,
+        navigation,
+
+        // Pass all other props to the component
+        ...props
+      }: any,
+      ref: any
+    ) => {
       const children = React.createElement(Component, {
         ...props,
         ref,
+        // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
+        // the intention is to make it possible to deduce shared routes.
+        segment: value.route,
       });
 
-      const errorBoundary = ErrorBoundary ? (
-        <Try catch={ErrorBoundary}>{children}</Try>
-      ) : (
-        children
-      );
+      const errorBoundary = React.useMemo(() => {
+        if (ErrorBoundary) {
+          return <Try catch={ErrorBoundary}>{children}</Try>;
+        }
+        return children;
+      }, [ErrorBoundary, children]);
 
-      return <Route filename={value.contextKey}>{errorBoundary}</Route>;
+      return (
+        <LocationProvider>
+          <Route node={value}>{errorBoundary}</Route>
+        </LocationProvider>
+      );
     }
   );
 
@@ -135,32 +158,70 @@ function getQualifiedRouteComponent(value: RouteNode) {
   return QualifiedRoute;
 }
 
+/** @returns a function which provides a screen id that matches the dynamic route name in params. */
+export function createGetIdForRoute(
+  route: Pick<RouteNode, "dynamic" | "route">
+) {
+  if (!route.dynamic?.length) {
+    return undefined;
+  }
+  return ({ params }: { params?: Record<string, any> }) => {
+    const getPreferredId = (segment: DynamicConvention) => {
+      // Params can be undefined when there are no params in the route.
+      const preferredId = params?.[segment.name];
+      // If the route has a dynamic segment, use the matching parameter
+      // as the screen id. This enables pushing a screen like `/[user]` multiple times
+      // when the user is different.
+      if (preferredId) {
+        if (!Array.isArray(preferredId)) {
+          return preferredId;
+        } else if (preferredId.length) {
+          // Deep dynamic routes will return as an array, so we'll join them to create a
+          // fully qualified string.
+          return preferredId.join("/");
+        }
+        // Empty arrays...
+      }
+      return segment.deep ? `[...${segment.name}]` : `[${segment.name}]`;
+    };
+    return route.dynamic?.map((segment) => getPreferredId(segment)).join("/");
+  };
+}
+
 function routeToScreen(
   route: RouteNode,
   { options, ...props }: Partial<ScreenProps> = {}
 ) {
-  const staticOptions = route.getExtras()?.getNavOptions;
   return (
     <Screen
+      // Users can override the screen getId function.
+      getId={createGetIdForRoute(route)}
       {...props}
       name={route.route}
       key={route.route}
-      options={
-        options
-          ? (args) => {
-              const staticResult =
-                typeof staticOptions === "function"
-                  ? staticOptions(args)
-                  : staticOptions;
-              const dynamicResult =
-                typeof options === "function" ? options?.(args) : options;
-              return {
-                ...staticResult,
-                ...dynamicResult,
-              };
-            }
-          : staticOptions
-      }
+      options={(args) => {
+        // Only eager load generated components
+        const staticOptions = route.generated
+          ? route.loadRoute()?.getNavOptions
+          : null;
+        const staticResult =
+          typeof staticOptions === "function"
+            ? staticOptions(args)
+            : staticOptions;
+        const dynamicResult =
+          typeof options === "function" ? options?.(args) : options;
+        const output = {
+          ...staticResult,
+          ...dynamicResult,
+        };
+
+        // Prevent generated screens from showing up in the tab bar.
+        if (route.generated) {
+          output.tabBarButton = () => null;
+        }
+
+        return output;
+      }}
       getComponent={() => getQualifiedRouteComponent(route)}
     />
   );

@@ -3,12 +3,12 @@ import React from "react";
 import { Platform, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Link } from "../link/Link";
 import { ErrorBoundaryProps } from "./Try";
+import { Link } from "../link/Link";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
-    <View accessibilityRole="main" style={[styles.container]}>
+    <View style={[styles.container]}>
       <SafeAreaView
         style={{ flex: 1, maxWidth: 720, marginHorizontal: "auto" }}
       >
@@ -65,7 +65,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 
         <StackTrace error={error} />
         {process.env.NODE_ENV === "development" && (
-          <Link href="/__index" style={styles.link}>
+          <Link href="/_sitemap" style={styles.link}>
             Sitemap
           </Link>
         )}

@@ -9,3 +9,7 @@ export interface RequireContext {
   /** **Unimplemented:** Readable identifier for the context module. */
   id: string;
 }
+
+/** The list of input keys will become optional, everything else will remain the same. */
+export type PickPartial<T, K extends keyof T> = Omit<T, K> &
+  Partial<Pick<T, K>>;

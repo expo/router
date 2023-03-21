@@ -1,21 +1,35 @@
-export type Href = string | { pathname?: string; query?: Record<string, any> };
+export type Href = string | HrefObject;
 
-export const resolveHref = (
-  href: { pathname?: string; query?: Record<string, any> } | string
-): string => {
+export interface HrefObject {
+  /** Path representing the selected route `/[id]`. */
+  pathname?: string;
+  /** Query parameters for the path. */
+  params?: Record<string, any>;
+}
+
+/** Resolve an href object into a fully qualified, relative href. */
+export const resolveHref = (href: Href): string => {
   if (typeof href === "string") {
-    return href ?? "";
+    return resolveHref({ pathname: href ?? "" });
   }
   const path = href.pathname ?? "";
-  if (!href?.query) {
+  if (!href?.params) {
     return path;
   }
-  const { pathname, query } = createQualifiedPathname(path, { ...href.query });
-  return pathname + (Object.keys(query).length ? `?${createQuery(query)}` : "");
+  const { pathname, params } = createQualifiedPathname(path, {
+    ...href.params,
+  });
+  return (
+    pathname +
+    (Object.keys(params).length ? `?${createQueryParams(params)}` : "")
+  );
 };
 
-function createQualifiedPathname(pathname: string, query: Record<string, any>) {
-  for (const [key, value = ""] of Object.entries(query)) {
+function createQualifiedPathname(
+  pathname: string,
+  params: Record<string, any>
+): Omit<Required<HrefObject>, "query"> {
+  for (const [key, value = ""] of Object.entries(params)) {
     const dynamicKey = `[${key}]`;
     const deepDynamicKey = `[...${key}]`;
     if (pathname.includes(dynamicKey)) {
@@ -32,13 +46,13 @@ function createQualifiedPathname(pathname: string, query: Record<string, any>) {
       continue;
     }
 
-    delete query[key];
+    delete params[key];
   }
-  return { pathname, query };
+  return { pathname, params };
 }
 
-function createQuery(query: Record<string, any>) {
-  return Object.keys(query)
-    .map((key) => `${key}=${query[key]}`)
+function createQueryParams(params: Record<string, any>): string {
+  return Object.entries(params)
+    .map((props) => props.join("="))
     .join("&");
 }

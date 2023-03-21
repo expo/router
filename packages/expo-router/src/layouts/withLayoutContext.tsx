@@ -1,13 +1,20 @@
 import React from "react";
 
+import { useContextKey } from "../Route";
+import { PickPartial } from "../types";
 import { useSortedScreens, ScreenProps } from "../useScreens";
 import { Screen } from "../views/Screen";
 
-type PickPartial<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
 export function useFilterScreenChildren(
   children: React.ReactNode,
-  { isCustomNavigator }: { isCustomNavigator?: boolean } = {}
+  {
+    isCustomNavigator,
+    contextKey,
+  }: {
+    isCustomNavigator?: boolean;
+    /** Used for sending developer hints */
+    contextKey?: string;
+  } = {}
 ) {
   return React.useMemo(() => {
     const customChildren: any[] = [];
@@ -15,7 +22,7 @@ export function useFilterScreenChildren(
       if (React.isValidElement(child) && child && child.type === Screen) {
         if (!child.props.name) {
           throw new Error(
-            "Screen must have a name prop when used as a child of a Layout"
+            `<Screen /> component in \`default export\` at \`app${contextKey}/_layout\` must have a \`name\` prop when used as a child of a Layout Route.`
           );
         }
         if (process.env.NODE_ENV !== "production") {
@@ -25,7 +32,7 @@ export function useFilterScreenChildren(
             )
           ) {
             throw new Error(
-              "Screen must not have a children, component, or getComponent prop when used as a child of a Layout"
+              `<Screen /> component in \`default export\` at \`app${contextKey}/_layout\` must not have a \`children\`, \`component\`, or \`getComponent\` prop when used as a child of a Layout Route`
             );
           }
         }
@@ -35,7 +42,7 @@ export function useFilterScreenChildren(
           customChildren.push(child);
         } else {
           console.warn(
-            "Layout children must be of type Screen, all other children are ignored. To use custom children, create a custom <Layout />."
+            `Layout children must be of type Screen, all other children are ignored. To use custom children, create a custom <Layout />. Update Layout Route at: "app${contextKey}/_layout"`
           );
         }
       }
@@ -62,7 +69,8 @@ export function withLayoutContext<
   TOptions extends object,
   T extends React.ComponentType<any>
 >(
-  Nav: T
+  Nav: T,
+  processor?: (options: ScreenProps<TOptions>[]) => ScreenProps<TOptions>[]
 ): React.ForwardRefExoticComponent<
   React.PropsWithoutRef<PickPartial<React.ComponentProps<T>, "children">> &
     React.RefAttributes<unknown>
@@ -77,9 +85,15 @@ export function withLayoutContext<
       }: PickPartial<React.ComponentProps<T>, "children">,
       ref
     ) => {
-      const { screens } = useFilterScreenChildren(userDefinedChildren);
+      const contextKey = useContextKey();
 
-      const sorted = useSortedScreens(screens ?? []);
+      const { screens } = useFilterScreenChildren(userDefinedChildren, {
+        contextKey,
+      });
+
+      const processed = processor ? processor(screens ?? []) : screens;
+
+      const sorted = useSortedScreens(processed ?? []);
 
       // Prevent throwing an error when there are no screens.
       if (!sorted.length) {
@@ -88,7 +102,7 @@ export function withLayoutContext<
 
       return (
         // @ts-expect-error
-        <Nav {...props} ref={ref} children={sorted} />
+        <Nav {...props} id={contextKey} ref={ref} children={sorted} />
       );
     }
   );
