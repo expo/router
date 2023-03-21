@@ -179,7 +179,7 @@ class Location {
         enumerable: true,
       },
       [Symbol.for("Expo.privateCustomInspect")]: {
-        value: function (inspect: any) {
+        value(inspect: any) {
           const object = {
             hash: this.hash,
             host: this.host,
