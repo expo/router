@@ -8,6 +8,7 @@ import { ctx as rootContext } from "expo-router/_root-ctx";
 
 export function getRootComponent() {
   const keys = rootContext.keys();
+  console.log("getRootComponent>>", keys);
   if (!keys.length) {
     return (require("./root") as typeof import("./root")).Root;
   }

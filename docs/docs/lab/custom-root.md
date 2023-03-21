@@ -2,7 +2,7 @@
 title: Custom Root HTML
 ---
 
-When you statically render an Expo website, the root HTML element for each page can be customized by creating an `apps/+root.js` file that exports a default HTML component.
+When you statically render an Expo website (`EXPO_USE_STATIC=1 yarn expo start` cite needed), the root HTML element for each page can be customized by creating an `apps/+root.js` file that exports a default HTML component.
 
 ## Default Root
 
