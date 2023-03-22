@@ -1,3 +1,4 @@
+const { getConfig } = require("expo/config");
 const nodePath = require("path");
 const resolveFrom = require("resolve-from");
 const { getExpoConstantsManifest } = require("./node/getExpoConstantsManifest");
@@ -17,23 +18,25 @@ function getExpoAppManifest(projectRoot) {
 }
 
 function getExpoRouterAppRoot(projectRoot) {
-  if (process.env.EXPO_ROUTER_APP_ROOT) {
-    return process.env.EXPO_ROUTER_APP_ROOT;
+  // Bump to v2 to prevent the CLI from setting the variable anymore.
+  // TODO: Bump to v3 to revert back to the CLI setting the variable again, but with custom value
+  // support.
+  if (process.env.EXPO_ROUTER_APP_ROOT_2) {
+    return process.env.EXPO_ROUTER_APP_ROOT_2;
   }
   const routerEntry = resolveFrom.silent(projectRoot, "expo-router/entry");
 
-  if (!routerEntry) {
-    console.warn(
-      `Required environment variable EXPO_ROUTER_APP_ROOT is not defined, bundle with Expo CLI (expo@^46.0.13) to fix.`
-    );
-    process.env.EXPO_ROUTER_APP_ROOT = "../../app";
-    return process.env.EXPO_ROUTER_APP_ROOT;
-  }
+  const { exp } = getConfig(projectRoot);
+  const customSrc = exp.extra.router.unstable_src || "./app";
+  const isAbsolute = customSrc.startsWith("/");
   // It doesn't matter if the app folder exists.
-  const appFolder = nodePath.join(projectRoot, "app");
+  const appFolder = isAbsolute
+    ? customSrc
+    : nodePath.join(projectRoot, customSrc);
   const appRoot = nodePath.relative(nodePath.dirname(routerEntry), appFolder);
   debug("routerEntry", routerEntry, appFolder, appRoot);
 
+  process.env.EXPO_ROUTER_APP_ROOT_2 = appRoot;
   return appRoot;
 }
 

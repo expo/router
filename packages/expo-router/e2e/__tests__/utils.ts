@@ -207,19 +207,52 @@ export async function createFromFixtureAsync(
     throw error;
   }
 
-  await execa(
-    "yarn",
-    ["add", await ensureLatestPackPathAsync(), latestCliPackPath],
-    {
-      cwd: projectRoot,
-    }
-  );
+  await execa("yarn", ["link"], { cwd: expoRouterFolder });
+  await execa("yarn", ["link", "expo-router"], { cwd: projectRoot });
+  await execa("yarn", ["install", "--force"], { cwd: projectRoot });
+
+  // await execa(
+  //   "yarn",
+  //   ["add", await ensureLatestPackPathAsync(), latestCliPackPath],
+  //   {
+  //     cwd: projectRoot,
+  //   }
+  // );
 
   return projectRoot;
 }
 
 // Set this to true to enable caching and prevent rerunning yarn installs
-const testingLocally = !process.env.CI;
+const testingLocally = false; //!process.env.CI;
+
+export async function ensureTesterReadyAsync(
+  fixtureName: string
+): Promise<string> {
+  const root = path.join(__dirname, "../../../apps/tester");
+
+  // Clear metro cache for the env var to be updated
+  await fs.remove(path.join(root, "node_modules/.cache/metro"));
+
+  process.env.E2E_ROUTER_SRC = fixtureName;
+
+  await execa("yarn", { cwd: root });
+
+  await execa("yarn", ["add", latestCliPackPath], {
+    cwd: root,
+  });
+
+  // // If you're testing this locally, you can set the projectRoot to a local project (you created with expo init) to save time.
+  // const projectRoot = await createFromFixtureAsync(os.tmpdir(), {
+  //   dirName: name,
+  //   reuseExisting: testingLocally,
+  //   fixtureName,
+  // });
+
+  // // Many of the factors in this test are based on the expected SDK version that we're testing against.
+  // const { exp } = getConfig(projectRoot, { skipPlugins: true });
+  // expect(exp.sdkVersion).toBe(sdkVersion);
+  return root;
+}
 
 export async function setupTestProjectAsync(
   name: string,

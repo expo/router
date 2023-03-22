@@ -10,6 +10,7 @@ import {
   setupTestProjectAsync,
   bin,
   ensurePortFreeAsync,
+  ensureTesterReadyAsync,
 } from "./utils";
 
 const originalForceColor = process.env.FORCE_COLOR;
@@ -33,11 +34,7 @@ beforeEach(() => ensurePortFreeAsync(19000));
 it(
   "runs `npx expo export -p web` for static rendering",
   async () => {
-    const projectRoot = await setupTestProjectAsync(
-      "export-router",
-      "with-custom-root",
-      "48.0.0"
-    );
+    const projectRoot = await ensureTesterReadyAsync("custom-html");
 
     await execa("npx", [bin, "export", "-p", "web"], {
       cwd: projectRoot,
