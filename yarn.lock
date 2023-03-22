@@ -1419,16 +1419,15 @@
     mv "~2"
     safe-json-stringify "~1"
 
-"@expo/cli@0.6.2":
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/@expo/cli/-/cli-0.6.2.tgz#1090c9d23f49d9603c4c85fa85b878b2848da322"
-  integrity sha512-uhmrXNemXTbCTKP/ycyJHOU/KLGdFwVCrWNBzz1VkwnmL8yJV5F3C18a83ybFFnUNfkGHeH5LtID7CSNbbTWKg==
+"@expo/cli@0.6.2", "@expo/cli@file:./expo-cli.tgz":
+  version "0.6.1"
+  resolved "file:./expo-cli.tgz#62773e4bffd23cf0dd21e4530fdeb3c5359189ac"
   dependencies:
     "@babel/runtime" "^7.20.0"
     "@expo/code-signing-certificates" "0.0.5"
     "@expo/config" "~8.0.0"
     "@expo/config-plugins" "~6.0.0"
-    "@expo/dev-server" "0.2.3"
+    "@expo/dev-server" "0.2.2"
     "@expo/devcert" "^1.0.0"
     "@expo/json-file" "^8.2.37"
     "@expo/metro-config" "~0.7.0"
@@ -1472,6 +1471,7 @@
     progress "2.0.3"
     prompts "^2.3.2"
     qrcode-terminal "0.11.0"
+    require-from-string "^2.0.2"
     requireg "^0.2.2"
     resolve-from "^5.0.0"
     semver "^6.3.0"
@@ -1484,6 +1484,7 @@
     text-table "^0.2.0"
     url-join "4.0.0"
     wrap-ansi "^7.0.0"
+    ws "^8.12.1"
 
 "@expo/code-signing-certificates@0.0.5":
   version "0.0.5"
@@ -1636,10 +1637,10 @@
     xcode "^3.0.0"
     xml-js "^1.6.11"
 
-"@expo/dev-server@0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@expo/dev-server/-/dev-server-0.2.3.tgz#736317cc1340b28dc49da8a45b85040306048e24"
-  integrity sha512-9+6QGRdymj3dmTp1vUpROvWJ+Ezz6Qp9xHafAcaRHzw322pUCOiRKxTYqDqYYZ/72shrHPGQ2CiIXTnV1vM2tA==
+"@expo/dev-server@0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@expo/dev-server/-/dev-server-0.2.2.tgz#203db1ffed32f096749ab491b2c50bd4e242a22a"
+  integrity sha512-JcBI3peg2YA2hmnbAB+2rwODNC/6ca3k5gUbFLf2/NM0nkT14AvrKYhWCXrZsmKWxdLjNvL3X/vrgUCZS+LIfg==
   dependencies:
     "@expo/bunyan" "4.0.0"
     "@expo/metro-config" "~0.7.0"
@@ -16576,6 +16577,11 @@ ws@^8.11.0:
   version "8.12.1"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.12.1.tgz#c51e583d79140b5e42e39be48c934131942d4a8f"
   integrity sha512-1qo+M9Ba+xNhPB+YTWUlK6M17brTut5EXbcBaMRN5pH5dFrXz7lzz1ChFSUq3bOUl8yEvSenhHmYUNJxFzdJew==
+
+ws@^8.12.1:
+  version "8.13.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.13.0.tgz#9a9fb92f93cf41512a0735c8f4dd09b8a1211cd0"
+  integrity sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==
 
 xcode@^3.0.0, xcode@^3.0.1:
   version "3.0.1"

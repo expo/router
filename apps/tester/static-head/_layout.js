@@ -1,5 +1,5 @@
-import { Stack } from 'expo-router';
-import Head from 'expo-router/head';
+import { Stack } from "expo-router";
+import Head from "expo-router/head";
 
 export default function Layout() {
   return (
@@ -7,7 +7,7 @@ export default function Layout() {
       <Head>
         <meta name="fake" content="bar" />
       </Head>
-      <Stack />;
+      <Stack />
     </>
   );
 }

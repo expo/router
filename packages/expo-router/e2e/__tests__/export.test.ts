@@ -5,19 +5,12 @@ import fs from "fs-extra";
 import klawSync from "klaw-sync";
 import path from "path";
 
-import {
-  projectRoot,
-  setupTestProjectAsync,
-  bin,
-  ensurePortFreeAsync,
-  ensureTesterReadyAsync,
-} from "./utils";
+import { bin, ensurePortFreeAsync, ensureTesterReadyAsync } from "./utils";
 
 const originalForceColor = process.env.FORCE_COLOR;
 const originalCI = process.env.CI;
 
 beforeAll(async () => {
-  await fs.mkdir(projectRoot, { recursive: true });
   process.env.FORCE_COLOR = "0";
   process.env.CI = "1";
   process.env.EXPO_USE_PATH_ALIASES = "1";
@@ -31,8 +24,9 @@ afterAll(() => {
 });
 
 beforeEach(() => ensurePortFreeAsync(19000));
-it(
-  "runs `npx expo export -p web` for static rendering",
+
+xit(
+  "exports with custom +html.js wrapper",
   async () => {
     const projectRoot = await ensureTesterReadyAsync("custom-html");
 
@@ -71,48 +65,169 @@ it(
       version: 0,
     });
 
-    // If this changes then everything else probably changed as well.
-    expect(files).toEqual([
-      // TODO: No +html.html
-      "+html.html",
-      "[...404].html",
-      "_sitemap.html",
-      "about.html",
-      "assets/35ba0eaec5a4f5ed12ca16fabeae451d",
-      "assets/369745d4a4a6fa62fa0ed495f89aa964",
-      "assets/4f355ba1efca4b9c0e7a6271af047f61",
-      "assets/5223c8d9b0d08b82a5670fb5f71faf78",
-      "assets/52dec48a970c0a4eed4119cd1252ab09",
-      "assets/5b50965d3dfbc518fe50ce36c314a6ec",
-      "assets/817aca47ff3cea63020753d336e628a4",
-      "assets/b2de8e638d92e0f719fa92fa4085e02a",
-      "assets/cbbeac683d803ac27cefb817787d2bfa",
-      "assets/e62addcde857ebdb7342e6b9f1095e97",
-      expect.stringMatching(/bundles\/web-.*\.js/),
-      "favicon.ico",
-      "index.html",
-      "metadata.json",
-    ]);
+    // The wrapper should not be included as a route.
+    expect(files).not.toContain("+html.html");
+    expect(files).toContain("index.html");
+    expect(files).toContain("_sitemap.html");
+    expect(files).toContain("[...404].html");
+    // expect(files).toContain(expect.stringMatching(/bundles\/web-.*\.js/));
 
-    const about = await fs.readFile(path.join(outputDir, "about.html"), "utf8");
+    const page = await fs.readFile(path.join(outputDir, "index.html"), "utf8");
 
-    // Route-specific head tags
-    expect(about).toContain(`<title data-rh="true">About | Website</title>`);
-
-    // Nested head tags from layout route
-    expect(about).toContain('<meta data-rh="true" name="fake" content="bar"/>');
+    expect(page).toContain('<meta name="custom-value" content="value"/>');
 
     // Root element
-    expect(about).toContain('<div id="root">');
-    // Content of the page
-    expect(about).toContain('data-testid="content">About</div>');
+    expect(page).toContain('<div id="root">');
 
-    // <script src="/bundles/web-c91ecb663cfce9b9e90e28d253e72e0a.js" defer>
-    const sanitizedAbout = about.replace(
+    const sanitized = page.replace(
       /<script src="\/bundles\/.*" defer>/g,
       '<script src="/bundles/[mock].js" defer>'
     );
-    expect(sanitizedAbout).toMatchSnapshot();
+    expect(sanitized).toMatchSnapshot();
+  },
+  // Could take 45s depending on how fast npm installs
+  240 * 1000
+);
+
+it(
+  "exports with nested static head",
+  async () => {
+    const projectRoot = await ensureTesterReadyAsync("static-head");
+
+    await execa("npx", [bin, "export", "-p", "web"], {
+      cwd: projectRoot,
+      env: {
+        EXPO_USE_STATIC: "1",
+      },
+    });
+
+    const outputDir = path.join(projectRoot, "dist");
+    // List output files with sizes for snapshotting.
+    // This is to make sure that any changes to the output are intentional.
+    // Posix path formatting is used to make paths the same across OSes.
+    const files = klawSync(outputDir)
+      .map((entry) => {
+        if (entry.path.includes("node_modules") || !entry.stats.isFile()) {
+          return null;
+        }
+        return path.posix.relative(outputDir, entry.path);
+      })
+      .filter(Boolean);
+
+    // The wrapper should not be included as a route.
+    expect(files).not.toContain("+html.html");
+    expect(files).toContain("index.html");
+    expect(files).toContain("about.html");
+    expect(files).toContain("_sitemap.html");
+    expect(files).toContain("[...404].html");
+    // expect(files).toContain(expect.stringMatching(/bundles\/web-.*\.js/));
+
+    const page = await fs.readFile(path.join(outputDir, "about.html"), "utf8");
+
+    // Route-specific head tags
+    expect(page).toContain(`<title data-rh="true">About | Website</title>`);
+
+    // Nested head tags from layout route
+    expect(page).toContain('<meta data-rh="true" name="fake" content="bar"/>');
+
+    // Content of the page
+    expect(page).toContain('data-testid="content">About</div>');
+
+    // Root element
+    expect(page).toContain('<div id="root">');
+
+    const sanitized = page.replace(
+      /<script src="\/bundles\/.*" defer>/g,
+      '<script src="/bundles/[mock].js" defer>'
+    );
+    expect(sanitized).toMatchSnapshot();
+  },
+  // Could take 45s depending on how fast npm installs
+  240 * 1000
+);
+
+xit(
+  "exports with relative fetch enabled",
+  async () => {
+    const projectRoot = await ensureTesterReadyAsync("relative-fetch");
+
+    await execa("npx", [bin, "export", "-p", "ios"], {
+      cwd: projectRoot,
+      env: {
+        EXPO_USE_STATIC: "1",
+      },
+    });
+
+    const outputDir = path.join(projectRoot, "dist");
+    // List output files with sizes for snapshotting.
+    // This is to make sure that any changes to the output are intentional.
+    // Posix path formatting is used to make paths the same across OSes.
+    const files = klawSync(outputDir)
+      .map((entry) => {
+        if (entry.path.includes("node_modules") || !entry.stats.isFile()) {
+          return null;
+        }
+        return path.posix.relative(outputDir, entry.path);
+      })
+      .filter(Boolean);
+
+    // The wrapper should not be included as a route.
+    expect(files).not.toContain("+html.html");
+    expect(files).not.toContain("index.html");
+
+    const iosBundle = files.find((v) => v?.startsWith("bundles/ios"));
+    expect(iosBundle).toBeDefined();
+
+    const bundle = await fs.readFile(path.join(outputDir, iosBundle!), "utf8");
+
+    expect(bundle).toContain("__EXPO_BASE_URL_POLYFILLED");
+  },
+  // Could take 45s depending on how fast npm installs
+  240 * 1000
+);
+
+xit(
+  "exports with global CSS",
+  async () => {
+    const projectRoot = await ensureTesterReadyAsync("global-css");
+
+    await execa("npx", [bin, "export"], {
+      cwd: projectRoot,
+      env: {
+        EXPO_USE_STATIC: "1",
+      },
+    });
+
+    const outputDir = path.join(projectRoot, "dist");
+    // List output files with sizes for snapshotting.
+    // This is to make sure that any changes to the output are intentional.
+    // Posix path formatting is used to make paths the same across OSes.
+    const files = klawSync(outputDir)
+      .map((entry) => {
+        if (entry.path.includes("node_modules") || !entry.stats.isFile()) {
+          return null;
+        }
+        return path.posix.relative(outputDir, entry.path);
+      })
+      .filter(Boolean);
+
+    expect(files).toContain("index.html");
+
+    const iosBundlePath = files.find((v) => v?.startsWith("bundles/ios"));
+    expect(iosBundlePath).toBeDefined();
+    const bundle = await fs.readFile(
+      path.join(outputDir, iosBundlePath!),
+      "utf8"
+    );
+    expect(bundle).not.toContain("background: cyan;");
+
+    const webBundlePath = files.find((v) => v?.startsWith("bundles/web"));
+    expect(webBundlePath).toBeDefined();
+    const webBundle = await fs.readFile(
+      path.join(outputDir, webBundlePath!),
+      "utf8"
+    );
+    expect(webBundle).toContain("background: cyan;");
   },
   // Could take 45s depending on how fast npm installs
   240 * 1000

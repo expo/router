@@ -41,11 +41,18 @@ config.resolver.nodeModulesPaths = [
 config.resolver.disableHierarchicalLookup = true;
 
 const { FileStore } = require("metro-cache");
+
 config.cacheStores = [
   // Ensure the cache isn't shared between projects
   // this ensures the transform-time environment variables are changed to reflect
   // the current project.
-  new FileStore({ root: path.join(projectRoot, "node_modules/.cache/metro") }),
+  new FileStore({
+    root: path.join(
+      projectRoot,
+      "node_modules/.cache/metro",
+      process.env.E2E_ROUTER_SRC || "app"
+    ),
+  }),
 ];
 
 module.exports = config;

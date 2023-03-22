@@ -54,6 +54,11 @@ export function getStaticContent(location: URL): string {
 
   // Eval the CSS after the HTML is rendered so that the CSS is in the same order
   const css = ReactDOMServer.renderToStaticMarkup(getStyleElement());
+  console.log(
+    "headContext.helmet",
+    location,
+    headContext.helmet.title.toString()
+  );
 
   let output = mixHeadComponentsWithStaticResults(headContext.helmet, html);
 
