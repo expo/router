@@ -4,13 +4,12 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { ctx as rootContext } from "expo-router/_root-ctx";
+import { ctx as rootContext } from "expo-router/_html-ctx";
 
 export function getRootComponent() {
   const keys = rootContext.keys();
-  console.log("getRootComponent>>", keys);
   if (!keys.length) {
-    return (require("./root") as typeof import("./root")).Root;
+    return (require("./html") as typeof import("./html")).Html;
   }
   if (keys.length > 1) {
     throw new Error(

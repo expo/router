@@ -242,13 +242,13 @@ describe(getUserDefinedDeepDynamicRoute, () => {
 
 describe(getExactRoutes, () => {
   // NOTE(EvanBacon): This tests when all you have is a root layout.
-  it(`automatically blocks +root file`, () => {
+  it(`automatically blocks +html file`, () => {
     expect(
       dropFunctions(
         getExactRoutes(
           createMockContextModule({
-            "./+root.js": { default() {} },
-            "./other/+root.js": { default() {} },
+            "./+html.js": { default() {} },
+            "./other/+html.js": { default() {} },
             "./_layout.tsx": { default() {} },
           })
         )!
@@ -257,9 +257,9 @@ describe(getExactRoutes, () => {
       children: [
         {
           children: [],
-          contextKey: "./other/+root.js",
+          contextKey: "./other/+html.js",
           dynamic: null,
-          route: "other/+root",
+          route: "other/+html",
         },
       ],
       contextKey: "./_layout.tsx",

@@ -1,9 +1,9 @@
 /// <reference path="metro-require.d.ts" />
 
-/** Optionally import `app/+root.js` file. */
+/** Optionally import `app/+html.js` file. */
 export const ctx = require.context(
   process.env.EXPO_ROUTER_APP_ROOT!,
   false,
-  /\+root\.[tj]sx?$/,
+  /\+html\.[tj]sx?$/,
   "sync"
 );

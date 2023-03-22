@@ -76,8 +76,8 @@ it(
 
     // If this changes then everything else probably changed as well.
     expect(files).toEqual([
-      // TODO: No +root.html
-      "+root.html",
+      // TODO: No +html.html
+      "+html.html",
       "[...404].html",
       "_sitemap.html",
       "about.html",

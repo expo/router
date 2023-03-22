@@ -19,18 +19,8 @@ export function ScrollViewStyleReset() {
     />
   );
 }
-// export function StyleReset() {
-//   return (
-//     <style
-//       id="expo-reset"
-//       dangerouslySetInnerHTML={{
-//         __html: `#root,body,html{-webkit-overflow-scrolling:touch}#root{display:flex;flex-direction:column;height:100%}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}body{overflow-y:auto;overscroll-behavior-y:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-ms-overflow-style:scrollbar}`,
-//       }}
-//     />
-//   );
-// }
 
-export function Root({ children }: { children: React.ReactNode }) {
+export function Html({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>

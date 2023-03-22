@@ -377,7 +377,7 @@ export function getExactRoutes(
 ): RouteNode | null {
   const allowed = processKeys(contextModule.keys(), {
     ...options,
-    ignore: [/^\.\/\+root\.[tj]sx?$/, ...options?.ignore],
+    ignore: [/^\.\/\+html\.[tj]sx?$/, ...options?.ignore],
   });
   assertDuplicateRoutes(allowed);
   const files = contextModuleToFileNodes(contextModule, allowed);
