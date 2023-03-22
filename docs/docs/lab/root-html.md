@@ -1,5 +1,7 @@
 ---
 title: Custom Root HTML
+# TODO
+sidebar_class_name: hidden
 ---
 
 > This guide refers to upcoming Expo Router features, all of which are experimental. You may need to use [Expo CLI on main](https://github.com/expo/expo/blob/main/packages/%40expo/cli/README.md#contributing) to enable this feature.
