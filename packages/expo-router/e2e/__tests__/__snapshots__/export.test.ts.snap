@@ -235,7 +235,7 @@ input::-webkit-search-cancel-button,input::-webkit-search-decoration,input::-web
 @keyframes r-9p3sdl{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
 @keyframes r-imtty0{0%{opacity:0;}100%{opacity:1;}}
 @keyframes r-ndfo3d{0%{transform:translateY(0%);}100%{transform:translateY(100%);}}
-@keyframes r-t2lo5v{0%{opacity:1;}100%{opacity:0;}}</style></head><body><div id="root"><div class="css-175oi2r" style="flex:1"><div class="css-175oi2r r-13awgt0"></div></div></div><script src="/bundles/[mock].js" defer></script></body></html>"
+@keyframes r-t2lo5v{0%{opacity:1;}100%{opacity:0;}}</style></head><body><div id="root"><div class="css-175oi2r" style="flex:1"><div class="css-175oi2r r-13awgt0"><div dir="auto" class="css-1rynq56">Index</div></div></div></div><script src="/bundles/[mock].js" defer></script></body></html>"
 `;
 
 exports[`exports with nested static head 1`] = `
