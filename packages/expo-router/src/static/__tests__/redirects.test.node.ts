@@ -34,7 +34,7 @@ describe(nextRedirect, () => {
   it(`redirects with external URLs`, () => {
     expect(
       nextRedirect("/a", [{ from: "/:slug", to: "https://acme.app" }])
-    ).toBe("https://acme.app");
+    ).toBe("https://acme.app/");
   });
   it(`redirects with slugs`, () => {
     expect(nextRedirect("/a", [{ from: "/:slug", to: "/b" }])).toBe("/b");
@@ -48,5 +48,66 @@ describe(nextRedirect, () => {
         { from: "/c/:slug", to: "/d/:slug" },
       ])
     ).toBe("/d/a");
+  });
+
+  it(`redirects with has`, () => {
+    expect(
+      nextRedirect("/a?foo=bar", [
+        {
+          from: "/:slug",
+          to: "/b/:slug",
+          has: [
+            {
+              type: "query",
+              key: "foo",
+            },
+          ],
+        },
+      ])
+    ).toBe("/b/a?foo=bar");
+    expect(
+      nextRedirect("/a?bar=foo", [
+        {
+          from: "/:slug",
+          to: "/b/:slug",
+          has: [
+            {
+              type: "query",
+              key: "foo",
+            },
+          ],
+        },
+      ])
+    ).toBe("/a?bar=foo");
+  });
+  it(`redirects with missing`, () => {
+    expect(
+      nextRedirect("/a?foo=bar", [
+        {
+          from: "/:slug",
+          to: "/b/:slug",
+          missing: [
+            {
+              type: "query",
+              key: "bar",
+            },
+          ],
+        },
+      ])
+    ).toBe("/b/a?foo=bar");
+    expect(
+      nextRedirect("/a?foo=bar", [
+        {
+          from: "/:slug",
+          to: "/b/:slug",
+          missing: [
+            {
+              type: "query",
+              key: "foo",
+            },
+          ],
+        },
+      ])
+    ).toBe("/a?foo=bar");
   });
 });
