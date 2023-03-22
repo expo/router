@@ -4,7 +4,9 @@ title: Redirects
 
 > This guide refers to upcoming Expo Router features, all of which are experimental.
 
-Expo Router provides offline (client-side) redirects on native which can be used to migrate users from old URLs to new ones.
+Expo Router provides offline (client-side) redirects on native which can be used to migrate users from old URLs to new ones. Server-side redirects for web are still in development.
+
+<!-- TODO: Update -->
 
 ## Setup
 
@@ -97,5 +99,7 @@ You may want to support matching usernames at the root of your app with `@`, e.g
 ```
 
 Now a link to `/@evanbacon` will redirect to `/users/evanbacon`.
+
+<!-- TODO: Update -->
 
 > This is generally performed with server-side `rewrites` (currently unsupported).
