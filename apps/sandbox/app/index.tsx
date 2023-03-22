@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 export default function Page() {
-  console.log("this:", window.location.origin + "/hello.json");
+  // console.log("this:", location.origin + "/hello.json");
 
   useEffect(() => {
     fetch("/hello.json", {})
@@ -19,7 +19,7 @@ export default function Page() {
     <View style={styles.container}>
       <View style={styles.main}>
         <Image
-          source={{ uri: location.origin + "/snack.png" }}
+          source={{ uri: "/snack.png" }}
           style={{ width: 250, height: 250, backgroundColor: "blue" }}
         />
         <Text style={styles.title}>Hello Worl@d</Text>

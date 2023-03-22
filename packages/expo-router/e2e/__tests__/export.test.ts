@@ -25,7 +25,7 @@ afterAll(() => {
 
 beforeEach(() => ensurePortFreeAsync(19000));
 
-xit(
+it(
   "exports with custom +html.js wrapper",
   async () => {
     const projectRoot = await ensureTesterReadyAsync("custom-html");
@@ -34,6 +34,7 @@ xit(
       cwd: projectRoot,
       env: {
         EXPO_USE_STATIC: "1",
+        E2E_ROUTER_SRC: "custom-html",
       },
     });
 
@@ -98,6 +99,7 @@ it(
       cwd: projectRoot,
       env: {
         EXPO_USE_STATIC: "1",
+        E2E_ROUTER_SRC: "static-head",
       },
     });
 
@@ -124,6 +126,7 @@ it(
 
     const page = await fs.readFile(path.join(outputDir, "about.html"), "utf8");
 
+    // If this breaks, it's likely because the Server context is not the same between the client and server.
     // Route-specific head tags
     expect(page).toContain(`<title data-rh="true">About | Website</title>`);
 
@@ -146,7 +149,7 @@ it(
   240 * 1000
 );
 
-xit(
+it(
   "exports with relative fetch enabled",
   async () => {
     const projectRoot = await ensureTesterReadyAsync("relative-fetch");
@@ -155,6 +158,7 @@ xit(
       cwd: projectRoot,
       env: {
         EXPO_USE_STATIC: "1",
+        E2E_ROUTER_SRC: "relative-fetch",
       },
     });
 
@@ -186,7 +190,7 @@ xit(
   240 * 1000
 );
 
-xit(
+it(
   "exports with global CSS",
   async () => {
     const projectRoot = await ensureTesterReadyAsync("global-css");
@@ -195,6 +199,7 @@ xit(
       cwd: projectRoot,
       env: {
         EXPO_USE_STATIC: "1",
+        E2E_ROUTER_SRC: "global-css",
       },
     });
 
