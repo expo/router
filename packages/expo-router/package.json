@@ -4,18 +4,20 @@
   "main": "src/index.tsx",
   "types": "build/index.d.ts",
   "files": [
-    "src",
-    "build",
-    "node",
-    "entry.js",
     "_root.tsx",
-    "babel.js",
     "assets",
+    "babel.js",
+    "build",
     "drawer.ts",
+    "entry.js",
+    "head.ts",
+    "index.d.ts",
+    "metro-require.d.ts",
+    "node",
+    "src",
     "stack.ts",
     "tabs.ts",
-    "head.ts",
-    "metro-require.d.ts"
+    "types"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",
