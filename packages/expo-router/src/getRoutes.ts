@@ -25,7 +25,6 @@ type TreeNode = {
 type Options = {
   ignore?: RegExp[];
   preserveApiRoutes?: boolean;
-  loadData?: boolean;
 };
 
 /** Convert a flat map of file nodes into a nested tree of files. */
@@ -94,12 +93,9 @@ function assertDeprecatedFormat(tree: TreeNode) {
   }
 }
 
-function getTreeNodesAsRouteNodes(
-  nodes: TreeNode[],
-  props: { loadData?: boolean; parentParams?: Record<string, any> }
-): RouteNode[] {
+function getTreeNodesAsRouteNodes(nodes: TreeNode[]): RouteNode[] {
   return nodes
-    .map((node) => treeNodeToRouteNode(node, props))
+    .map((node) => treeNodeToRouteNode(node))
     .flat()
     .filter(Boolean) as RouteNode[];
 }
@@ -187,15 +183,10 @@ function cloneGroupRoute(
   };
 }
 
-type TreeNodeResolutionOptions = {
-  loadData?: boolean;
-  parentParams?: Record<string, any>;
-};
-
-function folderNodeToRouteNode(
-  { name, children }: TreeNode,
-  props: TreeNodeResolutionOptions
-): RouteNode[] | null {
+function folderNodeToRouteNode({
+  name,
+  children,
+}: TreeNode): RouteNode[] | null {
   // Empty folder, skip it.
   if (!children.length) {
     return null;
@@ -209,117 +200,16 @@ function folderNodeToRouteNode(
         ...child,
         name: [name, child.name].filter(Boolean).join("/"),
       };
-    }),
-    props
+    })
   );
 }
 
-function fileNodeToRouteNode(
-  tree: TreeNode,
-  props: TreeNodeResolutionOptions
-): RouteNode[] | null {
+function fileNodeToRouteNode(tree: TreeNode): RouteNode[] | null {
   const { name, node, children } = tree;
 
   if (!node) throw new Error("node must be defined");
 
   const dynamic = generateDynamic(name);
-
-  if (dynamic && props?.loadData) {
-    const loaded = node?.loadRoute();
-    if (loaded?.generateStaticParams) {
-      const staticParams = loaded.generateStaticParams({
-        params: props.parentParams || {},
-      });
-
-      if (!Array.isArray(staticParams)) {
-        throw new Error(
-          `generateStaticParams() must return an array of params, received ${staticParams}`
-        );
-      }
-      // Assert that at least one param from each matches the dynamic route.
-      staticParams.forEach((params) => {
-        const matches = dynamic.every((dynamic) => {
-          const value = params[dynamic.name];
-          return value !== undefined && value !== null;
-        });
-        if (!matches) {
-          throw new Error(
-            `generateStaticParams() must return an array of params that match the dynamic route. Received ${JSON.stringify(
-              params
-            )}`
-          );
-        }
-
-        dynamic.forEach((dynamic) => {
-          const value = params[dynamic.name];
-          if (dynamic.deep) {
-            if (!Array.isArray(value)) {
-              throw new Error(
-                `generateStaticParams() for route "${node.contextKey}" expected param "${dynamic.name}" to be of type Array.`
-              );
-            }
-          } else {
-            if (Array.isArray(value)) {
-              throw new Error(
-                `generateStaticParams() for route "${node.contextKey}" expected param "${dynamic.name}" to not be of type Array.`
-              );
-            }
-          }
-          return value !== undefined && value !== null;
-        });
-      });
-
-      return [
-        applyDefaultInitialRouteName({
-          loadRoute: node.loadRoute,
-          route: name,
-          contextKey: node.contextKey,
-          children: getTreeNodesAsRouteNodes(children, {
-            ...props,
-            parentParams: {
-              ...props.parentParams,
-              ...staticParams,
-            },
-          }),
-          dynamic,
-        }),
-        ...staticParams.map((params) => {
-          let parsedRoute = name;
-
-          dynamic.map((query) => {
-            const param = params[query.name];
-            const formattedParameter = Array.isArray(param)
-              ? param.join("/")
-              : param;
-            if (query.deep) {
-              parsedRoute = parsedRoute.replace(
-                `[...${query.name}]`,
-                formattedParameter
-              );
-            } else {
-              parsedRoute = parsedRoute.replace(`[${query.name}]`, param);
-            }
-          });
-
-          // const nextNode = cloneGroupRoute(node!, clone);
-          return applyDefaultInitialRouteName({
-            loadRoute: node.loadRoute,
-            // Convert the dynamic route to a static route.
-            route: parsedRoute,
-            contextKey: node.contextKey,
-            children: getTreeNodesAsRouteNodes(children, {
-              ...props,
-              parentParams: {
-                ...props.parentParams,
-                ...staticParams,
-              },
-            }),
-            dynamic: null,
-          });
-        }),
-      ];
-    }
-  }
 
   const groupName = matchGroupName(name);
   const multiGroup = groupName?.includes(",");
@@ -345,7 +235,7 @@ function fileNodeToRouteNode(
     loadRoute: node.loadRoute,
     route: name,
     contextKey: node.contextKey,
-    children: getTreeNodesAsRouteNodes(children, props),
+    children: getTreeNodesAsRouteNodes(children),
     dynamic,
   };
 
@@ -360,21 +250,18 @@ function fileNodeToRouteNode(
       loadRoute: node.loadRoute,
       route: name,
       contextKey: node.contextKey,
-      children: getTreeNodesAsRouteNodes(children, props),
+      children: getTreeNodesAsRouteNodes(children),
       dynamic,
     }),
   ];
 }
 
-function treeNodeToRouteNode(
-  tree: TreeNode,
-  props: TreeNodeResolutionOptions
-): RouteNode[] | null {
+function treeNodeToRouteNode(tree: TreeNode): RouteNode[] | null {
   if (tree.node) {
-    return fileNodeToRouteNode(tree, props);
+    return fileNodeToRouteNode(tree);
   }
 
-  return folderNodeToRouteNode(tree, props);
+  return folderNodeToRouteNode(tree);
 }
 
 function contextModuleToFileNodes(
@@ -422,11 +309,8 @@ function hasCustomRootLayoutNode(routes: RouteNode[]) {
   return false;
 }
 
-function treeNodesToRootRoute(
-  treeNode: TreeNode,
-  props: { loadData?: boolean; parentParams?: Record<string, any> }
-): RouteNode | null {
-  const routes = treeNodeToRouteNode(treeNode, props);
+function treeNodesToRootRoute(treeNode: TreeNode): RouteNode | null {
+  const routes = treeNodeToRouteNode(treeNode);
   return withOptionalRootLayout(routes);
 }
 
@@ -514,7 +398,7 @@ export function getExactRoutes(
   options?: Options
 ): RouteNode | null {
   const treeNodes = contextModuleToTree(contextModule, options);
-  const route = treeNodesToRootRoute(treeNodes, options ?? {});
+  const route = treeNodesToRootRoute(treeNodes);
   return route || null;
 }
 
@@ -533,7 +417,7 @@ export async function getExactRoutesAsync(
   options?: Options
 ): Promise<RouteNode | null> {
   const treeNodes = contextModuleToTree(contextModule, options);
-  const route = treeNodesToRootRoute(treeNodes, options ?? {});
+  const route = treeNodesToRootRoute(treeNodes);
   return route || null;
 }
 

@@ -95,14 +95,6 @@ async function loadStaticParamsRecursive(
   // Assert that at least one param from each matches the dynamic route.
   staticParams.forEach((params) => assertStaticParams(route, params));
 
-  console.log(
-    "parse:",
-    route.contextKey,
-    route.route,
-    props.parentParams,
-    route.children
-  );
-
   route.children = uniqBy(
     (
       await recurseAndFlattenNodes(
