@@ -500,11 +500,7 @@ export function getRoutes(
   return route;
 }
 
-/** Get routes without unmatched or sitemap. */
-export function getExactRoutes(
-  contextModule: RequireContext,
-  options?: Options
-): RouteNode | null {
+function getIgnoreList(options?: Options) {
   const ignore: RegExp[] = [
     /^\.\/\+html\.[tj]sx?$/,
     // Filter out API routes which end with +api.tsx
@@ -513,9 +509,17 @@ export function getExactRoutes(
   if (options?.preserveApiRoutes !== true) {
     ignore.push(/\+api\.[tj]sx?$/);
   }
+  return ignore;
+}
+
+/** Get routes without unmatched or sitemap. */
+export function getExactRoutes(
+  contextModule: RequireContext,
+  options?: Options
+): RouteNode | null {
   const allowed = processKeys(contextModule.keys(), {
     ...options,
-    ignore,
+    ignore: getIgnoreList(options),
   });
   assertDuplicateRoutes(allowed);
   const files = contextModuleToFileNodes(contextModule, allowed);
