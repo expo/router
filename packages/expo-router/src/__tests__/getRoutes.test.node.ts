@@ -5,6 +5,7 @@ import {
   getRecursiveTree,
   FileNode,
   assertDuplicateRoutes,
+  getExactRoutes,
 } from "../getRoutes";
 import { RequireContext } from "../types";
 
@@ -18,6 +19,13 @@ function createMockContextModule(
   });
 
   return contextModule as unknown as RequireContext;
+}
+
+function dropFunctions({ loadRoute, ...node }: RouteNode) {
+  return {
+    ...node,
+    children: node.children.map(dropFunctions),
+  };
 }
 
 const ROUTE_404 = {
@@ -232,6 +240,35 @@ describe(getUserDefinedDeepDynamicRoute, () => {
   });
 });
 
+describe(getExactRoutes, () => {
+  // NOTE(EvanBacon): This tests when all you have is a root layout.
+  it(`automatically blocks +html file`, () => {
+    expect(
+      dropFunctions(
+        getExactRoutes(
+          createMockContextModule({
+            "./+html.js": { default() {} },
+            "./other/+html.js": { default() {} },
+            "./_layout.tsx": { default() {} },
+          })
+        )!
+      )
+    ).toEqual({
+      children: [
+        {
+          children: [],
+          contextKey: "./other/+html.js",
+          dynamic: null,
+          route: "other/+html",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      route: "",
+    });
+  });
+});
+
 describe(getRoutes, () => {
   // NOTE(EvanBacon): This tests when all you have is a root layout.
   it(`should allow a custom root _layout route`, () => {
@@ -331,13 +368,6 @@ describe(getRoutes, () => {
       })
     );
   });
-
-  function dropFunctions({ loadRoute, ...node }: RouteNode) {
-    return {
-      ...node,
-      children: node.children.map(dropFunctions),
-    };
-  }
 
   it(`should convert a complex context module routes`, () => {
     expect(

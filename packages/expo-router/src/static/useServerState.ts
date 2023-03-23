@@ -1,16 +1,18 @@
-//  TODO: This is fragile and only works on web
-// @ts-expect-error
-import ServerContext from "@react-navigation/native/lib/module/ServerContext";
 import React from "react";
 
 import getStateFromPath from "../fork/getStateFromPath";
 import { useLinkingContext } from "../link/useLinkingContext";
 
+// TODO: Expose this from React Navigation
+const ServerContext =
+  typeof window === "undefined"
+    ? require("@react-navigation/native/src/ServerContext").default
+    : require("@react-navigation/native/lib/module/ServerContext").default;
+
 export function useServerState() {
   const getStateFromPath = useGetStateFromPath();
 
   const server = React.useContext<any>(ServerContext);
-
   const pathname = React.useMemo(() => {
     const location =
       server?.location ??
