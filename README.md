@@ -7,7 +7,7 @@ Repo for the new File-based router for React Native apps. Please open a discussi
 - [Router](/packages/expo-router) - Current implementation.
 - [Documentation](https://expo.github.io/router) - Current documentation for the router (WIP / RFC).
 - [Example](/apps/demo) - Test app.
-- [RFC](https://github.com/expo/router/discussions/1) - Add your feedback here.
+<!-- - [RFC](https://github.com/expo/router/discussions/1) - Add your feedback here. -->
 
 ## Running
 
@@ -19,17 +19,6 @@ npx create-expo-app@latest -e with-router
 
 See the [setup guide for more](https://expo.github.io/router/docs/).
 
-## Contributing
-
-If you want to work against the latest branch for contributions, you can use `apps/sandbox`.
-
-> `apps/sandbox` is a basic playground for developing the Expo Router package, please don't open PRs specifically to improve the tester.
-
-- Run `yarn` in the root of the repo to install dependencies.
-- Run `yarn start` in the root to compile the `packages/`
-- Change directory to `apps/sandbox` and run `yarn start` to start the demo app.
-- Modify the contents of `apps/sandbox/app/` to use the router.
-
 ## Examples
 
 - [Test app](/apps/sandbox) - Test app, in this repository.
@@ -37,3 +26,7 @@ If you want to work against the latest branch for contributions, you can use `ap
 - [Expo Router Guest List App](https://github.com/hola-soy-milk/upleveled-react-native-expo) - Simple guest list app with fetching from external API
 
 > Add yours today!
+
+## Contributing
+
+- [Contributing](/CONTRIBUTING.md) - Read before contributing.

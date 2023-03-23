@@ -5,12 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { ServerContainer, ServerContainerRef } from "@react-navigation/native";
-import App, { getManifest } from "expo-router/_root";
-import { Root } from "expo-router/dom";
+import App, { getManifest } from "expo-router/_entry";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 import { AppRegistry } from "react-native-web";
 
+import { getRootComponent } from "./getRootComponent";
 import Head from "../head/Head";
 
 AppRegistry.registerComponent("App", () => App);
@@ -26,6 +26,8 @@ export function getStaticContent(location: URL): string {
     // the seemingly unused `RootTagContext.Provider` from being added.
     getStyleElement,
   } = AppRegistry.getApplication("App");
+
+  const Root = getRootComponent();
 
   const out = React.createElement(Root, {
     // TODO: Use RNW view after they fix hydration for React 18

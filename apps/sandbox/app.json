@@ -10,13 +10,10 @@
     "web": {
       "bundler": "metro"
     },
-    "router": {
-      "redirects": [
-        {
-          "source": "/source",
-          "destination": "https://github.com/expo/router"
-        }
-      ]
+    "extra": {
+      "router": {
+        "origin": "https://smart-symbiote.netlify.app/"
+      }
     }
   }
 }

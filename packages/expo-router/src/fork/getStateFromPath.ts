@@ -487,7 +487,7 @@ const createNormalizedConfigs = (
 
   parentScreens.push(screen);
 
-  const config = routeConfig[screen];
+  const config = (routeConfig as any)[screen];
 
   if (typeof config === "string") {
     // TODO: This should never happen with the addition of `_route`

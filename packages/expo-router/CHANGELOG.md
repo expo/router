@@ -6,7 +6,28 @@
 
 ### 🎉 New features
 
+- fake hiding the generated drawer items using `display: none`.
+
 ### 🐛 Bug fixes
+
+- fix deep linking on native.
+
+### 💡 Others
+
+## [Mon, 20 Mar 2023 11:23:51 -0500](https://github.com/expo/router/commit/ebba591b2e1cc30279da1309a8a77ce044dc18b9)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- feat: upgrade to TypeScript 5 ([#385](https://github.com/expo/router/issues/385))
+- feat: update <Link /> types for @expo/cli typed routes ([#377](https://github.com/expo/router/issues/377))
+- refactor tsconfig & publishing of declaration files ([#372](https://github.com/expo/router/issues/372))
+- stricter type for `useFocusEffect` ([#391](https://github.com/expo/router/issues/391))
+
+### 🐛 Bug fixes
+
+- fix: fix problematic ts-expect-error ([#369](https://github.com/expo/router/issues/369))
 
 ### 💡 Others
 

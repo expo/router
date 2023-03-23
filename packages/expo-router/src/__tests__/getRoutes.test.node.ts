@@ -22,6 +22,13 @@ function createMockContextModule(
   return contextModule as unknown as RequireContext;
 }
 
+function dropFunctions({ loadRoute, ...node }: RouteNode) {
+  return {
+    ...node,
+    children: node.children.map(dropFunctions),
+  };
+}
+
 const ROUTE_404 = {
   children: [],
   contextKey: "./[...404].tsx",
@@ -231,6 +238,35 @@ describe(getUserDefinedDeepDynamicRoute, () => {
         })
       )
     ).toEqual(null);
+  });
+});
+
+describe(getExactRoutes, () => {
+  // NOTE(EvanBacon): This tests when all you have is a root layout.
+  it(`automatically blocks +html file`, () => {
+    expect(
+      dropFunctions(
+        getExactRoutes(
+          createMockContextModule({
+            "./+html.js": { default() {} },
+            "./other/+html.js": { default() {} },
+            "./_layout.tsx": { default() {} },
+          })
+        )!
+      )
+    ).toEqual({
+      children: [
+        {
+          children: [],
+          contextKey: "./other/+html.js",
+          dynamic: null,
+          route: "other/+html",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      route: "",
+    });
   });
 });
 

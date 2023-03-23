@@ -22,6 +22,12 @@ type TreeNode = {
   node: FileNode | null;
 };
 
+type Options = {
+  ignore: RegExp[];
+  preserveApiRoutes?: boolean;
+  loadData?: boolean;
+};
+
 /** Convert a flat map of file nodes into a nested tree of files. */
 export function getRecursiveTree(files: FileNode[]): TreeNode {
   const tree = {
@@ -373,32 +379,17 @@ function treeNodeToRouteNode(
 
 function contextModuleToFileNodes(
   contextModule: RequireContext,
-  { preserveApiRoutes = false }: { preserveApiRoutes?: boolean } = {}
+  files: string[] = contextModule.keys()
 ): FileNode[] {
-  const nodes = contextModule
-    .keys()
-    .filter((key) => {
-      if (preserveApiRoutes) {
-        return true;
-      }
-      // Filter out API routes which end with +api.tsx
-      return !key.match(/\+api\.[jt]sx?$/);
-    })
-    .map((key) => {
-      // In development, check if the file exports a default component
-      // this helps keep things snappy when creating files. In production we load all screens lazily.
-      try {
-        const isApi = key.match(/\+api\.[jt]sx?$/);
+  const nodes = files.map((key) => {
+    // In development, check if the file exports a default component
+    // this helps keep things snappy when creating files. In production we load all screens lazily.
+    try {
+      const isApi = key.match(/\+api\.[jt]sx?$/);
 
-        if (!isApi && !contextModule(key)?.default) {
-          return null;
-        }
-      } catch (error) {
-        // Probably this won't stop metro from freaking out but it's worth a try.
-        console.warn('Error loading route "' + key + '"', error);
+      if (!isApi && !contextModule(key)?.default) {
         return null;
       }
-
       const node: FileNode = {
         loadRoute: () => contextModule(key),
         normalizedName: getNameFromFilePath(key),
@@ -406,7 +397,11 @@ function contextModuleToFileNodes(
       };
 
       return node;
-    });
+    } catch (error) {
+      // Probably this won't stop metro from freaking out but it's worth a try.
+      console.warn('Error loading route "' + key + '"', error);
+    }
+  });
 
   return nodes.filter(Boolean) as FileNode[];
 }
@@ -456,6 +451,14 @@ function treeNodesToRootRoute(
   };
 }
 
+function processKeys(files: string[], options: Options): string[] {
+  const { ignore } = options;
+
+  return files.filter((file) => {
+    return !ignore.some((pattern) => pattern.test(file));
+  });
+}
+
 /**
  * Asserts if the require.context has files that share the same name but have different extensions. Exposed for testing.
  * @private
@@ -482,10 +485,9 @@ export function assertDuplicateRoutes(filenames: string[]) {
 /** Given a Metro context module, return an array of nested routes. */
 export function getRoutes(
   contextModule: RequireContext,
-  options: { preserveApiRoutes?: boolean; loadData?: boolean } = {}
+  options: Options = { ignore: [] }
 ): RouteNode | null {
   const route = getExactRoutes(contextModule, options);
-
   if (!route) {
     return null;
   }
@@ -499,19 +501,25 @@ export function getRoutes(
 }
 
 export function getApiRoutes(contextModule: RequireContext): RouteNode | null {
-  return getExactRoutes(contextModule, { preserveApiRoutes: true });
+  return getExactRoutes(contextModule, { preserveApiRoutes: true, ignore: [] });
 }
 
 /** Get routes without unmatched or sitemap. */
 export function getExactRoutes(
   contextModule: RequireContext,
-  options: {
-    preserveApiRoutes?: boolean;
-    loadData?: boolean;
-  } = {}
+  options: Options = { ignore: [] }
 ): RouteNode | null {
-  assertDuplicateRoutes(contextModule.keys());
-  const files = contextModuleToFileNodes(contextModule, options);
+  const allowed = processKeys(contextModule.keys(), {
+    ...options,
+    ignore: [
+      /^\.\/\+html\.[tj]sx?$/,
+      // Filter out API routes which end with +api.tsx
+      options.preserveApiRoutes === false ? /\+api\.[tj]sx?$/ : null,
+      ...options?.ignore,
+    ].filter(Boolean) as RegExp[],
+  });
+  assertDuplicateRoutes(allowed);
+  const files = contextModuleToFileNodes(contextModule, allowed);
   const treeNodes = getRecursiveTree(files);
   const route = treeNodesToRootRoute(treeNodes, options);
   return route || null;

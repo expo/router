@@ -10,7 +10,7 @@ import useLinkToPathProps from "./useLinkToPathProps";
 import { useRouter } from "./useRouter";
 import { useFocusEffect } from "../useFocusEffect";
 
-type Props = {
+export interface LinkProps extends Omit<TextProps, "href" | "hoverStyle"> {
   /** Path to route to. */
   href: Href;
 
@@ -24,7 +24,7 @@ type Props = {
   onPress?: (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
   ) => void;
-} & (Omit<TextProps, "href" | "hoverStyle"> & { children?: React.ReactNode });
+}
 
 /** Redirects to the href as soon as the component is mounted. */
 export function Redirect({ href }: { href: Href }) {
@@ -33,6 +33,12 @@ export function Redirect({ href }: { href: Href }) {
     router.replace(href);
   });
   return null;
+}
+
+export interface LinkComponent {
+  (props: React.PropsWithChildren<LinkProps>): JSX.Element;
+  /** Helper method to resolve an Href object into a string. */
+  resolveHref: typeof resolveHref;
 }
 
 /**
@@ -44,10 +50,9 @@ export function Redirect({ href }: { href: Href }) {
  * @param props.asChild Forward props to child component. Useful for custom buttons.
  * @param props.children Child elements to render the content.
  */
-export const Link = React.forwardRef(ExpoRouterLink) as {
-  /** Helper method to resolve an Href object into a string. */
-  resolveHref: typeof resolveHref;
-} & React.ForwardRefExoticComponent<Props>;
+export const Link = React.forwardRef(
+  ExpoRouterLink
+) as unknown as LinkComponent;
 
 Link.resolveHref = resolveHref;
 
@@ -58,7 +63,7 @@ function ExpoRouterLink(
     // TODO: This does not prevent default on the anchor tag.
     asChild,
     ...rest
-  }: Props,
+  }: LinkProps,
   ref: React.ForwardedRef<Text>
 ) {
   const resolvedHref = React.useMemo(() => {
