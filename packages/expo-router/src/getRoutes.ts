@@ -427,28 +427,7 @@ function treeNodesToRootRoute(
   props: { loadData?: boolean; parentParams?: Record<string, any> }
 ): RouteNode | null {
   const routes = treeNodeToRouteNode(treeNode, props);
-
-  if (!routes?.length) {
-    return null;
-  }
-
-  if (hasCustomRootLayoutNode(routes)) {
-    return routes[0];
-  }
-
-  return {
-    loadRoute: () => ({
-      default: (
-        require("./views/Navigator") as typeof import("./views/Navigator")
-      ).DefaultNavigator,
-    }),
-    // Generate a fake file name for the directory
-    contextKey: "./_layout.tsx",
-    route: "",
-    generated: true,
-    dynamic: null,
-    children: routes,
-  };
+  return withOptionalRootLayout(routes);
 }
 
 function processKeys(files: string[], options: Options): string[] {
@@ -500,6 +479,23 @@ export function getRoutes(
   return route;
 }
 
+export async function getRoutesAsync(
+  contextModule: RequireContext,
+  options?: Options
+): Promise<RouteNode | null> {
+  const route = await getExactRoutesAsync(contextModule, options);
+  if (!route) {
+    return null;
+  }
+
+  appendSitemapRoute(route);
+
+  // Auto add not found route if it doesn't exist
+  appendUnmatchedRoute(route);
+
+  return route;
+}
+
 function getIgnoreList(options?: Options) {
   const ignore: RegExp[] = [
     /^\.\/\+html\.[tj]sx?$/,
@@ -517,13 +513,26 @@ export function getExactRoutes(
   contextModule: RequireContext,
   options?: Options
 ): RouteNode | null {
+  const treeNodes = contextModuleToTree(contextModule, options);
+  const route = treeNodesToRootRoute(treeNodes, options ?? {});
+  return route || null;
+}
+
+function contextModuleToTree(contextModule: RequireContext, options?: Options) {
   const allowed = processKeys(contextModule.keys(), {
     ...options,
     ignore: getIgnoreList(options),
   });
   assertDuplicateRoutes(allowed);
   const files = contextModuleToFileNodes(contextModule, allowed);
-  const treeNodes = getRecursiveTree(files);
+  return getRecursiveTree(files);
+}
+
+export async function getExactRoutesAsync(
+  contextModule: RequireContext,
+  options?: Options
+): Promise<RouteNode | null> {
+  const treeNodes = contextModuleToTree(contextModule, options);
   const route = treeNodesToRootRoute(treeNodes, options ?? {});
   return route || null;
 }
@@ -592,4 +601,28 @@ export function getUserDefinedDeepDynamicRoute(
     }
   }
   return null;
+}
+
+function withOptionalRootLayout(routes: RouteNode[] | null): RouteNode | null {
+  if (!routes?.length) {
+    return null;
+  }
+
+  if (hasCustomRootLayoutNode(routes)) {
+    return routes[0];
+  }
+
+  return {
+    loadRoute: () => ({
+      default: (
+        require("./views/Navigator") as typeof import("./views/Navigator")
+      ).DefaultNavigator,
+    }),
+    // Generate a fake file name for the directory
+    contextKey: "./_layout.tsx",
+    route: "",
+    generated: true,
+    dynamic: null,
+    children: routes,
+  };
 }

@@ -4,13 +4,15 @@ import { getContextKey, matchGroupName } from "./matchers";
 
 export type DynamicConvention = { name: string; deep: boolean };
 
+export type LoadedRoute = {
+  default?: any;
+  unstable_settings?: any;
+  generateStaticParams?: (props: { params?: any }) => any[];
+};
+
 export type RouteNode = {
   /** Load a route into memory. Returns the exports from a route. */
-  loadRoute: () => {
-    default?: any;
-    unstable_settings?: any;
-    generateStaticParams?: (props: { params?: any }) => any[];
-  };
+  loadRoute: () => LoadedRoute;
   /** Loaded initial route name. */
   initialRouteName?: string;
   /** nested routes */
