@@ -23,7 +23,7 @@ type TreeNode = {
 };
 
 type Options = {
-  ignore: RegExp[];
+  ignore?: RegExp[];
   preserveApiRoutes?: boolean;
   loadData?: boolean;
 };
@@ -455,7 +455,7 @@ function processKeys(files: string[], options: Options): string[] {
   const { ignore } = options;
 
   return files.filter((file) => {
-    return !ignore.some((pattern) => pattern.test(file));
+    return !ignore?.some((pattern) => pattern.test(file));
   });
 }
 
@@ -485,7 +485,7 @@ export function assertDuplicateRoutes(filenames: string[]) {
 /** Given a Metro context module, return an array of nested routes. */
 export function getRoutes(
   contextModule: RequireContext,
-  options: Options = { ignore: [] }
+  options?: Options
 ): RouteNode | null {
   const route = getExactRoutes(contextModule, options);
   if (!route) {
@@ -500,28 +500,27 @@ export function getRoutes(
   return route;
 }
 
-export function getApiRoutes(contextModule: RequireContext): RouteNode | null {
-  return getExactRoutes(contextModule, { preserveApiRoutes: true, ignore: [] });
-}
-
 /** Get routes without unmatched or sitemap. */
 export function getExactRoutes(
   contextModule: RequireContext,
-  options: Options = { ignore: [] }
+  options?: Options
 ): RouteNode | null {
+  const ignore: RegExp[] = [
+    /^\.\/\+html\.[tj]sx?$/,
+    // Filter out API routes which end with +api.tsx
+    ...(options?.ignore ?? []),
+  ];
+  if (options?.preserveApiRoutes !== true) {
+    ignore.push(/\+api\.[tj]sx?$/);
+  }
   const allowed = processKeys(contextModule.keys(), {
     ...options,
-    ignore: [
-      /^\.\/\+html\.[tj]sx?$/,
-      // Filter out API routes which end with +api.tsx
-      options.preserveApiRoutes === false ? /\+api\.[tj]sx?$/ : null,
-      ...options?.ignore,
-    ].filter(Boolean) as RegExp[],
+    ignore,
   });
   assertDuplicateRoutes(allowed);
   const files = contextModuleToFileNodes(contextModule, allowed);
   const treeNodes = getRecursiveTree(files);
-  const route = treeNodesToRootRoute(treeNodes, options);
+  const route = treeNodesToRootRoute(treeNodes, options ?? {});
   return route || null;
 }
 
