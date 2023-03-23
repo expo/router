@@ -104,34 +104,6 @@ export default function Home() {
 
 > Native support for Head is planned, but not supported yet.
 
-## Root HTML
-
-> Subject to change!
-
-By default, Expo Router adds HTML and a CSS reset that accomodates React Native for web. You can customize the root HTML by creating a `app/+dom.tsx` (TODO(EvanBacon): better name ???).
-
-```js title=app/+dom.tsx
-import { StyleReset } from "expo-router/dom";
-
-export default function Root({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" style={{ height: "100%" }}>
-      <head>
-        <meta charSet="utf-8" />
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta
-          name="viewport"
-          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1.00001,viewport-fit=cover"
-        />
-        {/* Reset styles for react-native-web */}
-        <StyleReset />
-      </head>
-      <body style={{ height: "100%", overflow: "hidden" }}>{children}</body>
-    </html>
-  );
-}
-```
-
 ## Request-time generation
 
 Also known as "server-side rendering", this is not supported yet.
