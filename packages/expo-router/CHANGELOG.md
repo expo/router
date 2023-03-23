@@ -6,6 +6,8 @@
 
 ### 🎉 New features
 
+- fake hiding the generated drawer items using `display: none`.
+
 ### 🐛 Bug fixes
 
 - fix deep linking on native.
