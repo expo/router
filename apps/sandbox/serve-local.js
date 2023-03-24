@@ -18,11 +18,15 @@ app.disable("x-powered-by");
 
 process.env.NODE_ENV = "production";
 
-// if (process.env.NODE_ENV === "production") {
-app.use(express.static(BUILD_DIR, { maxAge: "1h", extensions: ["html"] }));
-// } else {
-//   app.use(express.static("public", { maxAge: "1h" }));
-// }
+app.use(
+  // Prevent access to expo functions as these may
+  // contain sensitive information.
+  [/^\/_expo\/functions($|\/)/, "/"],
+  express.static(BUILD_DIR, {
+    maxAge: "1h",
+    extensions: ["html"],
+  })
+);
 
 app.use(morgan("tiny"));
 
@@ -31,32 +35,9 @@ app.all(
   createRequestHandler({
     build: BUILD_DIR,
   })
-  //   process.env.NODE_ENV === "development"
-  //     ? (req, res, next) => {
-  //         purgeRequireCache();
-  //         return createRequestHandler({
-  //           build: BUILD_DIR,
-  //         })(req, res, next);
-  //       }
-  //     : createRequestHandler({
-  //         build: BUILD_DIR,
-  //       })
 );
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
   console.log(`Express server listening on port ${port}`);
 });
-
-// function purgeRequireCache() {
-//   // purge require cache on requests for "server side HMR" this won't let
-//   // you have in-memory objects between requests in development,
-//   // alternatively you can set up nodemon/pm2-dev to restart the server on
-//   // file changes, but then you'll have to reconnect to databases/etc on each
-//   // change. We prefer the DX of this, so we've included it for you by default
-//   for (const key in require.cache) {
-//     if (key.startsWith(BUILD_DIR)) {
-//       delete require.cache[key];
-//     }
-//   }
-// }

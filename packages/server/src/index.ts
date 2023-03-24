@@ -11,18 +11,28 @@ const debug = require("debug")("expo:server") as typeof console.log;
 
 // TODO: Reuse this for dev as well
 export function createRequestHandler(distFolder: string) {
-  const routesManifest = JSON.parse(
+  // TODO: JSON Schema for validation
+  let routesManifest = JSON.parse(
     fs.readFileSync(path.join(distFolder, "_expo/routes.json"), "utf-8")
-  ).map((value: any) => {
+  );
+
+  routesManifest.functions = routesManifest.functions.map((value: any) => {
+    return {
+      ...value,
+      regex: new RegExp(value.regex),
+    };
+  });
+  routesManifest.staticHtml = routesManifest.staticHtml.map((value: any) => {
     return {
       ...value,
       regex: new RegExp(value.regex),
     };
   });
 
-  const dynamicManifest = routesManifest.filter(
-    (route: any) => route.type === "dynamic" || route.dynamic
-  );
+  const dynamicManifest = [
+    ...routesManifest.functions,
+    ...routesManifest.staticHtml,
+  ].filter((route: any) => route.type === "dynamic" || route.dynamic);
 
   return async function handler(request: ExpoRequest): Promise<Response> {
     const url = new URL(request.url, "http://acme.dev");

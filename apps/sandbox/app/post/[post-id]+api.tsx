@@ -1,9 +1,12 @@
-// import { Response } from "expo-router/server";
+import { ExpoResponse } from "expo-router/server";
 
-// /** @type import('expo-router/server').RequestHandler */
-// export async function GET(req) {
-//   console.log(">", req);
-//   return Response.json({
-//     message: "Hello World!",
-//   });
-// }
+const SUPER_E2E_TEST_SECRET_VALUE = "SUPER_E2E_TEST_SECRET_VALUE";
+
+/** @type import('expo-router/server').RequestHandler */
+export async function GET(req) {
+  console.log(">", req);
+  return ExpoResponse.json({ hey: "world" });
+  // return Response.json({
+  //   message: "Hello World!",
+  // });
+}

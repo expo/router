@@ -191,6 +191,101 @@ it(
 );
 
 it(
+  "exports with route handlers",
+  async () => {
+    const projectRoot = await ensureTesterReadyAsync("route-handlers");
+
+    await execa("npx", [bin, "export", "-p", "web"], {
+      cwd: projectRoot,
+      env: {
+        EXPO_USE_ROUTE_HANDLERS: "1",
+        EXPO_USE_STATIC: "1",
+        E2E_ROUTER_SRC: "route-handlers",
+      },
+    });
+
+    const outputDir = path.join(projectRoot, "dist");
+    // List output files with sizes for snapshotting.
+    // This is to make sure that any changes to the output are intentional.
+    // Posix path formatting is used to make paths the same across OSes.
+    const files = klawSync(outputDir)
+      .map((entry) => {
+        if (entry.path.includes("node_modules") || !entry.stats.isFile()) {
+          return null;
+        }
+        return path.posix.relative(outputDir, entry.path);
+      })
+      .filter(Boolean);
+
+    // Magic folder now exists
+    expect(files).toContain("_expo/routes.json");
+    expect(files).toContain("_expo/functions/data.json+api.js");
+    expect(files).toContain("_expo/functions/post/[post-id]+api.js");
+    expect(files).toContain("index.html");
+
+    // Ensure the function bundles have secret values
+    files
+      .filter((file) => file?.startsWith("_expo/functions/"))
+      .forEach((file) => {
+        const bundle = fs.readFileSync(path.join(outputDir, file!), "utf8");
+        expect(bundle).toContain("E2E_TEST_SECRET_VALUE");
+      });
+
+    // Ensure no client bundle has a secret value
+    expect(files.find((v) => v?.startsWith("bundles/web"))).toBeDefined();
+    files
+      .filter((file) => file?.startsWith("bundles/"))
+      .forEach((file) => {
+        const bundle = fs.readFileSync(path.join(outputDir, file!), "utf8");
+        expect(bundle).not.toContain("E2E_TEST_SECRET_VALUE");
+      });
+  },
+  // Could take 45s depending on how fast npm installs
+  360 * 1000
+);
+
+it(
+  "exports with route handlers for native only",
+  async () => {
+    const projectRoot = await ensureTesterReadyAsync("route-handlers");
+
+    await execa("npx", [bin, "export", "-p", "ios"], {
+      cwd: projectRoot,
+      env: {
+        EXPO_USE_ROUTE_HANDLERS: "1",
+        EXPO_USE_STATIC: "1",
+        E2E_ROUTER_SRC: "route-handlers",
+      },
+    });
+
+    const outputDir = path.join(projectRoot, "dist");
+    // List output files with sizes for snapshotting.
+    // This is to make sure that any changes to the output are intentional.
+    // Posix path formatting is used to make paths the same across OSes.
+    const files = klawSync(outputDir)
+      .map((entry) => {
+        if (entry.path.includes("node_modules") || !entry.stats.isFile()) {
+          return null;
+        }
+        return path.posix.relative(outputDir, entry.path);
+      })
+      .filter(Boolean);
+
+    expect(files).toContain("_expo/routes.json");
+    expect(files).toContain("_expo/functions/data.json+api.js");
+    expect(files).toContain("_expo/functions/post/[post-id]+api.js");
+
+    // No HTML
+    expect(files).not.toContain("index.html");
+
+    expect(files.find((v) => v?.startsWith("bundles/ios"))).toBeDefined();
+    expect(files.find((v) => v?.startsWith("bundles/web"))).not.toBeDefined();
+  },
+  // Could take 45s depending on how fast npm installs
+  360 * 1000
+);
+
+it(
   "exports with global CSS",
   async () => {
     const projectRoot = await ensureTesterReadyAsync("global-css");
