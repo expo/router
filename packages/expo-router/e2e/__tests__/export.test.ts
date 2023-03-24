@@ -186,7 +186,7 @@ it(
       path.join(outputDir, "welcome-to-the-universe.html"),
       "utf8"
     );
-    expect(page).toContain("welcome-to-the-universe");
+    expect(page).toContain("Post: <!-- -->welcome-to-the-universe");
   },
   // Could take 45s depending on how fast npm installs
   240 * 1000
