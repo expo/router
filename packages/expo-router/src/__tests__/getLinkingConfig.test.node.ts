@@ -1,4 +1,4 @@
-import { getReactNavigationScreensConfig } from "../getLinkingConfig";
+import { getReactNavigationScreensConfig } from "../getReactNavigationConfig";
 
 const mockRoutes = [
   {
@@ -72,12 +72,7 @@ const mockRoutes = [
 
 describe(getReactNavigationScreensConfig, () => {
   it("should return a valid linking config", () => {
-    expect(
-      getReactNavigationScreensConfig(
-        // @ts-expect-error
-        mockRoutes
-      )
-    ).toEqual({
+    expect(getReactNavigationScreensConfig(mockRoutes, true)).toEqual({
       "(group)": {
         initialRouteName: undefined,
         path: "(group)",
