@@ -50,15 +50,14 @@ function parseRouteSegments(segments: string): string {
 function convertRouteNodeToScreen(node: RouteNode, metaOnly: boolean): Screen {
   const path = parseRouteSegments(node.route);
   if (!node.children.length) {
-    const screen: Screen = {
-      path,
-      screens: {},
-    };
-
     if (!metaOnly) {
-      screen._route = node;
+      return {
+        path,
+        screens: {},
+        _route: node,
+      };
     }
-    return screen;
+    return path;
   }
   const screens = getReactNavigationScreensConfig(node.children, metaOnly);
 

@@ -1,4 +1,4 @@
-import type { PathConfigMap } from "@react-navigation/core";
+import { PathConfigMap } from "@react-navigation/core";
 import type {
   InitialState,
   NavigationState,
@@ -8,6 +8,7 @@ import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
 import { findFocusedRoute } from "./findFocusedRoute";
+import validatePathConfig from "./validatePathConfig";
 import { RouteNode } from "../Route";
 import { matchGroupName, stripGroupSegmentsFromPath } from "../matchers";
 
@@ -90,7 +91,7 @@ export function getMatchableRouteConfigs<ParamList extends object>(
   options?: Options<ParamList>
 ) {
   if (options) {
-    // validatePathConfig(options);
+    validatePathConfig(options);
   }
 
   const screens = options?.screens;

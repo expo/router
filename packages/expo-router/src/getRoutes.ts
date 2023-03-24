@@ -288,6 +288,7 @@ function contextModuleToFileNodes(
       // Probably this won't stop metro from freaking out but it's worth a try.
       console.warn('Error loading route "' + key + '"', error);
     }
+    return null;
   });
 
   return nodes.filter(Boolean) as FileNode[];
