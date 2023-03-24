@@ -1,7 +1,7 @@
 import { Slot } from "expo-router";
 
 export function generateStaticParams() {
-  return ["circle", "starfruit"].map((shape) => ({ shape }));
+  return ["circle"].map((shape) => ({ shape }));
 }
 
 export default function Layout() {

@@ -1,20 +1,6 @@
 import { Link, useSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
-export function generateStaticParams({
-  params,
-}: {
-  params: {
-    // Parent params
-    shape: string;
-  };
-}) {
-  return ["red", "blue"].map((color) => ({
-    ...params,
-    color,
-  }));
-}
-
 export default function Page() {
   const params = useSearchParams();
   return (

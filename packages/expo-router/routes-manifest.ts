@@ -1,16 +1,12 @@
+// no relative imports
 import { ctx } from "expo-router/_entry";
 import { getMatchableRouteConfigs } from "expo-router/src/fork/getStateFromPath";
 import { getReactNavigationConfig } from "expo-router/src/getReactNavigationConfig";
 import { getRoutes } from "expo-router/src/getRoutes";
 import { loadStaticParamsAsync } from "expo-router/src/loadStaticParamsAsync";
+import { matchGroupName } from "expo-router/src/matchers";
 
-type RoutesManifest = {
-  regex: string;
-  // original file path
-  src: string;
-}[];
-
-export async function createRoutesManifest(): Promise<RoutesManifest | null> {
+export async function createRoutesManifest(): Promise<any> {
   let routeTree = getRoutes(ctx, {
     preserveApiRoutes: true,
   });
@@ -25,7 +21,7 @@ export async function createRoutesManifest(): Promise<RoutesManifest | null> {
 
   const { configs } = getMatchableRouteConfigs(config);
 
-  const manifest: RoutesManifest = configs.map((config) => {
+  const manifest = configs.map((config) => {
     const isApi = config._route!.contextKey?.match(/\+api\.[tj]sx?/);
 
     const src = config
@@ -42,5 +38,108 @@ export async function createRoutesManifest(): Promise<RoutesManifest | null> {
     };
   });
 
-  return manifest;
+  return {
+    functions: manifest.filter((v) => v.type === "dynamic"),
+    staticHtml: manifest.filter((v) => v.type === "static"),
+    staticHtmlPaths: [...getStaticFiles(config)],
+  };
+}
+
+function getStaticFiles(manifest: any) {
+  const files = new Set<string>();
+
+  const sanitizeName = (segment: string) => {
+    // Strip group names from the segment
+    return segment
+      .split("/")
+      .map((s) => {
+        const d = s.match(/^:(.*)/);
+        // if (d) s = ''
+        if (d) s = `[${d[1]}]`;
+        s = matchGroupName(s) ? "" : s;
+        return s;
+      })
+      .filter(Boolean)
+      .join("/");
+  };
+
+  const nameWithoutGroups = (segment: string) => {
+    // Strip group names from the segment
+    return segment
+      .split("/")
+      .map((s) => (matchGroupName(s) ? "" : s))
+      .filter(Boolean)
+      .join("/");
+  };
+
+  const fetchScreens = (
+    screens: Record<string, any>,
+    additionPath: string = ""
+  ): any[] => {
+    function fetchScreenExact(pathname: string, filename: string) {
+      const outputPath = [additionPath, filename]
+        .filter(Boolean)
+        .join("/")
+        .replace(/^\//, "");
+      // TODO: Ensure no duplicates in the manifest.
+      if (!files.has(outputPath)) {
+        files.add(outputPath);
+      }
+    }
+
+    function fetchScreen({
+      segment,
+      filename,
+    }: {
+      segment: string;
+      filename: string;
+    }) {
+      // Strip group names from the segment
+      const cleanSegment = sanitizeName(segment);
+
+      if (nameWithoutGroups(segment) !== segment) {
+        // has groups, should request multiple screens.
+        fetchScreenExact(
+          [additionPath, segment].filter(Boolean).join("/"),
+          filename
+        );
+      }
+
+      fetchScreenExact(
+        [additionPath, cleanSegment].filter(Boolean).join("/"),
+        sanitizeName(filename)
+      );
+    }
+
+    return Object.entries(screens)
+      .map(([name, segment]) => {
+        const filename = name;
+
+        // Segment is a directory.
+        if (typeof segment !== "string") {
+          if (Object.keys(segment.screens).length) {
+            const cleanSegment = sanitizeName(segment.path);
+
+            return fetchScreens(
+              segment.screens,
+              [additionPath, cleanSegment].filter(Boolean).join("/")
+            );
+          } else {
+            // skip when extranrous `screens` object exists
+            segment = segment.path;
+          }
+        }
+
+        // TODO: handle dynamic routes
+        // if (!segment.startsWith('*')) {
+        fetchScreen({ segment, filename });
+        // }
+        return null;
+      })
+      .filter(Boolean);
+  };
+
+  fetchScreens(manifest.screens);
+
+  return files;
 }
