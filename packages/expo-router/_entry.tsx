@@ -8,7 +8,7 @@ import { ExpoRoot } from "./src";
 import { getNavigationConfig } from "./src/getLinkingConfig";
 import { getRoutes } from "./src/getRoutes";
 
-const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT!);
+export const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT!);
 
 // Must be exported or Fast Refresh won't update the context >:[
 export default function ExpoRouterRoot() {
@@ -16,8 +16,8 @@ export default function ExpoRouterRoot() {
 }
 
 /** Get the linking manifest from a Node.js process. */
-export function getManifest() {
-  const routeTree = getRoutes(ctx);
+export function getManifest(options: any) {
+  const routeTree = getRoutes(ctx, options);
   if (!routeTree) {
     return null;
   }

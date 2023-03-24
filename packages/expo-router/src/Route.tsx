@@ -1,12 +1,23 @@
 import React, { ReactNode, useContext } from "react";
+import type { ErrorBoundaryProps } from "./exports";
 
 import { getContextKey, matchGroupName } from "./matchers";
 
 export type DynamicConvention = { name: string; deep: boolean };
 
+export type LoadedRoute = {
+  ErrorBoundary?: React.ComponentType<ErrorBoundaryProps>;
+  default?: React.ComponentType<any>;
+  unstable_settings?: Record<string, any>;
+  getNavOptions?: () => any;
+  generateStaticParams?: (props: {
+    params?: Record<string, string | string[]>;
+  }) => Record<string, string | string[]>[];
+};
+
 export type RouteNode = {
   /** Load a route into memory. Returns the exports from a route. */
-  loadRoute: () => any;
+  loadRoute: () => LoadedRoute;
   /** Loaded initial route name. */
   initialRouteName?: string;
   /** nested routes */

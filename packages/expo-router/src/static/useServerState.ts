@@ -9,24 +9,35 @@ const ServerContext =
     ? require("@react-navigation/native/src/ServerContext").default
     : require("@react-navigation/native/lib/module/ServerContext").default;
 
-export function useServerState() {
+function useServerStateNode() {
   const getStateFromPath = useGetStateFromPath();
-
   const server = React.useContext<any>(ServerContext);
-  const pathname = React.useMemo(() => {
-    const location =
-      server?.location ??
-      (typeof window !== "undefined" ? window.location : undefined);
-
-    return location ? location.pathname + location.search : undefined;
+  const pathname = React.useMemo<string>(() => {
+    const location = server?.location;
+    if (!location) {
+      throw new Error(
+        `Static rendering server context is registered incorrectly and therefore the target pathname cannot be found.`
+      );
+    }
+    return location.pathname + location.search;
   }, [server]);
 
-  const state = React.useMemo(() => {
-    // TODO: useEffect is not called on the server, so we don't need these checks.
-    return pathname ? getStateFromPath(pathname) : null;
-  }, [pathname, getStateFromPath]);
+  return getStateFromPath(pathname);
+}
 
-  return typeof document === "undefined" ? state : null;
+function useServerStateBrowser() {
+  const getStateFromPath = useGetStateFromPath();
+  const pathname = window.location.pathname + window.location.search;
+  return getStateFromPath(pathname);
+}
+
+export function useServerState() {
+  if (typeof document === "undefined") {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    return useServerStateNode();
+  }
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  return useServerStateBrowser();
 }
 
 function useGetStateFromPath() {

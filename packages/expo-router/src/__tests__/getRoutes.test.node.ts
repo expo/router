@@ -1,11 +1,11 @@
 import { RouteNode } from "../Route";
 import {
+  assertDuplicateRoutes,
+  FileNode,
+  getExactRoutes,
+  getRecursiveTree,
   getRoutes,
   getUserDefinedDeepDynamicRoute,
-  getRecursiveTree,
-  FileNode,
-  assertDuplicateRoutes,
-  getExactRoutes,
 } from "../getRoutes";
 import { RequireContext } from "../types";
 
