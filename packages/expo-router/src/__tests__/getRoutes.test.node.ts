@@ -369,13 +369,6 @@ describe(getRoutes, () => {
     );
   });
 
-  function dropFunctions({ loadRoute, ...node }: RouteNode) {
-    return {
-      ...node,
-      children: node.children.map(dropFunctions),
-    };
-  }
-
   it(`should convert a complex context module routes`, () => {
     expect(
       dropFunctions(
