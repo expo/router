@@ -1,3 +1,4 @@
+import { RouteNode } from "../Route";
 import {
   assertDuplicateRoutes,
   FileNode,
@@ -6,7 +7,6 @@ import {
   getRoutes,
   getUserDefinedDeepDynamicRoute,
 } from "../getRoutes";
-import { RouteNode } from "../Route";
 import { RequireContext } from "../types";
 
 function createMockContextModule(

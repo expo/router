@@ -5,8 +5,10 @@ import { getContextKey, matchGroupName } from "./matchers";
 export type DynamicConvention = { name: string; deep: boolean };
 
 export type LoadedRoute = {
+  ErrorBoundary?: any;
   default?: any;
   unstable_settings?: any;
+  getNavOptions?: any;
   generateStaticParams?: (props: { params?: any }) => any[];
 };
 
