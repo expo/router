@@ -1,9 +1,9 @@
 import {
   AbortController as NodeAbortController,
   Headers as NodeHeaders,
-  Request as NodeRequest,
   writeReadableStreamToWritable,
 } from "@remix-run/node";
+import { ExpoRequest } from "../environment";
 
 import { createRequestHandler as createExpoHandler } from "..";
 
@@ -73,7 +73,7 @@ export function convertHeaders(
 export function convertRequest(
   req: VercelRequest,
   res: VercelResponse
-): NodeRequest {
+): ExpoRequest {
   const host = req.headers["x-forwarded-host"] || req.headers["host"];
   // doesn't seem to be available on their req object!
   const protocol = req.headers["x-forwarded-proto"] || "https";
@@ -95,7 +95,7 @@ export function convertRequest(
     init.body = req;
   }
 
-  return new NodeRequest(url.href, init);
+  return new ExpoRequest(url.href, init);
 }
 
 export async function respond(

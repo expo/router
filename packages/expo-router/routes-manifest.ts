@@ -7,6 +7,26 @@ import { getRoutes } from "expo-router/src/getRoutes";
 import { loadStaticParamsAsync } from "expo-router/src/loadStaticParamsAsync";
 import { matchGroupName } from "expo-router/src/matchers";
 
+export type RouteInfo<TRegex = string> = {
+  dynamic:
+    | {
+        name: string;
+        deep: boolean;
+      }[]
+    | null;
+  generated: boolean | undefined;
+  type: string;
+  file: string;
+  regex: TRegex;
+  src: string;
+};
+
+export type ExpoRoutesManifestV1<TRegex = string> = {
+  functions: RouteInfo<TRegex>[];
+  staticHtml: RouteInfo<TRegex>[];
+  staticHtmlPaths: string[];
+};
+
 export async function createRoutesManifest(): Promise<any> {
   let routeTree = getRoutes(ctx, {
     preserveApiRoutes: true,

@@ -5,29 +5,42 @@ import fs from "fs";
 import path from "path";
 import { URL } from "url";
 
+import type { ExpoRoutesManifestV1 } from "expo-router/routes-manifest";
+
 import { ExpoRequest, ExpoResponse } from "./environment";
 
 const debug = require("debug")("expo:server") as typeof console.log;
 
-// TODO: Reuse this for dev as well
-export function createRequestHandler(distFolder: string) {
+function getProcessedManifest(path: string): ExpoRoutesManifestV1<RegExp> {
   // TODO: JSON Schema for validation
   let routesManifest = JSON.parse(
-    fs.readFileSync(path.join(distFolder, "_expo/routes.json"), "utf-8")
-  );
+    fs.readFileSync(path, "utf-8")
+  ) as ExpoRoutesManifestV1;
 
-  routesManifest.functions = routesManifest.functions.map((value: any) => {
-    return {
-      ...value,
-      regex: new RegExp(value.regex),
-    };
-  });
-  routesManifest.staticHtml = routesManifest.staticHtml.map((value: any) => {
-    return {
-      ...value,
-      regex: new RegExp(value.regex),
-    };
-  });
+  const parsed: ExpoRoutesManifestV1<RegExp> = {
+    ...routesManifest,
+    functions: routesManifest.functions.map((value: any) => {
+      return {
+        ...value,
+        regex: new RegExp(value.regex),
+      };
+    }),
+    staticHtml: routesManifest.staticHtml.map((value: any) => {
+      return {
+        ...value,
+        regex: new RegExp(value.regex),
+      };
+    }),
+  };
+
+  return parsed;
+}
+
+// TODO: Reuse this for dev as well
+export function createRequestHandler(distFolder: string) {
+  const routesManifest = getProcessedManifest(
+    path.join(distFolder, "_expo/routes.json")
+  );
 
   const dynamicManifest = [
     ...routesManifest.functions,
@@ -43,6 +56,14 @@ export function createRequestHandler(distFolder: string) {
     for (const route of dynamicManifest) {
       if (!route.regex.test(sanitizedPathname)) {
         continue;
+      }
+
+      const params = getSearchParams(route.src, sanitizedPathname);
+
+      for (const [key, value] of Object.entries(params)) {
+        if (value) {
+          request.expoUrl.searchParams.set(key, value);
+        }
       }
 
       // Handle dynamic pages like `[foobar].tsx`
@@ -102,6 +123,25 @@ export function createRequestHandler(distFolder: string) {
     });
     return response;
   };
+}
+
+// Given a formatted URL like `/[foo]/bar/[baz].js` and a URL like `/hello/bar/world?other=1`
+// return the processed search params like `{ baz: 'world', foo: 'hello', other: '1' }`
+function getSearchParams(url: string, filePath: string) {
+  const params = new URLSearchParams(url.split("?")[1]);
+  const formattedParams = filePath.split("/").filter(Boolean);
+  const searchParams: Record<string, string | null> = {};
+
+  for (let i = 0; i < formattedParams.length; i++) {
+    const param = formattedParams[i];
+    if (param.startsWith("[")) {
+      const key = param.replace(/[\[\]]/g, "");
+      searchParams[key] = params.get(key);
+    }
+  }
+
+  console.log(">> getSearchParams", { url, filePath, searchParams });
+  return searchParams;
 }
 
 export { ExpoResponse, ExpoRequest };

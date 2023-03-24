@@ -1,8 +1,12 @@
 import {
   installGlobals as installRemixGlobals,
   Response,
+  RequestInit,
+  RequestInfo,
   Request,
 } from "@remix-run/node";
+
+import { URL } from "node:url";
 
 // Ensure these are available for the API Routes.
 export function installGlobals() {
@@ -36,4 +40,27 @@ export class ExpoResponse extends Response {
   }
 }
 
-export class ExpoRequest extends Request {}
+export const NON_STANDARD_SYMBOL = Symbol("non-standard");
+
+export class ExpoURL extends URL {}
+
+export class ExpoRequest extends Request {
+  [NON_STANDARD_SYMBOL]: {
+    url: ExpoURL;
+  };
+
+  constructor(info: RequestInfo, init?: RequestInit) {
+    super(info, init);
+
+    const url =
+      typeof info !== "string" && "url" in info ? info.url : String(info);
+
+    this[NON_STANDARD_SYMBOL] = {
+      url: new ExpoURL(url),
+    };
+  }
+
+  public get expoUrl() {
+    return this[NON_STANDARD_SYMBOL].url;
+  }
+}
