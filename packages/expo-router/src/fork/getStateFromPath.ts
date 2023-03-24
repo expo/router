@@ -337,16 +337,7 @@ function getStateFromPathWithConfigs(
 
   // We match the whole path against the regex instead of segments
   // This makes sure matches such as wildcard will catch any unmatched routes, even if nested
-  const routes = matchAgainstConfigs(
-    pathname,
-    // NOTE !!!! This could cause weird issues
-    configs
-    // configs.map((c) => ({
-    //   ...c,
-    //   // Add `$` to the regex to make sure it matches till end of the path and not just beginning
-    //   regex: c.regex ? new RegExp(c.regex.source + "$") : undefined,
-    // }))
-  );
+  const routes = matchAgainstConfigs(pathname, configs);
 
   if (routes == null) {
     return undefined;

@@ -3,20 +3,17 @@ import React from "react";
 import getStateFromPath from "../fork/getStateFromPath";
 import { useLinkingContext } from "../link/useLinkingContext";
 
-// TODO: Expose this from React Navigation
-const ServerContext =
-  typeof window === "undefined"
-    ? require("@react-navigation/native/src/ServerContext").default
-    : require("@react-navigation/native/lib/module/ServerContext").default;
-
 function useServerStateNode() {
+  // TODO: Expose this from React Navigation
+  const ServerContext =
+    require("@react-navigation/native/lib/module/ServerContext").default;
   const getStateFromPath = useGetStateFromPath();
   const server = React.useContext<any>(ServerContext);
   const pathname = React.useMemo<string>(() => {
     const location = server?.location;
     if (!location) {
       throw new Error(
-        `Static rendering server context is registered incorrectly and therefore the target pathname cannot be found.`
+        `URL pathname to static render could not be found. This could mean that the ServerContext is mismatched between the runtime and server rendering code. This may also be a result of main package.json resolution working differently between the runtime and server rendering code.`
       );
     }
     return location.pathname + location.search;
