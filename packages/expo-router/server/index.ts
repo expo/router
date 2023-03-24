@@ -1,5 +1,7 @@
-import { Request, Response } from "@expo/server";
+import { ExpoRequest, ExpoResponse } from "@expo/server/build/environment";
 
-export type RequestHandler = (request: Request) => Response;
+export type RequestHandler = (
+  request: ExpoRequest
+) => ExpoResponse | Promise<ExpoResponse>;
 
-export { Request, Response };
+export { ExpoRequest, ExpoResponse };

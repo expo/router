@@ -1,5 +1,6 @@
 // no relative imports
 import { ctx } from "expo-router/_entry";
+// import { ctx } from "expo-router/_entry-ctx-lazy";
 import { getMatchableRouteConfigs } from "expo-router/src/fork/getStateFromPath";
 import { getReactNavigationConfig } from "expo-router/src/getReactNavigationConfig";
 import { getRoutes } from "expo-router/src/getRoutes";

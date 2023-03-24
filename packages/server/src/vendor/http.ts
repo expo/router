@@ -1,4 +1,9 @@
-import { writeReadableStreamToWritable } from "@remix-run/node";
+import "@expo/server/install";
+import {
+  writeReadableStreamToWritable,
+  AbortController,
+  RequestInit,
+} from "@remix-run/node";
 import * as http from "http";
 
 import { ExpoRequest, ExpoResponse } from "../environment";
@@ -25,7 +30,6 @@ export function convertRequest(
   };
 
   if (req.method !== "GET" && req.method !== "HEAD") {
-    // @ts-expect-error
     init.body = req;
   }
 

@@ -5,6 +5,7 @@
   "scripts": {
     "postinstall": "patch-package && expo-yarn-workspaces check-workspace-dependencies",
     "start": "lerna run build --parallel -- --watch",
+    "build": "lerna run prepare --stream",
     "prepare": "lerna run prepare --parallel"
   },
   "workspaces": [

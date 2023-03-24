@@ -1,9 +1,9 @@
-import { HandlerEvent, HandlerResponse } from '@netlify/functions';
-import { Headers, readableStreamToString, RequestInit } from '@remix-run/node';
-import { AbortController } from 'abort-controller';
+import { HandlerEvent, HandlerResponse } from "@netlify/functions";
+import { Headers, readableStreamToString, RequestInit } from "@remix-run/node";
+import { AbortController } from "abort-controller";
 
-import { createRequestHandler as createExpoHandler } from '..';
-import { ExpoRequest, ExpoResponse } from '../environment';
+import { createRequestHandler as createExpoHandler } from "..";
+import { ExpoRequest, ExpoResponse } from "../environment";
 
 export function createRequestHandler({ build }: { build: string }) {
   const handleRequest = createExpoHandler(build);
@@ -16,13 +16,13 @@ export function createRequestHandler({ build }: { build: string }) {
 }
 
 export async function respond(res: ExpoResponse): Promise<HandlerResponse> {
-  const contentType = res.headers.get('Content-Type');
+  const contentType = res.headers.get("Content-Type");
   let body: string | undefined;
   const isBase64Encoded = isBinaryType(contentType);
 
   if (res.body) {
     if (isBase64Encoded) {
-      body = await readableStreamToString(res.body, 'base64');
+      body = await readableStreamToString(res.body, "base64");
     } else {
       body = await res.text();
     }
@@ -38,7 +38,9 @@ export async function respond(res: ExpoResponse): Promise<HandlerResponse> {
   };
 }
 
-export function createHeaders(requestHeaders: HandlerEvent['multiValueHeaders']): Headers {
+export function createHeaders(
+  requestHeaders: HandlerEvent["multiValueHeaders"]
+): Headers {
   const headers = new Headers();
 
   for (const [key, values] of Object.entries(requestHeaders)) {
@@ -80,7 +82,7 @@ function getRawPath(event: HandlerEvent): string {
 export function convertRequest(event: HandlerEvent): ExpoRequest {
   let url: URL;
 
-  if (process.env.NODE_ENV !== 'development') {
+  if (process.env.NODE_ENV !== "development") {
     url = new URL(event.rawUrl);
   } else {
     const origin = event.headers.host;
@@ -97,15 +99,17 @@ export function convertRequest(event: HandlerEvent): ExpoRequest {
     headers: createHeaders(event.multiValueHeaders),
     // Cast until reason/throwIfAborted added
     // https://github.com/mysticatea/abort-controller/issues/36
-    signal: controller.signal as RequestInit['signal'],
+    signal: controller.signal as RequestInit["signal"],
   };
 
-  if (event.httpMethod !== 'GET' && event.httpMethod !== 'HEAD' && event.body) {
-    let isFormData = event.headers['content-type']?.includes('multipart/form-data');
+  if (event.httpMethod !== "GET" && event.httpMethod !== "HEAD" && event.body) {
+    let isFormData = event.headers["content-type"]?.includes(
+      "multipart/form-data"
+    );
     init.body = event.isBase64Encoded
       ? isFormData
-        ? Buffer.from(event.body, 'base64')
-        : Buffer.from(event.body, 'base64').toString()
+        ? Buffer.from(event.body, "base64")
+        : Buffer.from(event.body, "base64").toString()
       : event.body;
   }
 
@@ -117,67 +121,67 @@ export function convertRequest(event: HandlerEvent): ExpoRequest {
  * @see https://github.com/architect/functions/blob/45254fc1936a1794c185aac07e9889b241a2e5c6/src/http/helpers/binary-types.js
  */
 const binaryTypes = [
-  'application/octet-stream',
+  "application/octet-stream",
   // Docs
-  'application/epub+zip',
-  'application/msword',
-  'application/pdf',
-  'application/rtf',
-  'application/vnd.amazon.ebook',
-  'application/vnd.ms-excel',
-  'application/vnd.ms-powerpoint',
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  "application/epub+zip",
+  "application/msword",
+  "application/pdf",
+  "application/rtf",
+  "application/vnd.amazon.ebook",
+  "application/vnd.ms-excel",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   // Fonts
-  'font/otf',
-  'font/woff',
-  'font/woff2',
+  "font/otf",
+  "font/woff",
+  "font/woff2",
   // Images
-  'image/avif',
-  'image/bmp',
-  'image/gif',
-  'image/jpeg',
-  'image/png',
-  'image/tiff',
-  'image/vnd.microsoft.icon',
-  'image/webp',
+  "image/avif",
+  "image/bmp",
+  "image/gif",
+  "image/jpeg",
+  "image/png",
+  "image/tiff",
+  "image/vnd.microsoft.icon",
+  "image/webp",
   // Audio
-  'audio/3gpp',
-  'audio/aac',
-  'audio/basic',
-  'audio/mpeg',
-  'audio/ogg',
-  'audio/wav',
-  'audio/webm',
-  'audio/x-aiff',
-  'audio/x-midi',
-  'audio/x-wav',
+  "audio/3gpp",
+  "audio/aac",
+  "audio/basic",
+  "audio/mpeg",
+  "audio/ogg",
+  "audio/wav",
+  "audio/webm",
+  "audio/x-aiff",
+  "audio/x-midi",
+  "audio/x-wav",
   // Video
-  'video/3gpp',
-  'video/mp2t',
-  'video/mpeg',
-  'video/ogg',
-  'video/quicktime',
-  'video/webm',
-  'video/x-msvideo',
+  "video/3gpp",
+  "video/mp2t",
+  "video/mpeg",
+  "video/ogg",
+  "video/quicktime",
+  "video/webm",
+  "video/x-msvideo",
   // Archives
-  'application/java-archive',
-  'application/vnd.apple.installer+xml',
-  'application/x-7z-compressed',
-  'application/x-apple-diskimage',
-  'application/x-bzip',
-  'application/x-bzip2',
-  'application/x-gzip',
-  'application/x-java-archive',
-  'application/x-rar-compressed',
-  'application/x-tar',
-  'application/x-zip',
-  'application/zip',
+  "application/java-archive",
+  "application/vnd.apple.installer+xml",
+  "application/x-7z-compressed",
+  "application/x-apple-diskimage",
+  "application/x-bzip",
+  "application/x-bzip2",
+  "application/x-gzip",
+  "application/x-java-archive",
+  "application/x-rar-compressed",
+  "application/x-tar",
+  "application/x-zip",
+  "application/zip",
 ];
 
 export function isBinaryType(contentType: string | null | undefined) {
   if (!contentType) return false;
-  let [test] = contentType.split(';');
+  let [test] = contentType.split(";");
   return binaryTypes.includes(test);
 }

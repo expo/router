@@ -26,7 +26,8 @@
   },
   "homepage": "https://github.com/expo/expo/tree/main/packages/@expo/server#readme",
   "files": [
-    "build"
+    "build",
+    "install.js"
   ],
   "dependencies": {
     "@remix-run/node": "^1.14.3",

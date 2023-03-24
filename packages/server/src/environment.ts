@@ -1,4 +1,8 @@
-import { installGlobals as installRemixGlobals, Response, Request } from '@remix-run/node';
+import {
+  installGlobals as installRemixGlobals,
+  Response,
+  Request,
+} from "@remix-run/node";
 
 // Ensure these are available for the API Routes.
 export function installGlobals() {
@@ -16,13 +20,13 @@ export class ExpoResponse extends Response {
     const body = JSON.stringify(data);
 
     if (body === undefined) {
-      throw new TypeError('data is not JSON serializable');
+      throw new TypeError("data is not JSON serializable");
     }
 
     const headers = new Headers(init?.headers);
 
-    if (!headers.has('content-type')) {
-      headers.set('content-type', 'application/json');
+    if (!headers.has("content-type")) {
+      headers.set("content-type", "application/json");
     }
 
     return new ExpoResponse(body, {
