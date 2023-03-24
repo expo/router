@@ -112,8 +112,8 @@ async function loadStaticParamsRecursive(
     (i) => i.route
   );
 
-  const createParsedRouteName = (params: any) => {
-    let parsedRouteName = route.route;
+  const createParsedRouteName = (input: string, params: any) => {
+    let parsedRouteName = input;
     route.dynamic?.map((query) => {
       const param = params[query.name];
       const formattedParameter = Array.isArray(param) ? param.join("/") : param;
@@ -132,10 +132,16 @@ async function loadStaticParamsRecursive(
 
   const generatedRoutes = await Promise.all(
     staticParams.map(async (params) => {
-      const parsedRoute = createParsedRouteName(params);
+      const parsedRoute = createParsedRouteName(route.route, params);
+      const generatedContextKey = createParsedRouteName(
+        route.contextKey,
+        params
+      );
 
       return {
         ...route,
+        // TODO: Add a new field for this
+        contextKey: generatedContextKey,
         // Convert the dynamic route to a static route.
         dynamic: null,
         route: parsedRoute,

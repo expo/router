@@ -1,8 +1,8 @@
+import { ctx } from "expo-router/_entry";
 import { getMatchableRouteConfigs } from "expo-router/src/fork/getStateFromPath";
 import { getReactNavigationConfig } from "expo-router/src/getReactNavigationConfig";
 import { getRoutes } from "expo-router/src/getRoutes";
-
-import { ctx } from "expo-router/_root";
+import { loadStaticParamsAsync } from "expo-router/src/loadStaticParamsAsync";
 
 type RoutesManifest = {
   regex: string;
@@ -10,16 +10,16 @@ type RoutesManifest = {
   src: string;
 }[];
 
-export function createRoutesManifest(files: string[]): RoutesManifest | null {
-  const routeTree = getRoutes(ctx, {
-    //   const routeTree = getRoutes(createMockContextModule(files), {
+export async function createRoutesManifest(): Promise<RoutesManifest | null> {
+  let routeTree = getRoutes(ctx, {
     preserveApiRoutes: true,
   });
-  //   console.log('tree:', process.env)
 
   if (!routeTree) {
     return null;
   }
+
+  routeTree = await loadStaticParamsAsync(routeTree);
 
   const config = getReactNavigationConfig(routeTree, false);
 

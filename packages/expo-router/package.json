@@ -91,6 +91,7 @@
     "tree-kill": "^1.2.2"
   },
   "dependencies": {
+    "@expo/server": "0.0.0",
     "@bacons/react-views": "^1.1.3",
     "@expo/metro-runtime": "1.1.1",
     "@radix-ui/react-slot": "^1.0.0",

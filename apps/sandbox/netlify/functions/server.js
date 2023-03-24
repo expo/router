@@ -1,6 +1,4 @@
-const {
-  createRequestHandler,
-} = require("../../../../../expo/packages/@expo/server/build/vendor/netlify");
+const { createRequestHandler } = require("@expo/server/build/vendor/netlify");
 
 // netlify dev
 const handler = createRequestHandler({
