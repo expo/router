@@ -7,6 +7,7 @@ import React from "react";
 import { ExpoRoot } from "./src";
 import { getNavigationConfig } from "./src/getLinkingConfig";
 import { getRoutes } from "./src/getRoutes";
+import { loadStaticParamsAsync } from "./src/loadStaticParamsAsync";
 
 export const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT!);
 
@@ -16,10 +17,14 @@ export default function ExpoRouterRoot() {
 }
 
 /** Get the linking manifest from a Node.js process. */
-export function getManifest(options: any) {
+export async function getManifest(options: any) {
   const routeTree = getRoutes(ctx, options);
   if (!routeTree) {
     return null;
   }
+
+  // Evaluate all static params
+  await loadStaticParamsAsync(routeTree);
+
   return getNavigationConfig(routeTree);
 }
