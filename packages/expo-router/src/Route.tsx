@@ -7,9 +7,9 @@ export type DynamicConvention = { name: string; deep: boolean };
 
 export type LoadedRoute = {
   ErrorBoundary?: React.ComponentType<ErrorBoundaryProps>;
-  default?: React.ComponentType<any>;
+  default: React.ComponentType<any>;
   unstable_settings?: Record<string, any>;
-  getNavOptions?: () => any;
+  getNavOptions?: (args: any) => any;
   generateStaticParams?: (props: {
     params?: Record<string, string | string[]>;
   }) => Record<string, string | string[]>[];
