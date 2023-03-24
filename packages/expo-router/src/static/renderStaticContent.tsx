@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import ServerContainer from "@react-navigation/native/src/ServerContainer";
 import { ServerContainerRef } from "@react-navigation/native";
+import ServerContainer from "@react-navigation/native/src/ServerContainer";
 import App, { getManifest } from "expo-router/_entry";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
