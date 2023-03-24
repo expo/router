@@ -6,7 +6,7 @@ import { useLinkingContext } from "../link/useLinkingContext";
 function useServerStateNode() {
   // TODO: Expose this from React Navigation
   const ServerContext =
-    require("@react-navigation/native/lib/module/ServerContext").default;
+    require("@react-navigation/native/src/ServerContext").default;
   const getStateFromPath = useGetStateFromPath();
   const server = React.useContext<any>(ServerContext);
   const pathname = React.useMemo<string>(() => {
