@@ -7,6 +7,7 @@
 ### 🎉 New features
 
 - fake hiding the generated drawer items using `display: none`.
+- add `generateStaticParams` export which can be used to generate a list of static pages to export with `EXPO_USE_STATIC=1 yarn expo export -p web` (on main).
 
 ### 🐛 Bug fixes
 
