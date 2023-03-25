@@ -31,6 +31,7 @@
     "metro-minify-terser": "0.75.0",
     "metro-minify-uglify": "0.75.0",
     "metro-react-native-babel-preset": "0.75.0",
+    "ws": "7.5.9",
     "@expo/cli": "file:./expo-cli.tgz"
   },
   "devDependencies": {
