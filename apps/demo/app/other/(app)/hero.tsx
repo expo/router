@@ -8,9 +8,13 @@ import { StyleSheet } from "react-native";
 
 import { useFonts, Inter_500Medium } from "@expo-google-fonts/inter";
 
+import styles from "@/styles/Home.module.css";
+
 const inter = { fontFamily: "Inter_500Medium" };
 
 export default function App() {
+  useFonts({ Inter_500Medium });
+
   return (
     <>
       <Head>
@@ -135,33 +139,33 @@ const vars = {
   'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace`,
 };
 
-const styles = StyleSheet.create({
-  main: {
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "6rem",
-    minHeight: "100vh",
-  },
-  card: {},
-  vercelLogo: {},
-  center: {},
-  description: {
-    // display: inherit;
-    justifyContent: "space-between",
-    alignItems: "center",
-    fontSize: "0.85rem",
-    maxWidth: vars["--max-width"],
-    width: "100%",
-    zIndex: 2,
-    fontFamily: vars["--font-mono"],
-  },
-  code: {
-    fontWeight: "700",
-    fontFamily: vars["--font-mono"],
-  },
-  grid: {},
-  logo: {},
-  thirteen: {},
-});
+// const styles = StyleSheet.create({
+//   main: {
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     padding: "6rem",
+//     minHeight: "100vh",
+//   },
+//   card: {},
+//   vercelLogo: {},
+//   center: {},
+//   description: {
+//     // display: inherit;
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     fontSize: "0.85rem",
+//     maxWidth: vars["--max-width"],
+//     width: "100%",
+//     zIndex: 2,
+//     fontFamily: vars["--font-mono"],
+//   },
+//   code: {
+//     fontWeight: "700",
+//     fontFamily: vars["--font-mono"],
+//   },
+//   grid: {},
+//   logo: {},
+//   thirteen: {},
+// });
 
 // TODO: inherit from the parent
