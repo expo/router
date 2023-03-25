@@ -1,0 +1,16 @@
+diff --git a/node_modules/expo-image/build/web/style.js b/node_modules/expo-image/build/web/style.js
+index 7fa600c..eeb9cf0 100644
+--- a/node_modules/expo-image/build/web/style.js
++++ b/node_modules/expo-image/build/web/style.js
+@@ -127,8 +127,10 @@ const style = `
+ }
+ `;
+ export default function loadStyle() {
++  if (typeof document !== 'undefined') {
+     const styleTag = document.createElement('style');
+     styleTag.innerHTML = style;
+     document.head.appendChild(styleTag);
++  }
+ }
+ //# sourceMappingURL=style.js.map
+\ No newline at end of file
