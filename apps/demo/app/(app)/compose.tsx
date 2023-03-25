@@ -9,8 +9,8 @@ import {
   View,
 } from "react-native";
 
-import { useNotes } from "../../context/notes";
-import { Button, ToggleButton } from "../../etc/button";
+import { useNotes } from "@/context/notes";
+import { Button, ToggleButton } from "@/components/button";
 
 export default function Compose() {
   const { addNote } = useNotes();

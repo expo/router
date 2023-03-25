@@ -3,8 +3,12 @@ import { createURL } from "expo-linking";
 import React from "react";
 
 import { usePathname } from "../LocationProvider";
+import Head from "../head/Head";
 import { Link } from "../link/Link";
 import { useNavigation } from "../useNavigation";
+
+const useLayoutEffect =
+  typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
 
 /** Default screen for unmatched routes. */
 export function Unmatched() {
@@ -12,40 +16,46 @@ export function Unmatched() {
   const pathname = usePathname();
   const url = createURL(pathname);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       title: "Not Found",
     });
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
-      <Text
-        accessibilityRole="header"
-        accessibilityLevel={1}
-        style={styles.title}
-      >
-        Unmatched Route
-      </Text>
-      <Text
-        accessibilityRole="header"
-        accessibilityLevel={2}
-        style={styles.subtitle}
-      >
-        Page could not be found.{" "}
-        <Link href="/" replace style={styles.link}>
-          Go back.
+    <>
+      <Head>
+        <title>Not Found</title>
+      </Head>
+
+      <View style={styles.container}>
+        <Text
+          accessibilityRole="header"
+          accessibilityLevel={1}
+          style={styles.title}
+        >
+          Unmatched Route
+        </Text>
+        <Text
+          accessibilityRole="header"
+          accessibilityLevel={2}
+          style={styles.subtitle}
+        >
+          Page could not be found.{" "}
+          <Link href="/" replace style={styles.link}>
+            Go back.
+          </Link>
+        </Text>
+
+        <Link href={pathname} replace style={styles.link}>
+          {url}
         </Link>
-      </Text>
 
-      <Link href={pathname} replace style={styles.link}>
-        {url}
-      </Link>
-
-      <Link href="/_sitemap" replace style={[styles.link, { marginTop: 8 }]}>
-        Sitemap
-      </Link>
-    </View>
+        <Link href="/_sitemap" replace style={[styles.link, styles.mt8]}>
+          Sitemap
+        </Link>
+      </View>
+    </>
   );
 }
 
@@ -74,4 +84,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   link: { color: "rgba(255,255,255,0.4)", textAlign: "center" },
+  mt8: { marginTop: 8 },
 });

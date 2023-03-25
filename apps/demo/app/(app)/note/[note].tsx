@@ -1,7 +1,7 @@
 import { Stack, useRouter, useSearchParams } from "expo-router";
 import { Text, StyleSheet, View } from "react-native";
-import { useNotes } from "../../../context/notes";
-import { Button } from "../../../etc/button";
+import { useNotes } from "@/context/notes";
+import { Button } from "@/components/button";
 
 export default function Note() {
   const { note } = useSearchParams<{ note: string }>();

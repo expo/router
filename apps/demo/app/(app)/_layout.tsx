@@ -3,8 +3,8 @@ import { StatusBar } from "expo-status-bar";
 import { Platform, Pressable, Text } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-import { useAuth } from "../../context/auth";
-import { NotesProvider } from "../../context/notes";
+import { useAuth } from "@/context/auth";
+import { NotesProvider } from "@/context/notes";
 
 export const unstable_settings = {
   initialRouteName: "index",

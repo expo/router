@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 
-import { useAuth } from "../../context/auth";
-import { Button } from "../../etc/button";
+import { useAuth } from "@/context/auth";
+import { Button } from "@/components/button";
 
 export default function SignIn() {
   const { signIn } = useAuth();

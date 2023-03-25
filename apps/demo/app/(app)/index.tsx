@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useNotes } from "../../context/notes";
+import { useNotes } from "@/context/notes";
 
 export default function App() {
   const { notes } = useNotes();
