@@ -27,7 +27,7 @@ function getExpoRouterAppRoot(projectRoot) {
   const routerEntry = resolveFrom.silent(projectRoot, "expo-router/entry");
 
   const { exp } = getConfig(projectRoot);
-  const customSrc = exp.extra.router.unstable_src || "./app";
+  const customSrc = exp.extra?.router?.unstable_src || "./app";
   const isAbsolute = customSrc.startsWith("/");
   // It doesn't matter if the app folder exists.
   const appFolder = isAbsolute
