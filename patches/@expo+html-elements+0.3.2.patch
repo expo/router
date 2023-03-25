@@ -1,5 +1,5 @@
 diff --git a/node_modules/@expo/html-elements/babel.js b/node_modules/@expo/html-elements/babel.js
-index 9717814..34e8211 100644
+index 9717814..ed7a4d0 100644
 --- a/node_modules/@expo/html-elements/babel.js
 +++ b/node_modules/@expo/html-elements/babel.js
 @@ -50,10 +50,26 @@ const elementToComponent = {
@@ -30,3 +30,60 @@ index 9717814..34e8211 100644
      // Replace element with @expo/html-elements
      const component = elementToComponent[name];
  
+diff --git a/node_modules/@expo/html-elements/build/elements/Anchor.js b/node_modules/@expo/html-elements/build/elements/Anchor.js
+index e39acd9..9d98668 100644
+--- a/node_modules/@expo/html-elements/build/elements/Anchor.js
++++ b/node_modules/@expo/html-elements/build/elements/Anchor.js
+@@ -1,14 +1,16 @@
+ import React, { forwardRef } from 'react';
+ import { Linking, Platform } from 'react-native';
+ import Text from '../primitives/Text';
+-export const A = forwardRef(({ href, target, download, rel, ...props }, ref) => {
++export const A = forwardRef(({ href, target, download, title, rel, hrefAttrs, ...props }, ref) => {
+     const nativeProps = Platform.select({
+         web: {
+             href,
+             hrefAttrs: {
+                 target,
+                 download,
++                title,
+                 rel,
++                ...hrefAttrs,
+             },
+         },
+         default: {
+diff --git a/node_modules/@expo/html-elements/build/elements/Text.types.d.ts b/node_modules/@expo/html-elements/build/elements/Text.types.d.ts
+index 9ce1b22..8dfdb11 100644
+--- a/node_modules/@expo/html-elements/build/elements/Text.types.d.ts
++++ b/node_modules/@expo/html-elements/build/elements/Text.types.d.ts
+@@ -9,14 +9,22 @@ export declare type BlockQuoteProps = React.PropsWithChildren<ViewProps & {
+ export declare type TimeProps = React.PropsWithChildren<TextProps & {
+     dateTime?: string;
+ }>;
+-export declare type LinkProps = React.PropsWithChildren<TextProps & {
++
++type hrefAttrs = {
++     /** @platform web */
++     target?: string;
++     /** @platform web */
++     rel?: string;
++     /** @platform web */
++     download?: boolean | string;
++     /** @platform web */
++     title?: string;
++     /** @platform web */
++}
++export declare type LinkProps = React.PropsWithChildren<TextProps & hrefAttrs & {
+     /** @platform web */
+     href?: string;
+-    /** @platform web */
+-    target?: string;
+-    /** @platform web */
+-    rel?: string;
+-    /** @platform web */
+-    download?: boolean | string;
++
++    hrefAttrs?: hrefAttrs;
+ }>;
+ //# sourceMappingURL=Text.types.d.ts.map
+\ No newline at end of file
