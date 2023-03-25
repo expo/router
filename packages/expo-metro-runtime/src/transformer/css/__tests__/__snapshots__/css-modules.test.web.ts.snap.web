@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`transformCssModuleNative transforms A 1`] = `"export default {"container":{"backgroundColor":"var(--accent-color)","animation":"pulse 2s infinite"},"betterContainer":{"composes":"container","borderRadius":50}}"`;
