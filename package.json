@@ -31,8 +31,11 @@
     "metro-minify-terser": "0.75.0",
     "metro-minify-uglify": "0.75.0",
     "metro-react-native-babel-preset": "0.75.0",
-    "ws": "7.5.9",
-    "@expo/cli": "file:./expo-cli.tgz"
+    "ws": "7.5.9",    
+    "expo": "^48.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.71.4"
   },
   "devDependencies": {
     "@types/babel__core": "~7.1.19",
