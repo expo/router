@@ -9,11 +9,13 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/html-elements": "^0.3.0",
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@react-native-async-storage/async-storage": "~1.17.3",
     "@react-navigation/drawer": "^6.4.4",
     "expo": "^48.0.0",
     "expo-auth-session": "~4.0.3",
+    "expo-image": "^1.0.0",
     "expo-random": "~13.1.1",
     "expo-router": "*",
     "expo-secure-store": "~12.1.1",
@@ -29,9 +31,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@babel/preset-typescript": "^7.21.0",
     "@types/react": "~18.0.0",
     "@types/react-native": "~0.69.1",
-    "@babel/preset-typescript": "^7.21.0",
     "babel-plugin-transform-imports": "^2.0.0"
   },
   "private": true
