@@ -21,6 +21,9 @@ export type ScreenProps<
   options?: TOptions;
 };
 
+const useLayoutEffect =
+  typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
+
 /** Component for setting the current screen's options dynamically. */
 export function Screen<TOptions extends object = object>({
   name,
@@ -29,7 +32,7 @@ export function Screen<TOptions extends object = object>({
 }: ScreenProps<TOptions>) {
   const navigation = useNavigation(name);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions(options ?? {});
   }, [navigation, options]);
 

@@ -4,7 +4,7 @@ import { useNotes } from "../../../context/notes";
 import { Button } from "../../../etc/button";
 
 export default function Note() {
-  const { note } = useSearchParams();
+  const { note } = useSearchParams<{ note: string }>();
   const data = useNotes();
   const router = useRouter();
 

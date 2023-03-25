@@ -1,0 +1,13 @@
+diff --git a/node_modules/expo-font/build/FontLoader.web.js b/node_modules/expo-font/build/FontLoader.web.js
+index 5cfc7f8..1b96ffe 100644
+--- a/node_modules/expo-font/build/FontLoader.web.js
++++ b/node_modules/expo-font/build/FontLoader.web.js
+@@ -1,7 +1,7 @@
+ import { Asset } from 'expo-asset';
+ import { CodedError } from 'expo-modules-core';
+ import ExpoFontLoader from './ExpoFontLoader';
+-import { FontDisplay } from './Font';
++import { FontDisplay } from './Font.types';
+ function uriFromFontSource(asset) {
+     if (typeof asset === 'string') {
+         return asset || null;
