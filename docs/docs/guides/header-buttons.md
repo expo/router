@@ -43,8 +43,7 @@ export default function Layout() {
 Use the `<Stack.Screen />` component in the child route to dynamically configure options.
 
 ```js title=app/home.js
-import { useLayoutEffect } from "react";
-import { View, Button, Text, Image } from "react-native";
+import { Button, Text, Image } from "react-native";
 // highlight-next-line
 import { Stack } from "expo-router";
 
