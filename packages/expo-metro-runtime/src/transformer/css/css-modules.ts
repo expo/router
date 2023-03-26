@@ -14,7 +14,9 @@ export async function transformCssModuleWeb(
     code: Buffer.from(props.src),
     sourceMap: false,
     cssModules: {
-      dashedIdents: true,
+      // Prevent renaming CSS variables to ensure
+      // variables created in global files are available.
+      dashedIdents: false,
     },
     // cssModules: true,
     projectRoot: props.options.projectRoot,
