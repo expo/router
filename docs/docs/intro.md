@@ -12,10 +12,10 @@ Expo Router brings the best routing concepts from the web to native iOS and Andr
 Run the following to create a project with `expo-router` setup:
 
 ```bash
-npx create-expo-app@latest -e with-router
+npx create-expo-app@latest --example with-router
 ```
 
-> [Template source](https://github.com/expo/examples/tree/master/with-router).
+> [Example source](https://github.com/expo/examples/tree/master/with-router).
 
 ## Features
 

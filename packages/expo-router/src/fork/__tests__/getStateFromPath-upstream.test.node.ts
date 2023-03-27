@@ -2524,6 +2524,7 @@ it("throws when invalid properties are specified in the config", () => {
     You can only specify the following properties:
     - initialRouteName
     - screens
+    - _route
 
     See https://reactnavigation.org/docs/configuring-links for more details on how to specify a linking configuration."
   `);
@@ -2551,6 +2552,7 @@ it("throws when invalid properties are specified in the config", () => {
     You can only specify the following properties:
     - initialRouteName
     - screens
+    - _route
     - path
     - exact
     - stringify

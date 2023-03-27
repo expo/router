@@ -1,4 +1,4 @@
-import { getReactNavigationScreensConfig } from "../getLinkingConfig";
+import { getReactNavigationScreensConfig } from "../getReactNavigationConfig";
 
 const mockRoutes = [
   {
@@ -75,7 +75,8 @@ describe(getReactNavigationScreensConfig, () => {
     expect(
       getReactNavigationScreensConfig(
         // @ts-expect-error
-        mockRoutes
+        mockRoutes,
+        true
       )
     ).toEqual({
       "(group)": {
@@ -90,6 +91,48 @@ describe(getReactNavigationScreensConfig, () => {
       },
       _sitemap: "_sitemap",
       "other/nested/[...screen]": "other/nested/*screen",
+    });
+  });
+  it("should return a valid linking config with route nodes", () => {
+    expect(
+      getReactNavigationScreensConfig(
+        // @ts-expect-error
+        mockRoutes,
+        false
+      )
+    ).toEqual({
+      "(group)": {
+        initialRouteName: undefined,
+        path: "(group)",
+        _route: expect.anything(),
+        screens: {
+          "[...deep]": {
+            path: "*deep",
+            screens: {},
+            _route: expect.anything(),
+          },
+          "[dynamic]": {
+            path: ":dynamic",
+            screens: {},
+            _route: expect.anything(),
+          },
+          index: { path: "", screens: {}, _route: expect.anything() },
+        },
+      },
+      "(second-group)": {
+        initialRouteName: undefined,
+        path: "(second-group)",
+        _route: expect.anything(),
+        screens: {
+          people: { path: "people", screens: {}, _route: expect.anything() },
+        },
+      },
+      _sitemap: { path: "_sitemap", screens: {}, _route: expect.anything() },
+      "other/nested/[...screen]": {
+        path: "other/nested/*screen",
+        screens: {},
+        _route: expect.anything(),
+      },
     });
   });
 });
