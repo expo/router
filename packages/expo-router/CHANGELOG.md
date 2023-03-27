@@ -11,6 +11,7 @@
 
 ### 🐛 Bug fixes
 
+- fix initial linking in Expo Go production projects or EAS Update projects.
 - fix deep linking on native.
 
 ### 💡 Others
