@@ -27,13 +27,17 @@ function getBaseUrl() {
   // TODO: Make it official by moving out of `extra`
   let productionBaseUrl = Constants.manifest?.extra?.router?.origin;
 
+  if (!productionBaseUrl) {
+    return null;
+  }
+
   if (process.env.NODE_ENV !== "production") {
     // e.g. http://localhost:19006
     productionBaseUrl = getDevServer().url;
   }
 
   // Ensure no trailing slash
-  return productionBaseUrl.replace(/\/$/, "");
+  return productionBaseUrl?.replace(/\/$/, "");
 }
 
 function wrapFetchWithWindowLocation(
@@ -49,7 +53,7 @@ function wrapFetchWithWindowLocation(
         warnProductionOriginNotConfigured(props[0]);
       }
 
-      props[0] = new URL(props[0], window.location.origin).toString();
+      props[0] = new URL(props[0], window.location?.origin).toString();
     } else if (props[0] && typeof props[0] === "object") {
       if (
         props[0].url &&
@@ -60,7 +64,10 @@ function wrapFetchWithWindowLocation(
           warnProductionOriginNotConfigured(props[0]);
         }
 
-        props[0].url = new URL(props[0].url, window.location.origin).toString();
+        props[0].url = new URL(
+          props[0].url,
+          window.location?.origin
+        ).toString();
       }
     }
     return fetch(...props);
@@ -74,10 +81,12 @@ function wrapFetchWithWindowLocation(
 if (Constants.manifest?.extra?.router?.origin !== false) {
   // Polyfill window.location in native runtimes.
   if (typeof window !== "undefined" && !window.location) {
-    setLocationHref(getBaseUrl());
-    install();
+    const url = getBaseUrl();
+    if (url) {
+      setLocationHref(url);
+      install();
+    }
   }
-
   // Polyfill native fetch to support relative URLs
   Object.defineProperty(global, "fetch", {
     value: wrapFetchWithWindowLocation(fetch),
