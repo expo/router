@@ -10,6 +10,18 @@
 
 ### 💡 Others
 
+## [Mon, 27 Mar 2023 17:42:06 -0500](https://github.com/expo/router/commit/52deb844568548eb6be0a217b7f0c7cbdf97ba89)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+- fix production crash ([#433](https://github.com/expo/router/issues/433))
+
+### 💡 Others
+
 ## [Mon, 27 Mar 2023 17:28:01 -0500](https://github.com/expo/router/commit/8e9123dbe0b6b817f49be87e1f7215bcb8bbe368)
 
 ### 🛠 Breaking changes
