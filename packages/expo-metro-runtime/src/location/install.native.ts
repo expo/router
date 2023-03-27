@@ -27,14 +27,7 @@ function getBaseUrl() {
   // TODO: Make it official by moving out of `extra`
   let productionBaseUrl = Constants.manifest?.extra?.router?.origin;
 
-  if (process.env.NODE_ENV === "production") {
-    // TODO: How would someone even get this?
-    if (!productionBaseUrl) {
-      throw new Error(
-        "You must provide a production base URL to wrapFetchWithBaseUrl"
-      );
-    }
-  } else {
+  if (process.env.NODE_ENV !== "production") {
     // e.g. http://localhost:19006
     productionBaseUrl = getDevServer().url;
   }
