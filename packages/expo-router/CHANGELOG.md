@@ -8,6 +8,7 @@
 
 ### 🐛 Bug fixes
 
+- Improve "going back" from an unmatched route.
 - fix `generateStaticParams` with clone syntax.
 
 ### 💡 Others
