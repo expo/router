@@ -9,6 +9,7 @@
 ### 🐛 Bug fixes
 
 - fix `generateStaticParams` with clone syntax.
+- fix static rendering by locking the server context to the value of `package.json` `main`.
 
 ### 💡 Others
 

@@ -6,7 +6,10 @@ import { useLinkingContext } from "../link/useLinkingContext";
 function useServerStateNode() {
   // TODO: Expose this from React Navigation
   const ServerContext =
-    require("@react-navigation/native/src/ServerContext").default;
+    // We use the value from `main` in the `package.json` since this
+    // should only be accessed from processes that are running in Node.js and
+    // conform to using `mainFields: ['main']` in their bundler config.
+    require("@react-navigation/native/lib/commonjs/ServerContext").default;
   const getStateFromPath = useGetStateFromPath();
   const server = React.useContext<any>(ServerContext);
   const pathname = React.useMemo<string>(() => {
