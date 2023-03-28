@@ -7,6 +7,9 @@ import { Link } from "../link/Link";
 import { useRouter } from "../link/useRouter";
 import { useNavigation } from "../useNavigation";
 
+const useLayoutEffect =
+  typeof window !== "undefined" ? React.useLayoutEffect : function () {};
+
 /** Default screen for unmatched routes. */
 export function Unmatched() {
   const router = useRouter();
@@ -14,7 +17,7 @@ export function Unmatched() {
   const pathname = usePathname();
   const url = createURL(pathname);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     navigation.setOptions({
       title: "Not Found",
     });
