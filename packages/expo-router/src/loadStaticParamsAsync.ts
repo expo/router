@@ -1,4 +1,4 @@
-import type { RouteNode } from "./Route";
+import type { DynamicConvention, RouteNode } from "./Route";
 
 async function recurseAndFlattenNodes<
   T,
@@ -24,7 +24,10 @@ export async function loadStaticParamsAsync(
   return route;
 }
 
-function assertStaticParams(route: RouteNode, params: any) {
+function assertStaticParams(
+  route: RouteNode,
+  params: Record<string, string | string[]>
+) {
   const matches = route.dynamic!.every((dynamic) => {
     const value = params[dynamic.name];
     return value !== undefined && value !== null;
@@ -37,20 +40,44 @@ function assertStaticParams(route: RouteNode, params: any) {
     );
   }
 
+  const validateSingleParam = (
+    dynamic: DynamicConvention,
+    value: any,
+    allowMultipleSegments?: boolean
+  ) => {
+    if (typeof value !== "string") {
+      throw new Error(
+        `generateStaticParams() for route "${
+          route.contextKey
+        }" expected param "${
+          dynamic.name
+        }" to be of type string, instead found "${typeof value}" while parsing "${value}".`
+      );
+    }
+    const parts = value.split("/").filter(Boolean);
+    if (parts.length > 1 && !allowMultipleSegments) {
+      throw new Error(
+        `generateStaticParams() for route "${route.contextKey}" expected param "${dynamic.name}" to not contain "/" (multiple segments) while parsing "${value}".`
+      );
+    }
+    if (parts.length === 0) {
+      throw new Error(
+        `generateStaticParams() for route "${route.contextKey}" expected param "${dynamic.name}" not to be empty while parsing "${value}".`
+      );
+    }
+  };
+
   route.dynamic!.forEach((dynamic) => {
     const value = params[dynamic.name];
     if (dynamic.deep) {
+      // TODO: We could split strings by `/` and use that too.
       if (!Array.isArray(value)) {
-        throw new Error(
-          `generateStaticParams() for route "${route.contextKey}" expected param "${dynamic.name}" to be of type Array.`
-        );
+        validateSingleParam(dynamic, value, true);
+      } else {
+        validateSingleParam(dynamic, value.filter(Boolean).join("/"), true);
       }
     } else {
-      if (Array.isArray(value)) {
-        throw new Error(
-          `generateStaticParams() for route "${route.contextKey}" expected param "${dynamic.name}" to not be of type Array.`
-        );
-      }
+      validateSingleParam(dynamic, value);
     }
     return value !== undefined && value !== null;
   });
@@ -73,27 +100,27 @@ async function loadStaticParamsRecursive(
   route: RouteNode,
   props: { parentParams: any }
 ): Promise<RouteNode[]> {
-  if (!route?.dynamic) {
+  if (!route?.dynamic && !route?.children?.length) {
     return [route];
   }
 
   const loaded = await route.loadRoute();
-  if (!loaded.generateStaticParams) {
-    return [route];
+
+  let staticParams: Record<string, string | string[]>[] = [];
+
+  if (loaded.generateStaticParams) {
+    staticParams = await loaded.generateStaticParams({
+      params: props.parentParams || {},
+    });
+    if (!Array.isArray(staticParams)) {
+      throw new Error(
+        `generateStaticParams() must return an array of params, received ${staticParams}`
+      );
+    }
+
+    // Assert that at least one param from each matches the dynamic route.
+    staticParams.forEach((params) => assertStaticParams(route, params));
   }
-
-  const staticParams = await loaded.generateStaticParams({
-    params: props.parentParams || {},
-  });
-
-  if (!Array.isArray(staticParams)) {
-    throw new Error(
-      `generateStaticParams() must return an array of params, received ${staticParams}`
-    );
-  }
-
-  // Assert that at least one param from each matches the dynamic route.
-  staticParams.forEach((params) => assertStaticParams(route, params));
 
   route.children = uniqBy(
     (
