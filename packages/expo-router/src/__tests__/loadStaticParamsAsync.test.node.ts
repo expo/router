@@ -277,6 +277,78 @@ describe(loadStaticParamsAsync, () => {
     });
   });
 
+  it(`evaluates with nested clone syntax`, async () => {
+    const ctx = createMockContextModule({
+      "./(app)/_layout.tsx": { default() {} },
+      "./(app)/(index,about)/blog/[post].tsx": {
+        default() {},
+        async generateStaticParams() {
+          return [{ post: "123" }, { post: "abc" }];
+        },
+      },
+    });
+
+    const route = getExactRoutes(ctx)!;
+
+    expect(dropFunctions(route)).toEqual({
+      children: [
+        {
+          children: [
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/[post].tsx",
+              dynamic: [{ deep: false, name: "post" }],
+              route: "(index,about)/blog/[post]",
+            },
+          ],
+          contextKey: "./(app)/_layout.tsx",
+          dynamic: null,
+          initialRouteName: undefined,
+          route: "(app)",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      route: "",
+    });
+
+    expect(dropFunctions(await loadStaticParamsAsync(route))).toEqual({
+      children: [
+        {
+          children: [
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/[post].tsx",
+              dynamic: [{ deep: false, name: "post" }],
+              route: "(index,about)/blog/[post]",
+            },
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/123.tsx",
+              dynamic: null,
+              route: "(index,about)/blog/123",
+            },
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/abc.tsx",
+              dynamic: null,
+              route: "(index,about)/blog/abc",
+            },
+          ],
+          contextKey: "./(app)/_layout.tsx",
+          dynamic: null,
+          initialRouteName: undefined,
+          route: "(app)",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      route: "",
+    });
+  });
+
   it(`generateStaticParams with nested dynamic segments`, async () => {
     const ctx = createMockContextModule({
       "./post/[post].tsx": {
@@ -377,20 +449,52 @@ describe(loadStaticParamsAsync, () => {
   });
 
   it(`generateStaticParams throws when deep dynamic segments return invalid type`, async () => {
-    const ctx = createMockContextModule({
-      "./post/[...post].tsx": {
-        default() {},
-        generateStaticParams() {
-          return [{ post: "123" }];
-        },
-      },
-    });
-    const route = getExactRoutes(ctx)!;
+    const loadWithParam = (params) =>
+      loadStaticParamsAsync(
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[...post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return params;
+              },
+            },
+          })
+        )!
+      );
+
+    // Passes
+    await loadWithParam([{ post: "123" }]);
+    await loadWithParam([{ post: "123/456" }]);
+    await loadWithParam([{ post: ["123/456", "123"] }]);
+    await loadWithParam([{ post: ["123", "123"] }]);
+    await loadWithParam([{ post: ["123", "/"] }]);
+    await loadWithParam([{ post: [123, "/", "432"] }]);
 
     await expect(
-      loadStaticParamsAsync(route)
+      loadWithParam([{ post: ["/"] }])
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" to be of type Array."`
+      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" not to be empty while parsing "/"."`
+    );
+    await expect(
+      loadWithParam([{ post: "" }])
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" not to be empty while parsing ""."`
+    );
+    await expect(
+      loadWithParam([{ post: ["", "/", ""] }])
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" not to be empty while parsing "/"."`
+    );
+    await expect(
+      loadWithParam([{ post: null }])
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() must return an array of params that match the dynamic route. Received {"post":null}"`
+    );
+    await expect(
+      loadWithParam([{ post: false }])
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" to be of type string, instead found "boolean" while parsing "false"."`
     );
   });
 
@@ -407,7 +511,72 @@ describe(loadStaticParamsAsync, () => {
     await expect(
       loadStaticParamsAsync(route)
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" to not be of type Array."`
+      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" to be of type string, instead found "object" while parsing "123"."`
     );
+  });
+
+  it(`generateStaticParams throws when dynamic segments return invalid format (multiple slugs)`, async () => {
+    const ctx = createMockContextModule({
+      "./post/[post].tsx": {
+        default() {},
+        generateStaticParams() {
+          return [{ post: "123/abc" }];
+        },
+      },
+    });
+    const route = getExactRoutes(ctx)!;
+    await expect(
+      loadStaticParamsAsync(route)
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" to not contain "/" (multiple segments) while parsing "123/abc"."`
+    );
+  });
+
+  it(`generateStaticParams throws when dynamic segments return empty string`, async () => {
+    await expect(
+      loadStaticParamsAsync(
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return [{ post: "/" }];
+              },
+            },
+          })
+        )!
+      )
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" not to be empty while parsing "/"."`
+    );
+    await expect(
+      loadStaticParamsAsync(
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return [{ post: "" }];
+              },
+            },
+          })
+        )!
+      )
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" not to be empty while parsing ""."`
+    );
+  });
+
+  it(`generateStaticParams allows when dynamic segments return a single slug with a benign slash`, async () => {
+    const ctx = createMockContextModule({
+      "./post/[post].tsx": {
+        default() {},
+        generateStaticParams() {
+          return [{ post: "123/" }, { post: "/123" }];
+        },
+      },
+    });
+    // doesn't throw
+    await loadStaticParamsAsync(getExactRoutes(ctx)!);
   });
 });

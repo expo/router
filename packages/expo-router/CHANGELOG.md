@@ -9,6 +9,8 @@
 ### 🐛 Bug fixes
 
 - fix loading useLayoutEffect in non-browser environment.
+- Improve "going back" from an unmatched route.
+- fix `generateStaticParams` with clone syntax.
 
 ### 💡 Others
 

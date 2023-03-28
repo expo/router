@@ -4,6 +4,7 @@ import React from "react";
 
 import { usePathname } from "../LocationProvider";
 import { Link } from "../link/Link";
+import { useRouter } from "../link/useRouter";
 import { useNavigation } from "../useNavigation";
 
 const useLayoutEffect =
@@ -11,6 +12,7 @@ const useLayoutEffect =
 
 /** Default screen for unmatched routes. */
 export function Unmatched() {
+  const router = useRouter();
   const navigation = useNavigation();
   const pathname = usePathname();
   const url = createURL(pathname);
@@ -36,9 +38,18 @@ export function Unmatched() {
         style={styles.subtitle}
       >
         Page could not be found.{" "}
-        <Link href="/" replace style={styles.link}>
+        <Text
+          onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              router.replace("/");
+            }
+          }}
+          style={styles.link}
+        >
           Go back.
-        </Link>
+        </Text>
       </Text>
 
       <Link href={pathname} replace style={styles.link}>
