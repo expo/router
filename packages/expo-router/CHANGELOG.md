@@ -6,11 +6,34 @@
 
 ### 🎉 New features
 
-- fake hiding the generated drawer items using `display: none`.
-- add `generateStaticParams` export which can be used to generate a list of static pages to export with `EXPO_USE_STATIC=1 yarn expo export -p web` (on main).
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## [Mon, 27 Mar 2023 17:42:06 -0500](https://github.com/expo/router/commit/52deb844568548eb6be0a217b7f0c7cbdf97ba89)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
 
 ### 🐛 Bug fixes
 
+### 💡 Others
+
+## [Mon, 27 Mar 2023 17:28:01 -0500](https://github.com/expo/router/commit/8e9123dbe0b6b817f49be87e1f7215bcb8bbe368)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- feat(router): public root HTML file with `app/+html.js` ([#404](https://github.com/expo/router/issues/404))
+- fake hiding the generated drawer items using `display: none`. ([#413](https://github.com/expo/router/issues/413))
+- add `generateStaticParams` export which can be used to generate a list of static pages to export with `EXPO_USE_STATIC=1 yarn expo export -p web` (on main). ([#425](https://github.com/expo/router/issues/425))
+- feat: expo-env.d.ts types ([#419](https://github.com/expo/router/issues/419))
+
+### 🐛 Bug fixes
+
+- fix initial linking in Expo Go production projects or EAS Update projects. ([#432](https://github.com/expo/router/issues/432))
 - fix deep linking on native.
 
 ### 💡 Others

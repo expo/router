@@ -75,15 +75,15 @@ Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guide
 
 <!-- TODO: Drop this when we upgrade React Native -->
 
-Ensure you're using at least `metro@0.73.7` by setting a Yarn resolution or npm override (this step goes away in Expo SDK 47).
+Ensure you're using at least `metro@0.76.0` by setting a Yarn resolution or npm override (this step goes away in Expo SDK 47).
 
 If you use **Yarn**:
 
 ```json title=package.json
 {
   "resolutions": {
-    "metro": "0.73.7",
-    "metro-resolver": "0.73.7"
+    "metro": "0.76.0",
+    "metro-resolver": "0.76.0"
   }
 }
 ```
@@ -93,8 +93,8 @@ If you use **npm**, this requires npm 8.3.0 or higher. You can install this with
 ```json title=package.json
 {
   "overrides": {
-    "metro": "0.73.7",
-    "metro-resolver": "0.73.7"
+    "metro": "0.76.0",
+    "metro-resolver": "0.76.0"
   }
 }
 ```
