@@ -8,6 +8,8 @@
 
 ### 🐛 Bug fixes
 
+- fix loading useLayoutEffect in non-browser environment.
+
 ### 💡 Others
 
 ## [Mon, 27 Mar 2023 17:42:06 -0500](https://github.com/expo/router/commit/52deb844568548eb6be0a217b7f0c7cbdf97ba89)
