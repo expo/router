@@ -277,6 +277,78 @@ describe(loadStaticParamsAsync, () => {
     });
   });
 
+  it(`evaluates with nested clone syntax`, async () => {
+    const ctx = createMockContextModule({
+      "./(app)/_layout.tsx": { default() {} },
+      "./(app)/(index,about)/blog/[post].tsx": {
+        default() {},
+        async generateStaticParams() {
+          return [{ post: "123" }, { post: "abc" }];
+        },
+      },
+    });
+
+    const route = getExactRoutes(ctx)!;
+
+    expect(dropFunctions(route)).toEqual({
+      children: [
+        {
+          children: [
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/[post].tsx",
+              dynamic: [{ deep: false, name: "post" }],
+              route: "(index,about)/blog/[post]",
+            },
+          ],
+          contextKey: "./(app)/_layout.tsx",
+          dynamic: null,
+          initialRouteName: undefined,
+          route: "(app)",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      route: "",
+    });
+
+    expect(dropFunctions(await loadStaticParamsAsync(route))).toEqual({
+      children: [
+        {
+          children: [
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/[post].tsx",
+              dynamic: [{ deep: false, name: "post" }],
+              route: "(index,about)/blog/[post]",
+            },
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/123.tsx",
+              dynamic: null,
+              route: "(index,about)/blog/123",
+            },
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/abc.tsx",
+              dynamic: null,
+              route: "(index,about)/blog/abc",
+            },
+          ],
+          contextKey: "./(app)/_layout.tsx",
+          dynamic: null,
+          initialRouteName: undefined,
+          route: "(app)",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      route: "",
+    });
+  });
+
   it(`generateStaticParams with nested dynamic segments`, async () => {
     const ctx = createMockContextModule({
       "./post/[post].tsx": {

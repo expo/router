@@ -73,27 +73,27 @@ async function loadStaticParamsRecursive(
   route: RouteNode,
   props: { parentParams: any }
 ): Promise<RouteNode[]> {
-  if (!route?.dynamic) {
+  if (!route?.dynamic && !route?.children?.length) {
     return [route];
   }
 
   const loaded = await route.loadRoute();
-  if (!loaded.generateStaticParams) {
-    return [route];
+
+  let staticParams: Record<string, string | string[]>[] = [];
+
+  if (loaded.generateStaticParams) {
+    staticParams = await loaded.generateStaticParams({
+      params: props.parentParams || {},
+    });
+    if (!Array.isArray(staticParams)) {
+      throw new Error(
+        `generateStaticParams() must return an array of params, received ${staticParams}`
+      );
+    }
+
+    // Assert that at least one param from each matches the dynamic route.
+    staticParams.forEach((params) => assertStaticParams(route, params));
   }
-
-  const staticParams = await loaded.generateStaticParams({
-    params: props.parentParams || {},
-  });
-
-  if (!Array.isArray(staticParams)) {
-    throw new Error(
-      `generateStaticParams() must return an array of params, received ${staticParams}`
-    );
-  }
-
-  // Assert that at least one param from each matches the dynamic route.
-  staticParams.forEach((params) => assertStaticParams(route, params));
 
   route.children = uniqBy(
     (
