@@ -1,17 +1,17 @@
-import type tsserverlibrary from "typescript/lib/tsserverlibrary";
-import { LanguageService } from "typescript/lib/tsserverlibrary";
+import ts, { LanguageService } from "typescript/lib/tsserverlibrary";
 
-import { createTSHelpers, isRouteFile } from "./utils";
+import { createTSHelpers, isRouteFile, walkNode } from "./utils";
 import { RuleContext } from "./rules/context";
 import { routePlatformExtension } from "./rules/platform-extensions";
 import { routeDefaultExport } from "./rules/route-default-export";
 import {
   typedSettingCodeAction,
   typedSettingSuggestion,
-} from "./suggestions/settings";
+} from "./suggestions/settings-type-fix";
+import { hrefSuggestion, hrefSuggestionCodeAction } from "./suggestions/href";
 
 interface InitOptions {
-  typescript: typeof tsserverlibrary;
+  typescript: typeof ts;
 }
 
 function init({ typescript: ts }: InitOptions) {
@@ -82,8 +82,9 @@ function init({ typescript: ts }: InitOptions) {
           Log,
         };
 
-        ts.forEachChild(source, (node) => {
+        walkNode(source, (node) => {
           typedSettingSuggestion(node, ruleContext);
+          hrefSuggestion(node, ruleContext);
         });
 
         return prior;
@@ -96,6 +97,7 @@ function init({ typescript: ts }: InitOptions) {
         const context = { prior, Log, ts, tsLS, source };
 
         typedSettingCodeAction(context, fileName, ...args);
+        hrefSuggestionCodeAction(context, fileName, ...args);
 
         Log.info("getCodeFixesAtPosition", JSON.stringify(prior, null, 2));
         return prior;

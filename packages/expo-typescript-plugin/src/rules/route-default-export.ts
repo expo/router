@@ -1,6 +1,9 @@
 import { EXPO_TS_CODES } from "../errors";
 import { RuleContext } from "./context";
 
+/*
+ * All route files must have a default export.
+ */
 export function routeDefaultExport(
   hasDefaultExpo: boolean,
   { prior, ts, source, fileName }: RuleContext

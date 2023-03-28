@@ -1,7 +1,8 @@
-import type tsserverlibrary from "typescript/lib/tsserverlibrary";
+import ts from "typescript/lib/tsserverlibrary";
 import { NamedImports, SourceFile, TextChange } from "typescript";
 
 export function getReplaceLineSpan(position: number, sourceFile: SourceFile) {
+  sourceFile.getLastToken;
   const lineStarts = sourceFile.getLineStarts();
   const line = sourceFile.getLineAndCharacterOfPosition(position).line;
   const end = sourceFile.getLineEndOfPosition(position);
@@ -12,7 +13,7 @@ export function getReplaceLineSpan(position: number, sourceFile: SourceFile) {
 }
 
 export interface GetImportChangesOptions {
-  ts: typeof tsserverlibrary;
+  ts: typeof ts;
   module: string;
   identifier: string;
   source: SourceFile;

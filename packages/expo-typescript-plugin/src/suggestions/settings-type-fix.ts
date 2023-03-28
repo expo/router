@@ -1,4 +1,4 @@
-import {
+import ts, {
   DiagnosticCategory,
   FormatCodeSettings,
   TextChange,
@@ -7,11 +7,19 @@ import {
 import { getImportTextChange, getReplaceLineSpan } from "../code-fixes";
 import { EXPO_TS_CODES } from "../errors";
 import { RuleContext } from "../rules/context";
-import { SuggestionContext } from "./suggestion";
+import { SuggestionContext } from "./types";
+
+/*
+ * Expo routes allow for `export const unstable_settings = {}`
+ *
+ * Before: `export const unstable_settings = {}`
+ * After: `export const unstable_settings: RouteSettings = {}`
+ *
+ */
 
 export function typedSettingSuggestion(
   node: ts.Node,
-  { prior, ts, source, Log }: RuleContext
+  { prior, ts, source }: RuleContext
 ) {
   const settingsNode =
     ts.isVariableStatement(node) &&
@@ -19,15 +27,13 @@ export function typedSettingSuggestion(
       return declaration.name.getText() === "unstable_settings";
     });
 
-  if (settingsNode && settingsNode.type?.getText() !== "RouterSettings") {
+  if (settingsNode && settingsNode.type?.getText() !== "RouteSettings") {
     const start = node.getStart();
     const end = settingsNode.getEnd();
 
-    Log.info("typedSettingSuggestion", start, end);
-
     prior.push({
       category: DiagnosticCategory.Suggestion,
-      code: EXPO_TS_CODES.MISSING_SETTINGS_TYPE,
+      code: EXPO_TS_CODES.FIX_SETTINGS_TYPE,
       messageText:
         "Missing or incorrect type. Use code actions to automatically add the correct type.",
       file: source,
@@ -46,7 +52,7 @@ export function typedSettingCodeAction(
   _formatOptions: FormatCodeSettings,
   _preferences: UserPreferences
 ) {
-  if (errorCodes.indexOf(EXPO_TS_CODES.MISSING_SETTINGS_TYPE) === -1) {
+  if (errorCodes.indexOf(EXPO_TS_CODES.FIX_SETTINGS_TYPE) === -1) {
     return;
   }
 
@@ -54,20 +60,20 @@ export function typedSettingCodeAction(
     ts,
     source,
     module: "expo-router",
-    identifier: "RouterSettings",
+    identifier: "RouteSettings",
   });
 
   const textChanges = [
     importChange,
     {
       span: getReplaceLineSpan(start, source),
-      newText: "export const unstable_settings: RouterSettings = {",
+      newText: "export const unstable_settings: RouteSettings = {",
     },
   ].filter((c) => !!c) as TextChange[];
 
   prior.push({
     fixName: "expo-router_suggestion_settings-type",
-    description: "(Expo Router) Add missing type definition",
+    description: "(Expo Router) Fix type definition",
     changes: [
       {
         fileName,

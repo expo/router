@@ -12,6 +12,7 @@
  *
  * Categories:
  *   Route files: 1
+ *   Route files: 2
  *
  */
 
@@ -25,5 +26,7 @@ export const EXPO_TS_CODES = {
    * Suggestions
    */
   // Route files
-  MISSING_SETTINGS_TYPE: 1321000,
+  FIX_SETTINGS_TYPE: 1321000,
+  // Components
+  HREF_DYNAMIC_STRING: 1322000,
 };

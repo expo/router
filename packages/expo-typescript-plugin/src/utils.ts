@@ -1,11 +1,13 @@
-import type tsserverlibrary from "typescript/lib/tsserverlibrary";
+import ts from "typescript/lib/tsserverlibrary";
+
+type tsserverlibrary = typeof ts;
 
 export interface Logger {
-  info(...messages: string[]): void;
-  error(...messages: string[]): void;
+  info(...messages: (string | number | undefined)[]): void;
+  error(...messages: (string | number | undefined)[]): void;
 }
 
-export function createTSHelpers(ts: typeof tsserverlibrary) {
+export function createTSHelpers(ts: tsserverlibrary) {
   return {
     isDefaultFunctionExport(node: ts.Node): node is ts.FunctionDeclaration {
       if (ts.isFunctionDeclaration(node)) {
@@ -50,6 +52,30 @@ export function createTSHelpers(ts: typeof tsserverlibrary) {
       };
     },
   };
+}
+
+export function walkNode(node: ts.Node, callback: (node: ts.Node) => void) {
+  ts.forEachChild(node, (child) => {
+    callback(child);
+    walkNode(child, callback);
+  });
+}
+
+export function findNode(
+  node: ts.Node,
+  start: number,
+  end: number
+): ts.Node | undefined {
+  return ts.forEachChild(node, (child) => {
+    const $start = child.getStart();
+    const $end = child.getEnd();
+
+    if (start >= $start && end <= $end && child.getChildCount() === 0) {
+      return child;
+    } else {
+      return findNode(child, start, end);
+    }
+  });
 }
 
 export function getFileNameParams(fileName: string) {

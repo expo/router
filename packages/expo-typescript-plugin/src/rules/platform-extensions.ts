@@ -1,6 +1,9 @@
 import { EXPO_TS_CODES } from "../errors";
 import { RuleContext } from "./context";
 
+/*
+ * Ensures that route files do not have Platform Extensions.
+ */
 export function routePlatformExtension({
   prior,
   ts,
