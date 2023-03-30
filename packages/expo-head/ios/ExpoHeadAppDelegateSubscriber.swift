@@ -88,23 +88,22 @@ public class ExpoHeadAppDelegateSubscriber: ExpoAppDelegateSubscriber {
         if let wellKnownHref = userActivity.userInfo?["href"] as? String {
             // From other native device to app
             sendFakeDeepLinkEventToReactNative(obj: self, url: wellKnownHref)
-        } else if let url = userActivity.webpageURL {
+        } else if var url = userActivity.webpageURL {
             // From website to app
             
             let schemes = InfoPlist.bundleURLSchemes()
             
             var deepLink = "\(schemes[0])://\(url.relativePath)"
-            
-            if #available(iOS 16.0, *) {
-                if let qs = url.query() {
-                    deepLink += "?\(qs)"
-                }
+                        
+            let components = URLComponents(string: url.absoluteString)
+            if let qs = components?.query {
+                deepLink += "?\(qs)"
+                deepLink += "&ref=web-handoff"
             } else {
-                if let qs = url.query {
-                    deepLink += "?\(qs)"
-                }
-                // Fallback on earlier versions
+                deepLink += "?ref=web-handoff"
             }
+            
+            
             
             sendFakeDeepLinkEventToReactNative(obj: self, url: deepLink)
         } else if (userActivity.activityType == CSQueryContinuationActionType) {
