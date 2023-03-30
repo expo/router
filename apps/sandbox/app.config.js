@@ -16,6 +16,7 @@ module.exports = {
   },
   extra: {
     router: {
+      handoffOrigin: `https://${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
       origin:
         process.env.NODE_ENV !== "production"
           ? `https://${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`

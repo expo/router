@@ -36,40 +36,6 @@ type UserActivity = {
   expirationDate?: Date;
 };
 
-function getWebUrlsFromManifest() {
-  // TODO: Replace this with the source of truth native manifest
-  // Then do a check to warn the user if the config doesn't match the native manifest.
-  // TODO: Warn if the applinks have `https://` in them.
-  const domains = Constants.expoConfig?.ios?.associatedDomains || [];
-  // [applinks:explore-api.netlify.app/] -> [explore-api.netlify.app]
-  const applinks = domains
-    .filter((domain) => domain.startsWith("applinks:"))
-    .map((domain) => {
-      const clean = domain.replace(/^applinks:/, "");
-      return clean.endsWith("/") ? clean.slice(0, -1) : clean;
-    });
-  const withoutCustom = applinks.filter(
-    (domain) =>
-      !domain.match(
-        /\?mode=(developer|managed|developer\+managed|managed\+developer)$/
-      )
-  );
-  return withoutCustom;
-}
-function setDefaultWebUrl() {
-  const webUrls = getWebUrlsFromManifest();
-  if (!webUrls.length) {
-    throw new Error(
-      `No web URL found in the native manifest. Please add a web URL to the native manifest.`
-    );
-  }
-  if (webUrls.length > 1) {
-    console.warn(
-      `Multiple web URLs found in the native manifest associatedDomains. Using the first one found: ${webUrls[0]}`
-    );
-  }
-  return "https://" + webUrls[0];
-}
 let webUrl: string = "";
 
 export function setWebUrl(url: string) {
@@ -83,8 +49,22 @@ export function setWebUrl(url: string) {
   }
 }
 
-if (!webUrl && typeof window !== "undefined" && window.location?.origin) {
-  setWebUrl(window.location.origin);
+function getUrlFromConstants() {
+  const origin = Constants.manifest?.extra?.router?.handoffOrigin;
+
+  if (!origin) {
+    throw new Error(
+      `Add the handoff origin to the native manifest under "extra.router.handoffOrigin"`
+    );
+  }
+
+  if (!/^https?:\/\//.test(origin)) {
+    throw new Error(
+      'Expo Head: Web URL must start with "http://" or "https://"'
+    );
+  }
+
+  return origin.replace(/\/$/, "");
 }
 
 function getStaticUrlFromExpoRouter(pathname: string) {
@@ -94,7 +74,8 @@ function getStaticUrlFromExpoRouter(pathname: string) {
 }
 function getWebUrl() {
   if (!webUrl) {
-    webUrl = setDefaultWebUrl();
+    return getUrlFromConstants();
+    // webUrl = setDefaultWebUrl();
   }
   return webUrl;
 }
@@ -107,18 +88,15 @@ function getLastSegment(path: string) {
   return lastSegment.replace(/\.[^/.]+$/, "").split("?")[0];
 }
 
-// Maybe use geo from structured data -- https://developers.google.com/search/docs/appearance/structured-data/local-business
-// import { useContextKey } from "expo-router/build/Route";
-// import { AppState, Linking } from "react-native";
+// TODO: Use Head Provider to collect all props so only one Head is rendered for a given route.
+
 export function Head({ children }: { children?: React.ReactNode }) {
   const pathname = usePathname();
   const params = useSearchParams<{ q?: string }>();
 
   const href = React.useMemo(() => {
     const qs = new URLSearchParams(params).toString();
-
     const url = getStaticUrlFromExpoRouter(pathname);
-
     if (qs) {
       return url + "?" + qs;
     }
@@ -201,12 +179,6 @@ export function Head({ children }: { children?: React.ReactNode }) {
 
   useRegisterCurrentActivity(activity);
 
-  // React.useEffect(() => {
-  //   return () => {
-  //     // https://developer.apple.com/documentation/foundation/nsuseractivity/1409596-resigncurrent
-  //     ExpoHead.suspendActivity("[TODO-SOME-PAGE-ID]");
-  //   };
-  // }, []);
   return renderableChildren;
 }
 
@@ -216,12 +188,17 @@ function useRegisterCurrentActivity(activity: UserActivity) {
       if (!activity.id) {
         throw new Error("Activity must have an ID");
       }
-      ExpoHead.createActivity(activity);
-    }
-    return () => {
-      if (activity?.id) {
-        ExpoHead.suspendActivity(activity.id);
+
+      // If no features are enabled, then skip registering the activity
+      if (activity.isEligibleForHandoff || activity.isEligibleForSearch) {
+        ExpoHead.createActivity(activity);
+        return () => {
+          if (activity?.id) {
+            ExpoHead.suspendActivity(activity.id);
+          }
+        };
       }
-    };
+    }
+    return () => {};
   }, [activity]);
 }

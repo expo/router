@@ -25,13 +25,13 @@
   "author": "evanbacon <bacon@expo.io> (https://github.com/EvanBacon)",
   "license": "MIT",
   "homepage": "https://github.com/expo/router#readme",
- 
   "devDependencies": {
     "expo-module-scripts": "^2.1.1"
   },
   "peerDependencies": {
     "expo": "*",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "expo-constants": "*"
   }
 }
