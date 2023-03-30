@@ -54,34 +54,6 @@ func userInfoToQueryString(_ userInfo: [String : NSSecureCoding]?) -> String {
 }
 
 public class ExpoHeadAppDelegateSubscriber: ExpoAppDelegateSubscriber {
-    
-    public func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
-        let schemes = InfoPlist.bundleURLSchemes()
-        // TODO: Allow user to define the scheme using structured data or something.
-        // opensearch = Chrome. spotlight = custom thing we're using to identify iOS
-        var url = "\(schemes[0]):/"
-        
-        if let wellKnownHref = shortcutItem.userInfo?["href"] as? String {
-            url += wellKnownHref
-        } else {
-            url += "/"
-        }
-        
-        url += "?title=\(encoded(shortcutItem.localizedTitle ))&id=\(encoded(shortcutItem.type))"
-        
-        
-        if let subtitle = shortcutItem.localizedSubtitle {
-            url += "&subtitle=\(encoded(subtitle))"
-        }
-        
-        url += "&ref=shortcut"
-        
-        url += userInfoToQueryString(shortcutItem.userInfo)
-        
-        // acme://<href>?id=<>&title=<>&subtitle=<>&ref=shortcut
-        sendFakeDeepLinkEventToReactNative(obj: self, url: url)
-    }
-    
     public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         launchedActivity = userActivity
         
@@ -103,8 +75,6 @@ public class ExpoHeadAppDelegateSubscriber: ExpoAppDelegateSubscriber {
                 deepLink += "?ref=web-handoff"
             }
             
-            
-            
             sendFakeDeepLinkEventToReactNative(obj: self, url: deepLink)
         } else if (userActivity.activityType == CSQueryContinuationActionType) {
             // From Spotlight search
@@ -119,7 +89,6 @@ public class ExpoHeadAppDelegateSubscriber: ExpoAppDelegateSubscriber {
                 sendFakeDeepLinkEventToReactNative(obj: self, url: url)
             }
         }
-        
         
         return false
     }

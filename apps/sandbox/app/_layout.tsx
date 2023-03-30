@@ -4,7 +4,9 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 export default function Layout() {
   return (
     <>
-      {/* <Head /> */}
+      <Head>
+        <meta property="expo:handoff" content="true" />
+      </Head>
       <Tabs>
         <Tabs.Screen
           name="index"

@@ -186,3 +186,7 @@ If all else fails, you can try to debug the issue by following the steps in the 
 - "Receiving activities from Handoff in your app on other devices." is performed by an [App Delegate Subscriber](https://docs.expo.dev/modules/appdelegate-subscribers/) in the Expo Head native module. It is used to redirect you to the correct route when you handoff to your native app.
 
 [apple-docs-handoff]: https://developer.apple.com/documentation/foundation/task_management/implementing_handoff_in_your_app
+
+## Known Issues
+
+- Handoff from web (Chrome) to native, does not appear to support Client-side Routing. This means the URL presented in the App Switcher will be the URL of the page you were on when you clicked the link, or reloaded the page. This appears to be a limitation of the web platform, and not something that can be fixed by Expo Router.

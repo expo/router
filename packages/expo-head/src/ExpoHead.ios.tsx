@@ -1,6 +1,4 @@
-// import URL from "url-parse";
 import * as App from "expo-application";
-// import { createURL } from "expo-linking";
 import { usePathname, useSearchParams } from "expo-router";
 import React from "react";
 import Constants from "expo-constants";
@@ -22,12 +20,15 @@ type UserActivity = {
   // TODO: Get this automatically somehow
   activityType: string;
   // TODO: Maybe something like robots.txt?
-  eligibleForSearch?: boolean;
   phrase?: string;
 
   thumbnailURL?: string;
 
   userInfo?: Record<string, string>;
+
+  isEligibleForHandoff?: boolean;
+  isEligibleForPrediction?: boolean;
+  isEligibleForSearch?: boolean;
 
   /** Local file path for an image */
   imageUrl?: string;
@@ -119,7 +120,6 @@ export function Head({ children }: { children?: React.ReactNode }) {
 
     const url = getStaticUrlFromExpoRouter(pathname);
 
-    console.log("url:", url + "?" + qs);
     if (qs) {
       return url + "?" + qs;
     }
@@ -144,8 +144,6 @@ export function Head({ children }: { children?: React.ReactNode }) {
     return { renderableChildren, metaChildren };
   }, [children]);
 
-  console.log("children:", renderableChildren, metaChildren);
-
   const activity = React.useMemo(() => {
     const userActivity: UserActivity = {
       title: getLastSegment(pathname),
@@ -158,7 +156,7 @@ export function Head({ children }: { children?: React.ReactNode }) {
       }
       // Child is meta tag
       if (child.type === "meta") {
-        const { property, name, media, content } = child.props;
+        const { property, name, content } = child.props;
         // <meta name="title" content="Hello world" />
         if (property === "og:title" || name === "title") {
           userActivity.title = content;
@@ -166,23 +164,17 @@ export function Head({ children }: { children?: React.ReactNode }) {
         if (property === "og:description" || name === "description") {
           userActivity.description = content;
         }
-        // if (property === "expo:spoken-phrase") {
-        //   userActivity.phrase = content;
-        // }
+        if (property === "expo:handoff") {
+          userActivity.isEligibleForHandoff = [true, "true", ""].includes(
+            content
+          );
+        }
+
         // <meta property="og:url" content="https://expo.io/foobar" />
         if ("og:url" === property || "url" === name) {
           userActivity.webpageURL = content;
         }
-        if (property === "og:image") {
-          //     if (media === "(prefers-color-scheme: dark)") {
-          // console.log("SETTING DARK IMAGE URL", content);
-          userActivity.darkImageUrl = content;
-          //     }
-          //     else {
-          //         // console.log("SETTING IMAGE URL", content);
-          //         userActivity.imageUrl = content;
-          //     }
-        }
+
         // <meta name="keywords" content="foo,bar,baz" />
         if (["keywords"].includes(name)) {
           userActivity.keywords = Array.isArray(content)
@@ -191,34 +183,25 @@ export function Head({ children }: { children?: React.ReactNode }) {
         }
       }
     });
-    const resolved = {
+    const resolved: UserActivity = {
       webpageURL: href,
-      eligibleForSearch: true,
-      keywords: [userActivity.title],
-      isEligibleForHandoff: true,
-      isEligibleForPrediction: true,
-      isEligibleForSearch: true,
+      keywords: [userActivity.title!],
+      // isEligibleForSearch: true,
       ...userActivity,
       // dateModified: new Date().toISOString(),
       userInfo: {
         href: pathname,
       },
     };
-    if (App.applicationName) {
-      resolved.keywords?.push(App.applicationName);
-    }
-    if (!resolved.id) {
+
+    if (!resolved.id && resolved.webpageURL) {
       resolved.id = urlToId(resolved.webpageURL);
     }
     return resolved;
   }, [metaChildren, pathname, href]);
-  React.useEffect(() => {
-    if (activity) {
-      ExpoHead.createActivity(activity);
-    } else {
-      // ExpoHead.revokeActivity();
-    }
-  }, [activity]);
+
+  useRegisterCurrentActivity(activity);
+
   // React.useEffect(() => {
   //   return () => {
   //     // https://developer.apple.com/documentation/foundation/nsuseractivity/1409596-resigncurrent
@@ -226,4 +209,20 @@ export function Head({ children }: { children?: React.ReactNode }) {
   //   };
   // }, []);
   return renderableChildren;
+}
+
+function useRegisterCurrentActivity(activity: UserActivity) {
+  React.useEffect(() => {
+    if (activity) {
+      if (!activity.id) {
+        throw new Error("Activity must have an ID");
+      }
+      ExpoHead.createActivity(activity);
+    }
+    return () => {
+      if (activity?.id) {
+        ExpoHead.suspendActivity(activity.id);
+      }
+    };
+  }, [activity]);
 }

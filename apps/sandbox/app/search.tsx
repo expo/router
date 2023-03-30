@@ -1,14 +1,7 @@
-import { Link, useRouter, useSearchParams } from "expo-router";
-import {
-  Platform,
-  AppState,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { useRouter, useSearchParams } from "expo-router";
 import Head from "expo-router/head";
 import React, { useEffect } from "react";
+import { AppState, Platform, StyleSheet, TextInput, View } from "react-native";
 
 function useAppState() {
   const [state, setState] = React.useState({
@@ -46,7 +39,6 @@ export default function Page() {
   const router = useRouter();
   const [search, setSearch] = React.useState(params.q);
 
-  console.log("> appState", appState, params.q, search);
   useEffect(() => {
     // alert(params.q);
     if (params.q && params.q !== search) {
