@@ -234,7 +234,7 @@ public class ExpoHeadModule: Module {
 
       activity.userInfo = value.userInfo
       // Required for handling incoming requests
-      activity.requiredUserInfoKeys = ["href"]
+//      activity.requiredUserInfoKeys = ["href"]
       activity.expirationDate = value.expirationDate
 
       if (value.webpageURL != nil) {
