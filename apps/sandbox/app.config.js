@@ -14,13 +14,16 @@ module.exports = {
   },
   ios: {
     bundleIdentifier: "app.expo.router.sandbox",
+    associatedDomains: [
+      "applinks:bacon-router-sandbox.ngrok.io",
+      "webcredentials:bacon-router-sandbox.ngrok.io",
+      "activitycontinuation:bacon-router-sandbox.ngrok.io",
+      // "applinks:bacon-router-sandbox.ngrok.io?mode=developer",
+      // "webcredentials:bacon-router-sandbox.ngrok.io?mode=developer",
+      // "activitycontinuation:bacon-router-sandbox.ngrok.io?mode=developer",
+    ],
     infoPlist: {
       CoreSpotlightContinuation: true,
-      associatedDomains: [
-        "applinks:bacon-router-sandbox.ngrok.io?mode=developer",
-        "webcredentials:bacon-router-sandbox.ngrok.io?mode=developer",
-        "activitycontinuation:bacon-router-sandbox.ngrok.io?mode=developer",
-      ],
     },
   },
 };

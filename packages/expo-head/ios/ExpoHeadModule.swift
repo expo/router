@@ -135,6 +135,14 @@ func stringToUIApplicationShortcutIconType(_ str: String) -> UIApplicationShortc
 }
 
 
+
+internal class InvalidSchemeException: Exception {
+  override var reason: String {
+    "Scheme file:// is not allowed for location origin (webpageUrl in NSUserActivity)"
+  }
+}
+
+
 public class ExpoHeadModule: Module {
   private var activities = Set<NSUserActivity>()
 
@@ -230,6 +238,9 @@ public class ExpoHeadModule: Module {
       activity.expirationDate = value.expirationDate
 
       if (value.webpageURL != nil) {
+          if (value.webpageURL!.absoluteString.starts(with: "file://") == true) {
+              throw Exception(name: "Invalid webpageUrl", description: "Scheme file:// is not allowed for location origin (webpageUrl in NSUserActivity). URL: \(value.webpageURL!.absoluteString)")
+          }
         // If you’re using all three APIs, it works well to use the URL of the relevant webpage as the value for uniqueIdentifier, relatedUniqueIdentifier, and webpageURL.
         // https://developer.apple.com/library/archive/documentation/General/Conceptual/AppSearch/CombiningAPIs.html#//apple_ref/doc/uid/TP40016308-CH10-SW1
           activity.webpageURL = value.webpageURL

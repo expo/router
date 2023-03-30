@@ -6,12 +6,12 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <Head>
-        <title>Home | Expo Router</title>
+        <title>Other | Expo Router</title>
       </Head>
       <View style={styles.main}>
-        <Text style={styles.title}>Home</Text>
-        <Link href="/other" style={styles.subtitle}>
-          Other
+        <Text style={styles.title}>Other</Text>
+        <Link href="/" style={styles.subtitle}>
+          Back
         </Link>
       </View>
     </View>

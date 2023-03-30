@@ -1,7 +1,7 @@
 import React from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 
-const Head = (({ children }: { children?: React.ReactNode }) => {
+const Head = (({ children }: { children?: any }) => {
   return <Helmet>{children}</Helmet>;
 }) as React.FC & {
   Provider: typeof HelmetProvider;

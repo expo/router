@@ -1,5 +1,6 @@
+// import URL from "url-parse";
 import * as App from "expo-application";
-import { createURL } from "expo-linking";
+// import { createURL } from "expo-linking";
 import { usePathname } from "expo-router";
 import React from "react";
 import Constants from "expo-constants";
@@ -74,11 +75,22 @@ let webUrl: string = "";
 export function setWebUrl(url: string) {
   // Wherever the user hosted their website + base URL.
   webUrl = url.replace(/\/$/, "");
+
+  if (!/^https?:\/\//.test(webUrl)) {
+    throw new Error(
+      'Expo Head: Web URL must start with "http://" or "https://"'
+    );
+  }
 }
-function getStaticUrlFromExpoRouter(href: string) {
+
+if (!webUrl && typeof window !== "undefined" && window.location?.origin) {
+  setWebUrl(window.location.origin);
+}
+
+function getStaticUrlFromExpoRouter(pathname: string) {
   // const host = "https://expo.io";
   // Append the URL we'd find in context
-  return getWebUrl() + href;
+  return getWebUrl() + pathname;
 }
 function getWebUrl() {
   if (!webUrl) {
@@ -98,7 +110,7 @@ function getLastSegment(path: string) {
 // import { useContextKey } from "expo-router/build/Route";
 // import { AppState, Linking } from "react-native";
 export function Head({ children }: { children?: React.ReactNode }) {
-  const link = usePathname();
+  const pathname = usePathname();
   const { renderableChildren, metaChildren } = React.useMemo(() => {
     const renderableChildren = [];
     const metaChildren: any[] = [];
@@ -121,7 +133,7 @@ export function Head({ children }: { children?: React.ReactNode }) {
 
   const activity = React.useMemo(() => {
     const userActivity: UserActivity = {
-      title: getLastSegment(link),
+      title: getLastSegment(pathname),
       activityType: ExpoHead.activities.INDEXED_ROUTE,
     };
 
@@ -165,13 +177,16 @@ export function Head({ children }: { children?: React.ReactNode }) {
       }
     });
     const resolved = {
-      webpageURL: getStaticUrlFromExpoRouter(link),
+      webpageURL: getStaticUrlFromExpoRouter(pathname),
       eligibleForSearch: true,
       keywords: [userActivity.title],
+      isEligibleForHandoff: true,
+      isEligibleForPrediction: true,
+      isEligibleForSearch: true,
       ...userActivity,
       // dateModified: new Date().toISOString(),
       userInfo: {
-        href: createURL(link),
+        href: pathname,
       },
     };
     if (App.applicationName) {
@@ -181,7 +196,7 @@ export function Head({ children }: { children?: React.ReactNode }) {
       resolved.id = urlToId(resolved.webpageURL);
     }
     return resolved;
-  }, [metaChildren, link]);
+  }, [metaChildren, pathname]);
   React.useEffect(() => {
     if (activity) {
       ExpoHead.createActivity(activity);
@@ -197,4 +212,3 @@ export function Head({ children }: { children?: React.ReactNode }) {
   // }, []);
   return renderableChildren;
 }
-//# sourceMappingURL=ExpoHead.ios.js.map
