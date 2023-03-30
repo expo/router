@@ -1,12 +1,11 @@
-import * as App from "expo-application";
+import Constants from "expo-constants";
 import { usePathname, useSearchParams } from "expo-router";
 import React from "react";
-import Constants from "expo-constants";
 
 import ExpoHead from "./ExpoHeadModule.native";
+
 // isEligibleForPrediction
 // https://developer.apple.com/documentation/foundation/nsuseractivity/2980674-iseligibleforprediction
-// suggestedInvocationPhrase -- `expo:spoken-phrase`
 
 type UserActivity = {
   id?: string;

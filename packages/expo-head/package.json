@@ -1,5 +1,5 @@
 {
-  "name": "@bacons/head",
+  "name": "@expo-router/head",
   "version": "0.0.3",
   "description": "static page definitions for universal SEO",
   "main": "build/index",
@@ -16,16 +16,15 @@
   "keywords": [
     "react-native",
     "expo",
-    "@bacons/head",
     "seo"
   ],
-  "repository": "https://github.com/EvanBacon/@bacons/head",
+  "repository": "https://github.com/expo/router",
   "bugs": {
-    "url": "https://github.com/EvanBacon/@bacons/head/issues"
+    "url": "https://github.com/expo/router/issues"
   },
   "author": "evanbacon <bacon@expo.io> (https://github.com/EvanBacon)",
   "license": "MIT",
-  "homepage": "https://github.com/EvanBacon/@bacons/head#readme",
+  "homepage": "https://github.com/expo/router#readme",
  
   "devDependencies": {
     "expo-module-scripts": "^2.1.1"

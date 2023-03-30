@@ -89,7 +89,10 @@ import { Text } from "react-native";
 export default function App() {
   return (
     <>
-      <Head />
+      <Head>
+        // highlight-next-line
+        <meta property="expo:handoff" content="true" />
+      </Head>
       <Text>Hello World</Text>
     </>
   );
@@ -182,7 +185,7 @@ Check your `ios/<project>/<project>.entitlements` file, under the `com.apple.dev
 If all else fails, you can try to debug the issue by following the steps in the [Apple Docs][apple-docs-handoff]. Note that:
 
 - "Representing user activities as instances of `NSUserActivity`." is performed by the Expo Head native module.
-- "Updating the activity instances as the user performs actions in your app." is performed by mounting/rendering the `<Head />` component.
+- "Updating the activity instances as the user performs actions in your app." is performed by mounting/rendering the `<Head />` component with the meta tag `<meta property="expo:handoff" content="true" />` inside.
 - "Receiving activities from Handoff in your app on other devices." is performed by an [App Delegate Subscriber](https://docs.expo.dev/modules/appdelegate-subscribers/) in the Expo Head native module. It is used to redirect you to the correct route when you handoff to your native app.
 
 [apple-docs-handoff]: https://developer.apple.com/documentation/foundation/task_management/implementing_handoff_in_your_app
