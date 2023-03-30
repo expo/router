@@ -50,7 +50,10 @@ export function setWebUrl(url: string) {
 }
 
 function getUrlFromConstants() {
-  const origin = Constants.manifest?.extra?.router?.handoffOrigin;
+  const manifest =
+    Constants.expoConfig || Constants.manifest2 || Constants.manifest;
+  console.log("manifest>", manifest);
+  const origin = manifest?.extra?.router?.handoffOrigin;
 
   if (!origin) {
     throw new Error(
@@ -202,3 +205,5 @@ function useRegisterCurrentActivity(activity: UserActivity) {
     return () => {};
   }, [activity]);
 }
+
+Head.Provider = React.Fragment;

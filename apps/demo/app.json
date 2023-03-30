@@ -2,7 +2,6 @@
   "expo": {
     "name": "Router Demo",
     "slug": "expo-router",
-    "icon": "https://icogen.vercel.app/api/icon?icon=2795&color_hex=1e90ff",
     "scheme": "bacontext",
     "splash": {
       "image": "./splash.png",
@@ -10,12 +9,6 @@
     },
     "web": {
       "bundler": "metro"
-    },
-    "ios": {
-      "bundleIdentifier": "com.bacon.expo-router",
-      "infoPlist": {
-        "CoreSpotlightContinuation": true
-      }
     }
   }
 }
