@@ -14,12 +14,20 @@ module.exports = {
   web: {
     bundler: "metro",
   },
+  extra: {
+    router: {
+      origin:
+        process.env.NODE_ENV !== "production"
+          ? `https://${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`
+          : "https://smart-symbiote.netlify.app/",
+    },
+  },
   ios: {
     bundleIdentifier: "app.expo.router.sandbox",
     associatedDomains: [
-      "applinks:bacon-router-sandbox.ngrok.io",
-      "webcredentials:bacon-router-sandbox.ngrok.io",
-      "activitycontinuation:bacon-router-sandbox.ngrok.io",
+      `applinks:${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
+      `webcredentials:${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
+      `activitycontinuation:${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
       // "applinks:bacon-router-sandbox.ngrok.io?mode=developer",
       // "webcredentials:bacon-router-sandbox.ngrok.io?mode=developer",
       // "activitycontinuation:bacon-router-sandbox.ngrok.io?mode=developer",
