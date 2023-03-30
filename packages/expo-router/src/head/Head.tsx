@@ -3,7 +3,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 
 const Head = (({ children }: { children?: any }) => {
   return <Helmet>{children}</Helmet>;
-}) as React.FC & {
+}) as any & {
   Provider: typeof HelmetProvider;
 };
 
