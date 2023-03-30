@@ -1270,9 +1270,9 @@
     mv "~2"
     safe-json-stringify "~1"
 
-"@expo/cli@0.6.2", "@expo/cli@file:./expo-cli.tgz":
-  version "0.6.1"
-  resolved "file:./expo-cli.tgz#62773e4bffd23cf0dd21e4530fdeb3c5359189ac"
+"@expo/cli@0.6.2", "@expo/cli@file:./expo-cli-29032023.tgz":
+  version "0.6.1-alpha.2"
+  resolved "file:./expo-cli-29032023.tgz#cd19b8fb92b0db4cab47bb814ed6229d8a955d1d"
   dependencies:
     "@babel/runtime" "^7.20.0"
     "@expo/code-signing-certificates" "0.0.5"

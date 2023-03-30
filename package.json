@@ -32,7 +32,7 @@
     "metro-minify-uglify": "0.76.0",
     "metro-react-native-babel-preset": "0.76.0",
     "ws": "7.5.9",
-    "@expo/cli": "file:./expo-cli.tgz"
+    "@expo/cli": "file:./expo-cli-29032023.tgz"
   },
   "devDependencies": {
     "@types/babel__core": "~7.1.19",
