@@ -8,12 +8,25 @@
 
 ### 🐛 Bug fixes
 
-- fix loading useLayoutEffect in non-browser environment.
-- Improve "going back" from an unmatched route.
-- fix `generateStaticParams` with clone syntax.
-- fix static rendering by locking the server context to the value of `package.json` `main`.
+### 💡 Others
+
+## [Wed, 29 Mar 2023 20:23:33 -0500](https://github.com/expo/router/commit/217bb34d40e3c62d2aaf08042ac3ecdb63a40807)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+- fix Node.js rendering by locking the server context ([#440](https://github.com/expo/router/issues/440))
+- fix loading useLayoutEffect in non-browser environment. ([#439](https://github.com/expo/router/issues/439))
+- fix improve "going back" from an unmatched route. ([#437](https://github.com/expo/router/issues/437))
+- fix `generateStaticParams` with clone syntax. ([#438](https://github.com/expo/router/issues/438))
 
 ### 💡 Others
+
+- upgrade metro to 0.76.0 in monorepo ([#418](https://github.com/expo/router/issues/418))
+- ignore tests in publish
 
 ## [Mon, 27 Mar 2023 17:42:06 -0500](https://github.com/expo/router/commit/52deb844568548eb6be0a217b7f0c7cbdf97ba89)
 
