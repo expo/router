@@ -4,7 +4,7 @@ import ts, {
   TextChange,
   UserPreferences,
 } from "typescript";
-import { getImportTextChange, getReplaceLineSpan } from "../code-fixes";
+import { getImportTextChange, getReplaceLineSpan } from "./code-fixes";
 import { EXPO_TS_CODES } from "../errors";
 import { RuleContext } from "../rules/context";
 import { SuggestionContext } from "./types";
@@ -27,7 +27,7 @@ export function typedSettingSuggestion(
       return declaration.name.getText() === "unstable_settings";
     });
 
-  if (settingsNode && settingsNode.type?.getText() !== "RouteSettings") {
+  if (settingsNode && settingsNode.type?.getText() !== "LayoutSettings") {
     const start = node.getStart();
     const end = settingsNode.getEnd();
 
@@ -67,13 +67,13 @@ export function typedSettingCodeAction(
     importChange,
     {
       span: getReplaceLineSpan(start, source),
-      newText: "export const unstable_settings: RouteSettings = {",
+      newText: "export const unstable_settings: LayoutSettings = {",
     },
   ].filter((c) => !!c) as TextChange[];
 
   prior.push({
     fixName: "expo-router_suggestion_settings-type",
-    description: "(Expo Router) Fix type definition",
+    description: "Fix type definition [Expo Router]",
     changes: [
       {
         fileName,

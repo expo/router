@@ -1,14 +1,18 @@
+import path from "path";
 import ts, { LanguageService } from "typescript/lib/tsserverlibrary";
 
-import { createTSHelpers, isRouteFile, walkNode } from "./utils";
 import { RuleContext } from "./rules/context";
 import { routePlatformExtension } from "./rules/platform-extensions";
 import { routeDefaultExport } from "./rules/route-default-export";
 import {
+  hrefSuggestion,
+  hrefSuggestionCodeAction,
+} from "./suggestions/hrefobject-fix";
+import {
   typedSettingCodeAction,
   typedSettingSuggestion,
 } from "./suggestions/settings-type-fix";
-import { hrefSuggestion, hrefSuggestionCodeAction } from "./suggestions/href";
+import { createTSHelpers, isRouteFile, walkNode } from "./utils";
 
 interface InitOptions {
   typescript: typeof ts;
@@ -24,11 +28,7 @@ function init({ typescript: ts }: InitOptions) {
     Log.info("Starting Expo TypeScript plugin");
 
     const projectDir = info.project.getCurrentDirectory();
-
-    // TODO: Should use EXPO_ROUTER config here
-    const appDir = new RegExp(
-      `^${projectDir}(/src)?/app`.replace(/[\\/]/g, "[\\/]")
-    );
+    const appDir = path.join(projectDir, "./app");
 
     Log.info("Expo Project Directory", projectDir);
 
@@ -51,6 +51,7 @@ function init({ typescript: ts }: InitOptions) {
           source,
           prior,
           Log,
+          appDir,
         };
 
         let hasDefaultExpo = false;
@@ -80,6 +81,7 @@ function init({ typescript: ts }: InitOptions) {
           source,
           prior,
           Log,
+          appDir,
         };
 
         walkNode(source, (node) => {
@@ -94,17 +96,14 @@ function init({ typescript: ts }: InitOptions) {
 
         const source = tsLS.getProgram()?.getSourceFile(fileName)!;
 
-        const context = { prior, Log, ts, tsLS, source };
+        const context = { prior, Log, ts, tsLS, source, appDir };
 
         typedSettingCodeAction(context, fileName, ...args);
         hrefSuggestionCodeAction(context, fileName, ...args);
 
-        Log.info("getCodeFixesAtPosition", JSON.stringify(prior, null, 2));
         return prior;
       },
     };
-
-    tsLS.getCombinedCodeFix;
 
     return { ...tsLS, ...expoLS };
   }

@@ -18,6 +18,7 @@ export { ExpoRoot } from "./ExpoRoot";
 export { Unmatched } from "./views/Unmatched";
 export { ErrorBoundaryProps } from "./views/Try";
 export { ErrorBoundary } from "./views/ErrorBoundary";
+export type { LayoutSettings } from "./Route";
 
 // Platform
 export { SplashScreen } from "./views/Splash";

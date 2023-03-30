@@ -31,16 +31,6 @@ export function createTSHelpers(ts: tsserverlibrary) {
       }
       return false;
     },
-    isUnstableSettingsExport(node: ts.Node) {
-      if (ts.isVariableStatement(node)) {
-        return node.declarationList.declarations.some((declaration) => {
-          return declaration.name.getText() === "unstable_settings";
-        });
-      }
-
-      return false;
-    },
-
     createLogger(info: ts.server.PluginCreateInfo): Logger {
       return {
         info(...messages: string[]) {
@@ -54,27 +44,35 @@ export function createTSHelpers(ts: tsserverlibrary) {
   };
 }
 
-export function walkNode(node: ts.Node, callback: (node: ts.Node) => void) {
-  ts.forEachChild(node, (child) => {
-    callback(child);
-    walkNode(child, callback);
+/*
+ * Walk the TypeScript API calling the callback for each node
+ *
+ * If the callback returns a value, the walk will stop and return that value.
+ */
+export function walkNode<T>(
+  node: ts.Node,
+  callback: (node: ts.Node) => T
+): T | undefined {
+  return ts.forEachChild(node, (child) => {
+    const returnEarly = callback(child);
+    if (returnEarly) return returnEarly;
+    return walkNode(child, callback);
   });
 }
 
-export function findNode(
-  node: ts.Node,
-  start: number,
-  end: number
-): ts.Node | undefined {
-  return ts.forEachChild(node, (child) => {
+/**
+ * Finds the closest node to the start/end range
+ */
+export function findNode(node: ts.Node, start: number, end: number) {
+  return walkNode(node, (child) => {
     const $start = child.getStart();
     const $end = child.getEnd();
 
     if (start >= $start && end <= $end && child.getChildCount() === 0) {
       return child;
-    } else {
-      return findNode(child, start, end);
     }
+
+    return undefined;
   });
 }
 
@@ -89,6 +87,6 @@ export function getFileNameParams(fileName: string) {
   return { fileSingleParams, fileSpreadParams };
 }
 
-export function isRouteFile(filePath: string, appDir: RegExp) {
-  return appDir.test(filePath) && !filePath.includes("_layout");
+export function isRouteFile(filePath: string, appDir: string) {
+  return filePath.startsWith(appDir) && !filePath.match(/_layout\.[tj]sx?$/);
 }

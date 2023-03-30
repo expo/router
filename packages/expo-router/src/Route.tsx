@@ -5,10 +5,14 @@ import { getContextKey, matchGroupName } from "./matchers";
 
 export type DynamicConvention = { name: string; deep: boolean };
 
+export type LayoutSettings = {
+  initialRouteName?: string;
+};
+
 export type LoadedRoute = {
   ErrorBoundary?: React.ComponentType<ErrorBoundaryProps>;
   default: React.ComponentType<any>;
-  unstable_settings?: Record<string, any>;
+  unstable_settings?: LayoutSettings;
   getNavOptions?: (args: any) => any;
   generateStaticParams?: (props: {
     params?: Record<string, string | string[]>;

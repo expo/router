@@ -4,16 +4,17 @@ import ts, {
   TextChange,
   UserPreferences,
 } from "typescript";
-import { RuleContext } from "../rules/context";
-import { EXPO_TS_CODES } from "../errors";
+
 import { SuggestionContext } from "./types";
+import { EXPO_TS_CODES } from "../errors";
+import { RuleContext } from "../rules/context";
 import { findNode } from "../utils";
 
 export const CAPTURE_DYNAMIC_PARAMS = /\[(?:\.{3})?(\w*?)[\]$]/g;
 
 export function hrefSuggestion(
   node: ts.Node,
-  { prior, ts, source, Log }: RuleContext
+  { prior, ts, source }: RuleContext
 ) {
   if (
     !(ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) ||
@@ -31,8 +32,6 @@ export function hrefSuggestion(
   }
 
   const routeName = href.initializer?.getText();
-
-  Log.info("hrefSuggestion", routeName);
 
   if (routeName && !routeName.startsWith("{") && routeName?.includes("[")) {
     const start = href.getStart();
@@ -58,6 +57,7 @@ export function hrefSuggestionCodeAction(
   _formatOptions: FormatCodeSettings,
   _preferences: UserPreferences
 ) {
+  Log.info("blah", ...errorCodes);
   if (errorCodes.indexOf(EXPO_TS_CODES.HREF_DYNAMIC_STRING) === -1) {
     return;
   }
@@ -86,7 +86,7 @@ export function hrefSuggestionCodeAction(
 
   prior.push({
     fixName: "expo-router_suggestion_href",
-    description: "(Expo Router) Change to HrefObject",
+    description: "Change to HrefObject [Expo Router]",
     changes: [
       {
         fileName,
