@@ -1,7 +1,7 @@
 // import URL from "url-parse";
 import * as App from "expo-application";
 // import { createURL } from "expo-linking";
-import { usePathname } from "expo-router";
+import { usePathname, useSearchParams } from "expo-router";
 import React from "react";
 import Constants from "expo-constants";
 
@@ -106,11 +106,26 @@ function getLastSegment(path: string) {
   const lastSegment = path.split("/").pop() ?? "";
   return lastSegment.replace(/\.[^/.]+$/, "").split("?")[0];
 }
+
 // Maybe use geo from structured data -- https://developers.google.com/search/docs/appearance/structured-data/local-business
 // import { useContextKey } from "expo-router/build/Route";
 // import { AppState, Linking } from "react-native";
 export function Head({ children }: { children?: React.ReactNode }) {
   const pathname = usePathname();
+  const params = useSearchParams<{ q?: string }>();
+
+  const href = React.useMemo(() => {
+    const qs = new URLSearchParams(params).toString();
+
+    const url = getStaticUrlFromExpoRouter(pathname);
+
+    console.log("url:", url + "?" + qs);
+    if (qs) {
+      return url + "?" + qs;
+    }
+    return url;
+  }, [pathname, params?.q]);
+
   const { renderableChildren, metaChildren } = React.useMemo(() => {
     const renderableChildren = [];
     const metaChildren: any[] = [];
@@ -177,7 +192,7 @@ export function Head({ children }: { children?: React.ReactNode }) {
       }
     });
     const resolved = {
-      webpageURL: getStaticUrlFromExpoRouter(pathname),
+      webpageURL: href,
       eligibleForSearch: true,
       keywords: [userActivity.title],
       isEligibleForHandoff: true,
@@ -196,7 +211,7 @@ export function Head({ children }: { children?: React.ReactNode }) {
       resolved.id = urlToId(resolved.webpageURL);
     }
     return resolved;
-  }, [metaChildren, pathname]);
+  }, [metaChildren, pathname, href]);
   React.useEffect(() => {
     if (activity) {
       ExpoHead.createActivity(activity);

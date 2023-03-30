@@ -85,23 +85,22 @@ public class ExpoHeadAppDelegateSubscriber: ExpoAppDelegateSubscriber {
         name: NSNotification.Name(rawValue: "RCTOpenURLNotification"),
         object: self,
         userInfo: ["url": wellKnownHref]);
-    }
-
-    if (userActivity.activityType == CSQueryContinuationActionType) {
-      if let query = userActivity.userInfo?[CSSearchQueryString] as? String {
-        let schemes = InfoPlist.bundleURLSchemes()
-        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? query
-        // TODO: Allow user to define the scheme using structured data or something.
-        // opensearch = Chrome. spotlight = custom thing we're using to identify iOS
-        let url = "\(schemes[0])://search?q=\(encodedQuery)&ref=spotlight"
-
-        // https://github.com/search?q=
-        NotificationCenter.default.post(
-          name: NSNotification.Name(rawValue: "RCTOpenURLNotification"),
-          object: self,
-          userInfo: ["url": url]);
-      }
-    }
+    } else if (userActivity.activityType == CSQueryContinuationActionType) {
+            if let query = userActivity.userInfo?[CSSearchQueryString] as? String {
+                let schemes = InfoPlist.bundleURLSchemes()
+                let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) ?? query
+                // TODO: Allow user to define the scheme using structured data or something.
+                // opensearch = Chrome. spotlight = custom thing we're using to identify iOS
+                let url = "\(schemes[0])://search?q=\(encodedQuery)&ref=spotlight"
+                
+                // https://github.com/search?q=
+                NotificationCenter.default.post(
+                    name: NSNotification.Name(rawValue: "RCTOpenURLNotification"),
+                    object: self,
+                    userInfo: ["url": url]);
+            }
+        }
+    
 
     return false
   }

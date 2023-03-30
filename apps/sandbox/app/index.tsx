@@ -9,10 +9,7 @@ export default function Page() {
         <title>Home | Expo Router</title>
       </Head>
       <View style={styles.main}>
-        <Text style={styles.title}>Home</Text>
-        <Link href="/other" style={styles.subtitle}>
-          Other
-        </Link>
+        <Text style={styles.title}>Welcome</Text>
       </View>
     </View>
   );

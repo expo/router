@@ -2,7 +2,7 @@ process.env.EXPO_TUNNEL_SUBDOMAIN = "bacon-router-sandbox";
 
 /** @type {import('expo/config').ExpoConfig} */
 module.exports = {
-  name: "Router Sandbox",
+  name: "Everywhere",
   slug: "expo-router-sandbox",
   icon: "./icon.png",
   scheme: "sandbox",
