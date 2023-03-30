@@ -36,23 +36,12 @@ type UserActivity = {
   expirationDate?: Date;
 };
 
-let webUrl: string = "";
-
-export function setWebUrl(url: string) {
-  // Wherever the user hosted their website + base URL.
-  webUrl = url.replace(/\/$/, "");
-
-  if (!/^https?:\/\//.test(webUrl)) {
-    throw new Error(
-      'Expo Head: Web URL must start with "http://" or "https://"'
-    );
-  }
-}
-
 function getUrlFromConstants() {
+  // This will require a rebuild in bare-workflow to update.
   const manifest =
     Constants.expoConfig || Constants.manifest2 || Constants.manifest;
-  console.log("manifest>", manifest);
+
+  // @ts-expect-error
   const origin = manifest?.extra?.router?.handoffOrigin;
 
   if (!origin) {
@@ -73,18 +62,13 @@ function getUrlFromConstants() {
 function getStaticUrlFromExpoRouter(pathname: string) {
   // const host = "https://expo.io";
   // Append the URL we'd find in context
-  return getWebUrl() + pathname;
+  return getUrlFromConstants() + pathname;
 }
-function getWebUrl() {
-  if (!webUrl) {
-    return getUrlFromConstants();
-    // webUrl = setDefaultWebUrl();
-  }
-  return webUrl;
-}
+
 function urlToId(url: string) {
   return url.replace(/[^a-zA-Z0-9]/g, "-");
 }
+
 function getLastSegment(path: string) {
   // Remove the extension
   const lastSegment = path.split("/").pop() ?? "";
@@ -134,44 +118,44 @@ export function Head({ children }: { children?: React.ReactNode }) {
       if (child.type === "title") {
         userActivity.title = child.props.children;
       }
+
       // Child is meta tag
       if (child.type === "meta") {
-        const { property, name, content } = child.props;
-        // <meta name="title" content="Hello world" />
-        if (property === "og:title" || name === "title") {
-          userActivity.title = content;
-        }
-        if (property === "og:description" || name === "description") {
-          userActivity.description = content;
-        }
-        if (property === "expo:handoff") {
-          userActivity.isEligibleForHandoff = [true, "true", ""].includes(
-            content
-          );
+        const { property, content } = child.props;
+
+        switch (property) {
+          case "og:title":
+            userActivity.title = content;
+            break;
+          case "og:description":
+            userActivity.description = content;
+            break;
+          case "og:url":
+            userActivity.webpageURL = content;
+            break;
+          case "expo:handoff":
+            userActivity.isEligibleForHandoff = [true, "true", ""].includes(
+              content
+            );
+            break;
         }
 
-        // <meta property="og:url" content="https://expo.io/foobar" />
-        if ("og:url" === property || "url" === name) {
-          userActivity.webpageURL = content;
-        }
-
-        // <meta name="keywords" content="foo,bar,baz" />
-        if (["keywords"].includes(name)) {
-          userActivity.keywords = Array.isArray(content)
-            ? content
-            : content.split(",");
-        }
+        // // <meta name="keywords" content="foo,bar,baz" />
+        // if (["keywords"].includes(name)) {
+        //   userActivity.keywords = Array.isArray(content)
+        //     ? content
+        //     : content.split(",");
+        // }
       }
     });
     const resolved: UserActivity = {
       webpageURL: href,
       keywords: [userActivity.title!],
-      // isEligibleForSearch: true,
       ...userActivity,
-      // dateModified: new Date().toISOString(),
       userInfo: {
         href: pathname,
       },
+      // dateModified: new Date().toISOString(),
     };
 
     if (!resolved.id && resolved.webpageURL) {

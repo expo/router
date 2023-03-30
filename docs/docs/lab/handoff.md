@@ -102,6 +102,35 @@ export default function App() {
 }
 ```
 
+### Meta Tags
+
+The `expo-router/head` component supports the following meta tags:
+
+- `expo:handoff` - Set to `true` to enable handoff for the current route. iOS-only. Defaults to `false`.
+- `og:url` - Set the URL that should be opened when the user switches to your app. Defaults to the current URL in-app with `extra.router.handoffOrigin` as the baseURL.
+- `og:title` and `<title>` - Set the title for the `NSUserActivity` this is unused with handoff.
+- `og:description` - Set the description for the `NSUserActivity` this is unused with handoff.
+
+You may want to switch the values between platforms, for that you can use `Platform.select`:
+
+```tsx title=app/index.tsx
+import Head from "expo-router/head";
+
+export default function App() {
+  return (
+    <>
+      <Head>
+        <meta
+          property="og:url"
+          // highlight-next-line
+          content={Platform.select({ web: "https://expo.dev", default: null })}
+        />
+      </Head>
+    </>
+  );
+}
+```
+
 ## Testing
 
 > Ensure your Apple devices have Handoff enabled: [Enabling Handoff](https://support.apple.com/en-us/HT209455). You can test this by following the steps below, but substituting your app with Safari.
