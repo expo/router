@@ -104,11 +104,11 @@ export default function App() {
 2. Navigate to a route in the app that supports handoff, i.e. is rendering the `<Head />` element from Expo Router.
 3. To switch to your Mac, click the app's Handoff icon in the Dock.
 
-![Apple Handoff from Apple device to Mac computer](/static/handoff/macos-handoff.png)
+![Apple Handoff from Apple device to Mac computer](/handoff/macos-handoff.png)
 
 4. To switch to your iPhone or iPad, open the App Switcher, as you would when switching between apps, then tap the app banner at the bottom of the screen.
 
-![Apple Handoff from Apple device to iPhone in the App Switcher](/static/handoff/iphone-handoff.png)
+![Apple Handoff from Apple device to iPhone in the App Switcher](/handoff/iphone-handoff.png)
 
 > If you only see the Safari icon in your iPhone's App Switcher, then handoff is not working. Follow the [Trouble Shooting](#trouble-shooting) section below.
 

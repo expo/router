@@ -4,10 +4,12 @@ process.env.EXPO_TUNNEL_SUBDOMAIN = "bacon-router-sandbox";
 module.exports = {
   name: "Router Sandbox",
   slug: "expo-router-sandbox",
+  icon: "./icon.png",
   scheme: "sandbox",
   splash: {
-    image: "./splash.png",
-    backgroundColor: "#1c2026",
+    image: "./icon.png",
+    resizeMode: "contain",
+    backgroundColor: "#ffffff",
   },
   web: {
     bundler: "metro",
