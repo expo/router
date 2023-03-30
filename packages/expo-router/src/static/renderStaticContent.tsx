@@ -6,7 +6,11 @@
  */
 
 import { ServerContainerRef } from "@react-navigation/native";
-import ServerContainer from "@react-navigation/native/src/ServerContainer";
+// We use the value from `main` in the `package.json` since this
+// should only be accessed from processes that are running in Node.js and
+// conform to using `mainFields: ['main']` in their bundler config.
+// @ts-expect-error
+import ServerContainer from "@react-navigation/native/lib/commonjs/ServerContainer";
 import App, { getManifest } from "expo-router/_entry";
 import React from "react";
 import ReactDOMServer from "react-dom/server";

@@ -11,6 +11,7 @@
 - fix loading useLayoutEffect in non-browser environment.
 - Improve "going back" from an unmatched route.
 - fix `generateStaticParams` with clone syntax.
+- fix static rendering by locking the server context to the value of `package.json` `main`.
 
 ### 💡 Others
 
