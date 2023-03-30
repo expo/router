@@ -10,6 +10,40 @@
 
 ### 💡 Others
 
+## [Wed, 29 Mar 2023 20:23:33 -0500](https://github.com/expo/router/commit/217bb34d40e3c62d2aaf08042ac3ecdb63a40807)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## [Mon, 27 Mar 2023 17:42:06 -0500](https://github.com/expo/router/commit/52deb844568548eb6be0a217b7f0c7cbdf97ba89)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+- fix production crash ([#433](https://github.com/expo/router/issues/433))
+
+### 💡 Others
+
+## [Mon, 27 Mar 2023 17:28:01 -0500](https://github.com/expo/router/commit/8e9123dbe0b6b817f49be87e1f7215bcb8bbe368)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- Polyfill `window.location` and `fetch` on native to support relative requests. ([#406](https://github.com/expo/router/issues/406))
+
+### 🐛 Bug fixes
+
+### 💡 Others
+
 ## [Mon, 20 Mar 2023 11:23:51 -0500](https://github.com/expo/router/commit/ebba591b2e1cc30279da1309a8a77ce044dc18b9)
 
 ### 🛠 Breaking changes

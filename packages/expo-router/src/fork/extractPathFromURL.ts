@@ -26,12 +26,16 @@ function extractExactPathFromURL(url: string) {
     }
 
     const res = Linking.parse(url);
+
     const qs = !res.queryParams
       ? ""
       : Object.entries(res.queryParams)
           .map(([k, v]) => `${k}=${v}`)
           .join("&");
-    return (res.path || "") + (qs ? "?" + qs : "");
+    return (
+      adjustPathname({ hostname: res.hostname, pathname: res.path || "" }) +
+      (qs ? "?" + qs : "")
+    );
   }
 
   // TODO: Support dev client URLs
@@ -69,4 +73,15 @@ function fromDeepLink(url: string) {
 export function extractExpoPathFromURL(url: string) {
   // TODO: We should get rid of this, dropping specificities is not good
   return extractExactPathFromURL(url).replace(/^\//, "");
+}
+
+export function adjustPathname(url: {
+  hostname?: string | null;
+  pathname: string;
+}) {
+  if (url.hostname === "exp.host" || url.hostname === "u.expo.dev") {
+    // drop the first two segments from pathname:
+    return url.pathname.split("/").slice(2).join("/");
+  }
+  return url.pathname;
 }

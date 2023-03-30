@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Router Sandbox",
+    "slug": "expo-router-sandbox",
+    "scheme": "sandbox",
+    "splash": {
+      "image": "./splash.png",
+      "backgroundColor": "#1c2026"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "extra": {
+      "router": {
+        "origin": "https://smart-symbiote.netlify.app/"
+      }
+    }
+  }
+}
