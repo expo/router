@@ -19,7 +19,8 @@
     "src",
     "stack.ts",
     "tabs.ts",
-    "types"
+    "types",
+    "!**/__tests__"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",
