@@ -12,7 +12,7 @@
     },
     "extra": {
       "router": {
-        "asyncRoutes": true,
+        "asyncRoutes": "development",
         "origin": "https://smart-symbiote.netlify.app/"
       }
     }

@@ -115,33 +115,32 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     return qualifiedStore.get(value)!;
   }
 
-  const Component = React.lazy(async () => {
+  const AsyncComponent = React.lazy(async () => {
     const res = value.loadRoute();
-    if (res instanceof Promise) {
-      // TODO: Wrap with error boundary
-      return res.then(({ ErrorBoundary, ...component }) => {
-        if (ErrorBoundary) {
-          return {
-            default: React.forwardRef(
-              (props: { route: any; navigation: any }, ref: any) => {
-                const children = React.createElement(component.default, {
-                  ...props,
-                  ref,
-                });
-                return <Try catch={ErrorBoundary}>{children}</Try>;
-              }
-            ),
-          };
-        }
-        return { default: component.default || EmptyRoute };
-      });
+
+    if (!(res instanceof Promise)) {
+      return { default: res.default || EmptyRoute };
     }
-    return { default: res.default || EmptyRoute };
+
+    return res.then(({ ErrorBoundary, ...component }) => {
+      if (ErrorBoundary) {
+        return {
+          default: React.forwardRef((props: any, ref: any) => {
+            const children = React.createElement(component.default, {
+              ...props,
+              ref,
+            });
+            return <Try catch={ErrorBoundary}>{children}</Try>;
+          }),
+        };
+      }
+      return { default: component.default || EmptyRoute };
+    });
   });
 
   const getLoadable = (props: any, ref: any) => (
     <React.Suspense fallback={<SuspenseFallback route={value} />}>
-      <Component
+      <AsyncComponent
         {...{
           ...props,
           ref,
