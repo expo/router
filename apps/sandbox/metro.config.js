@@ -19,8 +19,7 @@ config.resolver.sourceExts.push("css");
 
 config.server = {
   ...config.server,
-  // experimentalImportBundleSupport: process.env.NODE_ENV === "development",
-  experimentalImportBundleSupport: process.env.NODE_ENV !== "production",
+  experimentalImportBundleSupport: true,
 };
 
 config.watcher = {
