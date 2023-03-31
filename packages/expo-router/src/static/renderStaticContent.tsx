@@ -4,13 +4,19 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { ServerContainer, ServerContainerRef } from "@react-navigation/native";
-import App, { getManifest } from "expo-router/_root";
+
+import { ServerContainerRef } from "@react-navigation/native";
+// We use the value from `main` in the `package.json` since this
+// should only be accessed from processes that are running in Node.js and
+// conform to using `mainFields: ['main']` in their bundler config.
+// @ts-expect-error
+import ServerContainer from "@react-navigation/native/lib/commonjs/ServerContainer";
+import App, { getManifest } from "expo-router/_entry";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
-// @ts-expect-error
 import { AppRegistry } from "react-native-web";
 
+import { getRootComponent } from "./getRootComponent";
 import Head from "../head/Head";
 
 AppRegistry.registerComponent("App", () => App);
@@ -27,16 +33,21 @@ export function getStaticContent(location: URL): string {
     getStyleElement,
   } = AppRegistry.getApplication("App");
 
+  const Root = getRootComponent();
+
   const out = React.createElement(Root, {
     // TODO: Use RNW view after they fix hydration for React 18
     // https://github.com/necolas/react-native-web/blob/e8098fd029102d7801c32c1ede792bce01808c00/packages/react-native-web/src/exports/render/index.js#L10
     // Otherwise this wraps the app with two extra divs
-    children: (
-      // Inject the root tag
-      <div id="root">
+    children:
+      // Inject the root tag using createElement to prevent any transforms like the ones in `@expo/html-elements`.
+      React.createElement(
+        "div",
+        {
+          id: "root",
+        },
         <App />
-      </div>
-    ),
+      ),
   });
 
   const html = ReactDOMServer.renderToString(
@@ -78,57 +89,6 @@ function mixHeadComponentsWithStaticResults(helmet: any, html: string) {
   html = html.replace("<body ", `<body ${helmet?.bodyAttributes.toString()} `);
 
   return html;
-}
-
-// Follows the setup for react-native-web:
-// https://necolas.github.io/react-native-web/docs/setup/#root-element
-// Plus additional React Native scroll and text parity styles for various
-// browsers.
-// Force root DOM element to fill the parent's height
-const style = `
-html, body, #root {
-  -webkit-overflow-scrolling: touch;
-}
-#root {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-html {
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-}
-body {
-  /* Allows you to scroll below the viewport; default value is visible */
-  overflow-y: auto;
-  overscroll-behavior-y: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -ms-overflow-style: scrollbar;
-}
-`;
-
-function StyleReset() {
-  return <style id="expo-reset" dangerouslySetInnerHTML={{ __html: style }} />;
-}
-
-// TODO(EvanBacon): Expose this to the developer
-export function Root({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" style={{ height: "100%" }}>
-      <head>
-        <meta charSet="utf-8" />
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta
-          name="viewport"
-          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1.00001,viewport-fit=cover"
-        />
-        <StyleReset />
-      </head>
-      <body style={{ height: "100%", overflow: "hidden" }}>{children}</body>
-    </html>
-  );
 }
 
 // Re-export for use in server

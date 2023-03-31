@@ -7,7 +7,7 @@ import { RootNavigationRef } from "./useRootNavigation";
 import { useRootRouteNodeContext } from "./useRootRouteNodeContext";
 import { SplashScreen } from "./views/Splash";
 
-const navigationRef = createNavigationContainerRef();
+const navigationRef = createNavigationContainerRef<Record<string, unknown>>();
 
 /** Get the root navigation container ref. */
 export function getNavigationContainerRef() {
