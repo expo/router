@@ -93,7 +93,7 @@
   "dependencies": {
     "@bacons/react-views": "^1.1.3",
     "@expo/metro-runtime": "2.0.3",
-    "@expo-router/head": "2.0.3",
+    "@expo-router/head": "0.0.0",
     "@radix-ui/react-slot": "^1.0.0",
     "@react-navigation/bottom-tabs": "~6.5.7",
     "@react-navigation/native": "~6.1.6",
