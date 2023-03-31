@@ -1,0 +1,9 @@
+{
+  "extends": "expo-module-scripts/tsconfig.base",
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "commonjs",
+    "types": ["node", "jest"],
+    "strict": true
+  }
+}

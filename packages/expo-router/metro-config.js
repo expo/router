@@ -24,10 +24,13 @@ module.exports = function ({
 
   config.transformer = {
     ...config.transformer,
+    babelTransformerPath: require.resolve("@expo/metro-runtime/transformer"),
     asyncRequireModulePath: require.resolve(
       "@expo/metro-runtime/async-require"
     ),
   };
+
+  config.resolver.sourceExts.push("css");
 
   config.server = {
     ...config.server,
@@ -64,6 +67,8 @@ module.exports = function ({
       path.resolve(projectRoot, "node_modules"),
     ];
   }
+
+  const { FileStore } = require.resolve("metro-cache");
 
   config.cacheStores = [
     // Ensure the cache isn't shared between projects

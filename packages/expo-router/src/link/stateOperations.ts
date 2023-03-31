@@ -1,12 +1,25 @@
-import { InitialState } from "@react-navigation/native";
+import {
+  InitialState,
+  NavigationState,
+  ParamListBase,
+  getActionFromState,
+} from "@react-navigation/native";
 
 import { ResultState } from "../fork/getStateFromPath";
 
-export type ActionParams = {
-  params?: ActionParams;
+export type NavigateAction = Extract<
+  ReturnType<typeof getActionFromState>,
+  { type: "NAVIGATE" }
+> & {
+  payload: NavigateActionParams;
+};
+
+export type NavigateActionParams = {
+  params?: NavigateActionParams;
   path: string;
   initial: boolean;
   screen: string;
+  name?: string;
 };
 
 // Get the last state for a given target state (generated from a path).
@@ -95,18 +108,12 @@ export function getQualifiedStateForTopOfTargetState(
   return currentRoot;
 }
 
-type SubState = {
-  type: string;
-  routes?: { name: string; state?: SubState }[];
-  index?: number;
-};
-
 // Given the root state and a target state from `getStateFromPath`,
 // return the root state containing the highest target route matching the root state.
 // This can be used to determine what type of navigator action should be used.
-export function getEarliestMismatchedRoute(
-  rootState: SubState | undefined,
-  actionParams: ActionParams & { name?: string }
+export function getEarliestMismatchedRoute<T extends ParamListBase>(
+  rootState: NavigationState<T> | undefined,
+  actionParams: NavigateActionParams
 ): { name: string; params?: any; type?: string } | null {
   const actionName = actionParams.name ?? actionParams.screen;
   if (!rootState?.routes || rootState.index == null) {
@@ -125,7 +132,9 @@ export function getEarliestMismatchedRoute(
     }
 
     return getEarliestMismatchedRoute(
-      nextCurrentRoot.state,
+      // @react-navigation/native types this as NavigationState | Partial<NavigationState> | undefined
+      // In our usage, it's always a NavigationState | undefined
+      nextCurrentRoot.state as NavigationState<T> | undefined,
       actionParams.params
     );
   }

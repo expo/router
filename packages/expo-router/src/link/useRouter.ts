@@ -47,11 +47,8 @@ export function useRouter(): Router {
     push,
     back,
     replace,
-    setParams: (params) => {
-      root?.current?.setParams(
-        // @ts-expect-error
-        params
-      );
+    setParams: (params = {}) => {
+      root?.current?.setParams(params);
     },
     // TODO(EvanBacon): add `reload`
     // TODO(EvanBacon): add `canGoBack` but maybe more like a `hasContext`

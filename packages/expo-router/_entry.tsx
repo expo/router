@@ -1,13 +1,15 @@
+/// <reference path="metro-require.d.ts" />
+
 import "@expo/metro-runtime";
+
 import React from "react";
 
-import { ExpoRoot } from "expo-router";
-
+import { ExpoRoot } from "./src";
 import { getNavigationConfig } from "./src/getLinkingConfig";
 import { getRoutes } from "./src/getRoutes";
+import { loadStaticParamsAsync } from "./src/loadStaticParamsAsync";
 
-// @ts-expect-error: Not sure
-const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT);
+export const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT!);
 
 // Must be exported or Fast Refresh won't update the context >:[
 export default function ExpoRouterRoot() {
@@ -15,10 +17,14 @@ export default function ExpoRouterRoot() {
 }
 
 /** Get the linking manifest from a Node.js process. */
-export function getManifest() {
-  const routeTree = getRoutes(ctx);
+export async function getManifest(options: any) {
+  const routeTree = getRoutes(ctx, options);
   if (!routeTree) {
     return null;
   }
+
+  // Evaluate all static params
+  await loadStaticParamsAsync(routeTree);
+
   return getNavigationConfig(routeTree);
 }

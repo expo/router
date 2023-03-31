@@ -14,6 +14,7 @@ import {
   getEarliestMismatchedRoute,
   getQualifiedStateForTopOfTargetState,
   isMovingToSiblingRoute,
+  NavigateAction,
 } from "./stateOperations";
 import { useLinkingContext } from "./useLinkingContext";
 
@@ -54,7 +55,6 @@ export function useLinkToPath() {
       if (href.startsWith(".")) {
         let base = linking.getPathFromState?.(navigation.getRootState(), {
           ...linking.config,
-          // @ts-expect-error: non-standard option
           preserveGroups: true,
         });
 
@@ -117,13 +117,8 @@ export function useLinkToPath() {
         // Then find the nearest mismatched route in the existing state.
         // Finally, use the correct navigator-based action to replace the nested screens.
         // NOTE(EvanBacon): A future version of this will involve splitting the navigation request so we replace as much as possible, then push the remaining screens to fulfill the request.
-        if (
-          event === "REPLACE" &&
-          action.type === "NAVIGATE" &&
-          isAbsoluteInitialRoute(action)
-        ) {
+        if (event === "REPLACE" && isAbsoluteInitialRoute(action)) {
           const earliest = getEarliestMismatchedRoute(
-            // @ts-expect-error
             rootState,
             action.payload
           );
@@ -160,7 +155,7 @@ export function useLinkToPath() {
 /** @returns `true` if the action is moving to the first screen of all the navigators in the action. */
 export function isAbsoluteInitialRoute(
   action: ReturnType<typeof getActionFromState>
-) {
+): action is NavigateAction {
   if (action?.type !== "NAVIGATE") {
     return false;
   }

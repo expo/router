@@ -144,7 +144,7 @@ When `/abc/home` pushes `/123/shop`, `useSearchParams` would return `{ first: un
 
 ```js title=app/profile/[user].tsx
 import { Text } from "react-native";
-import { useSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 
 export default function Route() {
   // highlight-next-line

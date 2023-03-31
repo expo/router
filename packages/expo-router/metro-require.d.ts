@@ -48,4 +48,5 @@ declare namespace __MetroModuleApi {
 declare namespace NodeJS {
   interface Require extends __MetroModuleApi.RequireFunction {}
 }
-declare var process: NodeJS.Process;
+
+declare var require: NodeRequire;
