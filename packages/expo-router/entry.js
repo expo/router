@@ -4,15 +4,14 @@ import "@expo/metro-runtime";
 
 import { ExpoRoot } from "expo-router";
 import Head from "expo-router/head";
-import React from "react";
 
-import { renderRootComponent } from "./src/renderRootComponent";
+import { renderRootComponent } from "expo-router/src/renderRootComponent";
 
 const ctx = require.context(
-  process.env.EXPO_ROUTER_APP_ROOT!,
+  process.env.EXPO_ROUTER_APP_ROOT,
   true,
   /.*/,
-  "sync"
+  "lazy"
 );
 
 // Must be exported or Fast Refresh won't update the context
