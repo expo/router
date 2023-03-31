@@ -1,11 +1,16 @@
-import { NavigationContainerRefWithCurrent } from "@react-navigation/native";
+import {
+  NavigationContainerRefWithCurrent,
+  NavigationState,
+  PartialState,
+} from "@react-navigation/native";
 import React from "react";
 
 import { State } from "./fork/getPathFromState";
 
-export const RootNavigationRef = React.createContext<{
-  ref: NavigationContainerRefWithCurrent<ReactNavigation.RootParamList> | null;
-}>({ ref: null });
+export const RootNavigationRef =
+  React.createContext<NavigationContainerRefWithCurrent<ReactNavigation.RootParamList> | null>(
+    null
+  );
 
 if (process.env.NODE_ENV !== "production") {
   RootNavigationRef.displayName = "RootNavigationRef";
@@ -18,20 +23,19 @@ export function useRootNavigation() {
       "useRootNavigation must be used within a NavigationContainerContext"
     );
   }
-  return context.ref;
+  return context;
 }
 
 export function useRootNavigationState(): State | undefined {
   const navigation = useRootNavigation();
-  const [state, setState] = React.useState(navigation?.getRootState());
+  const [state, setState] = React.useState<
+    PartialState<NavigationState> | NavigationState | undefined
+  >(navigation?.getRootState());
   React.useEffect(() => {
     if (navigation) {
       setState(navigation.getRootState());
       const unsubscribe = navigation.addListener("state", ({ data }) => {
-        setState(
-          // @ts-expect-error: idk
-          data.state
-        );
+        setState(data.state);
       });
       return unsubscribe;
     }

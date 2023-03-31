@@ -50,10 +50,8 @@ export function Provider(props) {
   React.useEffect(() => {
     getItem().then((json) => {
       console.log("json", json);
-      if (json != null) {
+      if (json) {
         setAuth(JSON.parse(json));
-      } else {
-        setAuth(null);
       }
     });
   }, []);

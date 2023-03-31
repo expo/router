@@ -27,11 +27,9 @@ export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
     getItem().then((json) => {
       if (!isMounted) return;
 
-      if (json != null) {
+      if (json) {
         const loadedNotes = JSON.parse(json);
         setNotes(loadedNotes ?? []);
-      } else {
-        setNotes([]);
       }
     });
 

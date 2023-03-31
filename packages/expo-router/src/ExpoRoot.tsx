@@ -1,3 +1,4 @@
+import Head from "expo-router/head";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -35,21 +36,26 @@ const INITIAL_METRICS = {
 
 export function ExpoRoot({ context }: { context: RequireContext }) {
   return (
-    <GestureHandlerRootView>
-      <SafeAreaProvider
-        // SSR support
-        initialMetrics={INITIAL_METRICS}
-      >
-        <ContextNavigator context={context} />
-        {/* Users can override this by adding another StatusBar element anywhere higher in the component tree. */}
-        <StatusBar style="auto" />
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <Head.Provider>
+      <GestureHandlerRootView>
+        <SafeAreaProvider
+          // SSR support
+          initialMetrics={INITIAL_METRICS}
+        >
+          <ContextNavigator context={context} />
+          {/* Users can override this by adding another StatusBar element anywhere higher in the component tree. */}
+          <StatusBar style="auto" />
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </Head.Provider>
   );
 }
 
 function ContextNavigator({ context }: { context: RequireContext }) {
-  if (process.env.NODE_ENV !== "production") {
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.NODE_ENV !== "test"
+  ) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const Tutorial = useTutorial(context);
     if (Tutorial) {

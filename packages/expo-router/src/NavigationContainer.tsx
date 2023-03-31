@@ -18,12 +18,11 @@ export function getNavigationContainerRef() {
 export function NavigationContainer(props: { children: React.ReactNode }) {
   const [isReady, setReady] = React.useState(false);
   const [isSplashReady, setSplashReady] = React.useState(false);
-  const ref = React.useMemo(() => (isReady ? navigationRef : null), [isReady]);
   const root = useRootRouteNodeContext();
   const linking = React.useMemo(() => getLinkingConfig(root), [root]);
 
   return (
-    <RootNavigationRef.Provider value={{ ref }}>
+    <RootNavigationRef.Provider value={isReady ? navigationRef : null}>
       {!isSplashReady && <SplashScreen />}
       <UpstreamNavigationContainer
         {...props}
