@@ -17,6 +17,30 @@ function getExpoAppManifest(projectRoot) {
   return JSON.stringify(exp);
 }
 
+let config;
+
+function getConfigMemo(projectRoot) {
+  if (!config) {
+    config = getConfig(projectRoot);
+  }
+  return config;
+}
+
+function getExpoRouterImportMode(projectRoot) {
+  if (process.env.EXPO_ROUTER_IMPORT_MODE) {
+    return process.env.EXPO_ROUTER_IMPORT_MODE;
+  } else if (process.env.NODE_ENV === "production") {
+    // TODO: Production bundle splitting
+    return "sync";
+  }
+  const { exp } = getConfigMemo(projectRoot);
+  const mode = exp.extra?.router?.asyncRoutes ? "lazy" : "sync";
+  debug("Router import mode", mode);
+
+  process.env.EXPO_ROUTER_IMPORT_MODE = mode;
+  return mode;
+}
+
 function getExpoRouterAppRoot(projectRoot) {
   // Bump to v2 to prevent the CLI from setting the variable anymore.
   // TODO: Bump to v3 to revert back to the CLI setting the variable again, but with custom value
@@ -26,7 +50,7 @@ function getExpoRouterAppRoot(projectRoot) {
   }
   const routerEntry = resolveFrom.silent(projectRoot, "expo-router/entry");
 
-  const { exp } = getConfig(projectRoot);
+  const { exp } = getConfigMemo(projectRoot);
   const customSrc = exp.extra?.router?.unstable_src || "./app";
   const isAbsolute = customSrc.startsWith("/");
   // It doesn't matter if the app folder exists.
@@ -120,6 +144,19 @@ module.exports = function (api) {
         ) {
           const manifest = getExpoAppManifest(projectRoot);
           parent.replaceWith(t.stringLiteral(manifest));
+          return;
+        }
+
+        // Expose the app route import mode.
+        if (
+          t.isIdentifier(parent.node.property, {
+            name: "EXPO_ROUTER_IMPORT_MODE",
+          }) &&
+          !parent.parentPath.isAssignmentExpression()
+        ) {
+          parent.replaceWith(
+            t.stringLiteral(getExpoRouterImportMode(projectRoot))
+          );
           return;
         }
 

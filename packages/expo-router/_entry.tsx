@@ -13,7 +13,8 @@ export const ctx = require.context(
   process.env.EXPO_ROUTER_APP_ROOT!,
   true,
   /.*/,
-  "lazy"
+  // @ts-expect-error
+  process.env.EXPO_ROUTER_IMPORT_MODE!
 );
 
 // Must be exported or Fast Refresh won't update the context >:[
