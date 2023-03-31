@@ -14,7 +14,7 @@ function useFadeIn() {
   React.useEffect(() => {
     Animated.timing(value, {
       toValue: 1,
-      duration: 150,
+      duration: 200,
       useNativeDriver: true,
     }).start();
   }, []);
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   text: { color: "white", fontSize: 16 },
   filename: {
     fontFamily: CODE_FONT,
-    opacity: 0.5,
+    opacity: 0.8,
     color: "white",
     fontSize: 12,
   },
