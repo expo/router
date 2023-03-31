@@ -30,16 +30,21 @@ function getExpoRouterImportMode(projectRoot) {
   if (process.env.EXPO_ROUTER_IMPORT_MODE) {
     return process.env.EXPO_ROUTER_IMPORT_MODE;
   } else if (process.env.NODE_ENV === "production") {
-    if (exp.extra?.router?.asyncRoutes === "production") {
+    if ([true, "production"].includes(exp.extra?.router?.asyncRoutes)) {
       throw new Error(
         "Async routes are not supported in production yet. Set `extra.router.asyncRoutes` to `development`, `false`, or `undefined`."
       );
     }
+    process.env.EXPO_ROUTER_IMPORT_MODE = "sync";
     // TODO: Production bundle splitting
     return "sync";
   }
   const { exp } = getConfigMemo(projectRoot);
-  const mode = exp.extra?.router?.asyncRoutes ? "lazy" : "sync";
+  const mode = ["development", true, "dev"].includes(
+    exp.extra?.router?.asyncRoutes
+  )
+    ? "lazy"
+    : "sync";
   debug("Router import mode", mode);
 
   process.env.EXPO_ROUTER_IMPORT_MODE = mode;
