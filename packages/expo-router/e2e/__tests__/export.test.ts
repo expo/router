@@ -35,6 +35,7 @@ it(
       env: {
         EXPO_USE_STATIC: "1",
         E2E_ROUTER_SRC: "custom-html",
+        E2E_ROUTER_ASYNC: "development",
       },
     });
 
@@ -202,6 +203,7 @@ it(
       env: {
         EXPO_USE_STATIC: "1",
         E2E_ROUTER_SRC: "relative-fetch",
+        E2E_ROUTER_ASYNC: "development",
       },
     });
 

@@ -1,4 +1,4 @@
-/** @type import('expo/config').ExpoConfig */
+/** @type {import('expo/config').ExpoConfig} */
 module.exports = {
   name: "Router Sandbox",
   slug: "expo-router-sandbox",
@@ -14,6 +14,7 @@ module.exports = {
   },
   extra: {
     router: {
+      asyncRoutes: process.env.E2E_ROUTER_ASYNC,
       // THIS DOES NOT WORK -- DO NOT USE
       unstable_src: process.env.E2E_ROUTER_SRC,
       origin: "https://smart-symbiote.netlify.app/",
