@@ -8,6 +8,8 @@
 
 ### 🐛 Bug fixes
 
+- fix `window.location` polyfill in development.
+
 ### 💡 Others
 
 ## [Wed, 29 Mar 2023 20:23:33 -0500](https://github.com/expo/router/commit/217bb34d40e3c62d2aaf08042ac3ecdb63a40807)
