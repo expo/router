@@ -1,6 +1,8 @@
-import { StyleSheet, Image, Text, View } from "@bacons/react-views";
+import { Image, StyleSheet, Text, View } from "@bacons/react-views";
+import { BottomTabBarHeightContext } from "@react-navigation/bottom-tabs";
 import React from "react";
 import { ActivityIndicator, Animated, Platform } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export const CODE_FONT = Platform.select({
   default: "Courier",
@@ -19,6 +21,17 @@ function useFadeIn() {
     }).start();
   }, []);
   return value;
+}
+
+export function ToastWrapper({ children }: { children: React.ReactNode }) {
+  const inTabBar = React.useContext(BottomTabBarHeightContext);
+  const Wrapper = inTabBar ? View : SafeAreaView;
+
+  return (
+    <Wrapper collapsable={false} style={{ flex: 1 }}>
+      {children}
+    </Wrapper>
+  );
 }
 
 export function Toast({
