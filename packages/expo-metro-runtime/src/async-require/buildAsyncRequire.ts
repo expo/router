@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import { Platform } from "react-native";
+
 import { loadBundleAsync } from "./loadBundle";
 
 type ImportBundleNames = Record<string, string>;
