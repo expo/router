@@ -279,5 +279,5 @@ it(
     expect(webBundle).toContain("background: cyan;");
   },
   // Could take 45s depending on how fast npm installs
-  240 * 1000
+  360 * 1000
 );
