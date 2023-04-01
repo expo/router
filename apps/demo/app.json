@@ -9,6 +9,12 @@
     },
     "web": {
       "bundler": "metro"
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": "development",
+        "origin": "https://smart-symbiote.netlify.app/"
+      }
     }
   }
 }

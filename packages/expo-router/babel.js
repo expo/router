@@ -17,6 +17,46 @@ function getExpoAppManifest(projectRoot) {
   return JSON.stringify(exp);
 }
 
+let config;
+
+function getConfigMemo(projectRoot) {
+  if (!config) {
+    config = getConfig(projectRoot);
+  }
+  return config;
+}
+
+function getExpoRouterImportMode(projectRoot, platform) {
+  if (process.env.EXPO_ROUTER_IMPORT_MODE) {
+    return process.env.EXPO_ROUTER_IMPORT_MODE;
+  }
+  const { exp } = getConfigMemo(projectRoot);
+  let mode = [process.env.NODE_ENV, true].includes(
+    exp.extra?.router?.asyncRoutes
+  )
+    ? "lazy"
+    : "sync";
+
+  // TODO: Production bundle splitting
+
+  if (process.env.NODE_ENV === "production" && mode === "lazy") {
+    throw new Error(
+      "Async routes are not supported in production yet. Set `extra.router.asyncRoutes` to `development`, `false`, or `undefined`."
+    );
+  }
+
+  // NOTE: This is a temporary workaround for static rendering on web.
+  if (platform === "web" && process.env.EXPO_USE_STATIC) {
+    mode = "sync";
+  }
+
+  // Development
+  debug("Router import mode", mode);
+
+  process.env.EXPO_ROUTER_IMPORT_MODE = mode;
+  return mode;
+}
+
 function getExpoRouterAppRoot(projectRoot) {
   // Bump to v2 to prevent the CLI from setting the variable anymore.
   // TODO: Bump to v3 to revert back to the CLI setting the variable again, but with custom value
@@ -26,7 +66,7 @@ function getExpoRouterAppRoot(projectRoot) {
   }
   const routerEntry = resolveFrom.silent(projectRoot, "expo-router/entry");
 
-  const { exp } = getConfig(projectRoot);
+  const { exp } = getConfigMemo(projectRoot);
   const customSrc = exp.extra?.router?.unstable_src || "./app";
   const isAbsolute = customSrc.startsWith("/");
   // It doesn't matter if the app folder exists.
@@ -46,6 +86,7 @@ module.exports = function (api) {
   const getRelPath = (state) =>
     "./" + nodePath.relative(state.file.opts.root, state.filename);
 
+  const platform = api.caller((caller) => caller?.platform);
   return {
     name: "expo-router",
     visitor: {
@@ -120,6 +161,19 @@ module.exports = function (api) {
         ) {
           const manifest = getExpoAppManifest(projectRoot);
           parent.replaceWith(t.stringLiteral(manifest));
+          return;
+        }
+
+        // Expose the app route import mode.
+        if (
+          t.isIdentifier(parent.node.property, {
+            name: "EXPO_ROUTER_IMPORT_MODE",
+          }) &&
+          !parent.parentPath.isAssignmentExpression()
+        ) {
+          parent.replaceWith(
+            t.stringLiteral(getExpoRouterImportMode(projectRoot, platform))
+          );
           return;
         }
 

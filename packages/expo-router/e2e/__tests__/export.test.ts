@@ -35,6 +35,7 @@ it(
       env: {
         EXPO_USE_STATIC: "1",
         E2E_ROUTER_SRC: "custom-html",
+        E2E_ROUTER_ASYNC: "development",
       },
     });
 
@@ -278,5 +279,5 @@ it(
     expect(webBundle).toContain("background: cyan;");
   },
   // Could take 45s depending on how fast npm installs
-  240 * 1000
+  360 * 1000
 );
