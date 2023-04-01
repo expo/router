@@ -26,12 +26,12 @@ function getConfigMemo(projectRoot) {
   return config;
 }
 
-function getExpoRouterImportMode(projectRoot) {
+function getExpoRouterImportMode(projectRoot, platform) {
   if (process.env.EXPO_ROUTER_IMPORT_MODE) {
     return process.env.EXPO_ROUTER_IMPORT_MODE;
   }
   const { exp } = getConfigMemo(projectRoot);
-  const mode = [process.env.NODE_ENV, true].includes(
+  let mode = [process.env.NODE_ENV, true].includes(
     exp.extra?.router?.asyncRoutes
   )
     ? "lazy"
@@ -43,6 +43,11 @@ function getExpoRouterImportMode(projectRoot) {
     throw new Error(
       "Async routes are not supported in production yet. Set `extra.router.asyncRoutes` to `development`, `false`, or `undefined`."
     );
+  }
+
+  // NOTE: This is a temporary workaround for static rendering on web.
+  if (platform === "web" && process.env.EXPO_USE_STATIC) {
+    mode = "sync";
   }
 
   // Development
@@ -81,6 +86,7 @@ module.exports = function (api) {
   const getRelPath = (state) =>
     "./" + nodePath.relative(state.file.opts.root, state.filename);
 
+  const platform = api.caller((caller) => caller?.platform);
   return {
     name: "expo-router",
     visitor: {
@@ -166,7 +172,7 @@ module.exports = function (api) {
           !parent.parentPath.isAssignmentExpression()
         ) {
           parent.replaceWith(
-            t.stringLiteral(getExpoRouterImportMode(projectRoot))
+            t.stringLiteral(getExpoRouterImportMode(projectRoot, platform))
           );
           return;
         }

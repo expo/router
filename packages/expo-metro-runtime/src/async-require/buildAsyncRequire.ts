@@ -4,6 +4,7 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { Platform } from "react-native";
 import { loadBundleAsync } from "./loadBundle";
 
 type ImportBundleNames = Record<string, string>;
@@ -53,7 +54,11 @@ export function buildAsyncRequire(metroRequire: MetroRequire): AsyncRequire {
     paths: ImportBundleNames,
     options: { isPrefetchOnly: boolean } = { isPrefetchOnly: false }
   ): Promise<TModule | void> | TModule {
-    if (process.env.NODE_ENV === "production") {
+    if (
+      process.env.NODE_ENV === "production" ||
+      // Disable in static rendering environments.
+      (Platform.OS === "web" && typeof window === "undefined")
+    ) {
       // TODO: Don't disable in production
 
       return Promise.resolve().then(() => metroRequire.importAll(moduleID));
