@@ -8,7 +8,17 @@
 
 ### 🐛 Bug fixes
 
-- fix `window.location` polyfill in development.
+## [Sun, 2 Apr 2023 14:51:24 -0500](https://github.com/expo/router/commit/02141fa8a06cbeaa165565a58de4d0727c0f8990)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- feat(router, runtime): Development bundle splitting ([#449](https://github.com/expo/router/issues/449))
+
+### 🐛 Bug fixes
+
+- fix `window.location` polyfill in development. ([#451](https://github.com/expo/router/issues/451))
 
 ### 💡 Others
 

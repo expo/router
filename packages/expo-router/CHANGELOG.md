@@ -10,6 +10,18 @@
 
 ### 💡 Others
 
+## [Sun, 2 Apr 2023 14:51:24 -0500](https://github.com/expo/router/commit/02141fa8a06cbeaa165565a58de4d0727c0f8990)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- feat(router, runtime): Development bundle splitting ([#449](https://github.com/expo/router/issues/449))
+
+### 🐛 Bug fixes
+
+### 💡 Others
+
 ## [Wed, 29 Mar 2023 20:23:33 -0500](https://github.com/expo/router/commit/217bb34d40e3c62d2aaf08042ac3ecdb63a40807)
 
 ### 🛠 Breaking changes
