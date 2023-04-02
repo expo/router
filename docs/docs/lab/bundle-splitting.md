@@ -13,6 +13,8 @@ Unlike standard projects, Expo Router can automatically split your JavaScript bu
 Configure Metro to use Expo's bundle splitting features:
 
 ```js title=metro.config.js
+const { getDefaultConfig } = require("@expo/metro-config");
+
 const config = getDefaultConfig(__dirname);
 
 config.transformer = {
