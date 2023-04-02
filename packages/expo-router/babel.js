@@ -30,16 +30,16 @@ function getExpoRouterImportMode(projectRoot, platform) {
   if (process.env.EXPO_ROUTER_IMPORT_MODE) {
     return process.env.EXPO_ROUTER_IMPORT_MODE;
   }
+  const env = process.env.NODE_ENV || process.env.BABEL_ENV;
+
   const { exp } = getConfigMemo(projectRoot);
-  let mode = [process.env.NODE_ENV, true].includes(
-    exp.extra?.router?.asyncRoutes
-  )
+  let mode = [env, true].includes(exp.extra?.router?.asyncRoutes)
     ? "lazy"
     : "sync";
 
   // TODO: Production bundle splitting
 
-  if (process.env.NODE_ENV === "production" && mode === "lazy") {
+  if (env === "production" && mode === "lazy") {
     throw new Error(
       "Async routes are not supported in production yet. Set `extra.router.asyncRoutes` to `development`, `false`, or `undefined`."
     );
