@@ -1,12 +1,20 @@
+/// <reference types="../../types/jest.d.ts" />
 import "./mocks";
+import "./expect";
 
-import { render } from "@testing-library/react-native";
+import { BaseNavigationContainer } from "@react-navigation/core";
+import { render, RenderResult } from "@testing-library/react-native";
+import { findAll } from "@testing-library/react-native/build/helpers/findAll";
 import path from "path";
 import React from "react";
 
 import requireContext from "./require-context-ponyfill";
 import { ExpoRoot } from "../ExpoRoot";
+import { Route } from "../Route";
 import { RequireContext } from "../types";
+
+// re-export everything
+export * from "@testing-library/react-native";
 
 type RenderRouterOptions = Parameters<typeof render>[1] & {
   initialUrl?: string;
@@ -19,7 +27,10 @@ type RouteOverride = { default: RouteOverrideFunction } | RouteOverrideFunction;
 const initialUrlRef = {
   value: "/",
   then(onfulfilled: (v: string) => string) {
-    this.value = onfulfilled?.(this.value);
+    const nextValue = onfulfilled?.(this.value);
+    if (nextValue !== undefined) {
+      this.value = nextValue;
+    }
     return this;
   },
   catch() {
@@ -66,6 +77,8 @@ export function renderRouter(
     | Record<string, RouteOverride> = "./app",
   { initialUrl = "/", ...options }: RenderRouterOptions = {}
 ): ReturnType<typeof render> {
+  jest.useFakeTimers();
+
   let ctx: RequireContext;
 
   // Reset the initial URL
@@ -111,11 +124,37 @@ export function renderRouter(
     );
   }
 
-  return render(<></>, {
-    wrapper: () => <ExpoRoot context={ctx} />,
+  const result = render(<ExpoRoot context={ctx} />, {
     ...options,
   });
-}
 
-// re-export everything
-export * from "@testing-library/react-native";
+  Object.assign(result, {
+    getPathname(this: RenderResult): string {
+      const containers = findAll(this.root, (node) => {
+        return node.type === BaseNavigationContainer;
+      });
+
+      return (
+        "/" +
+        containers
+          .flatMap((route) => {
+            return route.props.initialState.routes.map((r: any) => r.name);
+          })
+          .join("/")
+      );
+    },
+    getSearchParams(this: RenderResult): URLSearchParams {
+      const containers = findAll(this.root, (node) => {
+        return node.type === BaseNavigationContainer;
+      });
+
+      return new URLSearchParams(
+        containers.reduce((acc, route) => {
+          return { ...acc, ...route.props.initialState.routes[0].params };
+        }, {} satisfies Record<string, string>)
+      );
+    },
+  });
+
+  return result;
+}

@@ -49,7 +49,6 @@ export function Provider(props) {
 
   React.useEffect(() => {
     getItem().then((json) => {
-      console.log("json", json);
       if (json) {
         setAuth(JSON.parse(json));
       }

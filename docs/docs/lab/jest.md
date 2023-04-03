@@ -10,7 +10,9 @@ Expo Router adds first-class support for testing with `@testing-library/react-na
 
 `yarn add -D @testing-library/react-native` or `npm install --save-dev @testing-library/react-native`
 
-> `jest-expo` is not required, but highly recommended
+:::tip
+
+`jest-expo` is not required, but highly recommended.
 
 ```tsx
 // jest.config.js
@@ -20,78 +22,82 @@ module.exports = {
 };
 ```
 
+:::
+
 ## Writing a test
 
-```
+```tsx
 // my-component.test.ts
-import { screen } from "expo-router/testing-library"
+import { screen } from "expo-router/testing-library";
 
 test("render the application", async () => {
   renderRouter();
-  await screen.findByText('Sign In')
+  const signInText = await screen.findByText("Sign In");
+  expect(signInText).toBeTruthy();
 });
 ```
 
+:::caution
+
+`renderRouter` will forcefully enable `jest.useFakeTimers()`. Please refer to the [Jest Docs](https://jestjs.io/docs/timer-mocks) on how to advance and/or run timers.
+
+:::
+
 ## API
 
-`expo-router/testing-library` re-exports `@testing-library/react-native` and is a drop in replacement.
+`expo-router/testing-library` can be used as a dropin replacement for [`@testing-library/react-native`](https://callstack.github.io/react-native-testing-library/).
+
+Additionally, the following extra functions are available
 
 ### renderRouter()
 
+A helper function that wraps `render` from `@testing-library/react-native`. Renders your Expo Router application in a way that allows for testing.
+
+`renderRouter()` has 3 methods of rendering:
+
+- Rendering the `/app` directory
+- Rendering a mock `/app` directory
+- Rendering the `/app` directory, with file mocks
+
+All render options also accepts the same options as [`render`](https://callstack.github.io/react-native-testing-library/docs/api#render-options), with the following additional options:
+
+##### `initialRoute` option
+
 ```tsx
-import { RenderOptions as TLRenderOptions } from "@testing-library/react-native";
-
-type RenderRouterOptions =
-  | undefined
-  | string
-  | Record<string, Route>
-  | { appDir?: string; overrides?: Record<string, Route> };
-
-type RenderOptions = Omit<TLRenderOptions, "wrapper"> & {
-  initialRoute?: string;
-};
-
-type renderRouter = (
-  routerOptions?: RenderRouterOptions,
-  renderOptions?: RenderOptions
-) => ReturnType<typeof render>;
+initialRoute?: string
 ```
 
-`renderRouter` has three rendering modes
+This option allows you to control the initial rendered route.
 
-- File system
-- Inline
-- Hybrid
+#### Rendering the `/app` directory
 
-The first argument speficies the render mode while the second
-
-#### File system
-
-`renderRouter(directory?: string)`
+`renderRouter(directory?: string, options?: RenderOptions)`
 
 Renders application specified directory (defaults to `app/`)
 
-#### Inline
+#### Rendering a mock `/app` directory
 
 ```tsx
-type Route =
-  | () => ReactElement
-  | { default: () => ReactELement }
-
-renderRouter(routes: Record<string, Route>)`
-
+renderRouter(routes: Record<string, Route>, options?: RenderOptions)`
 ```
 
 Renders an app using only the routes w/ components specified. This allows you to quickly setup isolated environments to test your components
 
-#### Hybrid
+#### Rendering the `/app` directory, with file mocks
 
 ```tsx
-type Route =
-  | () => ReactElement
-  | { default: () => ReactELement }
 
-renderRouter(options: { appDir?: string; overrides?: Record<string, Route> })`
+renderRouter(routes: { appDir?: string; overrides?: Record<string, Route> }, options?: RenderOptions)`
 ```
 
 The hybrid approach mixes both file system routing with inline overrides. This mode allows you to easily test your application, while mocking only certain routes and/or layouts.
+
+#### Mock routes
+
+```
+type Route =
+  | () => ReactElement
+  | { default: () => ReactELement }
+```
+
+When mocking a router, you can either define it as a function, or an object with a default property

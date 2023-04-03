@@ -160,7 +160,9 @@ export function getNormalizedStatePath({
   };
 }
 
-const LocationContext = React.createContext<UrlObject | undefined>(undefined);
+export const LocationContext = React.createContext<UrlObject | undefined>(
+  undefined
+);
 
 if (process.env.NODE_ENV !== "production") {
   LocationContext.displayName = "LocationContext";

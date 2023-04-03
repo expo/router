@@ -1,27 +1,27 @@
 import { renderRouter, screen } from "expo-router/testing-library";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 
-test.skip("examples of some things", async () => {
+test("examples of some things", async () => {
   renderRouter();
 
-  screen.debug();
+  const text = await screen.findByText("Sign Out");
 
-  expect(1).toBeTruthy();
+  expect(text).toBeTruthy();
 });
 
 test("examples of some things", async () => {
   renderRouter({
-    "(app)/index": () => {
-      return <Text>Test</Text>;
-    },
-    asdf: {
-      default: () => {
-        return <Text>Test</Text>;
-      },
+    index: () => {
+      return (
+        <View>
+          <Text>Test</Text>
+        </View>
+      );
     },
   });
 
   screen.debug();
+  const text = await screen.findByText("Test");
 
-  expect(1).toBeTruthy();
+  expect(text).toBeTruthy();
 });
