@@ -43,7 +43,7 @@ test("render the application", async () => {
 
 :::
 
-## API
+## Renders
 
 `expo-router/testing-library` can be used as a dropin replacement for [`@testing-library/react-native`](https://callstack.github.io/react-native-testing-library/).
 
@@ -101,3 +101,45 @@ type Route =
 ```
 
 When mocking a router, you can either define it as a function, or an object with a default property
+
+## Matchers
+
+### `.toHavePathname()
+
+```tsx
+expect(screen).toHavePathname(string);
+```
+
+Asserts that the currently rendered screen has the expected pathname.
+
+### `.toHaveSearchParams()
+
+```tsx
+expect(screen).toHaveSearchParams(object);
+```
+
+Asserts that the currently rendered screen has the expected search params
+
+:::tip
+
+If you need to assett the URLSearchParams object, you can do so via `screen.getSearchParams()``
+
+:::
+
+## Screen methods
+
+### `getPathname()`
+
+```tsx
+const pathname = screen.getPathname();
+```
+
+Returns the pathname of the currently rendered screen.
+
+### `getSearchParams()`
+
+```tsx
+const urlSearchParams: URLSearchParams = screen.getSearchParams();
+```
+
+Returns the URLSearchParams of the currently rendered screen.
