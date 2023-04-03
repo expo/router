@@ -5,6 +5,6 @@
     "rootDir": "./src",
     "emitDeclarationOnly": true
   },
-  "include": ["./src/**/*", "./types/jest.d.ts"],
+  "include": ["./src/**/*", "./types/jest.d.ts", "./types/expect.d.ts"],
   "exclude": ["**/__mocks__/*", "**/__tests__/*"]
 }
