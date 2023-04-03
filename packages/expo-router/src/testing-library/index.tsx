@@ -10,7 +10,6 @@ import React from "react";
 
 import requireContext from "./require-context-ponyfill";
 import { ExpoRoot } from "../ExpoRoot";
-import { Route } from "../Route";
 import { RequireContext } from "../types";
 
 // re-export everything
