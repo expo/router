@@ -6,7 +6,17 @@
 
 ### 🎉 New features
 
-- Add hack to temporarily support `expo-development-client`.
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## [Wed, 5 Apr 2023 12:31:34 -0500](https://github.com/expo/router/commit/ad5d734485e00468d39955d16b4af0e2ac1a6fbf)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- feat(router): add hack to temporarily support `expo-development-client`. ([#461](https://github.com/expo/router/issues/461))
 
 ### 🐛 Bug fixes
 
