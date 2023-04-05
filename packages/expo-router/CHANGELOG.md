@@ -6,6 +6,8 @@
 
 ### 🎉 New features
 
+- Add hack to temporarily support `expo-development-client`.
+
 ### 🐛 Bug fixes
 
 ### 💡 Others
