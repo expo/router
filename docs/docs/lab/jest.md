@@ -104,7 +104,7 @@ When mocking a router, you can either define it as a function, or an object with
 
 ## Matchers
 
-### `.toHavePathname()
+### `.toHavePathname()`
 
 ```tsx
 expect(screen).toHavePathname(string);
@@ -112,7 +112,7 @@ expect(screen).toHavePathname(string);
 
 Asserts that the currently rendered screen has the expected pathname.
 
-### `.toHaveSearchParams()
+### `.toHaveSearchParams()`
 
 ```tsx
 expect(screen).toHaveSearchParams(object);
