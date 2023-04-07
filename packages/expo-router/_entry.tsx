@@ -7,8 +7,15 @@ import React from "react";
 import { ExpoRoot } from "./src";
 import { getNavigationConfig } from "./src/getLinkingConfig";
 import { getRoutes } from "./src/getRoutes";
+import { loadStaticParamsAsync } from "./src/loadStaticParamsAsync";
 
-export const ctx = require.context(process.env.EXPO_ROUTER_APP_ROOT!);
+export const ctx = require.context(
+  process.env.EXPO_ROUTER_APP_ROOT!,
+  true,
+  /.*/,
+  // @ts-expect-error
+  process.env.EXPO_ROUTER_IMPORT_MODE!
+);
 
 // Must be exported or Fast Refresh won't update the context >:[
 export default function ExpoRouterRoot() {
@@ -21,5 +28,9 @@ export function getManifest(options: any) {
   if (!routeTree) {
     return null;
   }
+
+  // Evaluate all static params
+  await loadStaticParamsAsync(routeTree);
+
   return getNavigationConfig(routeTree);
 }

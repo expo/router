@@ -272,13 +272,21 @@ function contextModuleToFileNodes(
     // In development, check if the file exports a default component
     // this helps keep things snappy when creating files. In production we load all screens lazily.
     try {
-      const isApi = key.match(/\+api\.[jt]sx?$/);
-
-      if (!isApi && !contextModule(key)?.default) {
-        return null;
+      
+      if (process.env.NODE_ENV === "development") {
+        // If the user has set the `EXPO_ROUTER_IMPORT_MODE` to `sync` then we should
+        // filter the missing routes.
+        if (process.env.EXPO_ROUTER_IMPORT_MODE === "sync") {
+          const isApi = key.match(/\+api\.[jt]sx?$/);
+          if (!isApi && !contextModule(key)?.default) {
+            return null;
+          }
+        }
       }
       const node: FileNode = {
-        loadRoute: () => contextModule(key),
+        loadRoute() {
+          return contextModule(key);
+        },
         normalizedName: getNameFromFilePath(key),
         contextKey: key,
       };
@@ -384,7 +392,6 @@ export async function getRoutesAsync(
 function getIgnoreList(options?: Options) {
   const ignore: RegExp[] = [
     /^\.\/\+html\.[tj]sx?$/,
-    // Filter out API routes which end with +api.tsx
     ...(options?.ignore ?? []),
   ];
   if (options?.preserveApiRoutes !== true) {

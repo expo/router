@@ -33,10 +33,7 @@ describe(loadStaticParamsAsync, () => {
             return ["red", "blue"].map((color) => ({ color }));
           },
         },
-      }),
-      {
-        preserveApiRoutes: false,
-      }
+      })
     )!;
 
     expect(dropFunctions(route)).toEqual({
@@ -64,15 +61,10 @@ describe(loadStaticParamsAsync, () => {
           dynamic: [{ deep: false, name: "color" }],
           route: "[color]",
         },
+        { children: [], contextKey: "./red.tsx", dynamic: null, route: "red" },
         {
           children: [],
-          contextKey: "./[color].tsx",
-          dynamic: null,
-          route: "red",
-        },
-        {
-          children: [],
-          contextKey: "./[color].tsx",
+          contextKey: "./blue.tsx",
           dynamic: null,
           route: "blue",
         },
@@ -103,9 +95,7 @@ describe(loadStaticParamsAsync, () => {
         },
       },
     });
-    const route = getExactRoutes(ctx, {
-      preserveApiRoutes: false,
-    });
+    const route = getExactRoutes(ctx);
 
     expect(dropFunctions(route!)).toEqual({
       children: [
@@ -144,15 +134,14 @@ describe(loadStaticParamsAsync, () => {
             },
             {
               children: [],
-              contextKey: "./[color]/[shape].tsx",
+              contextKey: "./[color]/square.tsx",
               dynamic: null,
               route: "square",
             },
             {
               children: [],
-              contextKey: "./[color]/[shape].tsx",
+              contextKey: "./[color]/triangle.tsx",
               dynamic: null,
-
               route: "triangle",
             },
           ],
@@ -171,18 +160,18 @@ describe(loadStaticParamsAsync, () => {
             },
             {
               children: [],
-              contextKey: "./[color]/[shape].tsx",
+              contextKey: "./[color]/square.tsx",
               dynamic: null,
               route: "square",
             },
             {
               children: [],
-              contextKey: "./[color]/[shape].tsx",
+              contextKey: "./[color]/triangle.tsx",
               dynamic: null,
               route: "triangle",
             },
           ],
-          contextKey: "./[color]/_layout.tsx",
+          contextKey: "./red/_layout.tsx",
           dynamic: null,
           initialRouteName: undefined,
           route: "red",
@@ -197,18 +186,18 @@ describe(loadStaticParamsAsync, () => {
             },
             {
               children: [],
-              contextKey: "./[color]/[shape].tsx",
+              contextKey: "./[color]/square.tsx",
               dynamic: null,
               route: "square",
             },
             {
               children: [],
-              contextKey: "./[color]/[shape].tsx",
+              contextKey: "./[color]/triangle.tsx",
               dynamic: null,
               route: "triangle",
             },
           ],
-          contextKey: "./[color]/_layout.tsx",
+          contextKey: "./blue/_layout.tsx",
           dynamic: null,
           initialRouteName: undefined,
           route: "blue",
@@ -230,10 +219,7 @@ describe(loadStaticParamsAsync, () => {
             return [{}];
           },
         },
-      }),
-      {
-        preserveApiRoutes: false,
-      }
+      })
     )!;
     await expect(
       loadStaticParamsAsync(routes)
@@ -252,9 +238,7 @@ describe(loadStaticParamsAsync, () => {
       },
     });
 
-    const route = getExactRoutes(ctx, {
-      preserveApiRoutes: false,
-    })!;
+    const route = getExactRoutes(ctx)!;
 
     expect(dropFunctions(route)).toEqual({
       children: [
@@ -281,9 +265,81 @@ describe(loadStaticParamsAsync, () => {
         },
         {
           children: [],
-          contextKey: "./post/[...post].tsx",
+          contextKey: "./post/123/456.tsx",
           dynamic: null,
           route: "post/123/456",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      route: "",
+    });
+  });
+
+  it(`evaluates with nested clone syntax`, async () => {
+    const ctx = createMockContextModule({
+      "./(app)/_layout.tsx": { default() {} },
+      "./(app)/(index,about)/blog/[post].tsx": {
+        default() {},
+        async generateStaticParams() {
+          return [{ post: "123" }, { post: "abc" }];
+        },
+      },
+    });
+
+    const route = getExactRoutes(ctx)!;
+
+    expect(dropFunctions(route)).toEqual({
+      children: [
+        {
+          children: [
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/[post].tsx",
+              dynamic: [{ deep: false, name: "post" }],
+              route: "(index,about)/blog/[post]",
+            },
+          ],
+          contextKey: "./(app)/_layout.tsx",
+          dynamic: null,
+          initialRouteName: undefined,
+          route: "(app)",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      route: "",
+    });
+
+    expect(dropFunctions(await loadStaticParamsAsync(route))).toEqual({
+      children: [
+        {
+          children: [
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/[post].tsx",
+              dynamic: [{ deep: false, name: "post" }],
+              route: "(index,about)/blog/[post]",
+            },
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/123.tsx",
+              dynamic: null,
+              route: "(index,about)/blog/123",
+            },
+            {
+              children: [],
+              contextKey: "./(app)/(index,about)/blog/abc.tsx",
+              dynamic: null,
+              route: "(index,about)/blog/abc",
+            },
+          ],
+          contextKey: "./(app)/_layout.tsx",
+          dynamic: null,
+          initialRouteName: undefined,
+          route: "(app)",
         },
       ],
       contextKey: "./_layout.tsx",
@@ -309,9 +365,7 @@ describe(loadStaticParamsAsync, () => {
       },
     });
 
-    const route = getExactRoutes(ctx, {
-      preserveApiRoutes: false,
-    })!;
+    const route = getExactRoutes(ctx)!;
 
     expect(dropFunctions(route)).toEqual({
       children: [
@@ -357,7 +411,7 @@ describe(loadStaticParamsAsync, () => {
         },
         {
           children: [],
-          contextKey: "./post/[post].tsx",
+          contextKey: "./post/123.tsx",
           dynamic: null,
           route: "post/123",
         },
@@ -382,7 +436,7 @@ describe(loadStaticParamsAsync, () => {
         },
         {
           children: [],
-          contextKey: "./a/[b]/c/[d]/[e].tsx",
+          contextKey: "./a/b/c/d/e.tsx",
           dynamic: null,
           route: "a/b/c/d/e",
         },
@@ -395,22 +449,52 @@ describe(loadStaticParamsAsync, () => {
   });
 
   it(`generateStaticParams throws when deep dynamic segments return invalid type`, async () => {
-    const ctx = createMockContextModule({
-      "./post/[...post].tsx": {
-        default() {},
-        generateStaticParams() {
-          return [{ post: "123" }];
-        },
-      },
-    });
-    const route = getExactRoutes(ctx, {
-      preserveApiRoutes: false,
-    })!;
+    const loadWithParam = (params) =>
+      loadStaticParamsAsync(
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[...post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return params;
+              },
+            },
+          })
+        )!
+      );
+
+    // Passes
+    await loadWithParam([{ post: "123" }]);
+    await loadWithParam([{ post: "123/456" }]);
+    await loadWithParam([{ post: ["123/456", "123"] }]);
+    await loadWithParam([{ post: ["123", "123"] }]);
+    await loadWithParam([{ post: ["123", "/"] }]);
+    await loadWithParam([{ post: [123, "/", "432"] }]);
 
     await expect(
-      loadStaticParamsAsync(route)
+      loadWithParam([{ post: ["/"] }])
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" to be of type Array."`
+      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" not to be empty while parsing "/"."`
+    );
+    await expect(
+      loadWithParam([{ post: "" }])
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" not to be empty while parsing ""."`
+    );
+    await expect(
+      loadWithParam([{ post: ["", "/", ""] }])
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" not to be empty while parsing "/"."`
+    );
+    await expect(
+      loadWithParam([{ post: null }])
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() must return an array of params that match the dynamic route. Received {"post":null}"`
+    );
+    await expect(
+      loadWithParam([{ post: false }])
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[...post].tsx" expected param "post" to be of type string, instead found "boolean" while parsing "false"."`
     );
   });
 
@@ -423,13 +507,76 @@ describe(loadStaticParamsAsync, () => {
         },
       },
     });
-    const route = getExactRoutes(ctx, {
-      preserveApiRoutes: false,
-    })!;
+    const route = getExactRoutes(ctx)!;
     await expect(
       loadStaticParamsAsync(route)
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" to not be of type Array."`
+      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" to be of type string, instead found "object" while parsing "123"."`
     );
+  });
+
+  it(`generateStaticParams throws when dynamic segments return invalid format (multiple slugs)`, async () => {
+    const ctx = createMockContextModule({
+      "./post/[post].tsx": {
+        default() {},
+        generateStaticParams() {
+          return [{ post: "123/abc" }];
+        },
+      },
+    });
+    const route = getExactRoutes(ctx)!;
+    await expect(
+      loadStaticParamsAsync(route)
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" to not contain "/" (multiple segments) while parsing "123/abc"."`
+    );
+  });
+
+  it(`generateStaticParams throws when dynamic segments return empty string`, async () => {
+    await expect(
+      loadStaticParamsAsync(
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return [{ post: "/" }];
+              },
+            },
+          })
+        )!
+      )
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" not to be empty while parsing "/"."`
+    );
+    await expect(
+      loadStaticParamsAsync(
+        getExactRoutes(
+          createMockContextModule({
+            "./post/[post].tsx": {
+              default() {},
+              generateStaticParams() {
+                return [{ post: "" }];
+              },
+            },
+          })
+        )!
+      )
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      `"generateStaticParams() for route "./post/[post].tsx" expected param "post" not to be empty while parsing ""."`
+    );
+  });
+
+  it(`generateStaticParams allows when dynamic segments return a single slug with a benign slash`, async () => {
+    const ctx = createMockContextModule({
+      "./post/[post].tsx": {
+        default() {},
+        generateStaticParams() {
+          return [{ post: "123/" }, { post: "/123" }];
+        },
+      },
+    });
+    // doesn't throw
+    await loadStaticParamsAsync(getExactRoutes(ctx)!);
   });
 });

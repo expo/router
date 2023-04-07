@@ -18,7 +18,7 @@ declare let global: {
 export function fetchThenEvalAsync(url: string): Promise<void> {
   return fetchAsync(url).then(({ body, headers }) => {
     if (
-      headers.has("Content-Type") != null &&
+      headers?.has?.("Content-Type") != null &&
       headers.get("Content-Type")!.includes("application/json")
     ) {
       // Errors are returned as JSON.

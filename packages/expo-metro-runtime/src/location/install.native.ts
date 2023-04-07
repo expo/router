@@ -6,6 +6,10 @@ import getDevServer from "../getDevServer";
 
 let hasWarned = false;
 
+const manifest = (Constants.manifest ??
+  Constants.manifest2 ??
+  Constants.expoConfig) as Record<string, any> | null;
+
 // Add a development warning for fetch requests with relative paths
 // to ensure developers are aware of the need to configure a production
 // base URL in the Expo config (app.json) under `expo.extra.router.origin`.
@@ -14,7 +18,7 @@ function warnProductionOriginNotConfigured(requestUrl: string) {
     return;
   }
   hasWarned = true;
-  if (!Constants.manifest?.extra?.router?.origin) {
+  if (!manifest?.extra?.router?.origin) {
     console.warn(
       `The relative fetch request "${requestUrl}" will not work in production until the Expo config (app.json) \`expo.extra.router.origin\` field is set to the base URL of your web server. [Learn more](https://expo.github.io/router/docs/lab/runtime-location)`
     );
@@ -24,23 +28,20 @@ function warnProductionOriginNotConfigured(requestUrl: string) {
 // TODO: This would be better if native and tied as close to the JS engine as possible, i.e. it should
 // reflect the exact location of the JS file that was executed.
 function getBaseUrl() {
-  // TODO: Make it official by moving out of `extra`
-  let productionBaseUrl = Constants.manifest?.extra?.router?.origin;
-
-  if (process.env.NODE_ENV === "production") {
-    // TODO: How would someone even get this?
-    if (!productionBaseUrl) {
-      throw new Error(
-        "You must provide a production base URL to wrapFetchWithBaseUrl"
-      );
-    }
-  } else {
+  if (process.env.NODE_ENV !== "production") {
     // e.g. http://localhost:19006
-    productionBaseUrl = getDevServer().url;
+    return getDevServer().url?.replace(/\/$/, "");
+  }
+
+  // TODO: Make it official by moving out of `extra`
+  const productionBaseUrl = manifest?.extra?.router?.origin;
+
+  if (!productionBaseUrl) {
+    return null;
   }
 
   // Ensure no trailing slash
-  return productionBaseUrl.replace(/\/$/, "");
+  return productionBaseUrl?.replace(/\/$/, "");
 }
 
 function wrapFetchWithWindowLocation(
@@ -56,7 +57,7 @@ function wrapFetchWithWindowLocation(
         warnProductionOriginNotConfigured(props[0]);
       }
 
-      props[0] = new URL(props[0], window.location.origin).toString();
+      props[0] = new URL(props[0], window.location?.origin).toString();
     } else if (props[0] && typeof props[0] === "object") {
       if (
         props[0].url &&
@@ -67,7 +68,10 @@ function wrapFetchWithWindowLocation(
           warnProductionOriginNotConfigured(props[0]);
         }
 
-        props[0].url = new URL(props[0].url, window.location.origin).toString();
+        props[0].url = new URL(
+          props[0].url,
+          window.location?.origin
+        ).toString();
       }
     }
     return fetch(...props);
@@ -78,13 +82,15 @@ function wrapFetchWithWindowLocation(
   return _fetch;
 }
 
-if (Constants.manifest?.extra?.router?.origin !== false) {
+if (manifest?.extra?.router?.origin !== false) {
   // Polyfill window.location in native runtimes.
   if (typeof window !== "undefined" && !window.location) {
-    setLocationHref(getBaseUrl());
-    install();
+    const url = getBaseUrl();
+    if (url) {
+      setLocationHref(url);
+      install();
+    }
   }
-
   // Polyfill native fetch to support relative URLs
   Object.defineProperty(global, "fetch", {
     value: wrapFetchWithWindowLocation(fetch),

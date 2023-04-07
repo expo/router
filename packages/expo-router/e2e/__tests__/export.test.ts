@@ -35,6 +35,7 @@ it(
       env: {
         EXPO_USE_STATIC: "1",
         E2E_ROUTER_SRC: "custom-html",
+        E2E_ROUTER_ASYNC: "development",
       },
     });
 
@@ -144,6 +145,49 @@ it(
       '<script src="/bundles/[mock].js" defer>'
     );
     expect(sanitized).toMatchSnapshot();
+  },
+  // Could take 45s depending on how fast npm installs
+  240 * 1000
+);
+
+it(
+  "exports with static params",
+  async () => {
+    const projectRoot = await ensureTesterReadyAsync("static-params");
+
+    await execa("npx", [bin, "export", "-p", "web"], {
+      cwd: projectRoot,
+      env: {
+        EXPO_USE_STATIC: "1",
+        E2E_ROUTER_SRC: "static-params",
+      },
+    });
+
+    const outputDir = path.join(projectRoot, "dist");
+    // List output files with sizes for snapshotting.
+    // This is to make sure that any changes to the output are intentional.
+    // Posix path formatting is used to make paths the same across OSes.
+    const files = klawSync(outputDir)
+      .map((entry) => {
+        if (entry.path.includes("node_modules") || !entry.stats.isFile()) {
+          return null;
+        }
+        return path.posix.relative(outputDir, entry.path);
+      })
+      .filter(Boolean);
+
+    // The wrapper should not be included as a route.
+    expect(files).not.toContain("+html.html");
+    expect(files).toContain("welcome-to-the-universe.html");
+    expect(files).toContain("other.html");
+    expect(files).toContain("[post].html");
+    // expect(files).toContain(expect.stringMatching(/bundles\/web-.*\.js/));
+
+    const page = await fs.readFile(
+      path.join(outputDir, "welcome-to-the-universe.html"),
+      "utf8"
+    );
+    expect(page).toContain("Post: <!-- -->welcome-to-the-universe");
   },
   // Could take 45s depending on how fast npm installs
   240 * 1000
@@ -330,5 +374,5 @@ it(
     expect(webBundle).toContain("background: cyan;");
   },
   // Could take 45s depending on how fast npm installs
-  240 * 1000
+  360 * 1000
 );
