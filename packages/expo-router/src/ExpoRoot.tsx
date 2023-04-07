@@ -63,7 +63,7 @@ function ContextNavigator({ context }: { context: RequireContext }) {
 
   return (
     <>
-      {!shouldShowSplash && <SplashScreen />}
+      {shouldShowSplash && <SplashScreen />}
       <UpstreamNavigationContainer
         linking={linking}
         ref={navigation}

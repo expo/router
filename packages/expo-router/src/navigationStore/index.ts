@@ -7,6 +7,7 @@ import {
 } from "@react-navigation/native";
 import React from "react";
 
+import { getInitialState } from "./initialState";
 import { compareRouteInfo, getRouteInfoFromState } from "../LocationProvider";
 import { RouteNode } from "../Route";
 import getPathFromState, {
@@ -27,11 +28,13 @@ type UrlObject = {
   segments: string[];
 };
 
-class NavigationStore {
+export class NavigationStore {
   subscriptionMap = new Map<string, Set<() => void>>([
     ["rootState", new Set()],
     ["url", new Set()],
   ]);
+
+  ssrLocation: URL | undefined;
 
   navigation = navigation;
   routeNode!: RouteNode;
@@ -44,17 +47,16 @@ class NavigationStore {
   shouldShowTutorial = false;
   _onReady?: () => void;
 
+  constructor(ssrLocation?: URL) {
+    this.ssrLocation = ssrLocation;
+  }
+
   initialise = (context: RequireContext, onReady: () => void) => {
     this._onReady = onReady;
     this.routeNode = getRoutes(context)!;
 
-    const linking = getLinkingConfig(this.routeNode);
-    this.linking = linking;
-
-    this.initialRootState = this.linking.getStateFromPath?.(
-      window.location.pathname,
-      this.linking.config
-    );
+    this.linking = getLinkingConfig(this.routeNode);
+    this.initialRootState = getInitialState(this.linking, this.ssrLocation);
 
     this.handleRouteInfoChange(this.initialRootState);
 
@@ -63,7 +65,7 @@ class NavigationStore {
         this.shouldShowTutorial = !context.keys().some((key) => {
           // NOTE(EvanBacon): This should only ever occur in development as it breaks lazily loading.
           const component = context(key)?.default;
-          return React.isValidElement(component);
+          return typeof component === "function";
         });
       } else {
         this.shouldShowTutorial = context.keys().length === 0;
@@ -131,9 +133,12 @@ class NavigationStore {
   getRouteInfo = () => this.routeInfo;
 }
 
-const navigationStore = new NavigationStore();
+export const NavigationStoreContext = React.createContext(
+  new NavigationStore()
+);
 
 export function useNavigationStore(context: RequireContext) {
+  const navigationStore = React.useContext(NavigationStoreContext);
   const [shouldShowSplash, setShowSplash] = React.useState(true);
 
   React.useMemo(
@@ -150,6 +155,7 @@ export function useNavigationStore(context: RequireContext) {
 }
 
 export function useRouteInfo() {
+  const navigationStore = React.useContext(NavigationStoreContext);
   return React.useSyncExternalStore(
     navigationStore.subscribeRouteInfo,
     navigationStore.getRouteInfo,
