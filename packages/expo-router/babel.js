@@ -83,27 +83,44 @@ function getExpoRouterAppRoot(projectRoot) {
 
 module.exports = function (api) {
   const { types: t } = api;
-  const getRelPath = (state) =>
-    "./" + nodePath.relative(state.file.opts.root, state.filename);
+  // const getRelPath = (state) =>
+  //   "./" + nodePath.join(state.file.opts.root, state.filename);
 
   const platform = api.caller((caller) => caller?.platform);
   return {
     name: "expo-router",
     visitor: {
+      // Given `{ __filename }` expand to `{ __filename: __filename }` then convert the value.
+      ObjectProperty(path, state) {
+        if (path.node.key.name === "__filename") {
+          path.node.value = t.stringLiteral(state.filename);
+        }
+        if (path.node.key.name === "__dirname") {
+          path.node.value = t.stringLiteral(nodePath.dirname(state.filename));
+        }
+      },
       // Add support for Node.js __filename
       Identifier(path, state) {
+        // Prevent converting object keys
+        if (path.parentPath.isObjectProperty()) {
+          return;
+        }
+
+        // Add support for Node.js `__filename`.
+        // This static value comes from Webpack somewhere.
+
         if (path.node.name === "__filename") {
           path.replaceWith(
             t.stringLiteral(
               // `/index.js` is the value used by Webpack.
-              getRelPath(state)
+              nodePath.resolve(state.filename)
             )
           );
         }
         // Add support for Node.js `__dirname`.
         // This static value comes from Webpack somewhere.
         if (path.node.name === "__dirname") {
-          path.replaceWith(t.stringLiteral("/"));
+          path.replaceWith(t.stringLiteral(nodePath.dirname(state.filename)));
         }
       },
 

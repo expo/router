@@ -16,6 +16,10 @@ export function installGlobals() {
   global.Request = ExpoRequest;
   // @ts-expect-error
   global.Response = ExpoResponse;
+  // @ts-expect-error
+  global.ExpoResponse = ExpoResponse;
+  // @ts-expect-error
+  global.ExpoRequest = ExpoRequest;
 }
 
 export class ExpoResponse extends Response {
