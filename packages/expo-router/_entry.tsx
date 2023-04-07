@@ -23,7 +23,7 @@ export default function ExpoRouterRoot() {
 }
 
 /** Get the linking manifest from a Node.js process. */
-export function getManifest(options: any) {
+export async function getManifest(options: any) {
   const routeTree = getRoutes(ctx, { preserveApiRoutes: true, ...options });
   if (!routeTree) {
     return null;
