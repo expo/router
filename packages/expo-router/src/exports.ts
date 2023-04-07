@@ -7,7 +7,7 @@ export {
   useLocalSearchParams,
   useSearchParams,
   useSegments,
-} from "./LocationProvider";
+} from "./navigationStore";
 export { Link, Redirect } from "./link/Link";
 
 export { withLayoutContext } from "./layouts/withLayoutContext";
