@@ -13,17 +13,29 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RouteNode, sortRoutes } from "../Route";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName } from "../matchers";
-// import { useRootRouteNodeContext } from "../useRootRouteNodeContext";
+import { NavigationStoreContext } from "../navigationStore";
 
 const INDENT = 24;
 
+function sortRouteNodeRoutes(routeNode: RouteNode) {
+  return routeNode.children.filter((route) => !route.internal).sort(sortRoutes);
+}
+
 function useSortedRoutes() {
-  // const ctx = useRootRouteNodeContext();
-  // const routes = React.useMemo(
-  //   () => [ctx].filter((route) => !route.internal).sort(sortRoutes),
-  //   [ctx]
-  // );
-  // return routes;
+  const navigationStore = React.useContext(NavigationStoreContext);
+  const [sortedRoutes, setSortedRoutes] = React.useState(() => {
+    return sortRouteNodeRoutes(navigationStore.routeNode);
+  });
+
+  React.useEffect(
+    () =>
+      navigationStore.subscribeRootState(() => {
+        setSortedRoutes(sortRouteNodeRoutes(navigationStore.routeNode));
+      }),
+    []
+  );
+
+  return sortedRoutes;
 }
 
 export function getNavOptions(): NativeStackNavigationOptions {

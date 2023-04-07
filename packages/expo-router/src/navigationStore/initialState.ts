@@ -10,9 +10,14 @@ export function getInitialState(
         `You need to set a NavigationStoreContext.Provider, with a NavigationStore(ssrLocation: string) value`
       );
     }
-    const pathname = ssrLocation.pathname + ssrLocation.search;
-    return linking.getStateFromPath?.(pathname, linking.config);
+    return linking.getStateFromPath?.(
+      ssrLocation.pathname + ssrLocation.search,
+      linking.config
+    );
   }
 
-  return linking.getStateFromPath?.(window.location.pathname, linking.config);
+  return linking.getStateFromPath?.(
+    window.location.pathname + window.location.search,
+    linking.config
+  );
 }

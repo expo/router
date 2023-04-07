@@ -31,6 +31,7 @@ type UrlObject = {
 export class NavigationStore {
   subscriptionMap = new Map<string, Set<() => void>>([
     ["rootState", new Set()],
+    ["routeInfo", new Set()],
     ["url", new Set()],
   ]);
 
@@ -108,7 +109,9 @@ export class NavigationStore {
   onReady = () => {
     navigation.addListener("state", ({ data }) => {
       this.rootState = data.state;
+
       this.notifiySubscribers("rootState");
+
       this.handleRouteInfoChange(data.state);
     });
 
@@ -125,12 +128,14 @@ export class NavigationStore {
   subscribeFactory = (key: string) => {
     return (callback: () => void) => {
       this.subscriptionMap.get(key)?.add(callback);
-      return () => this.subscriptionMap.get(key)?.delete(callback);
+      return () => {
+        this.subscriptionMap.get(key)?.delete(callback);
+      };
     };
   };
 
   subscribeRouteInfo = this.subscribeFactory("routeInfo");
-  getRouteInfo = () => this.routeInfo;
+  subscribeRootState = this.subscribeFactory("rootState");
 }
 
 export const NavigationStoreContext = React.createContext(
@@ -154,13 +159,26 @@ export function useNavigationStore(context: RequireContext) {
   return Object.assign(navigationStore, { shouldShowSplash });
 }
 
+export function useRootNavigation() {
+  return navigation;
+}
+
+export function useRootNavigationState() {
+  const navigationStore = React.useContext(NavigationStoreContext);
+  const [, update] = React.useReducer((acc) => acc + 1, 0);
+
+  React.useEffect(() => navigationStore.subscribeRootState(update), []);
+
+  return navigationStore.rootState;
+}
+
 export function useRouteInfo() {
   const navigationStore = React.useContext(NavigationStoreContext);
-  return React.useSyncExternalStore(
-    navigationStore.subscribeRouteInfo,
-    navigationStore.getRouteInfo,
-    navigationStore.getRouteInfo
-  );
+  const [, update] = React.useReducer((acc) => acc + 1, 0);
+
+  React.useEffect(() => navigationStore.subscribeRouteInfo(update), []);
+
+  return navigationStore.routeInfo;
 }
 
 export function useSegments() {
