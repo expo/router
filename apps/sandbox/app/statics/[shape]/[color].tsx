@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
+import Head from "expo-router/head";
 
 export function generateStaticParams({
   params,
@@ -19,6 +20,11 @@ export default function Page() {
   const params = useSearchParams();
   return (
     <View style={styles.container}>
+      <Head>
+        <title>
+          Statics: {params.color} + {params.shape}
+        </title>
+      </Head>
       <View style={styles.main}>
         <Text style={styles.title}>Statics vvv</Text>
         <Link href="/" style={styles.subtitle}>

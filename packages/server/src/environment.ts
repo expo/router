@@ -7,6 +7,7 @@ import {
 } from "@remix-run/node";
 
 import { URL } from "node:url";
+import { ExpoRouterServerManifestV1FunctionRoute } from "./types";
 
 // Ensure these are available for the API Routes.
 export function installGlobals() {
@@ -46,21 +47,39 @@ export class ExpoResponse extends Response {
 
 export const NON_STANDARD_SYMBOL = Symbol("non-standard");
 
-export class ExpoURL extends URL {}
+export class ExpoURL extends URL {
+  static from(
+    url: string,
+    config: ExpoRouterServerManifestV1FunctionRoute
+  ): ExpoURL {
+    const expoUrl = new ExpoURL(url);
+
+    console.log(config);
+    return expoUrl;
+  }
+}
+
+// TODO: Flip regex to start with slash and end without slash
+// Use named capture groups
+// Convert named capture groups to allow dashes
 
 export class ExpoRequest extends Request {
   [NON_STANDARD_SYMBOL]: {
     url: ExpoURL;
   };
 
-  constructor(info: RequestInfo, init?: RequestInit) {
+  constructor(
+    info: RequestInfo,
+    init?: RequestInit,
+    config?: ExpoRouterServerManifestV1FunctionRoute
+  ) {
     super(info, init);
 
     const url =
       typeof info !== "string" && "url" in info ? info.url : String(info);
 
     this[NON_STANDARD_SYMBOL] = {
-      url: new ExpoURL(url),
+      url: config ? ExpoURL.from(url, config) : new ExpoURL(url),
     };
   }
 

@@ -20,8 +20,8 @@ export async function GET(
 
   console.log(
     ">",
-    pkg,
-    { __dirname, __filename },
+    // pkg,
+    // { __dirname, __filename },
     req.expoUrl,
     req.expoUrl.searchParams.get("post-id")
   );

@@ -83,8 +83,6 @@ function getExpoRouterAppRoot(projectRoot) {
 
 module.exports = function (api) {
   const { types: t } = api;
-  // const getRelPath = (state) =>
-  //   "./" + nodePath.join(state.file.opts.root, state.filename);
 
   const platform = api.caller((caller) => caller?.platform);
   return {

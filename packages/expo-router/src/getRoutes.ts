@@ -272,7 +272,6 @@ function contextModuleToFileNodes(
     // In development, check if the file exports a default component
     // this helps keep things snappy when creating files. In production we load all screens lazily.
     try {
-      
       if (process.env.NODE_ENV === "development") {
         // If the user has set the `EXPO_ROUTER_IMPORT_MODE` to `sync` then we should
         // filter the missing routes.

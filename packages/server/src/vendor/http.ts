@@ -7,11 +7,13 @@ import {
 import * as http from "http";
 
 import { ExpoRequest, ExpoResponse } from "../environment";
+import { ExpoRouterServerManifestV1FunctionRoute } from "../types";
 
 // Convert an http request to an expo request
 export function convertRequest(
   req: http.IncomingMessage,
-  res: http.ServerResponse
+  res: http.ServerResponse,
+  routeConfig: ExpoRouterServerManifestV1FunctionRoute
 ): ExpoRequest {
   const url = new URL(req.url!, `http://${req.headers.host}`);
 
@@ -33,7 +35,7 @@ export function convertRequest(
     init.body = req;
   }
 
-  return new ExpoRequest(url.href, init);
+  return new ExpoRequest(url.href, init, routeConfig);
 }
 
 export function convertHeaders(
