@@ -48,7 +48,7 @@ function ContextNavigator({ context }: { context: RequireContext }) {
     shouldShowTutorial,
     shouldShowSplash,
     linking,
-    navigation,
+    navigationRef,
     onReady,
     routeNode,
   } = useNavigationStore(context);
@@ -66,7 +66,7 @@ function ContextNavigator({ context }: { context: RequireContext }) {
       {shouldShowSplash && <SplashScreen />}
       <UpstreamNavigationContainer
         linking={linking}
-        ref={navigation}
+        ref={navigationRef}
         onReady={onReady}
       >
         <Component />

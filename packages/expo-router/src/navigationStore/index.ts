@@ -18,7 +18,8 @@ import { getLinkingConfig } from "../getLinkingConfig";
 import { getRoutes } from "../getRoutes";
 import { RequireContext } from "../types";
 
-const navigation = createNavigationContainerRef<Record<string, unknown>>();
+export const navigationRef =
+  createNavigationContainerRef<Record<string, unknown>>();
 
 type SearchParams = Record<string, string | string[]>;
 
@@ -37,7 +38,7 @@ export class NavigationStore {
 
   ssrLocation: URL | undefined;
 
-  navigation = navigation;
+  navigationRef = navigationRef;
   routeNode!: RouteNode;
   linking!: LinkingOptions<object>;
   rootState: NavigationState | PartialState<NavigationState> | undefined;
@@ -107,7 +108,7 @@ export class NavigationStore {
   };
 
   onReady = () => {
-    navigation.addListener("state", ({ data }) => {
+    navigationRef.addListener("state", ({ data }) => {
       this.rootState = data.state;
 
       this.notifiySubscribers("rootState");
@@ -115,7 +116,7 @@ export class NavigationStore {
       this.handleRouteInfoChange(data.state);
     });
 
-    this.rootState = navigation.getRootState();
+    this.rootState = navigationRef.getRootState();
     this._onReady?.();
   };
 
@@ -160,7 +161,7 @@ export function useNavigationStore(context: RequireContext) {
 }
 
 export function useRootNavigation() {
-  return navigation;
+  return navigationRef;
 }
 
 export function useRootNavigationState() {
