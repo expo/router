@@ -4,6 +4,8 @@
 
 ### 🛠 Breaking changes
 
+- Drop (undocumented) mocks for `__dirname` and `__filename` when transpiling client code.
+
 ### 🎉 New features
 
 ### 🐛 Bug fixes
