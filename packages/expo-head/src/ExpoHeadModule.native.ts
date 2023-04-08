@@ -1,5 +1,5 @@
-import { requireNativeModule } from "expo-modules-core";
 import Constants, { ExecutionEnvironment } from "expo-constants";
+import { requireNativeModule } from "expo-modules-core";
 
 let ExpoHead: null | any = null;
 

@@ -35,12 +35,10 @@ module.exports = {
       `applinks:${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
       `webcredentials:${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
       `activitycontinuation:${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
-      // "applinks:bacon-router-sandbox.ngrok.io?mode=developer",
-      // "webcredentials:bacon-router-sandbox.ngrok.io?mode=developer",
-      // "activitycontinuation:bacon-router-sandbox.ngrok.io?mode=developer",
     ],
     infoPlist: {
       CoreSpotlightContinuation: true,
     },
   },
+  plugins: ["expo-head"],
 };

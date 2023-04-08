@@ -28,6 +28,7 @@
   },
   "peerDependencies": {
     "expo": "*",
+    "expo-router": "*",
     "react": "*",
     "react-native": "*",
     "expo-constants": "*"
