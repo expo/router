@@ -5,6 +5,7 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <Head>
+        <meta property="expo:handoff" content="true" />
         <title>Home | Expo Router</title>
       </Head>
       <View style={styles.main}>

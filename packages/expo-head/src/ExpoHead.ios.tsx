@@ -155,6 +155,9 @@ function useActivityFromMetaChildren(meta: MetaNode[]) {
           case "expo:handoff":
             userActivity.isEligibleForHandoff = isTruthy(content);
             break;
+          case "expo:spotlight":
+            userActivity.isEligibleForSearch = isTruthy(content);
+            break;
         }
 
         // // <meta name="keywords" content="foo,bar,baz" />

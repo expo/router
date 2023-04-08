@@ -5,7 +5,8 @@ export default function Layout() {
   return (
     <>
       <Head>
-        <meta property="expo:handoff" content="true" />
+        {/* <meta property="expo:handoff" content="true" /> */}
+        {/* <meta property="expo:spotlight" content="true" /> */}
       </Head>
       <Tabs>
         <Tabs.Screen

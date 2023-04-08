@@ -49,6 +49,7 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <Head>
+        <meta property="expo:spotlight" content="true" />
         <title>Other | Expo Router</title>
       </Head>
       <View style={styles.main}>
