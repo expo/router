@@ -12,12 +12,12 @@ import { ServerContainerRef } from "@react-navigation/native";
 // @ts-expect-error
 import ServerContainer from "@react-navigation/native/lib/commonjs/ServerContainer";
 import App, { getManifest } from "expo-router/_entry";
+import Head from "expo-router/head";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 import { AppRegistry } from "react-native-web";
 
 import { getRootComponent } from "./getRootComponent";
-import Head from "expo-router/head";
 
 AppRegistry.registerComponent("App", () => App);
 
