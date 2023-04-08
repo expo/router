@@ -1,3 +1,5 @@
+// Copyright 2023-present 650 Industries. All rights reserved.
+
 import ExpoModulesCore
 import CoreSpotlight
 import MobileCoreServices
@@ -22,19 +24,13 @@ struct MetadataOptions: Record {
     @Field
     var imageUrl: URL?
     @Field
-    var darkImageUrl: URL?
-    @Field
     var keywords: [String]?
     @Field
     var dateModified: Date?
     @Field
-    var expirationDate: Date?
-    @Field
     var userInfo: [String: AnyHashable]?
     @Field
     var description: String?
-    @Field
-    var phrase: String?
 }
 
 let INDEXED_ROUTE = Bundle.main.bundleIdentifier! + ".expo.index_route"
@@ -83,17 +79,15 @@ public class ExpoHeadModule: Module {
                     "title": activity.title,
                     "webpageURL": activity.webpageURL,
                     "imageUrl": activity.contentAttributeSet?.thumbnailURL,
-                    "darkImageUrl": activity.contentAttributeSet?.darkThumbnailURL,
                     "keywords": activity.keywords,
                     "dateModified": activity.contentAttributeSet?.metadataModificationDate,
-                    "expirationDate": activity.expirationDate,
                     "userInfo": activity.userInfo,
                 ]
             }
             return nil
         }
         
-        AsyncFunction("createActivity") { (value: MetadataOptions) in
+        Function("createActivity") { (value: MetadataOptions) in
             if (value.webpageURL?.absoluteString.starts(with: "file://") == true) {
                 throw Exception(name: "Invalid webpageUrl", description: "Scheme file:// is not allowed for location origin (webpageUrl in NSUserActivity). URL: \(value.webpageURL!.absoluteString)")
             }
@@ -102,7 +96,7 @@ public class ExpoHeadModule: Module {
             activity.becomeCurrent()
         }
         
-        AsyncFunction("clearActivities") { (ids: [String], promise: Promise) in
+        AsyncFunction("clearActivitiesAsync") { (ids: [String], promise: Promise) in
             ids.forEach { id in
                 self.revokeActivity(id: id)
             }
@@ -116,12 +110,12 @@ public class ExpoHeadModule: Module {
             })
         }
         
-        AsyncFunction("suspendActivity") { (id: String) in
+        Function("suspendActivity") { (id: String) in
             let activity = self.activities.first(where: { $0.persistentIdentifier == id })
             activity?.resignCurrent()
         }
         
-        AsyncFunction("revokeActivity") { (id: String) in
+        Function("revokeActivity") { (id: String) in
             self.revokeActivity(id: id)
         }
     }
@@ -150,7 +144,6 @@ public class ExpoHeadModule: Module {
         activity.userInfo = value.userInfo
         // Required for handling incoming requests
         //      activity.requiredUserInfoKeys = ["href"]
-        activity.expirationDate = value.expirationDate
         
         if (value.webpageURL != nil) {
             
@@ -161,18 +154,13 @@ public class ExpoHeadModule: Module {
         }
         
         att.title = value.title
-        att.metadataModificationDate = value.dateModified
         // Make all indexed routes deletable
         att.domainIdentifier = INDEXED_ROUTE
         
         if let localUrl = value.imageUrl?.path {
             att.thumbnailURL = value.imageUrl
         }
-        
-        if let darkImageUrl = value.darkImageUrl {
-            att.darkThumbnailURL = darkImageUrl
-        }
-        
+
         if let description = value.description {
             att.contentDescription = description
         }

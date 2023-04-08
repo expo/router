@@ -1,69 +1,8 @@
-import Constants from "expo-constants";
-import { usePathname, useSearchParams } from "expo-router";
+import { usePathname, useSearchParams, useSegments } from "expo-router";
 import React from "react";
 
-import ExpoHead from "./ExpoHeadModule.native";
-
-// isEligibleForPrediction
-// https://developer.apple.com/documentation/foundation/nsuseractivity/2980674-iseligibleforprediction
-
-type UserActivity = {
-  id?: string;
-  /**
-   * The activity title should be clear and concise. This text describes the content of the link, like “Photo taken on July 27, 2020” or “Conversation with Maria”. Use nouns for activity titles.
-   */
-  title?: string;
-  description?: string;
-  webpageURL?: string;
-  keywords?: string[];
-  // TODO: Get this automatically somehow
-  activityType: string;
-  // TODO: Maybe something like robots.txt?
-  phrase?: string;
-
-  thumbnailURL?: string;
-
-  userInfo?: Record<string, string>;
-
-  isEligibleForHandoff?: boolean;
-  isEligibleForPrediction?: boolean;
-  isEligibleForSearch?: boolean;
-
-  /** Local file path for an image */
-  imageUrl?: string;
-  darkImageUrl?: string;
-  dateModified?: Date;
-  expirationDate?: Date;
-};
-
-function getUrlFromConstants() {
-  // This will require a rebuild in bare-workflow to update.
-  const manifest =
-    Constants.expoConfig || Constants.manifest2 || Constants.manifest;
-
-  // @ts-expect-error
-  const origin = manifest?.extra?.router?.handoffOrigin;
-
-  if (!origin) {
-    throw new Error(
-      `Add the handoff origin to the native manifest under "extra.router.handoffOrigin"`
-    );
-  }
-
-  if (!/^https?:\/\//.test(origin)) {
-    throw new Error(
-      'Expo Head: Web URL must start with "http://" or "https://"'
-    );
-  }
-
-  return origin.replace(/\/$/, "");
-}
-
-function getStaticUrlFromExpoRouter(pathname: string) {
-  // const host = "https://expo.io";
-  // Append the URL we'd find in context
-  return getUrlFromConstants() + pathname;
-}
+import { ExpoHead, UserActivity } from "./ExpoHeadModule";
+import { getStaticUrlFromExpoRouter } from "./url";
 
 function urlToId(url: string) {
   return url.replace(/[^a-zA-Z0-9]/g, "-");
@@ -77,22 +16,25 @@ function getLastSegment(path: string) {
 
 // TODO: Use Head Provider to collect all props so only one Head is rendered for a given route.
 
-export function Head({ children }: { children?: React.ReactNode }) {
+function useAddressableLink() {
   const pathname = usePathname();
   const params = useSearchParams<{ q?: string }>();
+  const qs = new URLSearchParams(params).toString();
+  let url = getStaticUrlFromExpoRouter(pathname);
+  if (qs) {
+    url += "?" + qs;
+  }
+  return { url, pathname, params };
+}
 
-  const href = React.useMemo(() => {
-    const qs = new URLSearchParams(params).toString();
-    const url = getStaticUrlFromExpoRouter(pathname);
-    if (qs) {
-      return url + "?" + qs;
-    }
-    return url;
-  }, [pathname, params?.q]);
+type MetaNode =
+  | React.ReactPortal
+  | React.ReactElement<unknown, string | React.JSXElementConstructor<any>>;
 
-  const { renderableChildren, metaChildren } = React.useMemo(() => {
-    const renderableChildren = [];
-    const metaChildren: any[] = [];
+function useMetaChildren(children: React.ReactNode) {
+  return React.useMemo(() => {
+    const renderableChildren: React.ReactNode[] = [];
+    const metaChildren: MetaNode[] = [];
 
     React.Children.forEach(children, (child) => {
       if (!React.isValidElement(child)) {
@@ -105,49 +47,72 @@ export function Head({ children }: { children?: React.ReactNode }) {
       }
     });
 
-    return { renderableChildren, metaChildren };
+    return { children, metaChildren };
   }, [children]);
+}
 
-  const activity = React.useMemo(() => {
+function useActivityFromMetaChildren(meta: MetaNode[]) {
+  const { url: href, pathname } = useAddressableLink();
+
+  return React.useMemo(() => {
     const userActivity: UserActivity = {
       title: getLastSegment(pathname),
-      activityType: ExpoHead.activities.INDEXED_ROUTE,
+      activityType: ExpoHead!.activities.INDEXED_ROUTE,
     };
 
-    metaChildren.forEach((child) => {
-      if (child.type === "title") {
-        userActivity.title = child.props.children;
-      }
-
-      // Child is meta tag
-      if (child.type === "meta") {
-        const { property, content } = child.props;
-
-        switch (property) {
-          case "og:title":
-            userActivity.title = content;
-            break;
-          case "og:description":
-            userActivity.description = content;
-            break;
-          case "og:url":
-            userActivity.webpageURL = content;
-            break;
-          case "expo:handoff":
-            userActivity.isEligibleForHandoff = [true, "true", ""].includes(
-              content
-            );
-            break;
+    meta
+      // This attempts to prioritize the more specific meta tags.
+      // https://developer.apple.com/library/archive/documentation/General/Conceptual/AppSearch/WebContent.html#//apple_ref/doc/uid/TP40016308-CH8-SW3
+      .sort((a, b) => {
+        if (a.type === b.type) {
+          return 0;
         }
 
-        // // <meta name="keywords" content="foo,bar,baz" />
-        // if (["keywords"].includes(name)) {
-        //   userActivity.keywords = Array.isArray(content)
-        //     ? content
-        //     : content.split(",");
-        // }
-      }
-    });
+        // More specific tags should be prioritized
+        if (a.type === "meta") {
+          return 1;
+        } else if (b.type === "meta") {
+          return -1;
+        }
+
+        return 0;
+      })
+      .forEach((child) => {
+        if (
+          // <title />
+          child.type === "title"
+        ) {
+          userActivity.title = child.props.children;
+        } else if (
+          // <meta />
+          child.type === "meta"
+        ) {
+          const { property, content } = child.props;
+
+          switch (property) {
+            case "og:title":
+              userActivity.title = content;
+              break;
+            case "og:description":
+              userActivity.description = content;
+              break;
+            case "og:url":
+              userActivity.webpageURL = content;
+              break;
+            // Custom properties
+            case "expo:handoff":
+              userActivity.isEligibleForHandoff = isTruthy(content);
+              break;
+          }
+
+          // // <meta name="keywords" content="foo,bar,baz" />
+          // if (["keywords"].includes(name)) {
+          //   userActivity.keywords = Array.isArray(content)
+          //     ? content
+          //     : content.split(",");
+          // }
+        }
+      });
     const resolved: UserActivity = {
       webpageURL: href,
       keywords: [userActivity.title!],
@@ -155,39 +120,77 @@ export function Head({ children }: { children?: React.ReactNode }) {
       userInfo: {
         href: pathname,
       },
-      // dateModified: new Date().toISOString(),
     };
 
     if (!resolved.id && resolved.webpageURL) {
       resolved.id = urlToId(resolved.webpageURL);
     }
     return resolved;
-  }, [metaChildren, pathname, href]);
-
-  useRegisterCurrentActivity(activity);
-
-  return renderableChildren;
+  }, [meta, pathname, href]);
 }
 
+function isTruthy(value: any): boolean {
+  return [true, "true"].includes(value);
+}
+
+function HeadNative(props: { children?: React.ReactNode }) {
+  const { metaChildren, children } = useMetaChildren(props.children);
+  const activity = useActivityFromMetaChildren(metaChildren);
+  useRegisterCurrentActivity(activity);
+  return children;
+}
+
+// segments => activity
+const activities: Map<string, UserActivity> = new Map();
+
 function useRegisterCurrentActivity(activity: UserActivity) {
+  // ID is tied to Expo Router and agnostic of URLs to ensure dynamic parameters are not considered.
+  const activityId = useSegments().join("/");
+
+  const cascadingActivity: UserActivity = activities.get(activityId)
+    ? {
+        ...activities.get(activityId),
+        ...activity,
+      }
+    : {
+        ...activity,
+        id: activityId,
+      };
+
+  activities.set(activityId, cascadingActivity);
+
   React.useEffect(() => {
-    if (activity) {
-      if (!activity.id) {
+    if (cascadingActivity) {
+      if (!cascadingActivity.id) {
         throw new Error("Activity must have an ID");
       }
 
       // If no features are enabled, then skip registering the activity
-      if (activity.isEligibleForHandoff || activity.isEligibleForSearch) {
-        ExpoHead.createActivity(activity);
+      if (
+        cascadingActivity.isEligibleForHandoff ||
+        cascadingActivity.isEligibleForSearch
+      ) {
+        ExpoHead?.createActivity(cascadingActivity);
         return () => {
-          if (activity?.id) {
-            ExpoHead.suspendActivity(activity.id);
+          if (cascadingActivity?.id) {
+            ExpoHead?.suspendActivity(cascadingActivity.id);
           }
         };
       }
     }
     return () => {};
-  }, [activity]);
+  }, [cascadingActivity]);
 }
+HeadNative.Provider = React.Fragment;
 
-Head.Provider = React.Fragment;
+function HeadShim(props: { children?: React.ReactNode }) {
+  return null;
+}
+HeadShim.Provider = React.Fragment;
+
+// Native Head is only enabled in bare iOS apps.
+export const Head: ((props: {
+  children?: React.ReactNode;
+}) => React.ReactNode) & {
+  Provider: React.ComponentType;
+} = ExpoHead ? HeadNative : HeadShim;

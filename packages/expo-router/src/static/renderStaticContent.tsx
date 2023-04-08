@@ -17,7 +17,7 @@ import ReactDOMServer from "react-dom/server";
 import { AppRegistry } from "react-native-web";
 
 import { getRootComponent } from "./getRootComponent";
-import Head from "../head/Head";
+import Head from "expo-router/head";
 
 AppRegistry.registerComponent("App", () => App);
 

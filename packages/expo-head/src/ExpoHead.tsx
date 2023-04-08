@@ -1,7 +1,10 @@
 import React from "react";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 
-export function Head() {}
+export const Head = (({ children }: { children?: any }) => {
+  return <Helmet>{children}</Helmet>;
+}) as any & {
+  Provider: typeof HelmetProvider;
+};
 
-Head.Provider = React.Fragment;
-
-export function setWebUrl(url: string) {}
+Head.Provider = HelmetProvider;

@@ -1,4 +1,4 @@
-// Copyright 2018-present 650 Industries. All rights reserved.
+// Copyright 2023-present 650 Industries. All rights reserved.
 
 import ExpoModulesCore
 import CoreSpotlight
