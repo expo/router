@@ -1,3 +1,3 @@
-import { Head } from "@expo-router/head";
+import { Head } from "expo-head";
 
 export default Head;

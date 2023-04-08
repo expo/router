@@ -1,5 +1,5 @@
 {
-  "name": "@expo-router/head",
+  "name": "expo-head",
   "version": "0.0.0",
   "description": "static page definitions for universal SEO",
   "main": "build/index",
