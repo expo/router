@@ -1,4 +1,8 @@
-import { useRoute } from "@react-navigation/native";
+import {
+  NavigationRouteContext,
+  ParamListBase,
+  RouteProp,
+} from "@react-navigation/native";
 import React from "react";
 
 import { getNavigationContainerRef } from "./NavigationContainer";
@@ -202,10 +206,19 @@ export function useSearchParams<
 export function useLocalSearchParams<
   TParams extends SearchParams = SearchParams
 >(): Partial<TParams> {
-  return (useRoute()?.params ?? ({} as any)) as Partial<TParams>;
+  const route = useOptionalReactNavigationRoute();
+  return (route?.params ?? ({} as any)) as Partial<TParams>;
 }
 
 /** @returns Array of selected segments. */
 export function useSegments(): string[] {
   return useLocation().segments;
+}
+
+function useOptionalReactNavigationRoute<
+  T extends RouteProp<ParamListBase>
+>(): T | null {
+  const route = React.useContext(NavigationRouteContext);
+
+  return route as T;
 }

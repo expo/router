@@ -1,4 +1,5 @@
-import { usePathname, useSearchParams, useSegments } from "expo-router";
+import { useIsFocused } from "@react-navigation/core";
+import { useLocalSearchParams, usePathname, useSegments } from "expo-router";
 import React from "react";
 
 import { ExpoHead, UserActivity } from "./ExpoHeadModule";
@@ -18,7 +19,7 @@ function getLastSegment(path: string) {
 
 function useAddressableLink() {
   const pathname = usePathname();
-  const params = useSearchParams<{ q?: string }>();
+  const params = useLocalSearchParams<any>();
   const qs = new URLSearchParams(params).toString();
   let url = getStaticUrlFromExpoRouter(pathname);
   if (qs) {
@@ -47,86 +48,140 @@ function useMetaChildren(children: React.ReactNode) {
       }
     });
 
-    return { children, metaChildren };
+    return { children: renderableChildren, metaChildren };
   }, [children]);
+}
+
+type SerializedMeta = {
+  type: string;
+  props: { [key: string]: string | undefined };
+};
+
+function serializedMetaChildren(meta: MetaNode[]): SerializedMeta[] {
+  const validMeta = meta.filter(
+    (child) => child.type === "meta" || child.type === "title"
+  );
+
+  return validMeta.map((child) => {
+    if (child.type === "title") {
+      return {
+        type: "title",
+        props: {
+          children:
+            typeof child.props.children === "string"
+              ? child.props.children
+              : undefined,
+        },
+      };
+    }
+    return {
+      type: "meta",
+      props: {
+        property:
+          typeof child.props.property === "string"
+            ? child.props.property
+            : undefined,
+        content:
+          typeof child.props.content === "string"
+            ? child.props.content
+            : undefined,
+      },
+    };
+  });
 }
 
 function useActivityFromMetaChildren(meta: MetaNode[]) {
   const { url: href, pathname } = useAddressableLink();
 
-  return React.useMemo(() => {
-    const userActivity: UserActivity = {
-      title: getLastSegment(pathname),
-      activityType: ExpoHead!.activities.INDEXED_ROUTE,
-    };
+  const previousMeta = React.useRef<SerializedMeta[]>([]);
+  const cachedActivity = React.useRef<Partial<UserActivity>>({});
 
-    meta
-      // This attempts to prioritize the more specific meta tags.
-      // https://developer.apple.com/library/archive/documentation/General/Conceptual/AppSearch/WebContent.html#//apple_ref/doc/uid/TP40016308-CH8-SW3
-      .sort((a, b) => {
-        if (a.type === b.type) {
-          return 0;
-        }
+  const sortedMeta = React.useMemo(() => serializedMetaChildren(meta), [meta]);
 
-        // More specific tags should be prioritized
-        if (a.type === "meta") {
-          return 1;
-        } else if (b.type === "meta") {
-          return -1;
-        }
+  const url = React.useMemo(() => {
+    const urlMeta = sortedMeta.find(
+      (child) => child.type === "meta" && child.props.property === "og:url"
+    );
 
-        return 0;
-      })
-      .forEach((child) => {
-        if (
-          // <title />
-          child.type === "title"
-        ) {
-          userActivity.title = child.props.children;
-        } else if (
-          // <meta />
-          child.type === "meta"
-        ) {
-          const { property, content } = child.props;
-
-          switch (property) {
-            case "og:title":
-              userActivity.title = content;
-              break;
-            case "og:description":
-              userActivity.description = content;
-              break;
-            case "og:url":
-              userActivity.webpageURL = content;
-              break;
-            // Custom properties
-            case "expo:handoff":
-              userActivity.isEligibleForHandoff = isTruthy(content);
-              break;
-          }
-
-          // // <meta name="keywords" content="foo,bar,baz" />
-          // if (["keywords"].includes(name)) {
-          //   userActivity.keywords = Array.isArray(content)
-          //     ? content
-          //     : content.split(",");
-          // }
-        }
-      });
-    const resolved: UserActivity = {
-      webpageURL: href,
-      keywords: [userActivity.title!],
-      ...userActivity,
-      userInfo: {
-        href: pathname,
-      },
-    };
-
-    if (!resolved.id && resolved.webpageURL) {
-      resolved.id = urlToId(resolved.webpageURL);
+    if (urlMeta) {
+      // Support =`/foo/bar` -> `https://example.com/foo/bar`
+      if (urlMeta.props.content?.startsWith("/")) {
+        return getStaticUrlFromExpoRouter(urlMeta.props.content);
+      }
+      return urlMeta.props.content;
     }
-    return resolved;
+    return href;
+  }, [sortedMeta, href]);
+
+  const title = React.useMemo(() => {
+    const titleTag = sortedMeta.find((child) => child.type === "title");
+    if (titleTag) {
+      return titleTag.props.children ?? "";
+    }
+    const titleMeta = sortedMeta.find(
+      (child) => child.type === "meta" && child.props.property === "og:title"
+    );
+    if (titleMeta) {
+      return titleMeta.props.content ?? "";
+    }
+
+    return getLastSegment(pathname);
+  }, [sortedMeta, pathname]);
+
+  const activity = React.useMemo(() => {
+    if (
+      !!previousMeta.current &&
+      !!cachedActivity.current &&
+      deepObjectCompare(previousMeta.current, sortedMeta)
+    ) {
+      return cachedActivity.current;
+    }
+    previousMeta.current = sortedMeta;
+
+    const userActivity: Partial<UserActivity> = {};
+
+    sortedMeta.forEach((child) => {
+      if (
+        // <meta />
+        child.type === "meta"
+      ) {
+        const { property, content } = child.props;
+
+        switch (property) {
+          case "og:description":
+            userActivity.description = content;
+            break;
+          // Custom properties
+          case "expo:handoff":
+            userActivity.isEligibleForHandoff = isTruthy(content);
+            break;
+        }
+
+        // // <meta name="keywords" content="foo,bar,baz" />
+        // if (["keywords"].includes(name)) {
+        //   userActivity.keywords = Array.isArray(content)
+        //     ? content
+        //     : content.split(",");
+        // }
+      }
+    });
+
+    cachedActivity.current = userActivity;
+    return userActivity;
   }, [meta, pathname, href]);
+
+  const parsedActivity: UserActivity = {
+    keywords: [title],
+    ...activity,
+    title,
+    webpageURL: url,
+    activityType: ExpoHead!.activities.INDEXED_ROUTE,
+    userInfo: {
+      href: pathname,
+    },
+  };
+
+  return parsedActivity;
 }
 
 function isTruthy(value: any): boolean {
@@ -134,10 +189,23 @@ function isTruthy(value: any): boolean {
 }
 
 function HeadNative(props: { children?: React.ReactNode }) {
+  const isFocused = useIsFocused();
+  if (!isFocused) {
+    return <UnfocusedHead />;
+  }
+  return <FocusedHead {...props} />;
+}
+
+function UnfocusedHead(props: { children?: React.ReactNode }): JSX.Element {
+  const { children } = useMetaChildren(props.children);
+  return <>{children}</>;
+}
+
+function FocusedHead(props: { children?: React.ReactNode }): JSX.Element {
   const { metaChildren, children } = useMetaChildren(props.children);
   const activity = useActivityFromMetaChildren(metaChildren);
   useRegisterCurrentActivity(activity);
-  return children;
+  return <>{children}</>;
 }
 
 // segments => activity
@@ -145,47 +213,97 @@ const activities: Map<string, UserActivity> = new Map();
 
 function useRegisterCurrentActivity(activity: UserActivity) {
   // ID is tied to Expo Router and agnostic of URLs to ensure dynamic parameters are not considered.
-  const activityId = useSegments().join("/");
+  // Using all segments ensures that cascading routes are considered.
+  const activityId = urlToId(useSegments().join("-") || "-");
+  const activityIds = Array.from(activities.keys());
+  const cascadingActivity: UserActivity = React.useMemo(() => {
+    const cascadingActivity = activities.has(activityId)
+      ? {
+          ...activities.get(activityId),
+          ...activity,
+        }
+      : {
+          ...activity,
+          id: activityId,
+        };
+    activities.set(activityId, cascadingActivity);
 
-  const cascadingActivity: UserActivity = activities.get(activityId)
-    ? {
-        ...activities.get(activityId),
-        ...activity,
-      }
-    : {
-        ...activity,
-        id: activityId,
-      };
+    return cascadingActivity;
+  }, [activityId, activity, activityIds]);
 
-  activities.set(activityId, cascadingActivity);
+  const previousActivity = React.useRef<UserActivity | null>(null);
 
   React.useEffect(() => {
-    if (cascadingActivity) {
-      if (!cascadingActivity.id) {
-        throw new Error("Activity must have an ID");
-      }
-
-      // If no features are enabled, then skip registering the activity
-      if (
-        cascadingActivity.isEligibleForHandoff ||
-        cascadingActivity.isEligibleForSearch
-      ) {
-        ExpoHead?.createActivity(cascadingActivity);
-        return () => {
-          if (cascadingActivity?.id) {
-            ExpoHead?.suspendActivity(cascadingActivity.id);
-          }
-        };
-      }
+    if (!cascadingActivity) {
+      return () => {};
     }
+    if (
+      !!previousActivity.current &&
+      deepObjectCompare(previousActivity.current, cascadingActivity)
+    ) {
+      return () => {};
+    }
+
+    previousActivity.current = cascadingActivity;
+
+    if (!cascadingActivity.id) {
+      throw new Error("Activity must have an ID");
+    }
+
+    // If no features are enabled, then skip registering the activity
+    if (
+      cascadingActivity.isEligibleForHandoff ||
+      cascadingActivity.isEligibleForSearch
+    ) {
+      ExpoHead?.createActivity(cascadingActivity);
+    }
+
     return () => {};
   }, [cascadingActivity]);
+
+  React.useEffect(() => {
+    return () => {
+      if (activityId) {
+        ExpoHead?.suspendActivity(activityId);
+      }
+    };
+  }, [activityId]);
 }
+
+function deepObjectCompare(a: any, b: any) {
+  if (typeof a !== typeof b) {
+    return false;
+  }
+  if (typeof a === "object") {
+    if (Array.isArray(a) !== Array.isArray(b)) {
+      return false;
+    }
+    if (Array.isArray(a)) {
+      if (a.length !== b.length) {
+        return false;
+      }
+      return a.every((item, index) => deepObjectCompare(item, b[index]));
+    }
+    // handle null
+    if (a === null || b === null) {
+      return a === b;
+    }
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+    if (aKeys.length !== bKeys.length) {
+      return false;
+    }
+    return aKeys.every((key) => deepObjectCompare(a[key], b[key]));
+  }
+  return a === b;
+}
+
 HeadNative.Provider = React.Fragment;
 
 function HeadShim(props: { children?: React.ReactNode }) {
   return null;
 }
+
 HeadShim.Provider = React.Fragment;
 
 // Native Head is only enabled in bare iOS apps.
