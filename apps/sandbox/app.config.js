@@ -21,6 +21,7 @@ module.exports = {
   },
   extra: {
     router: {
+      asyncRoutes: "development",
       headOrigin: origin,
       origin,
     },
