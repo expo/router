@@ -1,5 +1,9 @@
 process.env.EXPO_TUNNEL_SUBDOMAIN = "bacon-router-sandbox";
 
+const origin = process.env.NODE_ENV === "development"
+  ? `https://${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`
+  : "https://smart-symbiote.netlify.app",
+
 /** @type {import('expo/config').ExpoConfig} */
 module.exports = {
   name: "Everywhere",
@@ -16,12 +20,12 @@ module.exports = {
   },
   extra: {
     router: {
-      handoffOrigin: `https://${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
-      origin:
-        process.env.NODE_ENV !== "production"
-          ? `https://${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`
-          : "https://smart-symbiote.netlify.app/",
+      headOrigin: origin,
+      origin
     },
+  },
+  android: {
+    package: "app.expo.router.sandbox",
   },
   ios: {
     bundleIdentifier: "app.expo.router.sandbox",

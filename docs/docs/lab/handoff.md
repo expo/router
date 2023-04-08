@@ -69,7 +69,7 @@ module.exports = {
   extra: {
     router: {
       // highlight-next-line
-      handoffOrigin: `https://${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
+      headOrigin: `https://${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
     },
   },
 };
@@ -83,7 +83,7 @@ Now you must start the website BEFORE installing the app on your device, this is
 
 ## Usage
 
-In any route that you want to support handoff, you must use the `expo-router/head` component. This component will automatically set the `webpageUrl` to the current URL.
+In any route that you want to support handoff, you must use the `expo-router/head` component.
 
 ```tsx title=app/index.tsx
 import Head from "expo-router/head";
@@ -107,7 +107,8 @@ export default function App() {
 The `expo-router/head` component supports the following meta tags:
 
 - `expo:handoff` - Set to `true` to enable handoff for the current route. iOS-only. Defaults to `false`.
-- `og:url` - Set the URL that should be opened when the user switches to your app. Defaults to the current URL in-app with `extra.router.handoffOrigin` as the baseURL.
+- `expo:spotlight` - Set to `true` to enable spotlight search for the current route. iOS-only. Defaults to `false`.
+- `og:url` - Set the URL that should be opened when the user switches to your app. Defaults to the current URL in-app with `extra.router.headOrigin` as the baseURL. Passing a relative path will append the `headOrigin` to the path.
 - `og:title` and `<title>` - Set the title for the `NSUserActivity` this is unused with handoff.
 - `og:description` - Set the description for the `NSUserActivity` this is unused with handoff.
 

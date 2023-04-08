@@ -5,12 +5,13 @@ function getUrlFromConstants(): string | null {
   const manifest =
     Constants.expoConfig || Constants.manifest2 || Constants.manifest;
 
-  // @ts-expect-error
-  const origin = manifest?.extra?.router?.handoffOrigin;
+  const origin =
+    // @ts-expect-error
+    manifest?.extra?.router?.headOrigin ?? manifest?.extra?.router?.origin;
 
   if (!origin) {
     throwOrAlert(
-      'Expo Head: Add the handoff origin to the native manifest under "extra.router.handoffOrigin".'
+      'Expo Head: Add the handoff origin to the native manifest under "extra.router.headOrigin".'
     );
     // Fallback value that shouldn't be used for real.
     return "https://github.com";
