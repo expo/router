@@ -3,12 +3,15 @@ import React from "react";
 import { LocationProvider } from "./LocationProvider";
 import {
   DynamicConvention,
+  LoadedRoute,
   Route,
   RouteNode,
   sortRoutesWithInitial,
   useRouteNode,
 } from "./Route";
 import { Screen } from "./primitives";
+import { EmptyRoute } from "./views/EmptyRoute";
+import { SuspenseFallback } from "./views/SuspenseFallback";
 import { Try } from "./views/Try";
 
 export type ScreenProps<
@@ -103,6 +106,29 @@ export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
   );
 }
 
+function fromImport({ ErrorBoundary, ...component }: LoadedRoute) {
+  if (ErrorBoundary) {
+    return {
+      default: React.forwardRef((props: any, ref: any) => {
+        const children = React.createElement(component.default, {
+          ...props,
+          ref,
+        });
+        return <Try catch={ErrorBoundary}>{children}</Try>;
+      }),
+    };
+  }
+  return { default: component.default || EmptyRoute };
+}
+
+function fromLoadedRoute(res: LoadedRoute) {
+  if (!(res instanceof Promise)) {
+    return fromImport(res);
+  }
+
+  return res.then(fromImport);
+}
+
 // TODO: Maybe there's a more React-y way to do this?
 // Without this store, the process enters a recursive loop.
 const qualifiedStore = new WeakMap<RouteNode, React.ComponentType<any>>();
@@ -113,7 +139,48 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     return qualifiedStore.get(value)!;
   }
 
-  const { default: Component, ErrorBoundary } = value.loadRoute();
+  let getLoadable: (props: any, ref: any) => JSX.Element;
+
+  // TODO: This ensures sync doesn't use React.lazy, but it's not ideal.
+  if (process.env.EXPO_ROUTER_IMPORT_MODE === "sync") {
+    const SyncComponent = React.forwardRef((props, ref) => {
+      const res = value.loadRoute();
+      const Component = fromImport(res).default;
+      return <Component {...props} ref={ref} />;
+    });
+
+    getLoadable = (props: any, ref: any) => (
+      <SyncComponent
+        {...{
+          ...props,
+          ref,
+          // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
+          // the intention is to make it possible to deduce shared routes.
+          segment: value.route,
+        }}
+      />
+    );
+  } else {
+    const AsyncComponent = React.lazy(async () => {
+      const res = value.loadRoute();
+      return fromLoadedRoute(res) as Promise<{
+        default: React.ComponentType<any>;
+      }>;
+    });
+    getLoadable = (props: any, ref: any) => (
+      <React.Suspense fallback={<SuspenseFallback route={value} />}>
+        <AsyncComponent
+          {...{
+            ...props,
+            ref,
+            // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
+            // the intention is to make it possible to deduce shared routes.
+            segment: value.route,
+          }}
+        />
+      </React.Suspense>
+    );
+  }
 
   const QualifiedRoute = React.forwardRef(
     (
@@ -128,32 +195,18 @@ export function getQualifiedRouteComponent(value: RouteNode) {
       }: any,
       ref: any
     ) => {
-      const children = React.createElement(Component, {
-        ...props,
-        ref,
-        // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
-        // the intention is to make it possible to deduce shared routes.
-        segment: value.route,
-      });
-
-      const errorBoundary = React.useMemo(() => {
-        if (ErrorBoundary) {
-          return <Try catch={ErrorBoundary}>{children}</Try>;
-        }
-        return children;
-      }, [ErrorBoundary, children]);
+      const loadable = getLoadable(props, ref);
 
       return (
         <LocationProvider>
-          <Route node={value}>{errorBoundary}</Route>
+          <Route node={value}>{loadable}</Route>
         </LocationProvider>
       );
     }
   );
 
-  QualifiedRoute.displayName = `Route(${
-    Component.displayName || Component.name || value.route
-  })`;
+  QualifiedRoute.displayName = `Route(${value.route})`;
+
   qualifiedStore.set(value, QualifiedRoute);
   return QualifiedRoute;
 }

@@ -84,7 +84,7 @@ export default function Root() {
 }
 ```
 
-Now we can create our `(auth)` group which is protected, this screen can toggle the authentication using `signIn()`.
+Now we can create our `(auth)` group which is unprotected, this screen can toggle the authentication using `signIn()`.
 
 ```js title=app/(auth)/sign-in.js
 import { Text, View } from "react-native";

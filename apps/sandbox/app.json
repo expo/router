@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Router Demo",
-    "slug": "expo-router",
-    "scheme": "bacontext",
+    "name": "Router Sandbox",
+    "slug": "expo-router-sandbox",
+    "scheme": "sandbox",
     "splash": {
       "image": "./splash.png",
       "backgroundColor": "#1c2026"
@@ -12,7 +12,7 @@
     },
     "extra": {
       "router": {
-        "asyncRoutes": false,
+        "asyncRoutes": "development",
         "origin": "https://smart-symbiote.netlify.app/"
       }
     }

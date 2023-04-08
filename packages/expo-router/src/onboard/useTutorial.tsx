@@ -1,10 +1,10 @@
-import React, { useMemo } from "react";
+import { useMemo, ComponentType } from "react";
 
 import { RequireContext } from "../types";
 
 function isFunctionOrReactComponent(
   Component: any
-): Component is React.ComponentType {
+): Component is ComponentType {
   return (
     !!Component &&
     (typeof Component === "function" ||
@@ -23,14 +23,18 @@ export function useTutorial(context: RequireContext) {
   const keys = useMemo(() => context.keys(), [context]);
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const hasAnyValidComponent = useMemo(() => {
-    for (const key of keys) {
-      // NOTE(EvanBacon): This should only ever occur in development as it breaks lazily loading.
-      const component = context(key)?.default;
-      if (isFunctionOrReactComponent(component)) {
-        return true;
+    if (process.env.EXPO_ROUTER_IMPORT_MODE === "sync") {
+      for (const key of keys) {
+        // NOTE(EvanBacon): This should only ever occur in development as it breaks lazily loading.
+        const component = context(key)?.default;
+        if (isFunctionOrReactComponent(component)) {
+          return true;
+        }
       }
+      return false;
     }
-    return false;
+    return !!context.keys().length;
+    // return false;
   }, [keys]);
 
   if (hasAnyValidComponent) {
