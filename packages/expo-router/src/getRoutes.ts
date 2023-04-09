@@ -6,6 +6,7 @@ import {
   matchGroupName,
   removeSupportedExtensions,
   stripGroupSegmentsFromPath,
+  stripInvisibleSegmentsFromPath,
 } from "./matchers";
 import type { RequireContext } from "./types";
 
@@ -474,7 +475,9 @@ export function getUserDefinedDeepDynamicRoute(
 ): RouteNode | null {
   // Auto add not found route if it doesn't exist
   for (const route of routes.children ?? []) {
-    const isDeepDynamic = matchDeepDynamicRouteName(route.route);
+    if (route.generated) continue;
+    const opaqueRoute = stripInvisibleSegmentsFromPath(route.route);
+    const isDeepDynamic = matchDeepDynamicRouteName(opaqueRoute);
     if (isDeepDynamic) {
       return route;
     }

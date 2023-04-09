@@ -50,3 +50,7 @@ export function stripGroupSegmentsFromPath(path: string): string {
     }, [] as string[])
     .join("/");
 }
+
+export function stripInvisibleSegmentsFromPath(path: string): string {
+  return stripGroupSegmentsFromPath(path).replace(/\/?index$/, "");
+}
