@@ -27,6 +27,18 @@ describe(getNormalizedStatePath, () => {
       },
     });
   });
+
+  it(`should not throw an error when path contains a % sign`, () => {
+    expect(
+      getNormalizedStatePath({
+        path: "/foo/100%%20bar",
+        params: {},
+      })
+    ).toEqual({
+      segments: ["foo", "100% bar"],
+      params: {},
+    });
+  });
 });
 
 describe(compareUrlSearchParams, () => {
