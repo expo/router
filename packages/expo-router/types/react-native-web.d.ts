@@ -6,9 +6,9 @@ declare module "react-native" {
   /**
    * View
    */
-  export type ViewProps = RN.ViewProps & {
+  export interface ViewProps extends RN.ViewProps {
     className?: string;
-  };
+  }
 
   type CommonWebStyle = {
     /** @platform web */
@@ -119,12 +119,12 @@ declare module "react-native" {
     position?: "static" | "relative" | "absolute" | "fixed" | "sticky";
   };
 
-  export type ViewStyle = Omit<RN.ViewStyle, "position"> & CommonWebStyle;
+  export interface ViewStyle extends RN.ViewStyle, CommonWebStyle {}
 
   /**
    * Text
    */
-  export type TextProps = Omit<RN.TextProps, "style" | "accessibilityRole"> & {
+  export interface TextProps extends RN.TextProps {
     className?: string;
     style?: RN.StyleProp<TextStyle>;
     /** @platform web */
@@ -133,28 +133,24 @@ declare module "react-native" {
     accessibilityLevel?: number;
     /** @platform web */
     lang?: string;
-  };
+  }
 
-  export type TextStyle = Omit<
-    RN.TextStyle,
-    "position" | "fontSize" | "lineHeight"
-  > &
-    CommonWebStyle & {
-      /** @platform web */
-      fontFeatureSettings?: string;
-      /** @platform web */
-      textIndent?: string;
-      /** @platform web */
-      textOverflow?: string;
-      /** @platform web */
-      textRendering?: string;
-      /** @platform web */
-      textTransform?: string;
-      /** @platform web */
-      unicodeBidi?: string;
-      /** @platform web */
-      wordWrap?: string;
-    };
+  export interface TextStyle extends RN.TextStyle, CommonWebStyle {
+    /** @platform web */
+    fontFeatureSettings?: string;
+    /** @platform web */
+    textIndent?: string;
+    /** @platform web */
+    textOverflow?: string;
+    /** @platform web */
+    textRendering?: string;
+    /** @platform web */
+    textTransform?: string;
+    /** @platform web */
+    unicodeBidi?: string;
+    /** @platform web */
+    wordWrap?: string;
+  }
 
   /**
    * Pressable

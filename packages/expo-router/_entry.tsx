@@ -1,4 +1,4 @@
-/// <reference path="metro-require.d.ts" />
+/// <reference types="./index" />
 
 import "@expo/metro-runtime";
 
