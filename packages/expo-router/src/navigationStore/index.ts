@@ -1,6 +1,7 @@
 import {
   LinkingOptions,
   NavigationState,
+  ParamListBase,
   PartialState,
   createNavigationContainerRef,
   useRoute,
@@ -93,7 +94,7 @@ export class NavigationStore {
 
     const newRouteInfo = getRouteInfoFromState(
       getPathDataFromStateWithLinking,
-      this.initialRootState!
+      (this.rootState ?? this.initialRootState)!
     );
 
     if (!this.routeInfo) {
@@ -102,7 +103,7 @@ export class NavigationStore {
       this.routeInfo = newRouteInfo;
     }
 
-    if (this.routeInfo !== newRouteInfo) {
+    if (this.routeInfo === newRouteInfo) {
       this.notifiySubscribers("routeInfo");
     }
   };
@@ -162,6 +163,19 @@ export function useNavigationStore(context: RequireContext) {
 
 export function useRootNavigation() {
   return navigationRef;
+}
+
+export function useLinkingContext() {
+  const navigationStore = React.useContext(NavigationStoreContext);
+  const [, update] = React.useReducer((acc) => acc + 1, 0);
+
+  React.useEffect(() => navigationStore.subscribeRootState(update), []);
+
+  return navigationStore.linking as Required<
+    Omit<LinkingOptions<ParamListBase>, "filter" | "enabled">
+  > & {
+    getPathFromState: typeof getPathFromState;
+  };
 }
 
 export function useRootNavigationState() {
