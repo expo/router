@@ -32,12 +32,15 @@ export function compareRouteInfo(a: UrlObject, b: UrlObject) {
   );
 }
 
-function compareUrlSearchParams(a: SearchParams, b: SearchParams): boolean {
+export function compareUrlSearchParams(
+  a: SearchParams,
+  b: SearchParams
+): boolean {
   return deepEqual(a, b);
 }
 
 // TODO: Split up getPathFromState to return all this info at once.
-function getNormalizedStatePath({
+export function getNormalizedStatePath({
   path: statePath,
   params,
 }: {
