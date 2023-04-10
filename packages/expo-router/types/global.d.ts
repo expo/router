@@ -1,5 +1,4 @@
 /// <reference types="node" />
-//
 
 // Extend the NodeJS namespace
 declare namespace NodeJS {

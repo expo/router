@@ -33,6 +33,7 @@ it(
     await execa("npx", [bin, "export", "-p", "web"], {
       cwd: projectRoot,
       env: {
+        NODE_ENV: "production",
         EXPO_USE_STATIC: "1",
         E2E_ROUTER_SRC: "custom-html",
         E2E_ROUTER_ASYNC: "development",
@@ -99,6 +100,7 @@ it(
     await execa("npx", [bin, "export", "-p", "web"], {
       cwd: projectRoot,
       env: {
+        NODE_ENV: "production",
         EXPO_USE_STATIC: "1",
         E2E_ROUTER_SRC: "static-head",
       },
@@ -158,6 +160,7 @@ it(
     await execa("npx", [bin, "export", "-p", "web"], {
       cwd: projectRoot,
       env: {
+        NODE_ENV: "production",
         EXPO_USE_STATIC: "1",
         E2E_ROUTER_SRC: "static-params",
       },
@@ -201,6 +204,7 @@ it(
     await execa("npx", [bin, "export", "-p", "ios"], {
       cwd: projectRoot,
       env: {
+        NODE_ENV: "production",
         EXPO_USE_STATIC: "1",
         E2E_ROUTER_SRC: "relative-fetch",
       },
@@ -242,6 +246,7 @@ it(
     await execa("npx", [bin, "export"], {
       cwd: projectRoot,
       env: {
+        NODE_ENV: "production",
         EXPO_USE_STATIC: "1",
         E2E_ROUTER_SRC: "global-css",
       },
