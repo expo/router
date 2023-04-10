@@ -361,7 +361,7 @@ export function getRoutes(
     return null;
   }
 
-  // appendSitemapRoute(route);
+  appendSitemapRoute(route);
 
   // Auto add not found route if it doesn't exist
   appendUnmatchedRoute(route);
