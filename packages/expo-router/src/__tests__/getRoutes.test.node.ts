@@ -1,10 +1,11 @@
 import { RouteNode } from "../Route";
 import {
+  assertDuplicateRoutes,
+  FileNode,
+  getExactRoutes,
+  getRecursiveTree,
   getRoutes,
   getUserDefinedDeepDynamicRoute,
-  getRecursiveTree,
-  FileNode,
-  assertDuplicateRoutes,
 } from "../getRoutes";
 import { RequireContext } from "../types";
 
@@ -18,6 +19,13 @@ function createMockContextModule(
   });
 
   return contextModule as unknown as RequireContext;
+}
+
+function dropFunctions({ loadRoute, ...node }: RouteNode) {
+  return {
+    ...node,
+    children: node.children.map(dropFunctions),
+  };
 }
 
 const ROUTE_404 = {
@@ -154,6 +162,33 @@ describe(getRecursiveTree, () => {
 });
 
 describe(getUserDefinedDeepDynamicRoute, () => {
+  it(`should match top-level deep dynamic with nested index`, () => {
+    [
+      "./[...else].tsx",
+      "./(group)/[...else].tsx",
+      "./(group)/[...else]/(group).tsx",
+      "./(group)/[...else]/(group)/index.tsx",
+      "./[...else]/index.tsx",
+      "./[...else]/(group)/index.tsx",
+      "./(group1)/[...else]/(group2)/index.tsx",
+      "./(group1)/[...else]/(group2)/(group3)/index.tsx",
+    ].forEach((name) => {
+      expect(
+        getUserDefinedDeepDynamicRoute(
+          getRoutes(
+            createMockContextModule({
+              [name]: { default() {} },
+            })
+          )!
+        )
+      ).toEqual(
+        expect.objectContaining({
+          contextKey: name,
+        })
+      );
+    });
+  });
+
   it(`should return a basic deep dynamic route`, () => {
     const routes = asRouteNode({
       children: [
@@ -229,6 +264,35 @@ describe(getUserDefinedDeepDynamicRoute, () => {
         })
       )
     ).toEqual(null);
+  });
+});
+
+describe(getExactRoutes, () => {
+  // NOTE(EvanBacon): This tests when all you have is a root layout.
+  it(`automatically blocks +html file`, () => {
+    expect(
+      dropFunctions(
+        getExactRoutes(
+          createMockContextModule({
+            "./+html.js": { default() {} },
+            "./other/+html.js": { default() {} },
+            "./_layout.tsx": { default() {} },
+          })
+        )!
+      )
+    ).toEqual({
+      children: [
+        {
+          children: [],
+          contextKey: "./other/+html.js",
+          dynamic: null,
+          route: "other/+html",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      route: "",
+    });
   });
 });
 
@@ -331,13 +395,6 @@ describe(getRoutes, () => {
       })
     );
   });
-
-  function dropFunctions({ loadRoute, ...node }: RouteNode) {
-    return {
-      ...node,
-      children: node.children.map(dropFunctions),
-    };
-  }
 
   it(`should convert a complex context module routes`, () => {
     expect(

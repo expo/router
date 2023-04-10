@@ -15,11 +15,19 @@ describe(extractExpoPathFromURL, () => {
   ] as const) {
     describe(name, () => {
       test.each<string>([
+        "scheme://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081%2Fexample%2Fpath",
+        "scheme://expo-development-client/?url=http://acme.com/foo/bar?query=param",
+        "scheme://expo-development-client/?url=acme://foo/bar?query=param&query2=param2",
+        "app.bacon.expo://expo-development-client",
         "exp://127.0.0.1:19000/",
         "exp://127.0.0.1:19000/--/test/path?query=param",
         "exp://127.0.0.1:19000/--/test/path?shouldBeEscaped=x%252By%2540xxx.com",
         "exp://127.0.0.1:19000/x?y=x%252By%2540xxx.com",
         "exp://127.0.0.1:19000?query=param",
+        "exp://u.expo.dev/update/123abc",
+        "exp://u.expo.dev/update/123abc/--/test/path?query=param",
+        "exp://u.expo.dev/update/123abc/efg",
+        "exp://exp.host/@test/test",
         "exp://exp.host/@test/test/--/test/path?query=param",
         "exp://exp.host/@test/test/--/test/path",
         "exp://exp.host/@test/test/--/test/path/--/foobar",
