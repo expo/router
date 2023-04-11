@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { ServerContainer, ServerContainerRef } from "@react-navigation/native";
 import App, { getManifest } from "expo-router/_entry";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
@@ -18,6 +19,8 @@ AppRegistry.registerComponent("App", () => App);
 
 export function getStaticContent(location: URL): string {
   const headContext: { helmet?: any } = {};
+
+  const ref = React.createRef<ServerContainerRef>();
 
   const {
     // Skipping the `element` that's returned to ensure the HTML
@@ -45,9 +48,11 @@ export function getStaticContent(location: URL): string {
 
   const html = ReactDOMServer.renderToString(
     <Head.Provider context={headContext}>
-      <NavigationStoreContext.Provider value={new NavigationStore(location)}>
-        {out}
-      </NavigationStoreContext.Provider>
+      <ServerContainer ref={ref} location={location}>
+        <NavigationStoreContext.Provider value={new NavigationStore(location)}>
+          {out}
+        </NavigationStoreContext.Provider>
+      </ServerContainer>
     </Head.Provider>
   );
 
