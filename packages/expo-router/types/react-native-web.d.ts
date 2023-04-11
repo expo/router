@@ -1,19 +1,16 @@
 declare module "react-native" {
   export * from "react-native/types";
 
-  import {
-    PressableProps as RNPressableProps,
-    StyleProp,
-    TextProps as RNTextProps,
-    TextStyle as RNTextStyle,
-    View,
-    ViewStyle as RNViewStyle,
-  } from "react-native/types";
+  import * as RN from "react-native/types";
 
   /**
    * View
    */
-  export type ViewStyle = Omit<RNViewStyle, "position"> & {
+  export interface ViewProps extends RN.ViewProps {
+    className?: string;
+  }
+
+  type CommonWebStyle = {
     /** @platform web */
     backdropFilter?: string;
     /** @platform web */
@@ -122,39 +119,38 @@ declare module "react-native" {
     position?: "static" | "relative" | "absolute" | "fixed" | "sticky";
   };
 
+  export interface ViewStyle extends RN.ViewStyle, CommonWebStyle {}
+
   /**
    * Text
    */
-  export type TextStyle = Omit<
-    RNTextStyle,
-    "position" | "fontSize" | "lineHeight"
-  > &
-    ViewStyle & {
-      /** @platform web */
-      fontFeatureSettings?: string;
-      /** @platform web */
-      textIndent?: string;
-      /** @platform web */
-      textOverflow?: string;
-      /** @platform web */
-      textRendering?: string;
-      /** @platform web */
-      textTransform?: string;
-      /** @platform web */
-      unicodeBidi?: string;
-      /** @platform web */
-      wordWrap?: string;
-    };
-
-  export type TextProps = Omit<RNTextProps, "style" | "accessibilityRole"> & {
-    style?: StyleProp<TextStyle>;
+  export interface TextProps extends RN.TextProps {
+    className?: string;
+    style?: RN.StyleProp<TextStyle>;
     /** @platform web */
     tabIndex?: number;
     /** @platform web */
     accessibilityLevel?: number;
     /** @platform web */
     lang?: string;
-  };
+  }
+
+  export interface TextStyle extends RN.TextStyle, CommonWebStyle {
+    /** @platform web */
+    fontFeatureSettings?: string;
+    /** @platform web */
+    textIndent?: string;
+    /** @platform web */
+    textOverflow?: string;
+    /** @platform web */
+    textRendering?: string;
+    /** @platform web */
+    textTransform?: string;
+    /** @platform web */
+    unicodeBidi?: string;
+    /** @platform web */
+    wordWrap?: string;
+  }
 
   /**
    * Pressable
@@ -163,17 +159,38 @@ declare module "react-native" {
     readonly pressed: boolean;
   }
 
-  export interface PressableProps extends Omit<RNPressableProps, "style"> {
+  export interface PressableProps extends Omit<RN.PressableProps, "style"> {
     children?:
       | React.ReactNode
       | ((state: PressableStateCallbackType) => React.ReactNode)
       | undefined;
     style?:
-      | StyleProp<ViewStyle>
-      | ((state: PressableStateCallbackType) => StyleProp<ViewStyle>);
+      | RN.StyleProp<ViewStyle>
+      | ((state: PressableStateCallbackType) => RN.StyleProp<ViewStyle>);
   }
 
   export const Pressable: React.ForwardRefExoticComponent<
-    PressableProps & React.RefAttributes<View>
+    PressableProps & React.RefAttributes<RN.View>
   >;
+
+  export interface FlatListProps<ItemT> extends RN.VirtualizedListProps<ItemT> {
+    className?: string;
+  }
+
+  export interface ImagePropsBase extends RN.ImagePropsBase {
+    className?: string;
+  }
+
+  export interface SwitchProps extends RN.SwitchProps {
+    className?: string;
+  }
+
+  export interface InputAccessoryViewProps extends RN.InputAccessoryViewProps {
+    className?: string;
+  }
+
+  export interface TouchableWithoutFeedbackProps
+    extends RN.TouchableWithoutFeedbackProps {
+    className?: string;
+  }
 }
