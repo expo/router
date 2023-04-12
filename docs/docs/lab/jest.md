@@ -1,18 +1,20 @@
 ---
 title: Testing with Jest
+# TODO
+sidebar_class_name: hidden
 ---
 
 > This guide refers to upcoming Expo Router features, all of which are experimental.
 
-Expo Router adds first-class support for testing with `@testing-library/react-native`
+Expo Router adds first-class support for testing with [`Jest`](https://jestjs.io/)
 
 ## Setup
 
-`yarn add -D @testing-library/react-native` or `npm install --save-dev @testing-library/react-native`
+`yarn add -D jest @testing-library/react-native` or `npm install --save-dev jest @testing-library/react-native`
 
 :::tip
 
-`jest-expo` is not required, but highly recommended.
+We recommend using the `jest-expo` preset to quickly configure Jest for React Native
 
 ```tsx
 // jest.config.js
@@ -28,7 +30,7 @@ module.exports = {
 
 ```tsx
 // my-component.test.ts
-import { screen } from "expo-router/testing-library";
+import { screen, renderRouter } from "expo-router/testing-library";
 
 test("render the application", async () => {
   renderRouter();
