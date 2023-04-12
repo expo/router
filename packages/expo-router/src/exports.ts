@@ -7,7 +7,9 @@ export {
   useLocalSearchParams,
   useSearchParams,
   useSegments,
-} from "./LocationProvider";
+  useRootNavigation,
+  useRootNavigationState,
+} from "./navigationStore";
 export { Link, Redirect } from "./link/Link";
 
 export { withLayoutContext } from "./layouts/withLayoutContext";
@@ -24,5 +26,4 @@ export { SplashScreen } from "./views/Splash";
 
 // React Navigation
 export { useNavigation } from "./useNavigation";
-export { useRootNavigation, useRootNavigationState } from "./useRootNavigation";
 export { useFocusEffect } from "./useFocusEffect";

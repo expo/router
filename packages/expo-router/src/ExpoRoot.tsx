@@ -2,14 +2,9 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { NavigationContainer } from "./NavigationContainer";
-import { useTutorial } from "./onboard/useTutorial";
+import UpstreamNavigationContainer from "./fork/NavigationContainer";
+import { useNavigationStore } from "./navigationStore";
 import { RequireContext } from "./types";
-import { InitialRootStateProvider } from "./useInitialRootStateContext";
-import {
-  RootRouteNodeProvider,
-  useRootRouteNodeContext,
-} from "./useRootRouteNodeContext";
 import { getQualifiedRouteComponent } from "./useScreens";
 import { SplashScreen } from "./views/Splash";
 
@@ -49,27 +44,33 @@ export function ExpoRoot({ context }: { context: RequireContext }) {
 }
 
 function ContextNavigator({ context }: { context: RequireContext }) {
-  if (process.env.NODE_ENV !== "production") {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const Tutorial = useTutorial(context);
-    if (Tutorial) {
-      SplashScreen.hideAsync();
-      return <Tutorial />;
-    }
+  const {
+    shouldShowTutorial,
+    shouldShowSplash,
+    linking,
+    navigationRef,
+    onReady,
+    routeNode,
+  } = useNavigationStore(context);
+
+  if (shouldShowTutorial) {
+    const Tutorial = require("./onboard/Tutorial").Tutorial;
+    SplashScreen.hideAsync();
+    return <Tutorial />;
   }
 
-  return (
-    <RootRouteNodeProvider context={context}>
-      <NavigationContainer>
-        <InitialRootStateProvider>
-          <RootRoute />
-        </InitialRootStateProvider>
-      </NavigationContainer>
-    </RootRouteNodeProvider>
-  );
-}
+  const Component = getQualifiedRouteComponent(routeNode);
 
-function RootRoute() {
-  const Component = getQualifiedRouteComponent(useRootRouteNodeContext());
-  return <Component />;
+  return (
+    <>
+      {shouldShowSplash && <SplashScreen />}
+      <UpstreamNavigationContainer
+        linking={linking}
+        ref={navigationRef}
+        onReady={onReady}
+      >
+        <Component />
+      </UpstreamNavigationContainer>
+    </>
+  );
 }
