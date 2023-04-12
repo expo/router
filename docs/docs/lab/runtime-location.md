@@ -2,7 +2,7 @@
 title: window.location
 ---
 
-> This guide refers to upcoming Expo Router features, all of which are experimental.
+> This guide refers to upcoming Expo Router features, all of which are experimental. You may need to [use Expo CLI on `main`](https://github.com/expo/expo/tree/main/packages/%40expo/cli#contributing) to use these features.
 
 To support relative invocations that work both on the web and in native, across development and production, Expo Router polyfills the `window.location` API when needed. This can be used to access the current URL.
 

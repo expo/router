@@ -2,7 +2,7 @@
 title: Styling
 ---
 
-> This guide refers to upcoming Expo Router features, all of which are experimental.
+> This guide refers to upcoming Expo Router features, all of which are experimental. You may need to [use Expo CLI on `main`](https://github.com/expo/expo/tree/main/packages/%40expo/cli#contributing) to use these features.
 
 Expo Router adds first-class support for a number of CSS features which can be leveraged to create more optimized web experiences.
 

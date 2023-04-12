@@ -4,7 +4,7 @@ title: Bundle Splitting
 sidebar_class_name: hidden
 ---
 
-> This guide refers to upcoming Expo Router features, all of which are experimental. You may need to use [Expo CLI on main](https://github.com/expo/expo/blob/main/packages/%40expo/cli/README.md#contributing) to enable this feature.
+> This guide refers to upcoming Expo Router features, all of which are experimental. You may need to [use Expo CLI on `main`](https://github.com/expo/expo/tree/main/packages/%40expo/cli#contributing) to use these features.
 
 Unlike standard projects, Expo Router can automatically split your JavaScript bundle based on the route files, using [React Suspense](https://react.dev/reference/react/Suspense). This enables faster development as only the routes you navigate to will be bundled/loaded into memory. This can also be useful for reducing the initial bundle size for your application.
 
