@@ -8,6 +8,8 @@
 
 import * as React from "react";
 
+import NativeLogBox from "../modules/NativeLogBox";
+import parseErrorStack from "../modules/parseErrorStack";
 import { LogBoxLog, StackType } from "./LogBoxLog";
 import type { LogLevel } from "./LogBoxLog";
 import { LogContext } from "./LogContext";
@@ -18,8 +20,6 @@ import type {
   ComponentStack,
   ExtendedExceptionData,
 } from "./parseLogBoxLog";
-import NativeLogBox from "../modules/NativeLogBox";
-import parseErrorStack from "../modules/parseErrorStack";
 
 export type LogBoxLogs = Set<LogBoxLog>;
 
