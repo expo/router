@@ -15,17 +15,16 @@ export function useLogs() {
   const logs = React.useContext(LogContext);
   if (!logs) {
     if (Platform.OS === "web" && typeof window !== "undefined") {
-      const raw = JSON.parse(
-        document.getElementById("_expo-static-error").textContent
-      );
-      return {
-        ...raw,
-        logs: raw.logs.map((raw) => {
-          const log = new LogBoxLog(raw);
-          log.symbolicate("stack");
-          return log;
-        }),
-      };
+      // Logbox data that is pre-fetched on the dev server and rendered here.
+      const expoCliStaticErrorElement =
+        document.getElementById("_expo-static-error");
+      if (expoCliStaticErrorElement?.textContent) {
+        const raw = JSON.parse(expoCliStaticErrorElement.textContent);
+        return {
+          ...raw,
+          logs: raw.logs.map((raw: any) => new LogBoxLog(raw)),
+        };
+      }
     }
 
     throw new Error("useLogs must be used within a LogProvider");

@@ -107,7 +107,6 @@ export class LogBoxLog {
     const callbacks = this.callbacks.get(type);
     const status = this.symbolicated[type].status;
     if (callbacks) {
-      console.log("flushCallbacks()", this.symbolicated.stack.status);
       for (const callback of callbacks) {
         callback(status);
       }
