@@ -11,7 +11,11 @@ export const LogContext = React.createContext<{
   logs: LogBoxLog[];
 } | null>(null);
 
-export function useLogs() {
+export function useLogs(): {
+  selectedLogIndex: number;
+  isDisabled: boolean;
+  logs: LogBoxLog[];
+} {
   const logs = React.useContext(LogContext);
   if (!logs) {
     if (Platform.OS === "web" && typeof window !== "undefined") {

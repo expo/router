@@ -12,7 +12,9 @@ import { StackFrame } from "stacktrace-parser";
 import { LogBoxButton } from "../UI/LogBoxButton";
 import * as LogBoxStyle from "../UI/LogBoxStyle";
 import { CODE_FONT } from "../UI/constants";
-import { formatProjectFileName } from "../formatProjectFilePath";
+import { getStackFormattedLocation } from "../formatProjectFilePath";
+
+declare const process: any;
 
 type Props = {
   frame: StackFrame & { collapse?: boolean };
@@ -21,14 +23,10 @@ type Props = {
 
 export function LogBoxInspectorStackFrame(props: Props) {
   const { frame, onPress } = props;
-  const column = frame.column != null && parseInt(String(frame.column), 10);
-  const location =
-    formatProjectFileName(frame.file) +
-    (frame.lineNumber != null
-      ? ":" +
-        frame.lineNumber +
-        (column && !isNaN(column) ? ":" + (column + 1) : "")
-      : "");
+  const location = getStackFormattedLocation(
+    process.env.EXPO_PROJECT_ROOT,
+    frame
+  );
   return (
     <View style={styles.frameContainer}>
       <LogBoxButton

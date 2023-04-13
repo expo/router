@@ -6,13 +6,15 @@
   "homepage": "https://github.com/expo/router/tree/main/packages/expo-metro-runtime",
   "files": [
     "build",
+    "symbolicate",
     "async-require.js",
     "async-require.d.ts",
     "error-overlay.js",
     "error-overlay.d.ts",
     "transformer.js",
     "transformer.d.ts",
-    "assets"
+    "assets",
+    "!**/__tests__"
   ],
   "scripts": {
     "build": "expo-module build",

@@ -13,9 +13,11 @@ import { Ansi } from "../UI/AnsiHighlight";
 import { LogBoxButton } from "../UI/LogBoxButton";
 import * as LogBoxStyle from "../UI/LogBoxStyle";
 import { CODE_FONT } from "../UI/constants";
-import { formatProjectFileName } from "../formatProjectFilePath";
+import { formatProjectFilePath } from "../formatProjectFilePath";
 import openFileInEditor from "../modules/openFileInEditor";
 import { LogBoxInspectorSection } from "./LogBoxInspectorSection";
+
+declare const process: any;
 
 export function LogBoxInspectorCodeFrame({
   codeFrame,
@@ -27,7 +29,10 @@ export function LogBoxInspectorCodeFrame({
   }
 
   function getFileName() {
-    return formatProjectFileName(codeFrame?.fileName);
+    return formatProjectFilePath(
+      process.env.EXPO_PROJECT_ROOT,
+      codeFrame?.fileName
+    );
   }
 
   function getLocation() {
