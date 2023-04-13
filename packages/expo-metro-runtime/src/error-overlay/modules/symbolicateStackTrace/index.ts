@@ -26,7 +26,11 @@ export type SymbolicatedStackTrace = {
 async function symbolicateStackTrace(
   stack: StackFrame[]
 ): Promise<SymbolicatedStackTrace> {
-  const baseUrl = window.location.protocol + "//" + window.location.host;
+  const baseUrl =
+    typeof window === "undefined"
+      ? process.env.EXPO_DEV_SERVER_ORIGIN
+      : window.location.protocol + "//" + window.location.host;
+
   const response = await fetch(baseUrl + "/symbolicate", {
     method: "POST",
     body: JSON.stringify({ stack }),

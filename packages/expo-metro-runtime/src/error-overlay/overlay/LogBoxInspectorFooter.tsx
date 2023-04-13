@@ -19,7 +19,7 @@ type Props = {
 export function LogBoxInspectorFooter(props: Props) {
   const log = useSelectedLog();
 
-  if (log.level === "syntax") {
+  if (["static", "syntax"].includes(log.level)) {
     return (
       <View style={styles.root}>
         <View style={styles.button}>
