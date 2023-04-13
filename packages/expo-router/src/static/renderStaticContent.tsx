@@ -4,20 +4,17 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-import { ServerContainerRef } from "@react-navigation/native";
-// @ts-expect-error
-import ServerContainer from "@react-navigation/native/lib/commonjs/ServerContainer";
+
+import { ServerContainer, ServerContainerRef } from "@react-navigation/native";
 import App, { getManifest } from "expo-router/_entry";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 import { AppRegistry } from "react-native-web";
 
-import Head from "../head/Head";
 import { getRootComponent } from "./getRootComponent";
+import Head from "../head/Head";
+import { NavigationStore, NavigationStoreContext } from "../navigationStore";
 
-// We use the value from `main` in the `package.json` since this
-// should only be accessed from processes that are running in Node.js and
-// conform to using `mainFields: ['main']` in their bundler config.
 AppRegistry.registerComponent("App", () => App);
 
 export function getStaticContent(location: URL): string {
@@ -52,7 +49,9 @@ export function getStaticContent(location: URL): string {
   const html = ReactDOMServer.renderToString(
     <Head.Provider context={headContext}>
       <ServerContainer ref={ref} location={location}>
-        {out}
+        <NavigationStoreContext.Provider value={new NavigationStore(location)}>
+          {out}
+        </NavigationStoreContext.Provider>
       </ServerContainer>
     </Head.Provider>
   );
