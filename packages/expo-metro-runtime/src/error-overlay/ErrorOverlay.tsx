@@ -40,6 +40,7 @@ export function LogBoxInspectorContainer() {
     />
   );
 }
+
 export function LogBoxInspector({
   log,
   selectedLogIndex,
@@ -117,8 +118,22 @@ export function LogBoxInspector({
   );
 }
 
-function ErrorOverlayBody({ onRetry }: { onRetry: (type: StackType) => void }) {
+export function ErrorOverlayBody({
+  onRetry,
+}: {
+  onRetry: (type: StackType) => void;
+}) {
   const log = useSelectedLog();
+  return <ErrorOverlayBodyContents log={log} onRetry={onRetry} />;
+}
+
+export function ErrorOverlayBodyContents({
+  log,
+  onRetry,
+}: {
+  log: LogBoxLog;
+  onRetry: (type: StackType) => void;
+}) {
   const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
@@ -139,37 +154,27 @@ function ErrorOverlayBody({ onRetry }: { onRetry: (type: StackType) => void }) {
     />
   );
 
-  const content = (
-    <>
-      <LogBoxInspectorCodeFrame codeFrame={log.codeFrame} />
-      <LogBoxInspectorStackFrames
-        type="stack"
-        // eslint-disable-next-line react/jsx-no-bind
-        onRetry={onRetry.bind(onRetry, "stack")}
-      />
-      {!!log?.componentStack?.length && (
-        <LogBoxInspectorStackFrames
-          type="component"
-          // eslint-disable-next-line react/jsx-no-bind
-          onRetry={onRetry.bind(onRetry, "component")}
-        />
-      )}
-    </>
-  );
-
-  if (collapsed) {
-    return (
-      <>
-        {header}
-        <ScrollView style={styles.scrollBody}>{content}</ScrollView>
-      </>
-    );
-  }
   return (
-    <ScrollView style={styles.scrollBody}>
-      {header}
-      {content}
-    </ScrollView>
+    <>
+      {collapsed && header}
+      <ScrollView style={styles.scrollBody}>
+        {!collapsed && header}
+
+        <LogBoxInspectorCodeFrame codeFrame={log.codeFrame} />
+        <LogBoxInspectorStackFrames
+          type="stack"
+          // eslint-disable-next-line react/jsx-no-bind
+          onRetry={onRetry.bind(onRetry, "stack")}
+        />
+        {!!log?.componentStack?.length && (
+          <LogBoxInspectorStackFrames
+            type="component"
+            // eslint-disable-next-line react/jsx-no-bind
+            onRetry={onRetry.bind(onRetry, "component")}
+          />
+        )}
+      </ScrollView>
+    </>
   );
 }
 

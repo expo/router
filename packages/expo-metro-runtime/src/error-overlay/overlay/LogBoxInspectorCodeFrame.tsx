@@ -8,7 +8,6 @@
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { LogBoxInspectorSection } from "./LogBoxInspectorSection";
 import type { CodeFrame } from "../Data/parseLogBoxLog";
 import { Ansi } from "../UI/AnsiHighlight";
 import { LogBoxButton } from "../UI/LogBoxButton";
@@ -16,9 +15,13 @@ import * as LogBoxStyle from "../UI/LogBoxStyle";
 import { CODE_FONT } from "../UI/constants";
 import { formatProjectFileName } from "../formatProjectFilePath";
 import openFileInEditor from "../modules/openFileInEditor";
+import { LogBoxInspectorSection } from "./LogBoxInspectorSection";
 
-export function LogBoxInspectorCodeFrame(props: { codeFrame?: CodeFrame }) {
-  const codeFrame = props.codeFrame;
+export function LogBoxInspectorCodeFrame({
+  codeFrame,
+}: {
+  codeFrame?: CodeFrame;
+}) {
   if (codeFrame == null) {
     return null;
   }

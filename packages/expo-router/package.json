@@ -4,6 +4,7 @@
   "main": "src/index.tsx",
   "types": "build/index.d.ts",
   "files": [
+    "_error.js",
     "_entry.tsx",
     "_html-ctx.tsx",
     "assets",

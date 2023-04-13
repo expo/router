@@ -102,6 +102,9 @@ const styles = StyleSheet.create({
   syntax: {
     color: LogBoxStyle.getFatalColor(1),
   },
+  static: {
+    color: LogBoxStyle.getFatalColor(1),
+  },
   messageText: {
     color: LogBoxStyle.getTextColor(0.6),
   },
