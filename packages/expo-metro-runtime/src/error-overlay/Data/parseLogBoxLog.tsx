@@ -9,9 +9,9 @@
 // @ts-expect-error
 import UTFSequence from "react-native/Libraries/UTFSequence";
 
+import type { LogBoxLogData } from "./LogBoxLog";
 import parseErrorStack from "../modules/parseErrorStack";
 import stringifySafe from "../modules/stringifySafe";
-import type { LogBoxLogData } from "./LogBoxLog";
 type ExceptionData = any;
 
 const BABEL_TRANSFORM_ERROR_FORMAT =
