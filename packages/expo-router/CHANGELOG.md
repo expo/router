@@ -6,6 +6,21 @@
 
 ### 🎉 New features
 
+- refactor: consolidate providers into a central store ([#466](https://github.com/expo/router/issues/466))
+- feat: expo-env.d.ts ([#477](https://github.com/expo/router/issues/477))
+
+### 🐛 Bug fixes
+
+- fix: Convert react-native-web types to an ambient module ([#481](https://github.com/expo/router/issues/481))
+
+### 💡 Others
+
+## [Thu, 13 Apr 2023 21:13:59 -0500](https://github.com/expo/router/commit/8d8ece6dc5f73d824c0e3a7b44fb71b57ad24536)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
 ### 🐛 Bug fixes
 
 ### 💡 Others
