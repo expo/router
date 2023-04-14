@@ -1,6 +1,6 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require("expo/metro-config");
-const { build: twBuild } = require("tailwindcss/lib/cli/build");
+const { withTailwind } = require("@expo/styling/tailwind");
 const path = require("path");
 
 // Find the project and workspace directories
@@ -10,36 +10,9 @@ const workspaceRoot = path.resolve(projectRoot, "../..");
 
 const config = getDefaultConfig(__dirname);
 
-const inputPath = path.relative(__dirname, "./global.css");
-const outputPath = path.resolve(
-  __dirname,
-  "node_modules/.cache/expo/global.css"
+config.transformer.asyncRequireModulePath = require.resolve(
+  "@expo/metro-runtime/async-require"
 );
-
-const originalGetTransformOptions = config.transformer.getTransformOptions;
-
-config.transformer = {
-  ...config.transformer,
-  asyncRequireModulePath: require.resolve("@expo/metro-runtime/async-require"),
-  externallyManagedCss: {
-    [inputPath]: outputPath,
-  },
-  async getTransformOptions(entryPoints, options, getDependenciesOf) {
-    process.stdout.clearLine();
-    await twBuild({
-      "--input": inputPath,
-      "--output": outputPath,
-      "--watch": options.dev ? "always" : false,
-      "--poll": true,
-    });
-
-    return originalGetTransformOptions?.(
-      entryPoints,
-      options,
-      getDependenciesOf
-    );
-  },
-};
 
 config.server = {
   ...config.server,
@@ -64,6 +37,8 @@ config.resolver.nodeModulesPaths = [
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true;
 
+config.resolver.sourceExts = [...config.resolver.sourceExts, "css"];
+
 const { FileStore } = require("metro-cache");
 config.cacheStores = [
   // Ensure the cache isn't shared between projects
@@ -72,4 +47,4 @@ config.cacheStores = [
   new FileStore({ root: path.join(projectRoot, "node_modules/.cache/metro") }),
 ];
 
-module.exports = config;
+module.exports = withTailwind(config);

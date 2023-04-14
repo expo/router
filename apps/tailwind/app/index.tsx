@@ -1,33 +1,14 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 export default function Page() {
   return (
-    <View className="p-4" style={styles.container}>
-      <View style={styles.main}>
-        <Text style={styles.title}>Hello World</Text>
-        <Text style={styles.subtitle}>This is the first page of your app.</Text>
+    <View className="p-4 flex-1 items-center">
+      <View className="flex-1 max-w-4xl justify-center">
+        <Text className="text-orange-500 text-6xl font-bold">Hello World</Text>
+        <Text className="text-slate-700 text-4xl">
+          This is the first page of your app.
+        </Text>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-  },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-  },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-  },
-});
