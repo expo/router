@@ -1,10 +1,11 @@
 import {
-  Visitor,
   Declaration,
   transform as lightningcss,
   DeclarationBlock,
-  CustomAtRules,
   MediaQuery,
+  MediaRule,
+  SelectorList,
+  Rule,
 } from "lightningcss";
 
 import { parseDeclaration } from "./parseDeclaration";
@@ -26,9 +27,13 @@ export function cssToReactNativeRuntime(
   lightningcss({
     filename: "style.css", // This is ignored, but required
     code: Buffer.from(css),
-    visitor: getVisitor({
-      declarations,
-    }),
+    visitor: {
+      Rule(rule) {
+        extractRule(rule, { declarations });
+        // We have processed this rule, so now delete it from the AST
+        return [];
+      },
+    },
   });
 
   return {
@@ -36,58 +41,81 @@ export function cssToReactNativeRuntime(
   };
 }
 
-function getVisitor({ declarations }: GetVisitorOptions) {
-  let currentMediaQuery: MediaQuery | undefined;
+function extractRule(rule: Rule, { declarations }: GetVisitorOptions) {
+  switch (rule.type) {
+    case "media": {
+      extractedMedia(rule.value, declarations);
+      break;
+    }
+    case "style": {
+      if (rule.value.declarations) {
+        setStyleForSelectorList(
+          getExtractedStyle(rule.value.declarations),
+          rule.value.selectors,
+          declarations
+        );
+      }
+      break;
+    }
+  }
+}
 
-  const visitor: Visitor<CustomAtRules> = {
-    RuleExit(rule) {
-      if (rule.type === "style") {
-        let style = getExtractedStyle(rule.value.declarations);
+function setStyleForSelectorList(
+  style: ExtractedStyle,
+  selectorList: SelectorList,
+  declarations: GetVisitorOptions["declarations"]
+) {
+  for (const selectors of selectorList) {
+    for (const selector of selectors) {
+      if (selector.type === "class") {
+        const existing = declarations.get(selector.name);
 
-        if (currentMediaQuery) {
-          style = {
-            media: currentMediaQuery,
-            ...style,
-          };
+        if (Array.isArray(existing)) {
+          existing.push(style);
+        } else if (existing) {
+          declarations.set(selector.name, [existing, style]);
+        } else {
+          declarations.set(selector.name, style);
         }
-
-        /*
-         * Style rules can have multiple selectors, so we need to add a style for each selector
-         */
-        for (const selectors of rule.value.selectors) {
-          for (const selector of selectors) {
-            if (selector.type === "class") {
-              const existing = declarations.get(selector.name);
-
-              if (Array.isArray(existing)) {
-                existing.push(style);
-              } else if (existing) {
-                declarations.set(selector.name, [existing, style]);
-              } else {
-                declarations.set(selector.name, style);
-              }
-            }
-          }
-        }
       }
-    },
-    MediaQuery(mediaQuery) {
-      let isScreen = mediaQuery.mediaType !== "print";
+    }
+  }
+}
 
-      if (mediaQuery.qualifier === "not") {
-        isScreen = !isScreen;
-      }
+function extractedMedia(
+  mediaRule: MediaRule,
+  declarations: GetVisitorOptions["declarations"]
+) {
+  const media: MediaQuery[] = [];
 
-      if (isScreen) {
-        currentMediaQuery = mediaQuery;
-      }
-    },
-    MediaQueryExit() {
-      currentMediaQuery = undefined;
-    },
-  };
+  for (const mediaQuery of mediaRule.query.mediaQueries) {
+    let isScreen = mediaQuery.mediaType !== "print";
+    if (mediaQuery.qualifier === "not") {
+      isScreen = !isScreen;
+    }
 
-  return visitor;
+    if (isScreen) {
+      media.push(mediaQuery);
+    }
+  }
+
+  if (media.length === 0) {
+    return;
+  }
+
+  for (const rule of mediaRule.rules) {
+    if (rule.type === "style" && rule.value.declarations) {
+      const extractedStyle = getExtractedStyle(rule.value.declarations);
+
+      setStyleForSelectorList(
+        { ...extractedStyle, media },
+        rule.value.selectors,
+        declarations
+      );
+    }
+  }
+
+  return undefined;
 }
 
 function getExtractedStyle(

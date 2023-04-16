@@ -4,7 +4,10 @@ import { createSignal } from "./signals";
 import { StyleMeta, StyleProp } from "../../types";
 
 export const globalStyles = new Map<string, StyleProp>();
-export const styleMetaMap = new WeakMap<NonNullable<StyleProp>, StyleMeta>();
+export const styleMetaMap = new WeakMap<
+  NonNullable<StyleProp> | NonNullable<StyleProp>[],
+  StyleMeta
+>();
 
 export const rem = createRem(14);
 export const vw = viewportUnit("width", Dimensions);
@@ -23,6 +26,7 @@ function viewportUnit(key: "width" | "height", dimensions: Dimensions) {
 
   const get = () => signal.get() || 0;
   const reset = (dimensions: Dimensions) => {
+    signal.set(dimensions.get("window")[key] || 0);
     subscription.remove();
     subscription = dimensions.addEventListener("change", ({ window }) => {
       signal.set(window[key]);

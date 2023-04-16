@@ -41,7 +41,18 @@ export const StyleSheet = Object.assign({}, RNStyleSheet, parialStyleSheet);
 
 function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
   if (Array.isArray(styles)) {
-    return styles.map((s) => tagStyles(s));
+    let didTag = false;
+    const taggedStyles = styles.map((s) => {
+      const taggedStyle = tagStyles(s);
+      didTag ||= styleMetaMap.has(s.style);
+      return taggedStyle;
+    });
+
+    if (didTag) {
+      styleMetaMap.set(taggedStyles, {});
+    }
+
+    return taggedStyles;
   } else {
     const meta: StyleMeta = {};
     let hasMeta = false;
@@ -59,6 +70,11 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
       styles.variableProps.length > 0
     ) {
       meta.variableProps = new Set<string>(styles.variableProps);
+      hasMeta = true;
+    }
+
+    if (Array.isArray(styles.media) && styles.media.length > 0) {
+      meta.media = styles.media;
       hasMeta = true;
     }
 

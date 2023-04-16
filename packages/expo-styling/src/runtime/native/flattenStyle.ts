@@ -1,5 +1,6 @@
 import { rem, styleMetaMap, vh, vw } from "./globals";
 import { isRuntimeValue } from "./guards";
+import { testMediaQuery } from "./mediaQuery";
 import { Style, StyleMeta, StyleProp } from "../../types";
 
 export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
@@ -58,6 +59,12 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
     } else {
       // Skip already set keys
       if (key in flatStyle) continue;
+
+      // Skip failed media queries
+      if (styleMeta.media && !styleMeta.media.every(testMediaQuery)) {
+        continue;
+      }
+
       // Non runtime styles can be set directly
       if (!styleMeta.runtimeStyleProps?.has(key)) {
         (flatStyle as any)[key] = value;

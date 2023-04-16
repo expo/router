@@ -72,9 +72,10 @@ const DevOnlyCSSInteropWrapper = React.forwardRef(
 );
 
 const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
-  { __component: Component, __styleKeys, ...props }: CSSInteropWrapperProps,
+  { __component: Component, __styleKeys, ...$props }: CSSInteropWrapperProps,
   ref
 ) {
+  const { ...props } = $props;
   const [, rerender] = React.useReducer((acc) => acc + 1, 0);
 
   /* eslint-disable react-hooks/rules-of-hooks -- __styleKeys is consistent an immutable */
@@ -84,7 +85,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
      * is running will be subscribed to.
      */
     const computation = React.useMemo(
-      () => createComputation(() => flattenStyle(props[key])),
+      () => createComputation(() => flattenStyle($props[key])),
       [props[key]]
     );
     useEffect(() => computation.subscribe(rerender), [computation]);
@@ -118,9 +119,17 @@ function areStylesDynamic(style: any) {
     return false;
   }
 
-  if (Array.isArray(style)) {
-    return style.some(areStylesDynamic);
+  // Some array styles are pre-tagged
+  if (styleMetaMap.has(style)) {
+    return true;
   }
 
-  return styleMetaMap.has(style);
+  if (Array.isArray(style) && style.some(areStylesDynamic)) {
+    // If this wasn't tagged before, tag it now so we don't have to
+    // traget it again
+    styleMetaMap.set(style, {});
+    return true;
+  }
+
+  return false;
 }

@@ -33,13 +33,14 @@ export type ExtractedStyleValue =
 export type ExtractedStyle = {
   runtimeStyleProps: string[];
   variableProps: string[];
-  media?: MediaQuery;
+  media?: MediaQuery[];
   style: Record<string, ExtractedStyleValue>;
 };
 
 export type StyleMeta = {
   runtimeStyleProps?: Set<string>;
   variableProps?: Set<string>;
+  media?: MediaQuery[];
   variables?: Record<string, unknown>;
 };
 
