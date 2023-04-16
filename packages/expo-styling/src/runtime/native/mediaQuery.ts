@@ -5,17 +5,15 @@ import {
   MediaQuery,
 } from "lightningcss";
 
-import { vw } from "./globals";
+import { vh, vw } from "./globals";
 import { exhaustiveCheck } from "../../css-to-rn/utils";
 
+/**
+ * Test a media query against current conditions
+ */
 export function testMediaQuery(mediaQuery: MediaQuery) {
-  let conditionsPass = testCondition(mediaQuery.condition);
-
-  if (mediaQuery.qualifier === "not") {
-    conditionsPass = !conditionsPass;
-  }
-
-  return conditionsPass;
+  const conditionsPass = testCondition(mediaQuery.condition);
+  return mediaQuery.qualifier === "not" ? !conditionsPass : conditionsPass;
 }
 
 function testCondition(condition?: MediaCondition | null): boolean {
@@ -63,6 +61,12 @@ function testPlainFeature(name: string, featureValue: MediaFeatureValue) {
       return vw.get() >= value;
     case "max-width":
       return vw.get() <= value;
+    case "height":
+      return vh.get() === value;
+    case "min-height":
+      return vh.get() >= value;
+    case "max-height":
+      return vh.get() <= value;
     default:
       return false;
   }

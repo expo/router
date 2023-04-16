@@ -16,8 +16,8 @@ import {
   TokenOrValue,
 } from "lightningcss";
 
-import { RuntimeValue, TransformRecord } from "../types";
 import { exhaustiveCheck } from "./utils";
+import { RuntimeValue, TransformRecord } from "../types";
 
 type AddStyleProp = (
   property: string,
@@ -56,10 +56,10 @@ export function parseDeclaration(
     case "animation-play-state":
     case "animation-delay":
     case "animation-fill-mode":
-      addStyleProp(declaration.property, declaration.value);
+      // addStyleProp(declaration.property, declaration.value);
       break;
     case "animation":
-      addStyleProp(declaration.property, declaration.value);
+      // addStyleProp(declaration.property, declaration.value);
       break;
     case "font-size":
       addStyleProp(declaration.property, parseFontSize(declaration.value));
@@ -114,55 +114,6 @@ export function parseDeclaration(
       addStyleProp("paddingRigth", parseSize(declaration.value.right));
       addStyleProp("paddingBottom", parseSize(declaration.value.bottom));
       break;
-    case "transform": {
-      const transforms: TransformRecord = {};
-
-      for (const transform of declaration.value) {
-        switch (transform.type) {
-          case "perspective":
-            transforms[transform.type] = parseLength(transform.value) as number;
-            break;
-          case "translateX":
-          case "scaleX":
-            transforms[transform.type] = parseLength(transform.value) as number;
-            break;
-          case "translateY":
-          case "scaleY":
-            transforms[transform.type] = parseLength(transform.value) as number;
-            break;
-          case "rotate":
-          case "rotateX":
-          case "rotateY":
-          case "rotateZ":
-          case "skewX":
-          case "skewY":
-            transforms[transform.type] = parseAngle(transform.value);
-            break;
-          case "translate":
-            transforms.translateX = parseLength(transform.value[0]) as number;
-            transforms.translateY = parseLength(transform.value[1]) as number;
-            break;
-          case "scale":
-            transforms.scaleX = parseLength(transform.value[0]) as number;
-            transforms.scaleY = parseLength(transform.value[1]) as number;
-            break;
-          case "skew":
-            transforms.skewX = parseAngle(transform.value[0]);
-            transforms.skewY = parseAngle(transform.value[1]);
-            break;
-          case "translateZ":
-          case "translate3d":
-          case "scaleZ":
-          case "scale3d":
-          case "rotate3d":
-          case "matrix":
-          case "matrix3d":
-            break;
-        }
-      }
-
-      return addStyleProp(declaration.property, transforms);
-    }
     case "align-items":
       addStyleProp(declaration.property, parseAlignItems(declaration.value));
       break;
@@ -183,6 +134,25 @@ export function parseDeclaration(
     case "font-weight":
       addStyleProp(declaration.property, parseFontWeight(declaration.value));
       break;
+
+    case "border-top-width":
+    case "border-bottom-width":
+    case "border-left-width":
+    case "border-right-width": {
+      if (declaration.value.type === "length") {
+        addStyleProp(
+          declaration.property,
+          parseLength(declaration.value.value)
+        );
+      }
+      break;
+    }
+    case "border-top-color":
+    case "border-bottom-color":
+    case "border-left-color":
+    case "border-right-color":
+      addStyleProp(declaration.property, parseColor(declaration.value));
+      break;
     case "z-index":
       if (declaration.value.type === "integer") {
         addStyleProp(
@@ -190,6 +160,16 @@ export function parseDeclaration(
           parseLength(declaration.value.value)
         );
       }
+      break;
+    case "border-top-left-radius":
+    case "border-top-right-radius":
+    case "border-bottom-left-radius":
+    case "border-bottom-right-radius":
+    case "border-start-start-radius":
+    case "border-start-end-radius":
+    case "border-end-start-radius":
+    case "border-end-end-radius":
+      addStyleProp(declaration.property, parseLength(declaration.value[0]));
       break;
     case "align-content":
     case "place-content":
@@ -201,30 +181,14 @@ export function parseDeclaration(
     case "container-name":
     case "container":
     case "display":
-    case "border-top-color":
-    case "border-bottom-color":
-    case "border-left-color":
-    case "border-right-color":
     case "border-block-start-color":
     case "border-block-end-color":
     case "border-inline-start-color":
     case "border-inline-end-color":
-    case "border-top-width":
-    case "border-bottom-width":
-    case "border-left-width":
-    case "border-right-width":
     case "border-block-start-width":
     case "border-block-end-width":
     case "border-inline-start-width":
     case "border-inline-end-width":
-    case "border-top-left-radius":
-    case "border-top-right-radius":
-    case "border-bottom-left-radius":
-    case "border-bottom-right-radius":
-    case "border-start-start-radius":
-    case "border-start-end-radius":
-    case "border-end-start-radius":
-    case "border-end-end-radius":
     case "border-radius":
     case "background":
     case "background-image":
@@ -413,7 +377,55 @@ export function parseDeclaration(
     case "filter":
     case "backdrop-filter":
       break;
+    case "transform": {
+      const transforms: TransformRecord = {};
 
+      for (const transform of declaration.value) {
+        switch (transform.type) {
+          case "perspective":
+            transforms[transform.type] = parseLength(transform.value) as number;
+            break;
+          case "translateX":
+          case "scaleX":
+            transforms[transform.type] = parseLength(transform.value) as number;
+            break;
+          case "translateY":
+          case "scaleY":
+            transforms[transform.type] = parseLength(transform.value) as number;
+            break;
+          case "rotate":
+          case "rotateX":
+          case "rotateY":
+          case "rotateZ":
+          case "skewX":
+          case "skewY":
+            transforms[transform.type] = parseAngle(transform.value);
+            break;
+          case "translate":
+            transforms.translateX = parseLength(transform.value[0]) as number;
+            transforms.translateY = parseLength(transform.value[1]) as number;
+            break;
+          case "scale":
+            transforms.scaleX = parseLength(transform.value[0]) as number;
+            transforms.scaleY = parseLength(transform.value[1]) as number;
+            break;
+          case "skew":
+            transforms.skewX = parseAngle(transform.value[0]);
+            transforms.skewY = parseAngle(transform.value[1]);
+            break;
+          case "translateZ":
+          case "translate3d":
+          case "scaleZ":
+          case "scale3d":
+          case "rotate3d":
+          case "matrix":
+          case "matrix3d":
+            break;
+        }
+      }
+
+      return addStyleProp(declaration.property, transforms);
+    }
     default: {
       exhaustiveCheck(declaration);
     }

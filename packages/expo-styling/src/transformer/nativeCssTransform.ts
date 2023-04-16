@@ -16,7 +16,7 @@ export async function nativeCssTransform(
   data: Buffer,
   options: JsTransformOptions
 ): Promise<TransformResponse> {
-  const nativeStyles = cssToReactNativeRuntime(data.toString("utf8"));
+  const nativeStyles = cssToReactNativeRuntime(data);
 
   if (matchCssModule(filename)) {
     return worker.transform(

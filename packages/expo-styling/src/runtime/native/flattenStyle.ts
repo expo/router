@@ -3,6 +3,9 @@ import { isRuntimeValue } from "./guards";
 import { testMediaQuery } from "./mediaQuery";
 import { Style, StyleMeta, StyleProp } from "../../types";
 
+/**
+ * Reduce a StyleProp to a flat Style object.
+ */
 export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
   let flatStyleMeta: StyleMeta;
 
@@ -16,20 +19,15 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
 
   if (!styles) {
     return flatStyle;
-  } else if (Array.isArray(styles)) {
+  }
+
+  if (Array.isArray(styles)) {
     // We need to flatten in reverse order so that the last style in the array
     // is the value set
     for (let i = styles.length - 1; i >= 0; i--) {
-      const style = styles[i];
-      if (!style) {
-        continue;
+      if (styles[i]) {
+        flattenStyle(styles[i], flatStyle);
       }
-
-      if ("media" in style) {
-        continue;
-      }
-
-      flattenStyle(style, flatStyle);
     }
     return flatStyle;
   }

@@ -144,9 +144,3 @@ export function createComputation<T = unknown>(fn: () => T) {
 
   return computation;
 }
-
-export function isSignalLike(s: unknown): s is SignalLike {
-  return Boolean(
-    typeof s === "object" && s && typeof (s as SignalLike).get === "function"
-  );
-}

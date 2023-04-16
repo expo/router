@@ -20,13 +20,13 @@ interface GetVisitorOptions {
  * LightningCSS visitor that converts CSS to React Native styles
  */
 export function cssToReactNativeRuntime(
-  css: string
+  code: Buffer
 ): StyleSheetRegisterOptions {
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
 
   lightningcss({
     filename: "style.css", // This is ignored, but required
-    code: Buffer.from(css),
+    code,
     visitor: {
       Rule(rule) {
         extractRule(rule, { declarations });
