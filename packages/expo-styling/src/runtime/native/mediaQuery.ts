@@ -5,7 +5,7 @@ import {
   MediaQuery,
 } from "lightningcss";
 
-import { vh, vw } from "./globals";
+import { colorScheme, vh, vw } from "./globals";
 import { exhaustiveCheck } from "../../css-to-rn/utils";
 
 /**
@@ -55,6 +55,8 @@ function testPlainFeature(name: string, featureValue: MediaFeatureValue) {
   }
 
   switch (name) {
+    case "prefers-color-scheme":
+      return colorScheme.get() === value;
     case "width":
       return vw.get() === value;
     case "min-width":
@@ -85,6 +87,8 @@ function getMediaFeatureValue(value: MediaFeatureValue) {
     } else {
       return null;
     }
+  } else if (value.type === "ident") {
+    return value.value;
   }
 
   return null;

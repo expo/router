@@ -1,6 +1,17 @@
-import { Dimensions, StyleSheet as RNStyleSheet } from "react-native";
+import {
+  Dimensions,
+  StyleSheet as RNStyleSheet,
+  Appearance,
+} from "react-native";
 
-import { globalStyles, rem, styleMetaMap, vh, vw } from "./globals";
+import {
+  colorScheme,
+  globalStyles,
+  rem,
+  styleMetaMap,
+  vh,
+  vw,
+} from "./globals";
 import {
   StyleSheetRegisterOptions,
   ExtractedStyle,
@@ -18,11 +29,12 @@ const parialStyleSheet = {
       subscriptions.delete(subscription);
     };
   },
-  __reset() {
+  __reset({ dimensions = Dimensions, appearance = Appearance } = {}) {
     globalStyles.clear();
     rem.reset();
-    vw.reset(Dimensions);
-    vh.reset(Dimensions);
+    vw.reset(dimensions);
+    vh.reset(dimensions);
+    colorScheme.reset(appearance);
   },
   register: (options: StyleSheetRegisterOptions) => {
     if (options.declarations) {

@@ -1,4 +1,4 @@
-import { Dimensions, Platform } from "react-native";
+import { Dimensions, Platform, Appearance } from "react-native";
 
 import { createSignal } from "./signals";
 import { StyleMeta, StyleProp } from "../../types";
@@ -12,6 +12,7 @@ export const styleMetaMap = new WeakMap<
 export const rem = createRem(14);
 export const vw = viewportUnit("width", Dimensions);
 export const vh = viewportUnit("height", Dimensions);
+export const colorScheme = createColorScheme(Appearance);
 
 export function getGlobalStyles(value: string): StyleProp[] {
   return value.split(/\s+/).map((v) => globalStyles.get(v));
@@ -73,4 +74,40 @@ function createRem(defaultValue: number) {
   };
 
   return { get, set, reset };
+}
+
+function createColorScheme(appearance: typeof Appearance) {
+  let isSystem = true;
+  const signal = createSignal<"light" | "dark">(
+    appearance.getColorScheme() ?? "light"
+  );
+
+  const set = (colorScheme: "light" | "dark" | "system") => {
+    if (colorScheme === "system") {
+      isSystem = true;
+      signal.set(appearance.getColorScheme() ?? "light");
+    } else {
+      isSystem = false;
+      signal.set(colorScheme);
+    }
+  };
+
+  let listener = appearance.addChangeListener(({ colorScheme }) => {
+    if (isSystem) {
+      signal.set(colorScheme ?? "light");
+    }
+  });
+
+  const reset = (appearance: typeof Appearance) => {
+    listener.remove();
+    listener = appearance.addChangeListener(({ colorScheme }) => {
+      if (isSystem) {
+        signal.set(colorScheme ?? "light");
+      }
+    });
+    isSystem = true;
+    signal.set(appearance.getColorScheme() ?? "light");
+  };
+
+  return { get: signal.get, set, reset };
 }

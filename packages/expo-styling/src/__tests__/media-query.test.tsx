@@ -2,13 +2,36 @@ import { act, render } from "@testing-library/react-native";
 import React from "react";
 
 import { createMockComponent, registerCSS } from "./utils";
-import { vw } from "../runtime/native/globals";
+import { colorScheme, vw } from "../runtime/native/globals";
 import { StyleSheet } from "../runtime/native/stylesheet";
 
 const A = createMockComponent();
 
-afterEach(() => {
+beforeEach(() => {
   StyleSheet.__reset();
+});
+
+test.only("color scheme", () => {
+  registerCSS(`
+.my-class { color: blue; }
+
+@media (prefers-color-scheme: dark) {
+  .my-class { color: red; }
+}`);
+
+  render(<A className="my-class" />);
+
+  expect(A).styleToEqual({
+    color: "rgba(0, 0, 255, 1)",
+  });
+
+  act(() => {
+    colorScheme.set("dark");
+  });
+
+  expect(A).styleToEqual({
+    color: "rgba(255, 0, 0, 1)",
+  });
 });
 
 test("width", () => {
