@@ -23,7 +23,11 @@ export async function nativeCssTransform(
       config,
       projectRoot,
       filename,
-      Buffer.from(`module.exports = ${JSON.stringify(nativeStyles)};`),
+      Buffer.from(
+        `module.exports = require("@expo/styling").StyleSheet.create(${JSON.stringify(
+          nativeStyles
+        )});`
+      ),
       options
     );
   } else {

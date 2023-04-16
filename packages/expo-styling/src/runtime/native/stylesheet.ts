@@ -35,6 +35,19 @@ const parialStyleSheet = {
       subscription();
     }
   },
+  create: (styles: Record<string, ExtractedStyle>) => {
+    const namedStyles: Record<string, StyleProp> = {};
+
+    for (const [name, style] of Object.entries(styles)) {
+      namedStyles[name] = tagStyles(style);
+    }
+
+    for (const subscription of subscriptions) {
+      subscription();
+    }
+
+    return namedStyles;
+  },
 };
 
 export const StyleSheet = Object.assign({}, RNStyleSheet, parialStyleSheet);
