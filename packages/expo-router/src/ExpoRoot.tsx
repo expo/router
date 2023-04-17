@@ -1,4 +1,3 @@
-import Head from "expo-router/head";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -31,19 +30,17 @@ const INITIAL_METRICS = {
 
 export function ExpoRoot({ context }: { context: RequireContext }) {
   return (
-    <Head.Provider>
-      <GestureHandlerRootView>
-        <SafeAreaProvider
-          testID="test"
-          // SSR support
-          initialMetrics={INITIAL_METRICS}
-        >
-          <ContextNavigator context={context} />
-          {/* Users can override this by adding another StatusBar element anywhere higher in the component tree. */}
-          <StatusBar style="auto" />
-        </SafeAreaProvider>
-      </GestureHandlerRootView>
-    </Head.Provider>
+    <GestureHandlerRootView>
+      <SafeAreaProvider
+        testID="test"
+        // SSR support
+        initialMetrics={INITIAL_METRICS}
+      >
+        <ContextNavigator context={context} />
+        {/* Users can override this by adding another StatusBar element anywhere higher in the component tree. */}
+        <StatusBar style="auto" />
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
