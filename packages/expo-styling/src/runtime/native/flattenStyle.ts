@@ -5,6 +5,9 @@ import { Style, StyleMeta, StyleProp } from "../../types";
 
 /**
  * Reduce a StyleProp to a flat Style object.
+ * As we loop over keys & values, we will resolve any dynamic values.
+ * Some values cannot be calculated until the entire style has been flattened.
+ * These values are defined as a getter and will be resolved lazily
  */
 export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
   let flatStyleMeta: StyleMeta;
@@ -22,8 +25,7 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
   }
 
   if (Array.isArray(styles)) {
-    // We need to flatten in reverse order so that the last style in the array
-    // is the value set
+    // We need to flatten in reverse order so that the last style in the array is the one defined
     for (let i = styles.length - 1; i >= 0; i--) {
       if (styles[i]) {
         flattenStyle(styles[i], flatStyle);
@@ -32,6 +34,11 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
     return flatStyle;
   }
 
+  // The is the metadata for the style object.
+  // It contains information is like the MediaQuery data
+  //
+  // Note: This is different to flatStyleMeta, which is the metadata
+  // for the FLATTENED style object
   const styleMeta = styleMetaMap.get(styles) ?? {};
 
   for (const [key, value] of Object.entries(styles)) {
@@ -54,34 +61,29 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
       } else {
         flatStyleMeta.variables[key] = getterOrValue;
       }
+      continue;
+    }
+
+    // Skip already set keys
+    if (key in flatStyle) continue;
+
+    // Skip failed media queries
+    if (styleMeta.media && !styleMeta.media.every(testMediaQuery)) {
+      continue;
+    }
+
+    const getterOrValue = extractValue(value, flatStyle, flatStyleMeta);
+
+    if (typeof getterOrValue === "function") {
+      Object.defineProperty(flatStyle, key, {
+        configurable: true,
+        enumerable: true,
+        get() {
+          return getterOrValue();
+        },
+      });
     } else {
-      // Skip already set keys
-      if (key in flatStyle) continue;
-
-      // Skip failed media queries
-      if (styleMeta.media && !styleMeta.media.every(testMediaQuery)) {
-        continue;
-      }
-
-      // Non runtime styles can be set directly
-      if (!styleMeta.runtimeStyleProps?.has(key)) {
-        (flatStyle as any)[key] = value;
-        continue;
-      }
-
-      const getterOrValue = extractValue(value, flatStyle, flatStyleMeta);
-
-      if (typeof getterOrValue === "function") {
-        Object.defineProperty(flatStyle, key, {
-          configurable: true,
-          enumerable: true,
-          get() {
-            return getterOrValue();
-          },
-        });
-      } else {
-        flatStyle[key as keyof Style] = getterOrValue;
-      }
+      flatStyle[key as keyof Style] = getterOrValue;
     }
   }
 
@@ -98,9 +100,7 @@ function extractValue(
   flatStyle: Style,
   flatStyleMeta: StyleMeta
 ): any {
-  if (typeof value === "string" || typeof value === "number") {
-    return value;
-  } else if (isRuntimeValue(value)) {
+  if (isRuntimeValue(value)) {
     switch (value.name) {
       case "vh":
         return (vh.get() / 100) * (value.arguments[0] as number);
@@ -141,4 +141,6 @@ function extractValue(
       }
     }
   }
+
+  return value;
 }

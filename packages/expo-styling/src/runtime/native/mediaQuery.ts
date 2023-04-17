@@ -35,7 +35,7 @@ function testCondition(condition?: MediaCondition | null): boolean {
 function testFeature(feature: MediaFeature) {
   switch (feature.type) {
     case "plain":
-      return testPlainFeature(feature.name, feature.value);
+      return testPlainFeature(feature);
     case "range":
     case "boolean":
     case "interval":
@@ -47,28 +47,28 @@ function testFeature(feature: MediaFeature) {
   return false;
 }
 
-function testPlainFeature(name: string, featureValue: MediaFeatureValue) {
-  const value = getMediaFeatureValue(featureValue);
+function testPlainFeature(feature: Extract<MediaFeature, { type: "plain" }>) {
+  const value = getMediaFeatureValue(feature.value);
 
   if (value === null) {
     return false;
   }
 
-  switch (name) {
+  switch (feature.name) {
     case "prefers-color-scheme":
       return colorScheme.get() === value;
     case "width":
-      return vw.get() === value;
+      return typeof value === "number" && vw.get() === value;
     case "min-width":
-      return vw.get() >= value;
+      return typeof value === "number" && vw.get() >= value;
     case "max-width":
-      return vw.get() <= value;
+      return typeof value === "number" && vw.get() <= value;
     case "height":
-      return vh.get() === value;
+      return typeof value === "number" && vh.get() === value;
     case "min-height":
-      return vh.get() >= value;
+      return typeof value === "number" && vh.get() >= value;
     case "max-height":
-      return vh.get() <= value;
+      return typeof value === "number" && vh.get() <= value;
     default:
       return false;
   }

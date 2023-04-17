@@ -11,7 +11,7 @@ beforeEach(() => {
   StyleSheet.__reset();
 });
 
-test.only("color scheme", () => {
+test("color scheme", () => {
   registerCSS(`
 .my-class { color: blue; }
 

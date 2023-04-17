@@ -21,6 +21,10 @@ import {
 
 const subscriptions = new Set<() => void>();
 
+/**
+ * This is a custom wrapper around the React Native Stylesheet.
+ * It allows us to intercept the creation of styles and "tag" them wit the metadata
+ */
 const parialStyleSheet = {
   rem,
   __subscribe(subscription: () => void) {

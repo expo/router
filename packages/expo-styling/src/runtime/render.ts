@@ -4,7 +4,7 @@ export function render(
   props: Record<string | number, unknown>,
   key: string
 ) {
-  if (!props.__skipCssInterop && typeof type.cssInterop === "function") {
+  if (typeof type.cssInterop === "function" && !props.__skipCssInterop) {
     return type.cssInterop(jsx, type, props, key);
   } else {
     return jsx(type, props, key);
