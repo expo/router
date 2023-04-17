@@ -6,6 +6,32 @@
 
 ### 🎉 New features
 
+- feat(router, runtime): make LogBox capable of rendering in static runtimes ([#491](https://github.com/expo/router/issues/491))
+
+### 🐛 Bug fixes
+
+## [Thu, 13 Apr 2023 21:13:59 -0500](https://github.com/expo/router/commit/8d8ece6dc5f73d824c0e3a7b44fb71b57ad24536)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+## [Sun, 9 Apr 2023 16:42:18 -0500](https://github.com/expo/router/commit/ec6f6ecf15063bccf062307b0fcd350933956479)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+## [Wed, 5 Apr 2023 12:31:34 -0500](https://github.com/expo/router/commit/ad5d734485e00468d39955d16b4af0e2ac1a6fbf)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
 ### 🐛 Bug fixes
 
 ## [Sun, 2 Apr 2023 14:51:24 -0500](https://github.com/expo/router/commit/02141fa8a06cbeaa165565a58de4d0727c0f8990)

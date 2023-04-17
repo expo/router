@@ -6,6 +6,45 @@
 
 ### 🎉 New features
 
+- refactor: consolidate providers into a central store ([#466](https://github.com/expo/router/issues/466))
+- feat: expo-env.d.ts ([#477](https://github.com/expo/router/issues/477))
+
+### 🐛 Bug fixes
+
+- fix: Convert react-native-web types to an ambient module ([#481](https://github.com/expo/router/issues/481))
+
+### 💡 Others
+
+## [Thu, 13 Apr 2023 21:13:59 -0500](https://github.com/expo/router/commit/8d8ece6dc5f73d824c0e3a7b44fb71b57ad24536)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## [Sun, 9 Apr 2023 16:42:18 -0500](https://github.com/expo/router/commit/ec6f6ecf15063bccf062307b0fcd350933956479)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+- fix nested deep dynamic route colliding with generated 404 ([#473](https://github.com/expo/router/issues/473))
+
+### 💡 Others
+
+## [Wed, 5 Apr 2023 12:31:34 -0500](https://github.com/expo/router/commit/ad5d734485e00468d39955d16b4af0e2ac1a6fbf)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- feat(router): add hack to temporarily support `expo-development-client`. ([#461](https://github.com/expo/router/issues/461))
+
 ### 🐛 Bug fixes
 
 ### 💡 Others

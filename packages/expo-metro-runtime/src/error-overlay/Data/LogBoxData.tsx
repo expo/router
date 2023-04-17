@@ -68,7 +68,10 @@ type State = {
 const observers: Set<{ observer: Observer } & any> = new Set();
 const ignorePatterns: Set<IgnorePattern> = new Set();
 let logs: LogBoxLogs = new Set();
-let updateTimeout: null | ReturnType<typeof setImmediate> = null;
+let updateTimeout:
+  | null
+  | ReturnType<typeof setImmediate>
+  | ReturnType<typeof setTimeout> = null;
 let _isDisabled = false;
 let _selectedIndex = -1;
 
@@ -119,9 +122,16 @@ export function isMessageIgnored(message: string): boolean {
   return false;
 }
 
+function setImmediateShim(callback: () => void) {
+  if (!global.setImmediate) {
+    return setTimeout(callback, 0);
+  }
+  return global.setImmediate(callback);
+}
+
 function handleUpdate(): void {
   if (updateTimeout == null) {
-    updateTimeout = setImmediate(() => {
+    updateTimeout = setImmediateShim(() => {
       updateTimeout = null;
       const nextState = getNextState();
       observers.forEach(({ observer }) => observer(nextState));

@@ -1,4 +1,4 @@
-/// <reference path="metro-require.d.ts" />
+/// <reference types="./index" />
 
 /** Optionally import `app/+html.js` file. */
 export const ctx = require.context(

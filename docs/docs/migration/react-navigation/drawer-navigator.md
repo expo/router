@@ -7,7 +7,7 @@ To use the React Navigation [drawer navigator](https://reactnavigation.org/docs/
 ## Installation
 
 Follow the [installation guide](https://reactnavigation.org/docs/drawer-navigator#installation) for Drawer Navigator.
-
+- Install `@react-navigation/drawer`: `npx expo install @react-navigation/drawer`
 - Ensure `react-native-reanimated` is correctly configured in the `babel.config.js` file.
 - Changes to the `babel.config.js` require a clean babel cache to be applied: `npx expo start --clear`.
 

@@ -1,6 +1,5 @@
 import React from "react";
 
-import { LocationProvider } from "./LocationProvider";
 import {
   DynamicConvention,
   LoadedRoute,
@@ -197,11 +196,7 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     ) => {
       const loadable = getLoadable(props, ref);
 
-      return (
-        <LocationProvider>
-          <Route node={value}>{loadable}</Route>
-        </LocationProvider>
-      );
+      return <Route node={value}>{loadable}</Route>;
     }
   );
 

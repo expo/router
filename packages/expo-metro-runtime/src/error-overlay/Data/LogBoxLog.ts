@@ -17,7 +17,7 @@ import type {
 
 type SymbolicationStatus = "NONE" | "PENDING" | "COMPLETE" | "FAILED";
 
-export type LogLevel = "warn" | "error" | "fatal" | "syntax";
+export type LogLevel = "warn" | "error" | "fatal" | "syntax" | "static";
 
 export type LogBoxLogData = {
   level: LogLevel;
@@ -42,6 +42,14 @@ function componentStackToStack(componentStack: ComponentStack): Stack {
   }));
 }
 
+type SymbolicationCallback = (status: SymbolicationStatus) => void;
+
+type SymbolicationResult =
+  | { error: null; stack: null; status: "NONE" }
+  | { error: null; stack: null; status: "PENDING" }
+  | { error: null; stack: Stack; status: "COMPLETE" }
+  | { error: Error; stack: null; status: "FAILED" };
+
 export class LogBoxLog {
   message: Message;
   type: string;
@@ -52,13 +60,7 @@ export class LogBoxLog {
   level: LogLevel;
   codeFrame?: CodeFrame;
   isComponentError: boolean;
-  symbolicated: Record<
-    StackType,
-    | { error: null; stack: null; status: "NONE" }
-    | { error: null; stack: null; status: "PENDING" }
-    | { error: null; stack: Stack; status: "COMPLETE" }
-    | { error: Error; stack: null; status: "FAILED" }
-  > = {
+  symbolicated: Record<StackType, SymbolicationResult> = {
     stack: {
       error: null,
       stack: null,
@@ -71,7 +73,13 @@ export class LogBoxLog {
     },
   };
 
-  constructor(data: LogBoxLogData) {
+  private callbacks: Map<StackType, Set<SymbolicationCallback>> = new Map();
+
+  constructor(
+    data: LogBoxLogData & {
+      symbolicated?: Record<StackType, SymbolicationResult>;
+    }
+  ) {
     this.level = data.level;
     this.type = data.type ?? "error";
     this.message = data.message;
@@ -81,6 +89,7 @@ export class LogBoxLog {
     this.codeFrame = data.codeFrame;
     this.isComponentError = data.isComponentError;
     this.count = 1;
+    this.symbolicated = data.symbolicated ?? this.symbolicated;
   }
 
   incrementCount(): void {
@@ -94,22 +103,61 @@ export class LogBoxLog {
     return this.getStack(type);
   }
 
+  private flushCallbacks(type: StackType): void {
+    const callbacks = this.callbacks.get(type);
+    const status = this.symbolicated[type].status;
+    if (callbacks) {
+      for (const callback of callbacks) {
+        callback(status);
+      }
+      callbacks.clear();
+    }
+  }
+
+  private pushCallback(type: StackType, callback: SymbolicationCallback): void {
+    let callbacks = this.callbacks.get(type);
+    if (!callbacks) {
+      callbacks = new Set();
+      this.callbacks.set(type, callbacks);
+    }
+    callbacks.add(callback);
+  }
+
   retrySymbolicate(
     type: StackType,
     callback?: (status: SymbolicationStatus) => void
   ): void {
-    if (this.symbolicated[type].status !== "COMPLETE") {
-      LogBoxSymbolication.deleteStack(this.getStack(type));
-      this.handleSymbolicate(type, callback);
-    }
+    this._symbolicate(type, true, callback);
   }
 
   symbolicate(
     type: StackType,
     callback?: (status: SymbolicationStatus) => void
   ): void {
-    if (this.symbolicated[type].status === "NONE") {
-      this.handleSymbolicate(type, callback);
+    this._symbolicate(type, false, callback);
+  }
+
+  private _symbolicate(
+    type: StackType,
+    retry: boolean,
+    callback?: (status: SymbolicationStatus) => void
+  ): void {
+    if (callback) {
+      this.pushCallback(type, callback);
+    }
+    const status = this.symbolicated[type].status;
+
+    if (status === "COMPLETE") {
+      return this.flushCallbacks(type);
+    }
+
+    if (retry) {
+      LogBoxSymbolication.deleteStack(this.getStack(type));
+      this.handleSymbolicate(type);
+    } else {
+      if (status === "NONE") {
+        this.handleSymbolicate(type);
+      }
     }
   }
 
@@ -125,22 +173,19 @@ export class LogBoxLog {
     return this.stack;
   }
 
-  private handleSymbolicate(
-    type: StackType,
-    callback?: (status: SymbolicationStatus) => void
-  ): void {
+  private handleSymbolicate(type: StackType): void {
     if (type === "component" && !this.componentStack?.length) {
       return;
     }
 
     if (this.symbolicated[type].status !== "PENDING") {
-      this.updateStatus(type, null, null, null, callback);
+      this.updateStatus(type, null, null, null);
       LogBoxSymbolication.symbolicate(this.getStack(type)).then(
         (data) => {
-          this.updateStatus(type, null, data?.stack, data?.codeFrame, callback);
+          this.updateStatus(type, null, data?.stack, data?.codeFrame);
         },
         (error) => {
-          this.updateStatus(type, error, null, null, callback);
+          this.updateStatus(type, error, null, null);
         }
       );
     }
@@ -150,8 +195,7 @@ export class LogBoxLog {
     type: StackType,
     error?: Error | null,
     stack?: Stack | null,
-    codeFrame?: CodeFrame | null,
-    callback?: (status: SymbolicationStatus) => void
+    codeFrame?: CodeFrame | null
   ): void {
     const lastStatus = this.symbolicated[type].status;
     if (error != null) {
@@ -178,8 +222,11 @@ export class LogBoxLog {
       };
     }
 
-    if (callback && lastStatus !== this.symbolicated[type].status) {
-      callback(this.symbolicated[type].status);
+    const status = this.symbolicated[type].status;
+    if (lastStatus !== status) {
+      if (["COMPLETE", "FAILED"].includes(status)) {
+        this.flushCallbacks(type);
+      }
     }
   }
 }
