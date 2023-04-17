@@ -144,8 +144,8 @@ function getExtractedStyle(
    */
   function addStyleProp(
     property: string,
-    value: unknown,
-    nullishCoalescing = false
+    value: any,
+    { nullishCoalescing = false, append = false } = {}
   ) {
     if (value === undefined) {
       return;
@@ -158,7 +158,13 @@ function getExtractedStyle(
       property = property.replace(/-./g, (x) => x[1].toUpperCase());
     }
 
-    if (nullishCoalescing) {
+    if (append) {
+      if (Array.isArray(style[property])) {
+        style[property].push(...value);
+      } else {
+        style[property] = [value];
+      }
+    } else if (nullishCoalescing) {
       style[property] ??= value;
     } else {
       style[property] = value;

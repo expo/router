@@ -1,5 +1,7 @@
 import {
+  AlignContent,
   AlignItems,
+  AlignSelf,
   Angle,
   CssColor,
   Declaration,
@@ -13,6 +15,8 @@ import {
   MaxSize,
   NumberOrPercentage,
   Size,
+  TextDecorationLine,
+  TextShadow,
   TokenOrValue,
 } from "lightningcss";
 
@@ -22,7 +26,10 @@ import { RuntimeValue, TransformRecord } from "../types";
 type AddStyleProp = (
   property: string,
   value: unknown,
-  nullishCoalescing?: boolean
+  options?: {
+    nullishCoalescing?: boolean;
+    append?: boolean;
+  }
 ) => void;
 
 export function parseDeclaration(
@@ -48,19 +55,6 @@ export function parseDeclaration(
   }
 
   switch (declaration.property) {
-    case "animation-name":
-    case "animation-duration":
-    case "animation-timing-function":
-    case "animation-iteration-count":
-    case "animation-direction":
-    case "animation-play-state":
-    case "animation-delay":
-    case "animation-fill-mode":
-      // addStyleProp(declaration.property, declaration.value);
-      break;
-    case "animation":
-      // addStyleProp(declaration.property, declaration.value);
-      break;
     case "font-size":
       addStyleProp(declaration.property, parseFontSize(declaration.value));
       break;
@@ -114,8 +108,14 @@ export function parseDeclaration(
       addStyleProp("paddingRigth", parseSize(declaration.value.right));
       addStyleProp("paddingBottom", parseSize(declaration.value.bottom));
       break;
+    case "align-content":
+      addStyleProp(declaration.property, parseAlignContent(declaration.value));
+      break;
     case "align-items":
       addStyleProp(declaration.property, parseAlignItems(declaration.value));
+      break;
+    case "align-self":
+      addStyleProp(declaration.property, parseAlignSelf(declaration.value));
       break;
     case "justify-content":
       addStyleProp(
@@ -133,6 +133,54 @@ export function parseDeclaration(
       break;
     case "font-weight":
       addStyleProp(declaration.property, parseFontWeight(declaration.value));
+      break;
+    case "text-shadow":
+      parseTextShadow(declaration.value, addStyleProp);
+      break;
+    case "letter-spacing": {
+      if (declaration.value.type !== "normal") {
+        addStyleProp(
+          declaration.property,
+          parseLength(declaration.value.value)
+        );
+      }
+      break;
+    }
+    case "text-decoration-color":
+      addStyleProp(declaration.property, parseColor(declaration.value));
+      break;
+    case "text-decoration-line":
+      addStyleProp(
+        declaration.property,
+        parseTextDecorationLine(declaration.value)
+      );
+      break;
+    case "text-decoration-thickness":
+      if (declaration.value.type === "length-percentage") {
+        addStyleProp(
+          declaration.property,
+          parseLength(declaration.value.value)
+        );
+      }
+      break;
+    case "text-decoration":
+      addStyleProp(
+        "text-decoration-color",
+        parseColor(declaration.value.color)
+      );
+      addStyleProp(
+        "text-decoration-line",
+        parseTextDecorationLine(declaration.value)
+      );
+      if (declaration.value.thickness.type === "length-percentage") {
+        addStyleProp(
+          declaration.property,
+          parseLength(declaration.value.thickness.value)
+        );
+      }
+      break;
+    case "text-transform":
+      addStyleProp(declaration.property, declaration.value.case);
       break;
 
     case "border-top-width":
@@ -171,9 +219,16 @@ export function parseDeclaration(
     case "border-end-end-radius":
       addStyleProp(declaration.property, parseLength(declaration.value[0]));
       break;
-    case "align-content":
+    case "animation":
+    case "animation-name":
+    case "animation-duration":
+    case "animation-timing-function":
+    case "animation-iteration-count":
+    case "animation-direction":
+    case "animation-play-state":
+    case "animation-delay":
+    case "animation-fill-mode":
     case "place-content":
-    case "align-self":
     case "justify-self":
     case "place-self":
     case "justify-items":
@@ -314,23 +369,13 @@ export function parseDeclaration(
     case "transform-origin":
     case "perspective":
     case "perspective-origin":
-    case "translate":
-    case "rotate":
-    case "scale":
-    case "text-transform":
     case "tab-size":
     case "word-spacing":
-    case "letter-spacing":
     case "text-indent":
-    case "text-decoration-line":
-    case "text-decoration-color":
-    case "text-decoration-thickness":
-    case "text-decoration":
     case "text-emphasis-style":
     case "text-emphasis-color":
     case "text-emphasis":
     case "text-emphasis-position":
-    case "text-shadow":
     case "cursor":
     case "caret-color":
     case "caret":
@@ -377,21 +422,50 @@ export function parseDeclaration(
     case "filter":
     case "backdrop-filter":
       break;
+    case "translate":
+      addStyleProp(
+        "transform",
+        [
+          { translateX: declaration.value.x },
+          { translateY: declaration.value.y },
+        ],
+        { append: true }
+      );
+      break;
+    case "rotate":
+      addStyleProp(
+        "transform",
+        [
+          { rotateX: declaration.value.x },
+          { rotateY: declaration.value.y },
+          { rotateY: declaration.value.z },
+        ],
+        { append: true }
+      );
+      break;
+    case "scale":
+      addStyleProp(
+        "transform",
+        [
+          { scaleX: parseLength(declaration.value.x) },
+          { scaleY: parseLength(declaration.value.y) },
+        ],
+        { append: true }
+      );
+      break;
     case "transform": {
-      const transforms: TransformRecord = {};
+      const transforms: TransformRecord[] = [];
 
       for (const transform of declaration.value) {
         switch (transform.type) {
           case "perspective":
-            transforms[transform.type] = parseLength(transform.value) as number;
-            break;
           case "translateX":
-          case "scaleX":
-            transforms[transform.type] = parseLength(transform.value) as number;
-            break;
           case "translateY":
+          case "scaleX":
           case "scaleY":
-            transforms[transform.type] = parseLength(transform.value) as number;
+            transforms.push({
+              [transform.type]: parseLength(transform.value) as number,
+            });
             break;
           case "rotate":
           case "rotateX":
@@ -399,19 +473,27 @@ export function parseDeclaration(
           case "rotateZ":
           case "skewX":
           case "skewY":
-            transforms[transform.type] = parseAngle(transform.value);
+            transforms.push({ [transform.type]: parseAngle(transform.value) });
             break;
           case "translate":
-            transforms.translateX = parseLength(transform.value[0]) as number;
-            transforms.translateY = parseLength(transform.value[1]) as number;
+            transforms.push({
+              translateX: parseLength(transform.value[0]) as number,
+            });
+            transforms.push({
+              translateY: parseLength(transform.value[1]) as number,
+            });
             break;
           case "scale":
-            transforms.scaleX = parseLength(transform.value[0]) as number;
-            transforms.scaleY = parseLength(transform.value[1]) as number;
+            transforms.push({
+              scaleX: parseLength(transform.value[0]) as number,
+            });
+            transforms.push({
+              scaleY: parseLength(transform.value[1]) as number,
+            });
             break;
           case "skew":
-            transforms.skewX = parseAngle(transform.value[0]);
-            transforms.skewY = parseAngle(transform.value[1]);
+            transforms.push({ skewX: parseAngle(transform.value[0]) });
+            transforms.push({ skewY: parseAngle(transform.value[1]) });
             break;
           case "translateZ":
           case "translate3d":
@@ -768,6 +850,40 @@ function parseJustifyContent(justifyContent: JustifyContent) {
   return value;
 }
 
+function parseAlignContent(alignItems: AlignContent) {
+  const allowed = new Set([
+    "flex-start",
+    "flex-end",
+    "center",
+    "stretch",
+    "space-between",
+    "space-around",
+  ]);
+
+  let value: string | undefined;
+
+  switch (alignItems.type) {
+    case "normal":
+    case "baseline-position":
+      break;
+    case "content-distribution":
+      value = alignItems.value;
+      break;
+    case "content-position":
+      value = alignItems.value;
+      break;
+    default: {
+      exhaustiveCheck(alignItems);
+    }
+  }
+
+  if (value && !allowed.has(value)) {
+    return;
+  }
+
+  return value;
+}
+
 function parseAlignItems(alignItems: AlignItems) {
   const allowed = new Set([
     "flex-start",
@@ -781,6 +897,43 @@ function parseAlignItems(alignItems: AlignItems) {
 
   switch (alignItems.type) {
     case "normal":
+      return "auto";
+    case "stretch":
+      value = alignItems.type;
+      break;
+    case "baseline-position":
+      value = "baseline";
+      break;
+    case "self-position":
+      value = alignItems.value;
+      break;
+    default: {
+      exhaustiveCheck(alignItems);
+    }
+  }
+
+  if (value && !allowed.has(value)) {
+    return;
+  }
+
+  return value;
+}
+
+function parseAlignSelf(alignItems: AlignSelf) {
+  const allowed = new Set([
+    "auto",
+    "flex-start",
+    "flex-end",
+    "center",
+    "stretch",
+    "baseline",
+  ]);
+
+  let value: string | undefined;
+
+  switch (alignItems.type) {
+    case "normal":
+    case "auto":
       return "auto";
     case "stretch":
       value = alignItems.type;
@@ -818,6 +971,41 @@ function parseFontWeight(fontWeight: FontWeight) {
       exhaustiveCheck(fontWeight);
     }
   }
+  return undefined;
+}
+
+function parseTextShadow(
+  [textshadow]: TextShadow[],
+  addStyleProp: AddStyleProp
+) {
+  addStyleProp("textShadowColor", parseColor(textshadow.color));
+  addStyleProp("textShadowOffset", {
+    width: parseLength(textshadow.xOffset),
+    height: parseLength(textshadow.yOffset),
+  });
+  addStyleProp("textShadowRadius", parseLength(textshadow.blur));
+}
+
+function parseTextDecorationLine(textDecorationLine: TextDecorationLine) {
+  if (!Array.isArray(textDecorationLine)) {
+    if (textDecorationLine === "none") {
+      return textDecorationLine;
+    }
+    return;
+  }
+
+  const set = new Set(textDecorationLine);
+
+  if (set.has("underline")) {
+    if (set.has("line-through")) {
+      return "underline line-through";
+    } else {
+      return "underline";
+    }
+  } else if (set.has("line-through")) {
+    return "line-through";
+  }
+
   return undefined;
 }
 
