@@ -14,10 +14,12 @@ export function getInitialState(
       ssrLocation.pathname + ssrLocation.search,
       linking.config
     );
+  } else if (typeof window.location !== "undefined") {
+    return linking.getStateFromPath?.(
+      window.location.pathname + window.location.search,
+      linking.config
+    );
   }
 
-  return linking.getStateFromPath?.(
-    window.location.pathname + window.location.search,
-    linking.config
-  );
+  return undefined;
 }
