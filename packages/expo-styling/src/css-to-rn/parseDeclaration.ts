@@ -170,7 +170,7 @@ export function parseDeclaration(
       );
       addStyleProp(
         "text-decoration-line",
-        parseTextDecorationLine(declaration.value)
+        parseTextDecorationLine(declaration.value.line)
       );
       if (declaration.value.thickness.type === "length-percentage") {
         addStyleProp(
