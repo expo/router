@@ -9,6 +9,16 @@ Discuss them with us on [GitHub](https://github.com/expo/router/discussions).
 
 :::
 
+## Missing back button
+
+If you setup a modal or other screen which is expected to have a back button, then you'll need to add [`unstable_settings`](https://expo.github.io/router/docs/features/routing/#layout-settings) to the route's layout to ensure the initial route is configured. Initial routes are somewhat unique to mobile apps and therefore fit awkwardly in the system––improvements pending.
+
+```jsx title=app/_layout.tsx
+export const unstable_settings = {
+  initialRouteName: 'index'
+}
+```
+
 ## Expo Router vs. Expo vs. React Native CLI
 
 Expo Router is akin to modern web frameworks like SvelteKit, Next.js or Remix, whereas default Expo/React Native projects are more closely related to default React projects built with Create React App.
