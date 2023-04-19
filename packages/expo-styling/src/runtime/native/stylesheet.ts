@@ -106,6 +106,10 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
       meta.media = styles.media;
       hasMeta = true;
     }
+    if (styles.pseudoClasses) {
+      meta.pseudoClasses = styles.pseudoClasses;
+      hasMeta = true;
+    }
 
     if (hasMeta) {
       styleMetaMap.set(styles.style, meta);

@@ -39,6 +39,7 @@ export type ExtractedStyle = {
   variableProps: string[];
   media?: MediaQuery[];
   style: Record<string, ExtractedStyleValue>;
+  pseudoClasses?: PseudoClassesQuery;
 };
 
 export type StyleMeta = {
@@ -46,6 +47,13 @@ export type StyleMeta = {
   variableProps?: Set<string>;
   media?: MediaQuery[];
   variables?: Record<string, unknown>;
+  pseudoClasses?: PseudoClassesQuery;
+};
+
+export type PseudoClassesQuery = {
+  hover?: boolean;
+  active?: boolean;
+  focus?: boolean;
 };
 
 export type StyleSheetRegisterOptions = {

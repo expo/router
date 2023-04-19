@@ -5,6 +5,7 @@ import { VariableContext, getGlobalStyles, styleMetaMap } from "./globals";
 import { createComputation } from "./signals";
 import { StyleSheet } from "./stylesheet";
 import { useDynamicMemo } from "./utils";
+import { useInteractionHandlers, useInteractionSignals } from "./interaction";
 
 export type CSSInteropWrapperProps = {
   __component: ComponentType<any>;
@@ -81,6 +82,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
   const inheritedVariables = React.useContext(VariableContext);
 
   const inlineVariables: Record<string, unknown>[] = [];
+  const interaction = useInteractionSignals();
 
   /* eslint-disable react-hooks/rules-of-hooks -- __styleKeys is consistent an immutable */
   for (const key of __styleKeys) {
@@ -92,6 +94,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
       () =>
         createComputation(() =>
           flattenStyle($props[key], {
+            interaction,
             variables: inheritedVariables,
           })
         ),
@@ -109,6 +112,8 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     }
   }
   /* eslint-enable react-hooks/rules-of-hooks */
+
+  Object.assign(props, useInteractionHandlers($props, interaction));
 
   let children = <Component {...props} ref={ref} __skipCssInterop />;
 
