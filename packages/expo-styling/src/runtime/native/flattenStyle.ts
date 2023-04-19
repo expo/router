@@ -3,13 +3,21 @@ import { testMediaQuery } from "./conditions";
 import { rem, styleMetaMap, vh, vw } from "./globals";
 import { isRuntimeValue } from "./utils";
 
+interface FlattenStyleOptions {
+  variables: Record<string, any>;
+}
+
 /**
  * Reduce a StyleProp to a flat Style object.
  * As we loop over keys & values, we will resolve any dynamic values.
  * Some values cannot be calculated until the entire style has been flattened.
  * These values are defined as a getter and will be resolved lazily
  */
-export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
+export function flattenStyle(
+  styles: StyleProp,
+  options: FlattenStyleOptions,
+  flatStyle?: Style
+): Style {
   let flatStyleMeta: StyleMeta;
 
   if (!flatStyle) {
@@ -28,7 +36,7 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
     // We need to flatten in reverse order so that the last style in the array is the one defined
     for (let i = styles.length - 1; i >= 0; i--) {
       if (styles[i]) {
-        flattenStyle(styles[i], flatStyle);
+        flattenStyle(styles[i], options, flatStyle);
       }
     }
     return flatStyle;
@@ -49,7 +57,12 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
       // Skip already set variables
       if (key in flatStyleMeta.variables) continue;
 
-      const getterOrValue = extractValue(value, flatStyle, flatStyleMeta);
+      const getterOrValue = extractValue(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        options
+      );
 
       if (typeof getterOrValue === "function") {
         Object.defineProperty(flatStyleMeta.variables, key, {
@@ -84,7 +97,8 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
           const getterOrValue = extractValue(
             transformValue,
             flatStyle,
-            flatStyleMeta
+            flatStyleMeta,
+            options
           );
 
           if (typeof getterOrValue === "function") {
@@ -105,7 +119,12 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
 
       flatStyle.transform = transform as any;
     } else {
-      const getterOrValue = extractValue(value, flatStyle, flatStyleMeta);
+      const getterOrValue = extractValue(
+        value,
+        flatStyle,
+        flatStyleMeta,
+        options
+      );
 
       if (typeof getterOrValue === "function") {
         Object.defineProperty(flatStyle, key, {
@@ -132,7 +151,8 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
 function extractValue(
   value: unknown,
   flatStyle: Style,
-  flatStyleMeta: StyleMeta
+  flatStyleMeta: StyleMeta,
+  options: FlattenStyleOptions
 ): any {
   if (isRuntimeValue(value)) {
     switch (value.name) {
@@ -174,8 +194,9 @@ function extractValue(
         };
       case "var":
         return () => {
+          const name = value.arguments[0] as string;
           const resolvedValue =
-            flatStyleMeta.variables?.[value.arguments[0] as string];
+            flatStyleMeta.variables?.[name] ?? options.variables[name];
           return typeof resolvedValue === "function"
             ? resolvedValue()
             : resolvedValue;
@@ -185,7 +206,12 @@ function extractValue(
         const args: unknown[] = [];
 
         for (const arg of value.arguments) {
-          const getterOrValue = extractValue(arg, flatStyle, flatStyleMeta);
+          const getterOrValue = extractValue(
+            arg,
+            flatStyle,
+            flatStyleMeta,
+            options
+          );
 
           if (typeof getterOrValue === "function") {
             isStatic = false;

@@ -1,3 +1,4 @@
+import { createContext } from "react";
 import {
   AccessibilityInfo,
   Dimensions,
@@ -19,6 +20,8 @@ export const vw = viewportUnit("width", Dimensions);
 export const vh = viewportUnit("height", Dimensions);
 export const colorScheme = createColorScheme(Appearance);
 export const isReduceMotionEnabled = createIsReduceMotionEnabled();
+
+export const VariableContext = createContext<Record<string, any>>({});
 
 export function getGlobalStyles(value: string): StyleProp[] {
   return value.split(/\s+/).map((v) => globalStyles.get(v));

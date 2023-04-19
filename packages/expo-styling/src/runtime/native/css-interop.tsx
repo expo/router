@@ -1,9 +1,10 @@
 import React, { ComponentType, useEffect, useReducer } from "react";
 
 import { flattenStyle } from "./flattenStyle";
-import { getGlobalStyles, styleMetaMap } from "./globals";
+import { VariableContext, getGlobalStyles, styleMetaMap } from "./globals";
 import { createComputation } from "./signals";
 import { StyleSheet } from "./stylesheet";
+import { useDynamicMemo } from "./utils";
 
 export type CSSInteropWrapperProps = {
   __component: ComponentType<any>;
@@ -77,6 +78,9 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
 ) {
   const { ...props } = $props;
   const [, rerender] = React.useReducer((acc) => acc + 1, 0);
+  const inheritedVariables = React.useContext(VariableContext);
+
+  const inlineVariables: Record<string, unknown>[] = [];
 
   /* eslint-disable react-hooks/rules-of-hooks -- __styleKeys is consistent an immutable */
   for (const key of __styleKeys) {
@@ -85,15 +89,43 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
      * is running will be subscribed to.
      */
     const computation = React.useMemo(
-      () => createComputation(() => flattenStyle($props[key])),
-      [props[key]]
+      () =>
+        createComputation(() =>
+          flattenStyle($props[key], {
+            variables: inheritedVariables,
+          })
+        ),
+      [props[key], inheritedVariables]
     );
     useEffect(() => computation.subscribe(rerender), [computation]);
     props[key] = computation.snapshot();
+
+    const meta = styleMetaMap.get(props[key]);
+
+    if (meta) {
+      if (meta.variables) {
+        inlineVariables.push(meta.variables);
+      }
+    }
   }
   /* eslint-enable react-hooks/rules-of-hooks */
 
-  return <Component {...props} ref={ref} __skipCssInterop />;
+  let children = <Component {...props} ref={ref} __skipCssInterop />;
+
+  const variables = useDynamicMemo(
+    () => Object.assign({}, inheritedVariables, ...inlineVariables),
+    [inheritedVariables, ...inlineVariables]
+  );
+
+  if (inlineVariables.length > 0) {
+    children = (
+      <VariableContext.Provider value={variables}>
+        {children}
+      </VariableContext.Provider>
+    );
+  }
+
+  return children;
 });
 
 function classNameToStyle(props: any) {

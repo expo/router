@@ -40,3 +40,31 @@ test("combined inline variable", () => {
     width: 20,
   });
 });
+
+test("inherit variables", () => {
+  const B = createMockComponent();
+
+  registerCSS(`
+    .my-class-1 { width: var(--my-var); }
+    .my-class-2 { --my-var: 10px; }
+    .my-class-3 { --my-var: 20px; }
+  `);
+
+  render(
+    <A className="my-class-2">
+      <B className="my-class-1" />
+    </A>
+  );
+
+  expect(A).styleToEqual({});
+  expect(B).styleToEqual({ width: 10 });
+
+  screen.rerender(
+    <A className="my-class-3">
+      <B className="my-class-1" />
+    </A>
+  );
+
+  expect(A).styleToEqual({});
+  expect(B).styleToEqual({ width: 20 });
+});
