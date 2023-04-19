@@ -189,6 +189,12 @@ module.exports = function (api) {
           return;
         }
 
+        // Skip loading the app root in tests.
+        // This is handled by the testing-library utils
+        if (process.env.NODE_ENV === "test") {
+          return;
+        }
+
         parent.replaceWith(
           // This is defined in Expo CLI when using Metro. It points to the relative path for the project app directory.
           t.stringLiteral(getExpoRouterAppRoot(projectRoot))

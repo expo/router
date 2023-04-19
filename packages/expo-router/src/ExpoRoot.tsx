@@ -32,6 +32,7 @@ export function ExpoRoot({ context }: { context: RequireContext }) {
   return (
     <GestureHandlerRootView>
       <SafeAreaProvider
+        testID="test"
         // SSR support
         initialMetrics={INITIAL_METRICS}
       >

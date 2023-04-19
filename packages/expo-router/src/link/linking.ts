@@ -11,7 +11,11 @@ import getStateFromPath from "../fork/getStateFromPath";
 // This helps keep the native functionality working like the web functionality.
 // For example, if you had a root navigator where the first screen was `/settings` and the second was `/index`
 // then `/index` would be used on web and `/settings` would be used on native.
-export async function getInitialURL(): Promise<string> {
+export function getInitialURL(): Promise<string | null> | string {
+  if (process.env.NODE_ENV === "test") {
+    return Linking.getInitialURL();
+  }
+
   if (Platform.OS === "web") {
     if (typeof window === "undefined") {
       return "";

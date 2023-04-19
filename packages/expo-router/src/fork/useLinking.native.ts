@@ -156,7 +156,8 @@ export default function useLinking(
 
     const thenable = {
       then(onfulfilled?: (state: ResultState | undefined) => void) {
-        return Promise.resolve(onfulfilled ? onfulfilled(state) : state);
+        onfulfilled?.(state);
+        return thenable;
       },
       catch() {
         return thenable;
