@@ -3,6 +3,8 @@ import {
   AlignItems,
   AlignSelf,
   Angle,
+  BorderSideWidth,
+  BorderStyle,
   CssColor,
   Declaration,
   DimensionPercentageFor_LengthValue,
@@ -12,8 +14,10 @@ import {
   Length,
   LengthPercentageOrAuto,
   LengthValue,
+  LineStyle,
   MaxSize,
   NumberOrPercentage,
+  OverflowKeyword,
   Size,
   TextDecorationLine,
   TextShadow,
@@ -219,6 +223,195 @@ export function parseDeclaration(
     case "border-end-end-radius":
       addStyleProp(declaration.property, parseLength(declaration.value[0]));
       break;
+    case "display":
+      if (
+        declaration.value.type === "keyword" &&
+        declaration.value.value === "none"
+      ) {
+        addStyleProp(declaration.property, declaration.value.value);
+      } else if (
+        declaration.value.type === "pair" &&
+        declaration.value.inside.type === "flex"
+      ) {
+        addStyleProp(declaration.property, declaration.value.inside.type);
+      }
+      break;
+    case "border-radius":
+      addStyleProp(
+        "border-bottom-left-radius",
+        parseLength(declaration.value.bottomLeft[0]),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "border-bottom-right-radius",
+        parseLength(declaration.value.bottomRight[0]),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "border-top-left-radius",
+        parseLength(declaration.value.topLeft[0]),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "border-top-right-radius",
+        parseLength(declaration.value.topRight[0]),
+        { nullishCoalescing: true }
+      );
+      break;
+    case "overflow":
+      addStyleProp(declaration.property, parseOverflow(declaration.value.x));
+      break;
+    case "inset-block-start":
+    case "inset-block-end":
+      addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
+      break;
+    case "inset-block":
+      addStyleProp(
+        "inset-block-start",
+        parseLengthPercentageOrAuto(declaration.value.blockStart),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "inset-block-end",
+        parseLengthPercentageOrAuto(declaration.value.blockEnd),
+        { nullishCoalescing: true }
+      );
+      break;
+    case "inset":
+      addStyleProp("top", parseLengthPercentageOrAuto(declaration.value.top), {
+        nullishCoalescing: true,
+      });
+      addStyleProp(
+        "bottom",
+        parseLengthPercentageOrAuto(declaration.value.bottom),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "left",
+        parseLengthPercentageOrAuto(declaration.value.left),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "right",
+        parseLengthPercentageOrAuto(declaration.value.right),
+        { nullishCoalescing: true }
+      );
+      break;
+    case "border-color":
+      addStyleProp("border-top-color", parseColor(declaration.value.top), {
+        nullishCoalescing: true,
+      });
+      addStyleProp(
+        "border-bottom-color",
+        parseColor(declaration.value.bottom),
+        {
+          nullishCoalescing: true,
+        }
+      );
+      addStyleProp("border-left-color", parseColor(declaration.value.left), {
+        nullishCoalescing: true,
+      });
+      addStyleProp("border-right-color", parseColor(declaration.value.right), {
+        nullishCoalescing: true,
+      });
+      break;
+    case "border-style":
+      addStyleProp(declaration.property, parseBorderStyle(declaration.value));
+      break;
+    case "border-width":
+      addStyleProp(
+        "border-top-width",
+        parseBorderSideWidth(declaration.value.top),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "border-bottom-width",
+        parseBorderSideWidth(declaration.value.bottom),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "border-left-width",
+        parseBorderSideWidth(declaration.value.left),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "border-right-width",
+        parseBorderSideWidth(declaration.value.right),
+        { nullishCoalescing: true }
+      );
+      break;
+    case "border":
+      addStyleProp(
+        "border-width",
+        parseBorderSideWidth(declaration.value.width),
+        {
+          nullishCoalescing: true,
+        }
+      );
+      addStyleProp("border-style", parseBorderStyle(declaration.value.style), {
+        nullishCoalescing: true,
+      });
+      break;
+    case "border-top":
+    case "border-bottom":
+    case "border-left":
+    case "border-right":
+      addStyleProp(
+        declaration.property + "-color",
+        parseColor(declaration.value.color)
+      );
+      addStyleProp(
+        declaration.property + "-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      break;
+    case "margin-block-start":
+    case "margin-block-end":
+    case "margin-inline-start":
+    case "margin-inline-end":
+      addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
+      break;
+    case "padding-block-start":
+    case "padding-block-end":
+    case "padding-inline-start":
+    case "padding-inline-end":
+      addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
+      break;
+    case "margin-block":
+    case "padding-block":
+      addStyleProp(
+        declaration.property + "-start",
+        parseLengthPercentageOrAuto(declaration.value.blockStart),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        declaration.property + "-end",
+        parseLengthPercentageOrAuto(declaration.value.blockEnd),
+        { nullishCoalescing: true }
+      );
+      break;
+    case "margin-inline":
+    case "padding-inline":
+      addStyleProp(
+        declaration.property + "-start",
+        parseLengthPercentageOrAuto(declaration.value.inlineStart),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        declaration.property + "-end",
+        parseLengthPercentageOrAuto(declaration.value.inlineEnd),
+        { nullishCoalescing: true }
+      );
+      break;
     case "animation":
     case "animation-name":
     case "animation-duration":
@@ -228,15 +421,14 @@ export function parseDeclaration(
     case "animation-play-state":
     case "animation-delay":
     case "animation-fill-mode":
+    case "container-name":
+    case "container":
     case "place-content":
     case "justify-self":
     case "place-self":
     case "justify-items":
     case "place-items":
-    case "container-name":
-    case "container":
-    case "display":
-    case "border-block-start-color":
+    case "border-block-start-color": // https://github.com/facebook/react-native/issues/34425
     case "border-block-end-color":
     case "border-inline-start-color":
     case "border-inline-end-color":
@@ -244,7 +436,6 @@ export function parseDeclaration(
     case "border-block-end-width":
     case "border-inline-start-width":
     case "border-inline-end-width":
-    case "border-radius":
     case "background":
     case "background-image":
     case "background-position-x":
@@ -262,15 +453,10 @@ export function parseDeclaration(
     case "min-inline-size":
     case "max-block-size":
     case "max-inline-size":
-    case "overflow":
     case "position":
-    case "inset-block-start":
-    case "inset-block-end":
     case "inset-inline-start":
     case "inset-inline-end":
-    case "inset-block":
     case "inset-inline":
-    case "inset":
     case "border-spacing":
     case "border-image-source":
     case "border-image-outset":
@@ -278,20 +464,12 @@ export function parseDeclaration(
     case "border-image-width":
     case "border-image-slice":
     case "border-image":
-    case "border-color":
-    case "border-style":
-    case "border-width":
     case "border-block-color":
     case "border-block-style":
     case "border-block-width":
     case "border-inline-color":
     case "border-inline-style":
     case "border-inline-width":
-    case "border":
-    case "border-top":
-    case "border-bottom":
-    case "border-left":
-    case "border-right":
     case "border-block":
     case "border-block-start":
     case "border-block-end":
@@ -320,18 +498,6 @@ export function parseDeclaration(
     case "grid-row":
     case "grid-column":
     case "grid-area":
-    case "margin-block-start":
-    case "margin-block-end":
-    case "margin-inline-start":
-    case "margin-inline-end":
-    case "margin-block":
-    case "margin-inline":
-    case "padding-block":
-    case "padding-block-start":
-    case "padding-block-end":
-    case "padding-inline-start":
-    case "padding-inline-end":
-    case "padding-inline":
     case "scroll-margin-top":
     case "scroll-margin-bottom":
     case "scroll-margin-left":
@@ -1004,6 +1170,45 @@ function parseTextDecorationLine(textDecorationLine: TextDecorationLine) {
     }
   } else if (set.has("line-through")) {
     return "line-through";
+  }
+
+  return undefined;
+}
+
+function parseOverflow(overflow: OverflowKeyword) {
+  const allowed = new Set(["visible", "hidden", "scroll"]);
+
+  if (allowed.has(overflow)) {
+    return overflow;
+  }
+
+  return undefined;
+}
+
+function parseBorderStyle(borderStyle: BorderStyle | LineStyle) {
+  const allowed = new Set(["solid", "dotted", "dashed"]);
+
+  if (typeof borderStyle === "string") {
+    if (allowed.has(borderStyle)) {
+      return borderStyle;
+    } else {
+      return undefined;
+    }
+  } else if (
+    borderStyle.top === borderStyle.bottom &&
+    borderStyle.top === borderStyle.left &&
+    borderStyle.top === borderStyle.right &&
+    allowed.has(borderStyle.top)
+  ) {
+    return borderStyle.top;
+  }
+
+  return undefined;
+}
+
+function parseBorderSideWidth(borderSideWidth: BorderSideWidth) {
+  if (borderSideWidth.type === "length") {
+    return parseLength(borderSideWidth.value);
   }
 
   return undefined;
