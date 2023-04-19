@@ -8,12 +8,16 @@ import {
   CssColor,
   Declaration,
   DimensionPercentageFor_LengthValue,
+  FontFamily,
   FontSize,
+  FontStyle,
+  FontVariantCaps,
   FontWeight,
   JustifyContent,
   Length,
   LengthPercentageOrAuto,
   LengthValue,
+  LineHeight,
   LineStyle,
   MaxSize,
   NumberOrPercentage,
@@ -22,6 +26,7 @@ import {
   TextDecorationLine,
   TextShadow,
   TokenOrValue,
+  VerticalAlign,
 } from "lightningcss";
 
 import { exhaustiveCheck } from "./utils";
@@ -86,9 +91,31 @@ export function parseDeclaration(
     case "margin-right":
       addStyleProp(declaration.property, parseSize(declaration.value));
       break;
+    case "block-size":
+      addStyleProp("width", parseSize(declaration.value));
+      break;
+    case "min-block-size":
+      addStyleProp("min-width", parseSize(declaration.value));
+      break;
+    case "min-inline-size":
+      addStyleProp("min-height", parseSize(declaration.value));
+      break;
+    case "max-block-size":
+      addStyleProp("max-width", parseSize(declaration.value));
+      break;
+    case "max-inline-size":
+      addStyleProp("max-height", parseSize(declaration.value));
+      break;
+
+    case "inline-size":
+      addStyleProp("height", parseSize(declaration.value));
+      break;
     case "flex-flow":
       addStyleProp("flexWrap", declaration.value.wrap);
       addStyleProp("flexDirection", declaration.value.direction);
+      break;
+    case "flex-basis":
+      addStyleProp(declaration.property, parseSize(declaration.value));
       break;
     case "column-gap":
       if (declaration.value.type === "length-percentage") {
@@ -263,6 +290,8 @@ export function parseDeclaration(
       break;
     case "inset-block-start":
     case "inset-block-end":
+    case "inset-inline-start":
+    case "inset-inline-end":
       addStyleProp(
         declaration.property,
         parseLengthPercentageOrAuto(declaration.value)
@@ -277,6 +306,18 @@ export function parseDeclaration(
       addStyleProp(
         "inset-block-end",
         parseLengthPercentageOrAuto(declaration.value.blockEnd),
+        { nullishCoalescing: true }
+      );
+      break;
+    case "inset-inline":
+      addStyleProp(
+        "inset-block-start",
+        parseLengthPercentageOrAuto(declaration.value.inlineStart),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "inset-block-end",
+        parseLengthPercentageOrAuto(declaration.value.inlineEnd),
         { nullishCoalescing: true }
       );
       break;
@@ -412,181 +453,211 @@ export function parseDeclaration(
         { nullishCoalescing: true }
       );
       break;
+    case "vertical-align":
+      addStyleProp(declaration.property, parseVerticalAlign(declaration.value));
+      break;
+    case "font":
+      addStyleProp(
+        declaration.property + "-family",
+        parseFontFamily(declaration.value.family),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "line-height",
+        parseLineHeight(declaration.value.lineHeight),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        declaration.property + "-size",
+        parseFontSize(declaration.value.size),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        declaration.property + "-style",
+        parseFontStyle(declaration.value.style),
+        { nullishCoalescing: true }
+      );
+
+      addStyleProp(
+        declaration.property + "-variant",
+        parseFontVariantCaps(declaration.value.variantCaps),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        declaration.property + "-weight",
+        parseFontWeight(declaration.value.weight),
+        { nullishCoalescing: true }
+      );
+      break;
+    case "line-height":
+      addStyleProp(declaration.property, parseLineHeight(declaration.value));
+      break;
+    case "font-family":
+      addStyleProp(declaration.property, parseFontFamily(declaration.value));
+      break;
+    case "font-style":
+      addStyleProp(declaration.property, parseFontStyle(declaration.value));
+      break;
+    case "-webkit-mask-composite":
+    case "accent-color":
     case "animation":
-    case "animation-name":
-    case "animation-duration":
-    case "animation-timing-function":
-    case "animation-iteration-count":
-    case "animation-direction":
-    case "animation-play-state":
     case "animation-delay":
+    case "animation-direction":
+    case "animation-duration":
     case "animation-fill-mode":
-    case "container-name":
-    case "container":
-    case "place-content":
-    case "justify-self":
-    case "place-self":
-    case "justify-items":
-    case "place-items":
-    case "border-block-start-color": // https://github.com/facebook/react-native/issues/34425
-    case "border-block-end-color":
-    case "border-inline-start-color":
-    case "border-inline-end-color":
-    case "border-block-start-width":
-    case "border-block-end-width":
-    case "border-inline-start-width":
-    case "border-inline-end-width":
+    case "animation-iteration-count":
+    case "animation-name":
+    case "animation-play-state":
+    case "animation-timing-function":
+    case "backdrop-filter":
     case "background":
-    case "background-image":
-    case "background-position-x":
-    case "background-position-y":
-    case "background-position":
-    case "background-size":
-    case "background-repeat":
     case "background-attachment":
     case "background-clip":
+    case "background-image":
     case "background-origin":
-    case "box-shadow":
-    case "block-size":
-    case "inline-size":
-    case "min-block-size":
-    case "min-inline-size":
-    case "max-block-size":
-    case "max-inline-size":
-    case "position":
-    case "inset-inline-start":
-    case "inset-inline-end":
-    case "inset-inline":
-    case "border-spacing":
-    case "border-image-source":
-    case "border-image-outset":
-    case "border-image-repeat":
-    case "border-image-width":
-    case "border-image-slice":
-    case "border-image":
+    case "background-position":
+    case "background-position-x":
+    case "background-position-y":
+    case "background-repeat":
+    case "background-size":
+    case "border-block":
     case "border-block-color":
+    case "border-block-end":
+    case "border-block-end-color":
+    case "border-block-end-width":
+    case "border-block-start":
+    case "border-block-start-color":
+    case "border-block-start-width":
     case "border-block-style":
     case "border-block-width":
+    case "border-image":
+    case "border-image-outset":
+    case "border-image-repeat":
+    case "border-image-slice":
+    case "border-image-source":
+    case "border-image-width":
+    case "border-inline":
     case "border-inline-color":
+    case "border-inline-end":
+    case "border-inline-end-color":
+    case "border-inline-end-width":
+    case "border-inline-start":
+    case "border-inline-start-color":
+    case "border-inline-start-width":
     case "border-inline-style":
     case "border-inline-width":
-    case "border-block":
-    case "border-block-start":
-    case "border-block-end":
-    case "border-inline":
-    case "border-inline-start":
-    case "border-inline-end":
+    case "border-spacing":
+    case "box-shadow":
+    case "caret":
+    case "caret-color":
+    case "clip-path":
+    case "composes":
+    case "container":
+    case "container-name":
+    case "cursor":
+    case "fill":
+    case "filter":
+    case "flex-preferred-size":
+    case "font-palette":
+    case "font-stretch":
+    case "grid":
+    case "grid-area":
+    case "grid-auto-columns":
+    case "grid-auto-flow":
+    case "grid-auto-rows":
+    case "grid-column":
+    case "grid-column-end":
+    case "grid-column-start":
+    case "grid-row":
+    case "grid-row-end":
+    case "grid-row-start":
+    case "grid-template":
+    case "grid-template-areas":
+    case "grid-template-columns":
+    case "grid-template-rows":
+    case "justify-items":
+    case "justify-self":
+    case "list-style":
+    case "list-style-image":
+    case "list-style-type":
+    case "marker":
+    case "marker-end":
+    case "marker-mid":
+    case "marker-start":
+    case "mask":
+    case "mask-border":
+    case "mask-border-outset":
+    case "mask-border-repeat":
+    case "mask-border-slice":
+    case "mask-border-source":
+    case "mask-border-width":
+    case "mask-box-image":
+    case "mask-box-image-outset":
+    case "mask-box-image-repeat":
+    case "mask-box-image-slice":
+    case "mask-box-image-source":
+    case "mask-box-image-width":
+    case "mask-clip":
+    case "mask-composite":
+    case "mask-image":
+    case "mask-mode":
+    case "mask-origin":
+    case "mask-position":
+    case "mask-position-x":
+    case "mask-position-y":
+    case "mask-repeat":
+    case "mask-size":
+    case "mask-source-type":
     case "outline":
     case "outline-color":
     case "outline-style":
     case "outline-width":
-    case "flex-basis":
-    case "row-gap":
-    case "flex-preferred-size":
-    case "grid-template-columns":
-    case "grid-template-rows":
-    case "grid-auto-columns":
-    case "grid-auto-rows":
-    case "grid-auto-flow":
-    case "grid-template-areas":
-    case "grid-template":
-    case "grid":
-    case "grid-row-start":
-    case "grid-row-end":
-    case "grid-column-start":
-    case "grid-column-end":
-    case "grid-row":
-    case "grid-column":
-    case "grid-area":
-    case "scroll-margin-top":
-    case "scroll-margin-bottom":
-    case "scroll-margin-left":
-    case "scroll-margin-right":
-    case "scroll-margin-block-start":
-    case "scroll-margin-block-end":
-    case "scroll-margin-inline-start":
-    case "scroll-margin-inline-end":
-    case "scroll-margin-block":
-    case "scroll-margin-inline":
-    case "scroll-margin":
-    case "scroll-padding-top":
-    case "scroll-padding-bottom":
-    case "scroll-padding-left":
-    case "scroll-padding-right":
-    case "scroll-padding-block-start":
-    case "scroll-padding-block-end":
-    case "scroll-padding-inline-start":
-    case "scroll-padding-inline-end":
-    case "scroll-padding-block":
-    case "scroll-padding-inline":
-    case "scroll-padding":
-    case "font-stretch":
-    case "font-family":
-    case "font-style":
-    case "line-height":
-    case "font":
-    case "vertical-align":
-    case "font-palette":
-    case "transition-property":
-    case "transition-duration":
-    case "transition-delay":
-    case "transition-timing-function":
-    case "transition":
-    case "transform-origin":
     case "perspective":
     case "perspective-origin":
-    case "tab-size":
-    case "word-spacing":
-    case "text-indent":
-    case "text-emphasis-style":
-    case "text-emphasis-color":
-    case "text-emphasis":
-    case "text-emphasis-position":
-    case "cursor":
-    case "caret-color":
-    case "caret":
-    case "accent-color":
-    case "list-style-type":
-    case "list-style-image":
-    case "list-style":
-    case "composes":
-    case "fill":
+    case "place-content":
+    case "place-items":
+    case "place-self":
+    case "position":
+    case "row-gap":
+    case "scroll-margin":
+    case "scroll-margin-block":
+    case "scroll-margin-block-end":
+    case "scroll-margin-block-start":
+    case "scroll-margin-bottom":
+    case "scroll-margin-inline":
+    case "scroll-margin-inline-end":
+    case "scroll-margin-inline-start":
+    case "scroll-margin-left":
+    case "scroll-margin-right":
+    case "scroll-margin-top":
+    case "scroll-padding":
+    case "scroll-padding-block":
+    case "scroll-padding-block-end":
+    case "scroll-padding-block-start":
+    case "scroll-padding-bottom":
+    case "scroll-padding-inline":
+    case "scroll-padding-inline-end":
+    case "scroll-padding-inline-start":
+    case "scroll-padding-left":
+    case "scroll-padding-right":
+    case "scroll-padding-top":
     case "stroke":
-    case "stroke-width":
     case "stroke-dasharray":
     case "stroke-dashoffset":
-    case "marker-start":
-    case "marker-mid":
-    case "marker-end":
-    case "marker":
-    case "clip-path":
-    case "mask-image":
-    case "mask-mode":
-    case "mask-repeat":
-    case "mask-position-x":
-    case "mask-position-y":
-    case "mask-position":
-    case "mask-clip":
-    case "mask-origin":
-    case "mask-size":
-    case "mask-composite":
-    case "mask":
-    case "mask-border-source":
-    case "mask-border-slice":
-    case "mask-border-width":
-    case "mask-border-outset":
-    case "mask-border-repeat":
-    case "mask-border":
-    case "-webkit-mask-composite":
-    case "mask-source-type":
-    case "mask-box-image":
-    case "mask-box-image-source":
-    case "mask-box-image-slice":
-    case "mask-box-image-width":
-    case "mask-box-image-outset":
-    case "mask-box-image-repeat":
-    case "filter":
-    case "backdrop-filter":
+    case "stroke-width":
+    case "tab-size":
+    case "text-emphasis":
+    case "text-emphasis-color":
+    case "text-emphasis-position":
+    case "text-emphasis-style":
+    case "text-indent":
+    case "transform-origin":
+    case "transition":
+    case "transition-delay":
+    case "transition-duration":
+    case "transition-property":
+    case "transition-timing-function":
+    case "word-spacing":
       break;
     case "translate":
       addStyleProp(
@@ -953,20 +1024,6 @@ function parseColor(color: CssColor) {
   return undefined;
 }
 
-function parseFontSize(fontSize: FontSize) {
-  switch (fontSize.type) {
-    case "length":
-      return parseLength(fontSize.value);
-    case "absolute":
-    case "relative":
-      return undefined;
-    default: {
-      exhaustiveCheck(fontSize);
-    }
-  }
-  return undefined;
-}
-
 function parseLengthPercentageOrAuto(
   lengthPercentageOrAuto: LengthPercentageOrAuto
 ) {
@@ -1209,6 +1266,87 @@ function parseBorderStyle(borderStyle: BorderStyle | LineStyle) {
 function parseBorderSideWidth(borderSideWidth: BorderSideWidth) {
   if (borderSideWidth.type === "length") {
     return parseLength(borderSideWidth.value);
+  }
+
+  return undefined;
+}
+
+function parseVerticalAlign(verticalAlign: VerticalAlign) {
+  if (verticalAlign.type === "length") {
+    return undefined;
+  }
+
+  const allowed = new Set(["auto", "top", "bottom", "middle"]);
+
+  if (allowed.has(verticalAlign.value)) {
+    return verticalAlign.value;
+  }
+
+  return undefined;
+}
+
+function parseFontFamily(fontFamily: FontFamily[]) {
+  const nativeFont = fontFamily.find((f) => f.startsWith("react-native"));
+
+  if (nativeFont) {
+    return nativeFont.replace("react-native", "");
+  }
+
+  return fontFamily[0];
+}
+
+function parseLineHeight(lineHeight: LineHeight) {
+  if (lineHeight.type === "number") {
+    return lineHeight.value;
+  } else if (lineHeight.type === "length") {
+    const length = lineHeight.value;
+
+    if (length.type === "dimension") {
+      return parseLength(length);
+    }
+  }
+
+  return undefined;
+}
+
+function parseFontSize(fontSize: FontSize) {
+  switch (fontSize.type) {
+    case "length":
+      return parseLength(fontSize.value);
+    case "absolute":
+    case "relative":
+      return undefined;
+    default: {
+      exhaustiveCheck(fontSize);
+    }
+  }
+  return undefined;
+}
+
+function parseFontStyle(fontStyle: FontStyle) {
+  switch (fontStyle.type) {
+    case "normal":
+    case "italic":
+      return fontStyle.type;
+    case "oblique":
+      return undefined;
+    default: {
+      exhaustiveCheck(fontStyle);
+    }
+  }
+  return undefined;
+}
+
+function parseFontVariantCaps(fontVariantCaps: FontVariantCaps) {
+  const allowed = new Set([
+    "small-caps",
+    "oldstyle-nums",
+    "lining-nums",
+    "tabular-nums",
+    "proportional-nums",
+  ]);
+  if (allowed.has(fontVariantCaps)) {
+    return fontVariantCaps;
   }
 
   return undefined;
