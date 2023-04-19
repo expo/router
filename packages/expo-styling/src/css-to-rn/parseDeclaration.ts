@@ -1,4 +1,4 @@
-import {
+import type {
   AlignContent,
   AlignItems,
   AlignSelf,
@@ -30,7 +30,7 @@ import {
 } from "lightningcss";
 
 import { exhaustiveCheck } from "./utils";
-import { RuntimeValue, TransformRecord } from "../types";
+import type { RuntimeValue, TransformRecord } from "../types";
 
 type AddStyleProp = (
   property: string,
@@ -57,199 +57,35 @@ export function parseDeclaration(
     );
   }
 
-  const value = declaration.value;
-
-  if (!value || typeof value === "string" || typeof value === "number") {
-    return addStyleProp(declaration.property, value);
-  }
-
   switch (declaration.property) {
-    case "font-size":
-      addStyleProp(declaration.property, parseFontSize(declaration.value));
-      break;
-    case "color":
     case "background-color":
-      addStyleProp(declaration.property, parseColor(declaration.value));
-      break;
-    case "height":
-    case "width":
-    case "min-width":
-    case "min-height":
-    case "max-width":
-    case "max-height":
-    case "top":
-    case "bottom":
-    case "left":
-    case "right":
-    case "padding-top":
-    case "padding-bottom":
-    case "padding-left":
-    case "padding-right":
-    case "margin-top":
-    case "margin-bottom":
-    case "margin-left":
-    case "margin-right":
-      addStyleProp(declaration.property, parseSize(declaration.value));
-      break;
-    case "block-size":
-      addStyleProp("width", parseSize(declaration.value));
-      break;
-    case "min-block-size":
-      addStyleProp("min-width", parseSize(declaration.value));
-      break;
-    case "min-inline-size":
-      addStyleProp("min-height", parseSize(declaration.value));
-      break;
-    case "max-block-size":
-      addStyleProp("max-width", parseSize(declaration.value));
-      break;
-    case "max-inline-size":
-      addStyleProp("max-height", parseSize(declaration.value));
-      break;
-
-    case "inline-size":
-      addStyleProp("height", parseSize(declaration.value));
-      break;
-    case "flex-flow":
-      addStyleProp("flexWrap", declaration.value.wrap);
-      addStyleProp("flexDirection", declaration.value.direction);
-      break;
-    case "flex-basis":
-      addStyleProp(declaration.property, parseSize(declaration.value));
-      break;
-    case "column-gap":
-      if (declaration.value.type === "length-percentage") {
-        addStyleProp("gap", parseSize(declaration.value));
-      }
-      break;
-    case "gap":
-      if (declaration.value.column.type === "length-percentage") {
-        addStyleProp(declaration.property, parseSize(declaration.value.column));
-      }
-      break;
-    case "margin":
-      addStyleProp("marginTop", parseSize(declaration.value.top));
-      addStyleProp("marginLeft", parseSize(declaration.value.left));
-      addStyleProp("marginRigth", parseSize(declaration.value.right));
-      addStyleProp("marginBottom", parseSize(declaration.value.bottom));
-      break;
-    case "padding":
-      addStyleProp("paddingTop", parseSize(declaration.value.top));
-      addStyleProp("paddingLeft", parseSize(declaration.value.left));
-      addStyleProp("paddingRigth", parseSize(declaration.value.right));
-      addStyleProp("paddingBottom", parseSize(declaration.value.bottom));
-      break;
-    case "align-content":
-      addStyleProp(declaration.property, parseAlignContent(declaration.value));
-      break;
-    case "align-items":
-      addStyleProp(declaration.property, parseAlignItems(declaration.value));
-      break;
-    case "align-self":
-      addStyleProp(declaration.property, parseAlignSelf(declaration.value));
-      break;
-    case "justify-content":
-      addStyleProp(
-        declaration.property,
-        parseJustifyContent(declaration.value)
-      );
-      break;
-    case "flex":
-      addStyleProp("flex-grow", declaration.value.grow);
-      addStyleProp("flex-shrink", declaration.value.shrink);
-      addStyleProp(
-        "flex-basis",
-        parseLengthPercentageOrAuto(declaration.value.basis)
-      );
-      break;
-    case "font-weight":
-      addStyleProp(declaration.property, parseFontWeight(declaration.value));
-      break;
-    case "text-shadow":
-      parseTextShadow(declaration.value, addStyleProp);
-      break;
-    case "letter-spacing": {
-      if (declaration.value.type !== "normal") {
-        addStyleProp(
-          declaration.property,
-          parseLength(declaration.value.value)
-        );
-      }
-      break;
-    }
-    case "text-decoration-color":
-      addStyleProp(declaration.property, parseColor(declaration.value));
-      break;
-    case "text-decoration-line":
-      addStyleProp(
-        declaration.property,
-        parseTextDecorationLine(declaration.value)
-      );
-      break;
-    case "text-decoration-thickness":
-      if (declaration.value.type === "length-percentage") {
-        addStyleProp(
-          declaration.property,
-          parseLength(declaration.value.value)
-        );
-      }
-      break;
-    case "text-decoration":
-      addStyleProp(
-        "text-decoration-color",
-        parseColor(declaration.value.color)
-      );
-      addStyleProp(
-        "text-decoration-line",
-        parseTextDecorationLine(declaration.value.line)
-      );
-      if (declaration.value.thickness.type === "length-percentage") {
-        addStyleProp(
-          declaration.property,
-          parseLength(declaration.value.thickness.value)
-        );
-      }
-      break;
-    case "text-transform":
-      addStyleProp(declaration.property, declaration.value.case);
-      break;
-
-    case "border-top-width":
-    case "border-bottom-width":
-    case "border-left-width":
-    case "border-right-width": {
-      if (declaration.value.type === "length") {
-        addStyleProp(
-          declaration.property,
-          parseLength(declaration.value.value)
-        );
-      }
-      break;
-    }
-    case "border-top-color":
-    case "border-bottom-color":
-    case "border-left-color":
-    case "border-right-color":
-      addStyleProp(declaration.property, parseColor(declaration.value));
-      break;
-    case "z-index":
-      if (declaration.value.type === "integer") {
-        addStyleProp(
-          declaration.property,
-          parseLength(declaration.value.value)
-        );
-      }
-      break;
-    case "border-top-left-radius":
-    case "border-top-right-radius":
-    case "border-bottom-left-radius":
-    case "border-bottom-right-radius":
-    case "border-start-start-radius":
-    case "border-start-end-radius":
-    case "border-end-start-radius":
-    case "border-end-end-radius":
-      addStyleProp(declaration.property, parseLength(declaration.value[0]));
-      break;
+      return addStyleProp(declaration.property, parseColor(declaration.value));
+    case "background-image":
+      return;
+    case "background-position-x":
+      return;
+    case "background-position-y":
+      return;
+    case "background-position":
+      return;
+    case "background-size":
+      return;
+    case "background-repeat":
+      return;
+    case "background-attachment":
+      return;
+    case "background-clip":
+      return;
+    case "background-origin":
+      return;
+    case "background":
+      return;
+    case "box-shadow":
+      return;
+    case "opacity":
+      return addStyleProp(declaration.property, declaration.value);
+    case "color":
+      return addStyleProp(declaration.property, parseColor(declaration.value));
     case "display":
       if (
         declaration.value.type === "keyword" &&
@@ -262,7 +98,236 @@ export function parseDeclaration(
       ) {
         addStyleProp(declaration.property, declaration.value.inside.type);
       }
-      break;
+      return;
+    case "visibility":
+      // Might be possible to polyfill this with opacity 0 and to disable event handlers
+      return;
+    case "width":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "height":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "min-width":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "min-height":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "max-width":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "max-height":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "block-size":
+      return addStyleProp("width", parseSize(declaration.value));
+    case "inline-size":
+      return addStyleProp("height", parseSize(declaration.value));
+    case "min-block-size":
+      return addStyleProp("min-width", parseSize(declaration.value));
+    case "min-inline-size":
+      return addStyleProp("min-height", parseSize(declaration.value));
+    case "max-block-size":
+      return addStyleProp("max-width", parseSize(declaration.value));
+    case "max-inline-size":
+      return addStyleProp("max-height", parseSize(declaration.value));
+    case "box-sizing":
+      return;
+    case "overflow":
+      return addStyleProp(
+        declaration.property,
+        parseOverflow(declaration.value.x)
+      );
+    case "overflow-x":
+      return;
+    case "overflow-y":
+      return;
+    case "text-overflow":
+      return;
+    case "position":
+      // Position works differently on web and native
+      return;
+    case "top":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "bottom":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "left":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "right":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "inset-block-start":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
+    case "inset-block-end":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
+    case "inset-inline-start":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
+    case "inset-inline-end":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
+    case "inset-block":
+      addStyleProp(
+        "inset-block-start",
+        parseLengthPercentageOrAuto(declaration.value.blockStart),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "inset-block-end",
+        parseLengthPercentageOrAuto(declaration.value.blockEnd),
+        { nullishCoalescing: true }
+      );
+      return;
+    case "inset-inline":
+      addStyleProp(
+        "inset-block-start",
+        parseLengthPercentageOrAuto(declaration.value.inlineStart),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "inset-block-end",
+        parseLengthPercentageOrAuto(declaration.value.inlineEnd),
+        { nullishCoalescing: true }
+      );
+      return;
+    case "inset":
+      addStyleProp("top", parseLengthPercentageOrAuto(declaration.value.top), {
+        nullishCoalescing: true,
+      });
+      addStyleProp(
+        "bottom",
+        parseLengthPercentageOrAuto(declaration.value.bottom),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "left",
+        parseLengthPercentageOrAuto(declaration.value.left),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        "right",
+        parseLengthPercentageOrAuto(declaration.value.right),
+        { nullishCoalescing: true }
+      );
+      return;
+    case "border-spacing":
+      return;
+    case "border-top-color":
+      return addStyleProp(declaration.property, parseColor(declaration.value));
+    case "border-bottom-color":
+      return addStyleProp(declaration.property, parseColor(declaration.value));
+    case "border-left-color":
+      return addStyleProp(declaration.property, parseColor(declaration.value));
+    case "border-right-color":
+      return addStyleProp(declaration.property, parseColor(declaration.value));
+    case "border-block-start-color":
+      return addStyleProp("border-top-color", parseColor(declaration.value));
+    case "border-block-end-color":
+      return addStyleProp("border-bottom-color", parseColor(declaration.value));
+    case "border-inline-start-color":
+      return addStyleProp("border-left-color", parseColor(declaration.value));
+    case "border-inline-end-color":
+      return addStyleProp("border-right-color", parseColor(declaration.value));
+    case "border-top-style":
+      return;
+    case "border-bottom-style":
+      return;
+    case "border-left-style":
+      return;
+    case "border-right-style":
+      return;
+    case "border-block-start-style":
+      return;
+    case "border-block-end-style":
+      return;
+    case "border-inline-start-style":
+      return;
+    case "border-inline-end-style":
+      return;
+    case "border-top-width":
+      return addStyleProp(
+        declaration.property,
+        parseBorderSideWidth(declaration.value)
+      );
+    case "border-bottom-width":
+      return addStyleProp(
+        declaration.property,
+        parseBorderSideWidth(declaration.value)
+      );
+    case "border-left-width":
+      return addStyleProp(
+        declaration.property,
+        parseBorderSideWidth(declaration.value)
+      );
+    case "border-right-width":
+      return addStyleProp(
+        declaration.property,
+        parseBorderSideWidth(declaration.value)
+      );
+    case "border-block-start-width":
+      return addStyleProp(
+        "border-top-width",
+        parseBorderSideWidth(declaration.value)
+      );
+    case "border-block-end-width":
+      return addStyleProp(
+        "border-bottom-width",
+        parseBorderSideWidth(declaration.value)
+      );
+    case "border-inline-start-width":
+      return addStyleProp(
+        "border-left-width",
+        parseBorderSideWidth(declaration.value)
+      );
+    case "border-inline-end-width":
+      return addStyleProp(
+        "border-right-width",
+        parseBorderSideWidth(declaration.value)
+      );
+    case "border-top-left-radius":
+      return addStyleProp(
+        declaration.property,
+        parseLength(declaration.value[0])
+      );
+    case "border-top-right-radius":
+      return addStyleProp(
+        declaration.property,
+        parseLength(declaration.value[0])
+      );
+    case "border-bottom-left-radius":
+      return addStyleProp(
+        declaration.property,
+        parseLength(declaration.value[0])
+      );
+    case "border-bottom-right-radius":
+      return addStyleProp(
+        declaration.property,
+        parseLength(declaration.value[0])
+      );
+    case "border-start-start-radius":
+      return addStyleProp(
+        declaration.property,
+        parseLength(declaration.value[0])
+      );
+    case "border-start-end-radius":
+      return addStyleProp(
+        declaration.property,
+        parseLength(declaration.value[0])
+      );
+    case "border-end-start-radius":
+      return addStyleProp(
+        declaration.property,
+        parseLength(declaration.value[0])
+      );
+    case "border-end-end-radius":
+      return addStyleProp(
+        declaration.property,
+        parseLength(declaration.value[0])
+      );
     case "border-radius":
       addStyleProp(
         "border-bottom-left-radius",
@@ -284,63 +349,19 @@ export function parseDeclaration(
         parseLength(declaration.value.topRight[0]),
         { nullishCoalescing: true }
       );
-      break;
-    case "overflow":
-      addStyleProp(declaration.property, parseOverflow(declaration.value.x));
-      break;
-    case "inset-block-start":
-    case "inset-block-end":
-    case "inset-inline-start":
-    case "inset-inline-end":
-      addStyleProp(
-        declaration.property,
-        parseLengthPercentageOrAuto(declaration.value)
-      );
-      break;
-    case "inset-block":
-      addStyleProp(
-        "inset-block-start",
-        parseLengthPercentageOrAuto(declaration.value.blockStart),
-        { nullishCoalescing: true }
-      );
-      addStyleProp(
-        "inset-block-end",
-        parseLengthPercentageOrAuto(declaration.value.blockEnd),
-        { nullishCoalescing: true }
-      );
-      break;
-    case "inset-inline":
-      addStyleProp(
-        "inset-block-start",
-        parseLengthPercentageOrAuto(declaration.value.inlineStart),
-        { nullishCoalescing: true }
-      );
-      addStyleProp(
-        "inset-block-end",
-        parseLengthPercentageOrAuto(declaration.value.inlineEnd),
-        { nullishCoalescing: true }
-      );
-      break;
-    case "inset":
-      addStyleProp("top", parseLengthPercentageOrAuto(declaration.value.top), {
-        nullishCoalescing: true,
-      });
-      addStyleProp(
-        "bottom",
-        parseLengthPercentageOrAuto(declaration.value.bottom),
-        { nullishCoalescing: true }
-      );
-      addStyleProp(
-        "left",
-        parseLengthPercentageOrAuto(declaration.value.left),
-        { nullishCoalescing: true }
-      );
-      addStyleProp(
-        "right",
-        parseLengthPercentageOrAuto(declaration.value.right),
-        { nullishCoalescing: true }
-      );
-      break;
+      return;
+    case "border-image-source":
+      return;
+    case "border-image-outset":
+      return;
+    case "border-image-repeat":
+      return;
+    case "border-image-width":
+      return;
+    case "border-image-slice":
+      return;
+    case "border-image":
+      return;
     case "border-color":
       addStyleProp("border-top-color", parseColor(declaration.value.top), {
         nullishCoalescing: true,
@@ -358,10 +379,12 @@ export function parseDeclaration(
       addStyleProp("border-right-color", parseColor(declaration.value.right), {
         nullishCoalescing: true,
       });
-      break;
+      return;
     case "border-style":
-      addStyleProp(declaration.property, parseBorderStyle(declaration.value));
-      break;
+      return addStyleProp(
+        declaration.property,
+        parseBorderStyle(declaration.value)
+      );
     case "border-width":
       addStyleProp(
         "border-top-width",
@@ -383,7 +406,39 @@ export function parseDeclaration(
         parseBorderSideWidth(declaration.value.right),
         { nullishCoalescing: true }
       );
-      break;
+      return;
+    case "border-block-color":
+      addStyleProp("border-top-color", parseColor(declaration.value.start));
+      addStyleProp("border-bottom-color", parseColor(declaration.value.end));
+      return;
+    case "border-block-style":
+      return;
+    case "border-block-width":
+      addStyleProp(
+        "border-top-width",
+        parseBorderSideWidth(declaration.value.start)
+      );
+      addStyleProp(
+        "border-bottom-width",
+        parseBorderSideWidth(declaration.value.end)
+      );
+      return;
+    case "border-inline-color":
+      addStyleProp("border-left-color", parseColor(declaration.value.start));
+      addStyleProp("border-right-color", parseColor(declaration.value.end));
+      return;
+    case "border-inline-style":
+      return;
+    case "border-inline-width":
+      addStyleProp(
+        "border-left-width",
+        parseBorderSideWidth(declaration.value.start)
+      );
+      addStyleProp(
+        "border-right-width",
+        parseBorderSideWidth(declaration.value.end)
+      );
+      return;
     case "border":
       addStyleProp(
         "border-width",
@@ -395,10 +450,37 @@ export function parseDeclaration(
       addStyleProp("border-style", parseBorderStyle(declaration.value.style), {
         nullishCoalescing: true,
       });
-      break;
+      return;
     case "border-top":
+      addStyleProp(
+        declaration.property + "-color",
+        parseColor(declaration.value.color)
+      );
+      addStyleProp(
+        declaration.property + "-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      return;
     case "border-bottom":
+      addStyleProp(
+        declaration.property + "-color",
+        parseColor(declaration.value.color)
+      );
+      addStyleProp(
+        declaration.property + "-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      return;
     case "border-left":
+      addStyleProp(
+        declaration.property + "-color",
+        parseColor(declaration.value.color)
+      );
+      addStyleProp(
+        declaration.property + "-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      return;
     case "border-right":
       addStyleProp(
         declaration.property + "-color",
@@ -408,26 +490,281 @@ export function parseDeclaration(
         declaration.property + "-width",
         parseBorderSideWidth(declaration.value.width)
       );
+      return;
+    case "border-block":
+      addStyleProp("border-top-color", parseColor(declaration.value.color));
+      addStyleProp("border-bottom-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-top-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      addStyleProp(
+        "border-bottom-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      return;
+    case "border-block-start":
+      addStyleProp("border-top-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-top-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      return;
+    case "border-block-end":
+      addStyleProp("border-bottom-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-bottom-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      return;
+    case "border-inline":
+      addStyleProp("border-left-color", parseColor(declaration.value.color));
+      addStyleProp("border-right-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-left-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      addStyleProp(
+        "border-right-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      return;
+    case "border-inline-start":
+      addStyleProp("border-left-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-left-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      return;
+    case "border-inline-end":
+      addStyleProp("border-right-color", parseColor(declaration.value.color));
+      addStyleProp(
+        "border-right-width",
+        parseBorderSideWidth(declaration.value.width)
+      );
+      return;
+    case "outline":
+      return;
+    case "outline-color":
+      return;
+    case "outline-style":
+      return;
+    case "outline-width":
+      return;
+    case "flex-direction":
+      // TODO
+      return;
+    case "flex-wrap":
+      // TODO
+      return;
+    case "flex-flow":
+      addStyleProp("flexWrap", declaration.value.wrap);
+      addStyleProp("flexDirection", declaration.value.direction);
       break;
+    case "flex-grow":
+      // TODO
+      return;
+    case "flex-shrink":
+      // TODO
+      return;
+    case "flex-basis":
+      // TODO
+      return;
+    case "flex":
+      addStyleProp("flex-grow", declaration.value.grow);
+      addStyleProp("flex-shrink", declaration.value.shrink);
+      addStyleProp(
+        "flex-basis",
+        parseLengthPercentageOrAuto(declaration.value.basis)
+      );
+      break;
+    case "order":
+      return;
+    case "align-content":
+      return addStyleProp(
+        declaration.property,
+        parseAlignContent(declaration.value)
+      );
+    case "justify-content":
+      return addStyleProp(
+        declaration.property,
+        parseJustifyContent(declaration.value)
+      );
+    case "place-content":
+      return;
+    case "align-self":
+      return addStyleProp(
+        declaration.property,
+        parseAlignSelf(declaration.value)
+      );
+    case "justify-self":
+      return;
+    case "place-self":
+      return;
+    case "align-items":
+      return addStyleProp(
+        declaration.property,
+        parseAlignItems(declaration.value)
+      );
+    case "justify-items":
+      return;
+    case "place-items":
+      return;
+    case "row-gap":
+      return;
+    case "column-gap":
+      return;
+    case "gap":
+      // TODO
+      return;
+    case "box-orient":
+      return;
+    case "box-direction":
+      return;
+    case "box-ordinal-group":
+      return;
+    case "box-align":
+      return;
+    case "box-flex":
+      return;
+    case "box-flex-group":
+      return;
+    case "box-pack":
+      return;
+    case "box-lines":
+      return;
+    case "flex-pack":
+      return;
+    case "flex-order":
+      return;
+    case "flex-align":
+      return;
+    case "flex-item-align":
+      return;
+    case "flex-line-pack":
+      return;
+    case "flex-positive":
+      return;
+    case "flex-negative":
+      return;
+    case "flex-preferred-size":
+      return;
+    case "grid-template-columns":
+      return;
+    case "grid-template-rows":
+      return;
+    case "grid-auto-columns":
+      return;
+    case "grid-auto-rows":
+      return;
+    case "grid-auto-flow":
+      return;
+    case "grid-template-areas":
+      return;
+    case "grid-template":
+      return;
+    case "grid":
+      return;
+    case "grid-row-start":
+      return;
+    case "grid-row-end":
+      return;
+    case "grid-column-start":
+      return;
+    case "grid-column-end":
+      return;
+    case "grid-row":
+      return;
+    case "grid-column":
+      return;
+    case "grid-area":
+      return;
+    case "margin-top":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "margin-bottom":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "margin-left":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "margin-right":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
     case "margin-block-start":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
     case "margin-block-end":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
     case "margin-inline-start":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
     case "margin-inline-end":
-      addStyleProp(
+      return addStyleProp(
         declaration.property,
         parseLengthPercentageOrAuto(declaration.value)
       );
-      break;
-    case "padding-block-start":
-    case "padding-block-end":
-    case "padding-inline-start":
-    case "padding-inline-end":
-      addStyleProp(
-        declaration.property,
-        parseLengthPercentageOrAuto(declaration.value)
-      );
-      break;
     case "margin-block":
+      addStyleProp(
+        declaration.property + "-start",
+        parseLengthPercentageOrAuto(declaration.value.blockStart),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        declaration.property + "-end",
+        parseLengthPercentageOrAuto(declaration.value.blockEnd),
+        { nullishCoalescing: true }
+      );
+      return;
+    case "margin-inline":
+      addStyleProp(
+        declaration.property + "-start",
+        parseLengthPercentageOrAuto(declaration.value.inlineStart),
+        { nullishCoalescing: true }
+      );
+      addStyleProp(
+        declaration.property + "-end",
+        parseLengthPercentageOrAuto(declaration.value.inlineEnd),
+        { nullishCoalescing: true }
+      );
+      return;
+    case "margin":
+      addStyleProp("marginTop", parseSize(declaration.value.top));
+      addStyleProp("marginLeft", parseSize(declaration.value.left));
+      addStyleProp("marginRigth", parseSize(declaration.value.right));
+      addStyleProp("marginBottom", parseSize(declaration.value.bottom));
+      return;
+    case "padding-top":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "padding-bottom":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "padding-left":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "padding-right":
+      return addStyleProp(declaration.property, parseSize(declaration.value));
+    case "padding-block-start":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
+    case "padding-block-end":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
+    case "padding-inline-start":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
+    case "padding-inline-end":
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value)
+      );
     case "padding-block":
       addStyleProp(
         declaration.property + "-start",
@@ -439,8 +776,7 @@ export function parseDeclaration(
         parseLengthPercentageOrAuto(declaration.value.blockEnd),
         { nullishCoalescing: true }
       );
-      break;
-    case "margin-inline":
+      return;
     case "padding-inline":
       addStyleProp(
         declaration.property + "-start",
@@ -453,9 +789,67 @@ export function parseDeclaration(
         { nullishCoalescing: true }
       );
       break;
-    case "vertical-align":
-      addStyleProp(declaration.property, parseVerticalAlign(declaration.value));
+    case "padding":
+      addStyleProp("paddingTop", parseSize(declaration.value.top));
+      addStyleProp("paddingLeft", parseSize(declaration.value.left));
+      addStyleProp("paddingRigth", parseSize(declaration.value.right));
+      addStyleProp("paddingBottom", parseSize(declaration.value.bottom));
       break;
+    case "scroll-margin-top":
+    case "scroll-margin-bottom":
+    case "scroll-margin-left":
+    case "scroll-margin-right":
+    case "scroll-margin-block-start":
+    case "scroll-margin-block-end":
+    case "scroll-margin-inline-start":
+    case "scroll-margin-inline-end":
+    case "scroll-margin-block":
+    case "scroll-margin-inline":
+    case "scroll-margin":
+    case "scroll-padding-top":
+    case "scroll-padding-bottom":
+    case "scroll-padding-left":
+    case "scroll-padding-right":
+    case "scroll-padding-block-start":
+    case "scroll-padding-block-end":
+    case "scroll-padding-inline-start":
+    case "scroll-padding-inline-end":
+    case "scroll-padding-block":
+    case "scroll-padding-inline":
+    case "scroll-padding":
+      return;
+    case "font-weight":
+      return addStyleProp(
+        declaration.property,
+        parseFontWeight(declaration.value)
+      );
+    case "font-size":
+      return addStyleProp(
+        declaration.property,
+        parseFontSize(declaration.value)
+      );
+    case "font-stretch":
+      return;
+    case "font-family":
+      return addStyleProp(
+        declaration.property,
+        parseFontFamily(declaration.value)
+      );
+    case "font-style":
+      return addStyleProp(
+        declaration.property,
+        parseFontStyle(declaration.value)
+      );
+    case "font-variant-caps":
+      return addStyleProp(
+        declaration.property,
+        parseFontVariantCaps(declaration.value)
+      );
+    case "line-height":
+      return addStyleProp(
+        declaration.property,
+        parseLineHeight(declaration.value)
+      );
     case "font":
       addStyleProp(
         declaration.property + "-family",
@@ -488,208 +882,42 @@ export function parseDeclaration(
         parseFontWeight(declaration.value.weight),
         { nullishCoalescing: true }
       );
-      break;
-    case "line-height":
-      addStyleProp(declaration.property, parseLineHeight(declaration.value));
-      break;
-    case "font-family":
-      addStyleProp(declaration.property, parseFontFamily(declaration.value));
-      break;
-    case "font-style":
-      addStyleProp(declaration.property, parseFontStyle(declaration.value));
-      break;
-    case "-webkit-mask-composite":
-    case "accent-color":
-    case "animation":
-    case "animation-delay":
-    case "animation-direction":
-    case "animation-duration":
-    case "animation-fill-mode":
-    case "animation-iteration-count":
-    case "animation-name":
-    case "animation-play-state":
-    case "animation-timing-function":
-    case "backdrop-filter":
-    case "background":
-    case "background-attachment":
-    case "background-clip":
-    case "background-image":
-    case "background-origin":
-    case "background-position":
-    case "background-position-x":
-    case "background-position-y":
-    case "background-repeat":
-    case "background-size":
-    case "border-block":
-    case "border-block-color":
-    case "border-block-end":
-    case "border-block-end-color":
-    case "border-block-end-width":
-    case "border-block-start":
-    case "border-block-start-color":
-    case "border-block-start-width":
-    case "border-block-style":
-    case "border-block-width":
-    case "border-image":
-    case "border-image-outset":
-    case "border-image-repeat":
-    case "border-image-slice":
-    case "border-image-source":
-    case "border-image-width":
-    case "border-inline":
-    case "border-inline-color":
-    case "border-inline-end":
-    case "border-inline-end-color":
-    case "border-inline-end-width":
-    case "border-inline-start":
-    case "border-inline-start-color":
-    case "border-inline-start-width":
-    case "border-inline-style":
-    case "border-inline-width":
-    case "border-spacing":
-    case "box-shadow":
-    case "caret":
-    case "caret-color":
-    case "clip-path":
-    case "composes":
-    case "container":
-    case "container-name":
-    case "cursor":
-    case "fill":
-    case "filter":
-    case "flex-preferred-size":
+      return;
+    case "vertical-align":
+      return addStyleProp(
+        declaration.property,
+        parseVerticalAlign(declaration.value)
+      );
     case "font-palette":
-    case "font-stretch":
-    case "grid":
-    case "grid-area":
-    case "grid-auto-columns":
-    case "grid-auto-flow":
-    case "grid-auto-rows":
-    case "grid-column":
-    case "grid-column-end":
-    case "grid-column-start":
-    case "grid-row":
-    case "grid-row-end":
-    case "grid-row-start":
-    case "grid-template":
-    case "grid-template-areas":
-    case "grid-template-columns":
-    case "grid-template-rows":
-    case "justify-items":
-    case "justify-self":
-    case "list-style":
-    case "list-style-image":
-    case "list-style-type":
-    case "marker":
-    case "marker-end":
-    case "marker-mid":
-    case "marker-start":
-    case "mask":
-    case "mask-border":
-    case "mask-border-outset":
-    case "mask-border-repeat":
-    case "mask-border-slice":
-    case "mask-border-source":
-    case "mask-border-width":
-    case "mask-box-image":
-    case "mask-box-image-outset":
-    case "mask-box-image-repeat":
-    case "mask-box-image-slice":
-    case "mask-box-image-source":
-    case "mask-box-image-width":
-    case "mask-clip":
-    case "mask-composite":
-    case "mask-image":
-    case "mask-mode":
-    case "mask-origin":
-    case "mask-position":
-    case "mask-position-x":
-    case "mask-position-y":
-    case "mask-repeat":
-    case "mask-size":
-    case "mask-source-type":
-    case "outline":
-    case "outline-color":
-    case "outline-style":
-    case "outline-width":
-    case "perspective":
-    case "perspective-origin":
-    case "place-content":
-    case "place-items":
-    case "place-self":
-    case "position":
-    case "row-gap":
-    case "scroll-margin":
-    case "scroll-margin-block":
-    case "scroll-margin-block-end":
-    case "scroll-margin-block-start":
-    case "scroll-margin-bottom":
-    case "scroll-margin-inline":
-    case "scroll-margin-inline-end":
-    case "scroll-margin-inline-start":
-    case "scroll-margin-left":
-    case "scroll-margin-right":
-    case "scroll-margin-top":
-    case "scroll-padding":
-    case "scroll-padding-block":
-    case "scroll-padding-block-end":
-    case "scroll-padding-block-start":
-    case "scroll-padding-bottom":
-    case "scroll-padding-inline":
-    case "scroll-padding-inline-end":
-    case "scroll-padding-inline-start":
-    case "scroll-padding-left":
-    case "scroll-padding-right":
-    case "scroll-padding-top":
-    case "stroke":
-    case "stroke-dasharray":
-    case "stroke-dashoffset":
-    case "stroke-width":
-    case "tab-size":
-    case "text-emphasis":
-    case "text-emphasis-color":
-    case "text-emphasis-position":
-    case "text-emphasis-style":
-    case "text-indent":
-    case "transform-origin":
-    case "transition":
-    case "transition-delay":
-    case "transition-duration":
+      return;
     case "transition-property":
+      return;
+    case "transition-duration":
+      return;
+    case "transition-delay":
+      return;
     case "transition-timing-function":
-    case "word-spacing":
-      break;
-    case "translate":
-      addStyleProp(
-        "transform",
-        [
-          { translateX: declaration.value.x },
-          { translateY: declaration.value.y },
-        ],
-        { append: true }
-      );
-      break;
-    case "rotate":
-      addStyleProp(
-        "transform",
-        [
-          { rotateX: declaration.value.x },
-          { rotateY: declaration.value.y },
-          { rotateY: declaration.value.z },
-        ],
-        { append: true }
-      );
-      break;
-    case "scale":
-      addStyleProp(
-        "transform",
-        [
-          { scaleX: parseLength(declaration.value.x) },
-          { scaleY: parseLength(declaration.value.y) },
-        ],
-        { append: true }
-      );
-      break;
+      return;
+    case "transition":
+      return;
+    case "animation-name":
+      return;
+    case "animation-duration":
+      return;
+    case "animation-timing-function":
+      return;
+    case "animation-iteration-count":
+      return;
+    case "animation-direction":
+      return;
+    case "animation-play-state":
+      return;
+    case "animation-delay":
+      return;
+    case "animation-fill-mode":
+      return;
+    case "animation":
+      return;
     case "transform": {
       const transforms: TransformRecord[] = [];
 
@@ -745,12 +973,209 @@ export function parseDeclaration(
 
       return addStyleProp(declaration.property, transforms);
     }
+    case "transform-origin":
+      return;
+    case "transform-style":
+      return;
+    case "transform-box":
+      return;
+    case "backface-visibility":
+      return;
+    case "perspective":
+      return;
+    case "perspective-origin":
+      return;
+    case "translate":
+      return addStyleProp(
+        "transform",
+        [
+          { translateX: declaration.value.x },
+          { translateY: declaration.value.y },
+        ],
+        { append: true }
+      );
+    case "rotate":
+      return addStyleProp(
+        "transform",
+        [
+          { rotateX: declaration.value.x },
+          { rotateY: declaration.value.y },
+          { rotateY: declaration.value.z },
+        ],
+        { append: true }
+      );
+    case "scale":
+      return addStyleProp(
+        "transform",
+        [
+          { scaleX: parseLength(declaration.value.x) },
+          { scaleY: parseLength(declaration.value.y) },
+        ],
+        { append: true }
+      );
+    case "text-transform":
+      return addStyleProp(declaration.property, declaration.value.case);
+    case "white-space":
+      return;
+    case "tab-size":
+      return;
+    case "word-break":
+      return;
+    case "line-break":
+      return;
+    case "hyphens":
+      return;
+    case "overflow-wrap":
+      return;
+    case "word-wrap":
+      return;
+    case "text-align":
+      return;
+    case "text-align-last":
+      return;
+    case "text-justify":
+      return;
+    case "word-spacing":
+      return;
+    case "letter-spacing":
+      if (declaration.value.type !== "normal") {
+        return addStyleProp(
+          declaration.property,
+          parseLength(declaration.value.value)
+        );
+      }
+      return;
+    case "text-indent":
+      return;
+    case "text-decoration-line":
+      return addStyleProp(
+        declaration.property,
+        parseTextDecorationLine(declaration.value)
+      );
+    case "text-decoration-style":
+      return;
+    case "text-decoration-color":
+      return addStyleProp(declaration.property, parseColor(declaration.value));
+    case "text-decoration-thickness":
+      if (declaration.value.type === "length-percentage") {
+        return addStyleProp(
+          declaration.property,
+          parseLength(declaration.value.value)
+        );
+      }
+      return;
+    case "text-decoration":
+      addStyleProp(
+        "text-decoration-color",
+        parseColor(declaration.value.color)
+      );
+      addStyleProp(
+        "text-decoration-line",
+        parseTextDecorationLine(declaration.value.line)
+      );
+      if (declaration.value.thickness.type === "length-percentage") {
+        addStyleProp(
+          declaration.property,
+          parseLength(declaration.value.thickness.value)
+        );
+      }
+      return;
+    case "text-decoration-skip-ink":
+      return;
+    case "text-emphasis-style":
+      return;
+    case "text-emphasis-color":
+      return;
+    case "text-emphasis":
+      return;
+    case "text-emphasis-position":
+      return;
+    case "text-shadow":
+      return parseTextShadow(declaration.value, addStyleProp);
+    case "box-decoration-break":
+    case "resize":
+    case "cursor":
+    case "caret-color":
+    case "caret-shape":
+    case "caret":
+    case "user-select":
+    case "accent-color":
+    case "appearance":
+    case "list-style-type":
+    case "list-style-image":
+    case "list-style-position":
+    case "list-style":
+    case "marker-side":
+    case "composes":
+    case "fill":
+    case "fill-rule":
+    case "fill-opacity":
+    case "stroke":
+    case "stroke-opacity":
+    case "stroke-width":
+    case "stroke-linecap":
+    case "stroke-linejoin":
+    case "stroke-miterlimit":
+    case "stroke-dasharray":
+    case "stroke-dashoffset":
+    case "marker-start":
+    case "marker-mid":
+    case "marker-end":
+    case "marker":
+    case "color-interpolation":
+    case "color-interpolation-filters":
+    case "color-rendering":
+    case "shape-rendering":
+    case "text-rendering":
+    case "image-rendering":
+    case "clip-path":
+    case "clip-rule":
+    case "mask-image":
+    case "mask-mode":
+    case "mask-repeat":
+    case "mask-position-x":
+    case "mask-position-y":
+    case "mask-position":
+    case "mask-clip":
+    case "mask-origin":
+    case "mask-size":
+    case "mask-composite":
+    case "mask-type":
+    case "mask":
+    case "mask-border-source":
+    case "mask-border-mode":
+    case "mask-border-slice":
+    case "mask-border-width":
+    case "mask-border-outset":
+    case "mask-border-repeat":
+    case "mask-border":
+    case "-webkit-mask-composite":
+    case "mask-source-type":
+    case "mask-box-image":
+    case "mask-box-image-source":
+    case "mask-box-image-slice":
+    case "mask-box-image-width":
+    case "mask-box-image-outset":
+    case "mask-box-image-repeat":
+    case "filter":
+    case "backdrop-filter":
+      return;
+    case "z-index":
+      if (declaration.value.type === "integer") {
+        addStyleProp(
+          declaration.property,
+          parseLength(declaration.value.value)
+        );
+      }
+      return;
+    case "container-type":
+    case "container-name":
+    case "container":
+      return;
     default: {
       exhaustiveCheck(declaration);
     }
   }
-
-  return undefined;
 }
 /**
  * When the CSS cannot be parsed (often due to a runtime condition like a CSS variable)
