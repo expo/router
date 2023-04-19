@@ -15,12 +15,17 @@
   "dependencies": {
     "lightningcss": "^1.19.0"
   },
-  "optionalDependencies": {
-    "tailwindcss": "^3.3.1"
-  },
   "devDependencies": {
     "@testing-library/react-native": "^12.0.1",
     "@types/metro-config": "0.76.2",
     "jest-expo": "^48.0.2"
+  },
+  "peerDependencies": {
+    "tailwindcss": "^3.3.1"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
   }
 }
