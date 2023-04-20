@@ -1722,7 +1722,11 @@ function parseFontFamily(fontFamily: FontFamily[]) {
 
 function parseLineHeight(lineHeight: LineHeight) {
   if (lineHeight.type === "number") {
-    return lineHeight.value;
+    return {
+      type: "runtime",
+      name: "em",
+      arguments: [lineHeight.value],
+    };
   } else if (lineHeight.type === "length") {
     const length = lineHeight.value;
 

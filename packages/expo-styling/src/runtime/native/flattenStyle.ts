@@ -108,6 +108,16 @@ function extractValue(
         return (vw.get() / 100) * (value.arguments[0] as number);
       case "rem":
         return rem.get() * (value.arguments[0] as number);
+      case "em":
+        return () => {
+          const multiplier = value.arguments[0] as number;
+
+          if ("fontSize" in flatStyle) {
+            return (flatStyle.fontSize || 0) * multiplier;
+          }
+
+          return undefined;
+        };
       case "var":
         return () => {
           const resolvedValue =
