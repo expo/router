@@ -8,7 +8,7 @@ import {
   Rule,
 } from "lightningcss";
 
-import { parseDeclaration } from "./parseDeclaration";
+import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import { isRuntimeValue } from "../runtime/native/guards";
 import { ExtractedStyle, StyleSheetRegisterOptions } from "../types";
 
@@ -16,11 +16,14 @@ interface GetVisitorOptions {
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
 }
 
+export type CssToReactNativeRuntimeOptions = ParseDeclarationOptions;
+
 /**
  * LightningCSS visitor that converts CSS to React Native styles
  */
 export function cssToReactNativeRuntime(
-  code: Buffer
+  code: Buffer,
+  options: CssToReactNativeRuntimeOptions = {}
 ): StyleSheetRegisterOptions {
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
 
@@ -29,7 +32,7 @@ export function cssToReactNativeRuntime(
     code,
     visitor: {
       Rule(rule) {
-        extractRule(rule, { declarations });
+        extractRule(rule, { declarations }, options);
         // We have processed this rule, so now delete it from the AST
         return [];
       },
@@ -41,16 +44,20 @@ export function cssToReactNativeRuntime(
   };
 }
 
-function extractRule(rule: Rule, { declarations }: GetVisitorOptions) {
+function extractRule(
+  rule: Rule,
+  { declarations }: GetVisitorOptions,
+  options: ParseDeclarationOptions
+) {
   switch (rule.type) {
     case "media": {
-      extractedMedia(rule.value, declarations);
+      extractedMedia(rule.value, declarations, options);
       break;
     }
     case "style": {
       if (rule.value.declarations) {
         setStyleForSelectorList(
-          getExtractedStyle(rule.value.declarations),
+          getExtractedStyle(rule.value.declarations, options),
           rule.value.selectors,
           declarations
         );
@@ -84,7 +91,8 @@ function setStyleForSelectorList(
 
 function extractedMedia(
   mediaRule: MediaRule,
-  declarations: GetVisitorOptions["declarations"]
+  declarations: GetVisitorOptions["declarations"],
+  options: ParseDeclarationOptions
 ) {
   const media: MediaQuery[] = [];
 
@@ -105,7 +113,10 @@ function extractedMedia(
 
   for (const rule of mediaRule.rules) {
     if (rule.type === "style" && rule.value.declarations) {
-      const extractedStyle = getExtractedStyle(rule.value.declarations);
+      const extractedStyle = getExtractedStyle(
+        rule.value.declarations,
+        options
+      );
 
       setStyleForSelectorList(
         { ...extractedStyle, media },
@@ -119,7 +130,8 @@ function extractedMedia(
 }
 
 function getExtractedStyle(
-  declarationBlock: DeclarationBlock<Declaration>
+  declarationBlock: DeclarationBlock<Declaration>,
+  options: ParseDeclarationOptions
 ): ExtractedStyle {
   const style: Record<string, any> = {};
   const runtimeStyleProps: string[] = [];
@@ -176,7 +188,7 @@ function getExtractedStyle(
   }
 
   for (const declaration of declarationArray) {
-    parseDeclaration(declaration, addStyleProp);
+    parseDeclaration(declaration, addStyleProp, options);
   }
 
   return {

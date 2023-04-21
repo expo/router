@@ -1,12 +1,18 @@
 import React, { ComponentType, FunctionComponent } from "react";
 import { View, ViewProps } from "react-native";
 
-import { cssToReactNativeRuntime } from "../css-to-rn";
+import {
+  CssToReactNativeRuntimeOptions,
+  cssToReactNativeRuntime,
+} from "../css-to-rn";
 import { defaultCSSInterop } from "../runtime/native/css-interop";
 import { StyleSheet } from "../runtime/native/stylesheet";
 
-export function registerCSS(css: string) {
-  StyleSheet.register(cssToReactNativeRuntime(Buffer.from(css)));
+export function registerCSS(
+  css: string,
+  options?: CssToReactNativeRuntimeOptions
+) {
+  StyleSheet.register(cssToReactNativeRuntime(Buffer.from(css), options));
 }
 
 type MockComponentProps = ViewProps & { className?: string };

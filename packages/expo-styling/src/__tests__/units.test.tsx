@@ -2,7 +2,7 @@ import { act, render } from "@testing-library/react-native";
 import React from "react";
 
 import { createMockComponent, registerCSS } from "./utils";
-import { vh, vw } from "../runtime/native/globals";
+import { rem, vh, vw } from "../runtime/native/globals";
 import { StyleSheet } from "../runtime/native/stylesheet";
 
 const A = createMockComponent();
@@ -36,6 +36,7 @@ test("vw", () => {
 
   render(<A className="my-class" />);
 
+  expect(vw.get()).toEqual(750);
   expect(A).styleToEqual({
     width: 75,
   });
@@ -44,9 +45,8 @@ test("vw", () => {
     vw.__set(100);
   });
 
-  expect(A).styleToEqual({
-    width: 10,
-  });
+  expect(vw.get()).toEqual(100);
+  expect(A).styleToEqual({ width: 10 });
 });
 
 test("vh", () => {
@@ -54,15 +54,49 @@ test("vh", () => {
 
   render(<A className="my-class" />);
 
-  expect(A).styleToEqual({
-    height: 133.4,
-  });
+  expect(vh.get()).toEqual(1334);
+  expect(A).styleToEqual({ height: 133.4 });
 
   act(() => {
     vh.__set(100);
   });
 
-  expect(A).styleToEqual({
-    height: 10,
+  expect(vh.get()).toEqual(100);
+  expect(A).styleToEqual({ height: 10 });
+});
+
+test("rem - default", () => {
+  registerCSS(`.my-class { fontSize: 10rem; }`);
+
+  render(<A className="my-class" />);
+
+  expect(A).styleToEqual({ fontSize: 140 });
+});
+
+test("rem - override", () => {
+  registerCSS(`.my-class { fontSize: 10rem; }`, {
+    inlineRem: 10,
   });
+
+  render(<A className="my-class" />);
+
+  expect(A).styleToEqual({ fontSize: 100 });
+});
+
+test("rem - dynamic", () => {
+  registerCSS(`.my-class { fontSize: 10rem; }`, {
+    inlineRem: false,
+  });
+
+  render(<A className="my-class" />);
+
+  expect(rem.get()).toEqual(14);
+  expect(A).styleToEqual({ fontSize: 140 });
+
+  act(() => {
+    rem.set(10);
+  });
+
+  expect(rem.get()).toEqual(10);
+  expect(A).styleToEqual({ fontSize: 100 });
 });
