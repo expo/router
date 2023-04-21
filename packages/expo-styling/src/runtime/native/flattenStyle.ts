@@ -72,18 +72,52 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
       continue;
     }
 
-    const getterOrValue = extractValue(value, flatStyle, flatStyleMeta);
+    if (key === "transform") {
+      const transform = [];
 
-    if (typeof getterOrValue === "function") {
-      Object.defineProperty(flatStyle, key, {
-        configurable: true,
-        enumerable: true,
-        get() {
-          return getterOrValue();
-        },
-      });
+      for (const transformObject of value) {
+        for (const [transformKey, transformValue] of Object.entries(
+          transformObject
+        )) {
+          const _transform: Record<string, any> = {};
+
+          const getterOrValue = extractValue(
+            transformValue,
+            flatStyle,
+            flatStyleMeta
+          );
+
+          if (typeof getterOrValue === "function") {
+            Object.defineProperty(_transform, transformKey, {
+              configurable: true,
+              enumerable: true,
+              get() {
+                return getterOrValue();
+              },
+            });
+          } else {
+            _transform[transformKey] = getterOrValue;
+          }
+
+          transform.push(_transform);
+        }
+      }
+
+      flatStyle.transform = transform as any;
     } else {
-      flatStyle[key as keyof Style] = getterOrValue;
+      const getterOrValue = extractValue(value, flatStyle, flatStyleMeta);
+
+      if (typeof getterOrValue === "function") {
+        Object.defineProperty(flatStyle, key, {
+          configurable: true,
+          enumerable: true,
+          get() {
+            return getterOrValue();
+          },
+        });
+      } else {
+        flatStyle[key as keyof Style] = getterOrValue;
+      }
     }
   }
 
@@ -103,17 +137,37 @@ function extractValue(
   if (isRuntimeValue(value)) {
     switch (value.name) {
       case "vh":
-        return (vh.get() / 100) * (value.arguments[0] as number);
+        return round((vh.get() / 100) * (value.arguments[0] as number));
       case "vw":
-        return (vw.get() / 100) * (value.arguments[0] as number);
+        return round((vw.get() / 100) * (value.arguments[0] as number));
       case "rem":
-        return rem.get() * (value.arguments[0] as number);
+        return round(rem.get() * (value.arguments[0] as number));
       case "em":
         return () => {
           const multiplier = value.arguments[0] as number;
 
           if ("fontSize" in flatStyle) {
-            return (flatStyle.fontSize || 0) * multiplier;
+            return round((flatStyle.fontSize || 0) * multiplier);
+          }
+
+          return undefined;
+        };
+      case "ch":
+        return () => {
+          const multiplier = value.arguments[0] as number;
+
+          if (typeof flatStyle.height === "number") {
+            return round((flatStyle.height || 0) * multiplier);
+          }
+
+          return undefined;
+        };
+      case "cw":
+        return () => {
+          const multiplier = value.arguments[0] as number;
+
+          if (typeof flatStyle.width === "number") {
+            return round((flatStyle.width || 0) * multiplier);
           }
 
           return undefined;
@@ -153,4 +207,8 @@ function extractValue(
   }
 
   return value;
+}
+
+function round(number: number) {
+  return Math.round((number + Number.EPSILON) * 100) / 100;
 }

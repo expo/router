@@ -924,12 +924,26 @@ export function parseDeclaration(
       for (const transform of declaration.value) {
         switch (transform.type) {
           case "perspective":
-          case "translateX":
-          case "translateY":
-          case "scaleX":
-          case "scaleY":
             transforms.push({
               [transform.type]: parseLength(transform.value) as number,
+            });
+            break;
+          case "translateX":
+          case "scaleX":
+            transforms.push({
+              [transform.type]: parseLengthOrCoercePercentageToRuntime(
+                transform.value,
+                "cw"
+              ) as number,
+            });
+            break;
+          case "translateY":
+          case "scaleY":
+            transforms.push({
+              [transform.type]: parseLengthOrCoercePercentageToRuntime(
+                transform.value,
+                "ch"
+              ) as number,
             });
             break;
           case "rotate":
@@ -1779,6 +1793,21 @@ function parseFontVariantCaps(fontVariantCaps: FontVariantCaps) {
   }
 
   return undefined;
+}
+
+function parseLengthOrCoercePercentageToRuntime(
+  value: Length | DimensionPercentageFor_LengthValue | NumberOrPercentage,
+  runtimeName: string
+) {
+  if (value.type === "percentage") {
+    return {
+      type: "runtime",
+      name: runtimeName,
+      arguments: [value.value],
+    };
+  } else {
+    return parseLength(value);
+  }
 }
 
 function round(number: number) {
