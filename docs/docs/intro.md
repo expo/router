@@ -19,7 +19,7 @@ npx create-expo-app@latest --example with-router
 
 ## Features
 
-<video src="/router/demo/routing.mp4" controls style={{ width: "100%" }} autoplay loop />
+<!-- <video src="/router/demo/routing.mp4" controls style={{ width: "100%" }} autoplay loop /> -->
 
 - **Native** Truly native navigation with the most cutting-edge developer experience.
 <!-- - **Zero-config** No need to configure anything, just start building your app. -->
