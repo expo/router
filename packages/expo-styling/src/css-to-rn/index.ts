@@ -14,8 +14,8 @@ import { ExtractedStyle, StyleSheetRegisterOptions } from "../types";
 
 export type CssToReactNativeRuntimeOptions = ParseDeclarationOptions;
 
-/**
- * LightningCSS visitor that converts CSS to React Native styles
+/*
+ * Converts a CSS file to a collection of style declarations that can be used with the StyleSheet API
  */
 export function cssToReactNativeRuntime(
   code: Buffer,
@@ -41,7 +41,11 @@ export function cssToReactNativeRuntime(
 }
 
 interface ExtractRuleOptions {
+  // The collection of declarations that have been extracted so far
+  // This should be mutated
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
+  // Rules may be inside other rules, such as media queries.
+  // We can build this this partial rule object as we traverse the tree
   style?: Partial<ExtractedStyle>;
 }
 
@@ -52,14 +56,16 @@ function extractRule(
 ) {
   switch (rule.type) {
     case "media": {
-      extractedMedia(rule.value, extractOptions, parseOptions);
+      extractMedia(rule.value, extractOptions, parseOptions);
       break;
     }
     case "style": {
       if (rule.value.declarations) {
-        const style = getExtractedStyle(rule.value.declarations, parseOptions);
         setStyleForSelectorList(
-          { ...extractOptions.style, ...style },
+          {
+            ...extractOptions.style,
+            ...getExtractedStyle(rule.value.declarations, parseOptions),
+          },
           rule.value.selectors,
           extractOptions.declarations
         );
@@ -67,6 +73,47 @@ function extractRule(
       break;
     }
   }
+}
+
+/*
+ * Extracts styles from a media query
+ */
+function extractMedia(
+  mediaRule: MediaRule,
+  extractOptions: ExtractRuleOptions,
+  parseOptions: ParseDeclarationOptions
+) {
+  const media: MediaQuery[] = [];
+
+  // We only want to extract styles for screen media queries
+  for (const mediaQuery of mediaRule.query.mediaQueries) {
+    let isScreen = mediaQuery.mediaType !== "print";
+    if (mediaQuery.qualifier === "not") {
+      isScreen = !isScreen;
+    }
+
+    if (isScreen) {
+      media.push(mediaQuery);
+    }
+  }
+
+  // If there are no screen media queries, we don't need to extract anything
+  if (media.length === 0) {
+    return;
+  }
+
+  const newExtractOptions: ExtractRuleOptions = {
+    ...extractOptions,
+    style: {
+      media,
+    },
+  };
+
+  for (const rule of mediaRule.rules) {
+    extractRule(rule, newExtractOptions, parseOptions);
+  }
+
+  return undefined;
 }
 
 function setStyleForSelectorList(
@@ -91,42 +138,6 @@ function setStyleForSelectorList(
   }
 }
 
-function extractedMedia(
-  mediaRule: MediaRule,
-  extractOptions: ExtractRuleOptions,
-  parseOptions: ParseDeclarationOptions
-) {
-  const media: MediaQuery[] = [];
-
-  for (const mediaQuery of mediaRule.query.mediaQueries) {
-    let isScreen = mediaQuery.mediaType !== "print";
-    if (mediaQuery.qualifier === "not") {
-      isScreen = !isScreen;
-    }
-
-    if (isScreen) {
-      media.push(mediaQuery);
-    }
-  }
-
-  if (media.length === 0) {
-    return;
-  }
-
-  const newExtractOptions: ExtractRuleOptions = {
-    ...extractOptions,
-    style: {
-      media,
-    },
-  };
-
-  for (const rule of mediaRule.rules) {
-    extractRule(rule, newExtractOptions, parseOptions);
-  }
-
-  return undefined;
-}
-
 function getExtractedStyle(
   declarationBlock: DeclarationBlock<Declaration>,
   options: ParseDeclarationOptions
@@ -143,19 +154,18 @@ function getExtractedStyle(
     .filter((d): d is Declaration => !!d);
 
   /*
-   * Adds a style property to the rule record. Use nullish coalescing to control setting shorthand vs longhand
+   * Adds a style property to the rule record.
    *
-   * For example, margin-right should use `nullishCoalescing=false`, but margin should use `true`
-   * This is because margin-right is a longhand property of margin, so it should override the shorthand
+   * The shorthand option handles if the style came from a long or short hand property
+   * E.g. `margin` is a shorthand property for `margin-top`, `margin-bottom`, `margin-left` and `margin-right`
    *
-   * @param property - the property name
-   * @param value - the property value
-   * @param nullishCoalescing - whether to use nullish coalescing to set the property
+   * The `append` option allows the same property to be added multiple times
+   * E.g. `transform` accepts an array of transforms
    */
   function addStyleProp(
     property: string,
     value: any,
-    { nullishCoalescing = false, append = false } = {}
+    { shortHand = false, append = false } = {}
   ) {
     if (value === undefined) {
       return;
@@ -174,7 +184,9 @@ function getExtractedStyle(
       } else {
         style[property] = [value];
       }
-    } else if (nullishCoalescing) {
+    } else if (shortHand) {
+      // If the shorthand property has already been set, don't overwrite it
+      // The longhand property always have priority
       style[property] ??= value;
     } else {
       style[property] = value;

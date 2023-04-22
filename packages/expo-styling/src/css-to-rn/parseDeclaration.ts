@@ -40,7 +40,7 @@ type AddStyleProp = (
   property: string,
   value: unknown,
   options?: {
-    nullishCoalescing?: boolean;
+    shortHand?: boolean;
     append?: boolean;
   }
 ) => void;
@@ -209,24 +209,24 @@ export function parseDeclaration(
       addStyleProp(
         "inset-block-start",
         parseLengthPercentageOrAuto(declaration.value.blockStart, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "inset-block-end",
         parseLengthPercentageOrAuto(declaration.value.blockEnd, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       return;
     case "inset-inline":
       addStyleProp(
         "inset-block-start",
         parseLengthPercentageOrAuto(declaration.value.inlineStart, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "inset-block-end",
         parseLengthPercentageOrAuto(declaration.value.inlineEnd, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       return;
     case "inset":
@@ -234,23 +234,23 @@ export function parseDeclaration(
         "top",
         parseLengthPercentageOrAuto(declaration.value.top, options),
         {
-          nullishCoalescing: true,
+          shortHand: true,
         }
       );
       addStyleProp(
         "bottom",
         parseLengthPercentageOrAuto(declaration.value.bottom, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "left",
         parseLengthPercentageOrAuto(declaration.value.left, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "right",
         parseLengthPercentageOrAuto(declaration.value.right, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       return;
     case "border-spacing":
@@ -371,22 +371,22 @@ export function parseDeclaration(
       addStyleProp(
         "border-bottom-left-radius",
         parseLength(declaration.value.bottomLeft[0], options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "border-bottom-right-radius",
         parseLength(declaration.value.bottomRight[0], options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "border-top-left-radius",
         parseLength(declaration.value.topLeft[0], options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "border-top-right-radius",
         parseLength(declaration.value.topRight[0], options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       return;
     case "border-image-source":
@@ -403,20 +403,20 @@ export function parseDeclaration(
       return;
     case "border-color":
       addStyleProp("border-top-color", parseColor(declaration.value.top), {
-        nullishCoalescing: true,
+        shortHand: true,
       });
       addStyleProp(
         "border-bottom-color",
         parseColor(declaration.value.bottom),
         {
-          nullishCoalescing: true,
+          shortHand: true,
         }
       );
       addStyleProp("border-left-color", parseColor(declaration.value.left), {
-        nullishCoalescing: true,
+        shortHand: true,
       });
       addStyleProp("border-right-color", parseColor(declaration.value.right), {
-        nullishCoalescing: true,
+        shortHand: true,
       });
       return;
     case "border-style":
@@ -428,22 +428,22 @@ export function parseDeclaration(
       addStyleProp(
         "border-top-width",
         parseBorderSideWidth(declaration.value.top, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "border-bottom-width",
         parseBorderSideWidth(declaration.value.bottom, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "border-left-width",
         parseBorderSideWidth(declaration.value.left, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "border-right-width",
         parseBorderSideWidth(declaration.value.right, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       return;
     case "border-block-color":
@@ -483,11 +483,11 @@ export function parseDeclaration(
         "border-width",
         parseBorderSideWidth(declaration.value.width, options),
         {
-          nullishCoalescing: true,
+          shortHand: true,
         }
       );
       addStyleProp("border-style", parseBorderStyle(declaration.value.style), {
-        nullishCoalescing: true,
+        shortHand: true,
       });
       return;
     case "border-top":
@@ -762,24 +762,24 @@ export function parseDeclaration(
       addStyleProp(
         declaration.property + "-start",
         parseLengthPercentageOrAuto(declaration.value.blockStart, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         declaration.property + "-end",
         parseLengthPercentageOrAuto(declaration.value.blockEnd, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       return;
     case "margin-inline":
       addStyleProp(
         declaration.property + "-start",
         parseLengthPercentageOrAuto(declaration.value.inlineStart, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         declaration.property + "-end",
         parseLengthPercentageOrAuto(declaration.value.inlineEnd, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       return;
     case "margin":
@@ -835,24 +835,24 @@ export function parseDeclaration(
       addStyleProp(
         declaration.property + "-start",
         parseLengthPercentageOrAuto(declaration.value.blockStart, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         declaration.property + "-end",
         parseLengthPercentageOrAuto(declaration.value.blockEnd, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       return;
     case "padding-inline":
       addStyleProp(
         declaration.property + "-start",
         parseLengthPercentageOrAuto(declaration.value.inlineStart, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         declaration.property + "-end",
         parseLengthPercentageOrAuto(declaration.value.inlineEnd, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       break;
     case "padding":
@@ -923,33 +923,33 @@ export function parseDeclaration(
       addStyleProp(
         declaration.property + "-family",
         parseFontFamily(declaration.value.family),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         "line-height",
         parseLineHeight(declaration.value.lineHeight, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         declaration.property + "-size",
         parseFontSize(declaration.value.size, options),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         declaration.property + "-style",
         parseFontStyle(declaration.value.style),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
 
       addStyleProp(
         declaration.property + "-variant",
         parseFontVariantCaps(declaration.value.variantCaps),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       addStyleProp(
         declaration.property + "-weight",
         parseFontWeight(declaration.value.weight),
-        { nullishCoalescing: true }
+        { shortHand: true }
       );
       return;
     case "vertical-align":
