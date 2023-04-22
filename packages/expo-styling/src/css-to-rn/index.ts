@@ -12,10 +12,6 @@ import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import { isRuntimeValue } from "../runtime/native/guards";
 import { ExtractedStyle, StyleSheetRegisterOptions } from "../types";
 
-interface GetVisitorOptions {
-  declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
-}
-
 export type CssToReactNativeRuntimeOptions = ParseDeclarationOptions;
 
 /**
@@ -44,22 +40,28 @@ export function cssToReactNativeRuntime(
   };
 }
 
+interface ExtractRuleOptions {
+  declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
+  style?: Partial<ExtractedStyle>;
+}
+
 function extractRule(
   rule: Rule,
-  { declarations }: GetVisitorOptions,
-  options: ParseDeclarationOptions
+  extractOptions: ExtractRuleOptions,
+  parseOptions: ParseDeclarationOptions
 ) {
   switch (rule.type) {
     case "media": {
-      extractedMedia(rule.value, declarations, options);
+      extractedMedia(rule.value, extractOptions, parseOptions);
       break;
     }
     case "style": {
       if (rule.value.declarations) {
+        const style = getExtractedStyle(rule.value.declarations, parseOptions);
         setStyleForSelectorList(
-          getExtractedStyle(rule.value.declarations, options),
+          { ...extractOptions.style, ...style },
           rule.value.selectors,
-          declarations
+          extractOptions.declarations
         );
       }
       break;
@@ -70,7 +72,7 @@ function extractRule(
 function setStyleForSelectorList(
   style: ExtractedStyle,
   selectorList: SelectorList,
-  declarations: GetVisitorOptions["declarations"]
+  declarations: ExtractRuleOptions["declarations"]
 ) {
   for (const selectors of selectorList) {
     for (const selector of selectors) {
@@ -91,8 +93,8 @@ function setStyleForSelectorList(
 
 function extractedMedia(
   mediaRule: MediaRule,
-  declarations: GetVisitorOptions["declarations"],
-  options: ParseDeclarationOptions
+  extractOptions: ExtractRuleOptions,
+  parseOptions: ParseDeclarationOptions
 ) {
   const media: MediaQuery[] = [];
 
@@ -111,19 +113,15 @@ function extractedMedia(
     return;
   }
 
-  for (const rule of mediaRule.rules) {
-    if (rule.type === "style" && rule.value.declarations) {
-      const extractedStyle = getExtractedStyle(
-        rule.value.declarations,
-        options
-      );
+  const newExtractOptions: ExtractRuleOptions = {
+    ...extractOptions,
+    style: {
+      media,
+    },
+  };
 
-      setStyleForSelectorList(
-        { ...extractedStyle, media },
-        rule.value.selectors,
-        declarations
-      );
-    }
+  for (const rule of mediaRule.rules) {
+    extractRule(rule, newExtractOptions, parseOptions);
   }
 
   return undefined;
