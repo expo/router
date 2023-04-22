@@ -73,6 +73,14 @@ const config = {
 
         //... other Algolia params
       },
+      announcementBar: {
+        id: "v1-notice",
+        content:
+          "Expo Router v1 is stable! The API will not add breaking changes until v2. Expo Router is still in early development and has a number of cases that prevent it from having parity with web-only equivalents.",
+        backgroundColor: "#fafbfc",
+        textColor: "#091E42",
+        isCloseable: true,
+      },
       image: "img/og-image.png",
       navbar: {
         title: "Expo Router",

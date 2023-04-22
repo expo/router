@@ -1,13 +1,15 @@
-declare const process: any;
+import type { StackFrame } from "stacktrace-parser";
 
-export function formatProjectFileName(file?: string | null): string {
+export type MetroStackFrame = StackFrame & { collapse?: boolean };
+
+export function formatProjectFilePath(
+  projectRoot: string,
+  file?: string | null
+): string {
   if (file == null) {
     return "<unknown>";
   }
-  const projectRoot = process.env.EXPO_PROJECT_ROOT;
-  if (!projectRoot) {
-    return file;
-  }
+
   return pathRelativeToPath(
     file.replace(/\\/g, "/"),
     projectRoot.replace(/\\/g, "/")
@@ -25,4 +27,20 @@ function pathRelativeToPath(path: string, relativeTo: string, sep = "/") {
     i++;
   }
   return pathParts.slice(i).join(sep);
+}
+
+export function getStackFormattedLocation(
+  projectRoot: string,
+  frame: MetroStackFrame
+) {
+  const column = frame.column != null && parseInt(String(frame.column), 10);
+  const location =
+    formatProjectFilePath(projectRoot, frame.file) +
+    (frame.lineNumber != null
+      ? ":" +
+        frame.lineNumber +
+        (column && !isNaN(column) ? ":" + (column + 1) : "")
+      : "");
+
+  return location;
 }

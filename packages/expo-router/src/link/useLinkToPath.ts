@@ -1,7 +1,6 @@
 import {
   CommonActions,
   getActionFromState,
-  NavigationContainerRefContext,
   StackActions,
 } from "@react-navigation/core";
 import { TabActions } from "@react-navigation/routers";
@@ -16,7 +15,7 @@ import {
   isMovingToSiblingRoute,
   NavigateAction,
 } from "./stateOperations";
-import { useLinkingContext } from "./useLinkingContext";
+import { navigationRef, useLinkingContext } from "../navigationStore";
 
 type NavStateParams = {
   params?: NavStateParams;
@@ -31,7 +30,6 @@ function isRemoteHref(href: string): boolean {
 }
 
 export function useLinkToPath() {
-  const navigation = React.useContext(NavigationContainerRefContext);
   const linking = useLinkingContext();
 
   const linkTo = React.useCallback(
@@ -41,19 +39,19 @@ export function useLinkToPath() {
         return;
       }
 
-      if (navigation == null) {
+      if (navigationRef == null) {
         throw new Error(
           "Couldn't find a navigation object. Is your component inside NavigationContainer?"
         );
       }
 
       if (href === ".." || href === "../") {
-        navigation.goBack();
+        navigationRef.goBack();
         return;
       }
 
       if (href.startsWith(".")) {
-        let base = linking.getPathFromState?.(navigation.getRootState(), {
+        let base = linking.getPathFromState?.(navigationRef.getRootState(), {
           ...linking.config,
           preserveGroups: true,
         });
@@ -74,7 +72,7 @@ export function useLinkToPath() {
         return;
       }
 
-      const rootState = navigation.getRootState();
+      const rootState = navigationRef.getRootState();
 
       // Ensure simple operations are used when moving between siblings
       // in the same navigator. This ensures that the state is not reset.
@@ -88,18 +86,18 @@ export function useLinkToPath() {
         const nextRoute = findTopRouteForTarget(state);
 
         if (knownOwnerState.type === "tab") {
-          navigation.dispatch(
+          navigationRef.dispatch(
             TabActions.jumpTo(nextRoute.name, nextRoute.params)
           );
           return;
         } else {
           if (event === "REPLACE") {
-            navigation.dispatch(
+            navigationRef.dispatch(
               StackActions.replace(nextRoute.name, nextRoute.params)
             );
           } else {
             // NOTE: Not sure if we should pop or push here...
-            navigation.dispatch(
+            navigationRef.dispatch(
               CommonActions.navigate(nextRoute.name, nextRoute.params)
             );
           }
@@ -124,11 +122,11 @@ export function useLinkToPath() {
           );
           if (earliest) {
             if (earliest.type === "stack") {
-              navigation.dispatch(
+              navigationRef.dispatch(
                 StackActions.replace(earliest.name, earliest.params)
               );
             } else {
-              navigation.dispatch(
+              navigationRef.dispatch(
                 TabActions.jumpTo(earliest.name, earliest.params)
               );
             }
@@ -141,12 +139,12 @@ export function useLinkToPath() {
 
         // Ignore the replace event here since replace across
         // navigators is not supported.
-        navigation.dispatch(action);
+        navigationRef.dispatch(action);
       } else {
-        navigation.reset(state);
+        navigationRef.reset(state);
       }
     },
-    [linking, navigation]
+    [linking, navigationRef]
   );
 
   return linkTo;

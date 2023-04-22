@@ -4,11 +4,6 @@
 
 Repo for the new File-based router for React Native apps. Please open a discussion if you have any questions or feedback.
 
-- [Router](/packages/expo-router) - Current implementation.
-- [Documentation](https://expo.github.io/router) - Current documentation for the router (WIP / RFC).
-- [Example](/apps/demo) - Test app.
-<!-- - [RFC](https://github.com/expo/router/discussions/1) - Add your feedback here. -->
-
 ## Running
 
 The easiest way to try **Expo Router** is by creating a new project:

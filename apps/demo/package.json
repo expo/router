@@ -5,6 +5,7 @@
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
+    "test": "expo-module test",
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
@@ -29,10 +30,23 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@babel/preset-typescript": "^7.21.0",
+    "@testing-library/react-native": "^12.0.1",
     "@types/react": "~18.0.0",
     "@types/react-native": "~0.69.1",
-    "@babel/preset-typescript": "^7.21.0",
     "babel-plugin-transform-imports": "^2.0.0"
   },
-  "private": true
+  "private": true,
+  "jest": {
+    "preset": "jest-expo",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/__tests__/setup"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/__tests__/setup.ts"
+    ],
+    "roots": [
+      "."
+    ]
+  }
 }

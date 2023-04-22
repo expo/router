@@ -43,9 +43,11 @@ This is nested in the `home/_layout.js` layout, so it will be rendered as a tab.
 import { View, Text } from "react-native";
 
 export default function Feed() {
-  return (<View>
-    <Text>Feed screen</Text>
-   </View>);
+  return (
+    <View>
+      <Text>Feed screen</Text>
+    </View>
+   );
 }
 ```
 
@@ -53,9 +55,11 @@ export default function Feed() {
 import { View, Text } from "react-native";
 
 export default function Messages() {
-  return (<View>
-    <Text>Messages screen</Text>
-   </View>);
+  return (
+    <View>
+      <Text>Messages screen</Text>
+    </View>
+   );
 }
 ```
 

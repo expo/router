@@ -87,6 +87,10 @@ const backgroundForLevel = (level: LogLevel) =>
       default: "transparent",
       pressed: LogBoxStyle.getFatalDarkColor(),
     },
+    static: {
+      default: "transparent",
+      pressed: LogBoxStyle.getFatalDarkColor(),
+    },
   }[level]);
 
 function LogBoxInspectorHeaderButton(props: {
@@ -131,6 +135,9 @@ const headerStyles = StyleSheet.create({
 
 const styles = StyleSheet.create({
   syntax: {
+    backgroundColor: LogBoxStyle.getFatalColor(),
+  },
+  static: {
     backgroundColor: LogBoxStyle.getFatalColor(),
   },
   fatal: {
