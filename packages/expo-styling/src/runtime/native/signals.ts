@@ -40,8 +40,6 @@ export interface Signal<T = unknown> {
   subscribe(callback: () => void): () => void;
 }
 
-export type SignalLike<T = unknown> = { get(): T };
-
 const context: Computation[] = [];
 
 export function createSignal<T = unknown>(value: T): Signal<T> {

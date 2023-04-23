@@ -1,6 +1,6 @@
+import { testMediaQuery } from "./conditions";
 import { rem, styleMetaMap, vh, vw } from "./globals";
 import { isRuntimeValue } from "./guards";
-import { testMediaQuery } from "./mediaQuery";
 import { Style, StyleMeta, StyleProp } from "../../types";
 
 /**
@@ -68,7 +68,7 @@ export function flattenStyle(styles: StyleProp, flatStyle?: Style): Style {
     if (key in flatStyle) continue;
 
     // Skip failed media queries
-    if (styleMeta.media && !styleMeta.media.every(testMediaQuery)) {
+    if (styleMeta.media && !styleMeta.media.every((m) => testMediaQuery(m))) {
       continue;
     }
 

@@ -18,6 +18,10 @@ import type {
   ViewStyle,
 } from "react-native";
 
+export type SignalLike<T = unknown> = {
+  get(): T;
+};
+
 export type RuntimeValue = {
   type: "runtime";
   name: string;

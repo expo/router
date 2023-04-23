@@ -1,4 +1,9 @@
-import { Dimensions, Platform, Appearance } from "react-native";
+import {
+  AccessibilityInfo,
+  Dimensions,
+  Platform,
+  Appearance,
+} from "react-native";
 
 import { createSignal } from "./signals";
 import { StyleMeta, StyleProp } from "../../types";
@@ -13,6 +18,7 @@ export const rem = createRem(14);
 export const vw = viewportUnit("width", Dimensions);
 export const vh = viewportUnit("height", Dimensions);
 export const colorScheme = createColorScheme(Appearance);
+export const isReduceMotionEnabled = createIsReduceMotionEnabled();
 
 export function getGlobalStyles(value: string): StyleProp[] {
   return value.split(/\s+/).map((v) => globalStyles.get(v));
@@ -110,4 +116,12 @@ function createColorScheme(appearance: typeof Appearance) {
   };
 
   return { get: signal.get, set, reset };
+}
+
+function createIsReduceMotionEnabled() {
+  const signal = createSignal(false);
+  AccessibilityInfo.isReduceMotionEnabled()?.then(signal.set);
+  AccessibilityInfo.addEventListener("reduceMotionChanged", signal.set);
+
+  return { ...signal, reset: () => signal.set(false) };
 }

@@ -2,7 +2,11 @@ import { act, render } from "@testing-library/react-native";
 import React from "react";
 
 import { createMockComponent, registerCSS } from "./utils";
-import { colorScheme, vw } from "../runtime/native/globals";
+import {
+  colorScheme,
+  isReduceMotionEnabled,
+  vw,
+} from "../runtime/native/globals";
 import { StyleSheet } from "../runtime/native/stylesheet";
 
 const A = createMockComponent();
@@ -34,11 +38,58 @@ test("color scheme", () => {
   });
 });
 
-test("width", () => {
+test("prefers-reduced-motion", () => {
+  registerCSS(`
+    .my-class { color: blue; }
+
+    @media (prefers-reduced-motion) {
+      .my-class { color: red; }
+    }
+  `);
+
+  render(<A className="my-class" />);
+
+  expect(A).styleToEqual({
+    color: "rgba(0, 0, 255, 1)",
+  });
+
+  act(() => {
+    isReduceMotionEnabled.set(true);
+  });
+
+  expect(A).styleToEqual({
+    color: "rgba(255, 0, 0, 1)",
+  });
+});
+
+test("width (plain)", () => {
   registerCSS(`
 .my-class { color: blue; }
 
 @media (width: 500px) {
+  .my-class { color: red; }
+}`);
+
+  render(<A className="my-class" />);
+
+  expect(A).styleToEqual({
+    color: "rgba(0, 0, 255, 1)",
+  });
+
+  act(() => {
+    vw.__set(500);
+  });
+
+  expect(A).styleToEqual({
+    color: "rgba(255, 0, 0, 1)",
+  });
+});
+
+test("width (range)", () => {
+  registerCSS(`
+.my-class { color: blue; }
+
+@media (width = 500px) {
   .my-class { color: red; }
 }`);
 
