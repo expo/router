@@ -45,19 +45,17 @@ export function ExpoRoot({ context }: { context: RequireContext }) {
 }
 
 function ContextNavigator({ context }: { context: RequireContext }) {
-  const {
-    shouldShowTutorial,
-    shouldShowSplash,
-    linking,
-    navigationRef,
-    onReady,
-    routeNode,
-  } = useNavigationStore(context);
+  const { shouldShowSplash, linking, navigationRef, onReady, routeNode } =
+    useNavigationStore(context);
 
-  if (shouldShowTutorial) {
-    const Tutorial = require("./onboard/Tutorial").Tutorial;
-    SplashScreen.hideAsync();
-    return <Tutorial />;
+  if (!routeNode) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("No route found for initial URL");
+    } else {
+      const Tutorial = require("./onboard/Tutorial").Tutorial;
+      SplashScreen.hideAsync();
+      return <Tutorial />;
+    }
   }
 
   const Component = getQualifiedRouteComponent(routeNode);

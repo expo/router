@@ -17,7 +17,8 @@ import { NavigationStoreContext } from "../navigationStore";
 
 const INDENT = 24;
 
-function sortRouteNodeRoutes(routeNode: RouteNode) {
+function sortRouteNodeRoutes(routeNode: RouteNode | null) {
+  if (!routeNode) return [];
   return routeNode.children.filter((route) => !route.internal).sort(sortRoutes);
 }
 

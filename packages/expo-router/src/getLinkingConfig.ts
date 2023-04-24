@@ -9,14 +9,16 @@ import {
   getStateFromPath,
 } from "./link/linking";
 
-export function getNavigationConfig(routes: RouteNode): {
+export function getNavigationConfig(routes: RouteNode | null): {
   initialRouteName?: string;
   screens: Record<string, Screen>;
 } {
   return getReactNavigationConfig(routes, true);
 }
 
-export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
+export function getLinkingConfig(
+  routes: RouteNode | null
+): LinkingOptions<object> {
   return {
     prefixes: [],
     // @ts-expect-error

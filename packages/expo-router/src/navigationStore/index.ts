@@ -40,14 +40,13 @@ export class NavigationStore {
   ssrLocation: URL | undefined;
 
   navigationRef = navigationRef;
-  routeNode!: RouteNode;
+  routeNode!: RouteNode | null;
   linking!: LinkingOptions<object>;
   rootState: NavigationState | PartialState<NavigationState> | undefined;
   initialRootState: ResultState | undefined;
   url!: URL;
   routeInfo!: UrlObject;
 
-  shouldShowTutorial = false;
   _onReady?: () => void;
 
   constructor(ssrLocation?: URL) {
@@ -56,24 +55,12 @@ export class NavigationStore {
 
   initialise = (context: RequireContext, onReady: () => void) => {
     this._onReady = onReady;
-    this.routeNode = getRoutes(context)!;
+    this.routeNode = getRoutes(context);
 
     this.linking = getLinkingConfig(this.routeNode);
     this.initialRootState = getInitialState(this.linking, this.ssrLocation);
 
     this.handleRouteInfoChange(this.initialRootState);
-
-    if (process.env.NODE_ENV === "development") {
-      if (process.env.EXPO_ROUTER_IMPORT_MODE === "sync") {
-        this.shouldShowTutorial = !context.keys().some((key) => {
-          // NOTE(EvanBacon): This should only ever occur in development as it breaks lazily loading.
-          const component = context(key)?.default;
-          return typeof component === "function";
-        });
-      } else {
-        this.shouldShowTutorial = context.keys().length === 0;
-      }
-    }
   };
 
   handleRouteInfoChange = (
