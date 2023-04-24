@@ -4,5 +4,7 @@
   "link": {
     "type": "generated-index",
     "description": "Learn more about Expo router"
-  }
+  },
+  "collapsible": true,
+  "collapsed": true
 }

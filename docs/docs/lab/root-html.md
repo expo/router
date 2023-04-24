@@ -4,11 +4,19 @@ title: Custom Root HTML
 sidebar_class_name: hidden
 ---
 
-> This guide refers to upcoming Expo Router features, all of which are experimental. You may need to [use Expo CLI on `main`](https://github.com/expo/expo/tree/main/packages/%40expo/cli#contributing) to use these features.
+:::caution
+
+This guide refers to upcoming Expo Router features which are experimental, not covered by semantic versioning and you may need to be using the latest version on `main`
+
+:::
 
 When you statically render an Expo website (`EXPO_USE_STATIC=1 yarn expo start` cite needed), the root HTML element for each page can be customized by creating an `apps/+html.js` file that exports a default HTML component.
 
-> Notice: Global context providers should go in the [Root Layout](/docs/guides/root-layout) component, not the Root HTML component.
+:::tip
+
+Notice: Global context providers should go in the [Top-level `_layout` file](/docs/routing/layouts) component, not the Root HTML component.
+
+:::
 
 ## Default Root
 

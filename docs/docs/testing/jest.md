@@ -1,5 +1,5 @@
 ---
-title: Testing with Jest
+title: Testing with Jest 🧪
 # TODO
 sidebar_class_name: hidden
 ---

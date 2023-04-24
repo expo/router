@@ -14,7 +14,7 @@ The following restrictions and considerations are very important:
 
 - Handoff is Apple-only.
 - Handoff can not be used in the Expo Go app as it requires build-time configuration.
-- Handoff requires [universal links](/docs/guides/universal-links) to be configured.
+- Handoff requires [universal links](/docs/routing/universal-links) to be configured.
 - Handoff requires the `expo-router/head` component to be used on each page that you want to support.
 
 Ensure your `public/.well-known/apple-app-site-association` file is configured correctly. It must contain the `activitycontinuation` key with the `apps` array containing your app's bundle ID and Team ID formatted as `<APPLE_TEAM_ID>.<IOS_BUNDLE_ID>`, e.g. `QQ57RJ5UTD.app.expo.acme` where `QQ57RJ5UTD` is the Team ID and `app.expo.acme` is the bundle identifier.
@@ -196,7 +196,7 @@ Ensure your `public/.well-known/apple-app-site-association` file matches all rou
 }
 ```
 
-In the application, ensure you are not rendering the `<Head />` element conditionally (e.g. in an if/else block), it must be rendered on every page that you want to support handoff. We recommend adding it to the [Root Layout](/docs/guides/root-layout) component to ensure every route is linkable while debugging.
+In the application, ensure you are not rendering the `<Head />` element conditionally (e.g. in an if/else block), it must be rendered on every page that you want to support handoff. We recommend adding it to the [Root Layout](/docs/routing/layouts/root) component to ensure every route is linkable while debugging.
 
 <!--
 ```json title=app.json
@@ -221,8 +221,9 @@ Ensure you can access the Ngrok URL (via the browser for example), before buildi
 
 Handoff between your Mac and iPhone/iPad is not supported in the Expo Go app. You must build and install your app on your device.
 
-**If you see the Safari icon in the App Switcher on your iPhone**, then it means handoff is not working. 
-- Ensure you are not using the `?mode=developer` suffix when testing handoff to native. 
+**If you see the Safari icon in the App Switcher on your iPhone**, then it means handoff is not working.
+
+- Ensure you are not using the `?mode=developer` suffix when testing handoff to native.
 - Also be sure you're not using the local development server URL, e.g. `http://localhost:8081` as this cannot be used as a valid app site association link, open the running Ngrok URL in your browser to test.
 - We've observed that in iOS 16.3.1 and macOS 13.0 (Ventura), bundle identifiers starting with `app.` and `io.` will _sometimes_ not trigger the native app to show up in the iOS task switcher. Use `com.` as the first part of your bundle identifier.
 

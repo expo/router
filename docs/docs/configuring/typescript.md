@@ -4,7 +4,11 @@ title: TypeScript
 sidebar_class_name: hidden
 ---
 
-> This guide refers to upcoming Expo Router features, all of which are experimental.
+:::caution
+
+This guide refers to upcoming Expo Router features which are experimental, not covered by semantic versioning and you may need to be using the latest version on `main`
+
+:::
 
 Expo Router provides an integrated TypeScript experience. To get started:
 

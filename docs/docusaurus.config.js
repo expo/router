@@ -93,11 +93,6 @@ const config = {
 
         items: [
           {
-            to: "/docs/features/routing",
-            label: "Features",
-            position: "left",
-          },
-          {
             href: "https://github.com/expo/router",
             label: "GitHub",
             position: "right",
@@ -113,14 +108,6 @@ const config = {
               {
                 label: "Start",
                 to: "/docs",
-              },
-              {
-                label: "Features",
-                to: "/docs/features/routing",
-              },
-              {
-                label: "Guides",
-                to: "/docs/category/guides",
               },
             ],
           },

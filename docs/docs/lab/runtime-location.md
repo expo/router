@@ -14,9 +14,9 @@ No setup is required on web, and no polyfill is needed.
 
 ### Native
 
-In development, the `window.location` API is polyfilled to point to the development server. In production, the `window.location` API is polyfilled to point to the URL that your static assets are [hosted at](/docs/guides/hosting.md), this must be configured manually.
+In development, the `window.location` API is polyfilled to point to the development server. In production, the `window.location` API is polyfilled to point to the URL that your static assets are [hosted at](../deploying/hosting.md), this must be configured manually.
 
-In order to polyfill in production, the `expo-router` config plugin must be used, and the `origin` prop must be provided in the `app.config.js` (or `app.json`). `origin` must be set to the URL that your static assets are [hosted at](/docs/guides/hosting.md).
+In order to polyfill in production, the `expo-router` config plugin must be used, and the `origin` prop must be provided in the `app.config.js` (or `app.json`). `origin` must be set to the URL that your static assets are [hosted at](/docs/deploying/hosting.md).
 
 ```js title=app.config.js
 module.exports = {
@@ -33,7 +33,7 @@ module.exports = {
 
 > Recommend using `app.config.js` to support dynamically swapping the URL before bundling.
 
-You can host your `public/` directory and other public resources by deploying the expo website to a server that supports HTTPS. For instance, running `npx expo export && netlify deploy --dir dist --prod` will collect your resources and deploy them to netlify, **we plan to automate this in the future.** See the [hosting guide for more](/docs/guides/hosting.md).
+You can host your `public/` directory and other public resources by deploying the expo website to a server that supports HTTPS. For instance, running `npx expo export && netlify deploy --dir dist --prod` will collect your resources and deploy them to netlify, **we plan to automate this in the future.** See the [hosting guide for more](../deploying/hosting.md).
 
 > Public assets will not be bundled into your native app or available offline (with exception for network caching).
 

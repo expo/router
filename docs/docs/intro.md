@@ -127,11 +127,4 @@ Create files in the `app` directory and they will be automatically added to the 
 
 ## Troubleshooting
 
-If you run into any issues, please check the [troubleshooting guide](/router/docs/troubleshooting). If you're still running into problems, please [open an issue](https://github.com/expo/router/issues).
-
-## Next Steps
-
-- [Routing](/docs/features/routing).
-- [Linking](/docs/features/linking).
-- [Guides](/docs/category/guides).
-- [Migrating from React Navigation](/docs/category/react-navigation).
+If you run into any issues, please check the [troubleshooting guide](./troubleshooting). If you're still running into problems, please [open an issue](https://github.com/expo/router/issues).

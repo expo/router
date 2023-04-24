@@ -64,7 +64,7 @@ All Routes are loaded asynchronously, and loaded inside a suspense boundary. Thi
 
 <!-- TODO: Errors -->
 
-Loading errors are handled in the parent route, via the [`ErrorBoundary`](/docs/features/errors) export. This will probably be refactored in the future to use a `<route>+error.js` file.
+Loading errors are handled in the parent route, via the [`ErrorBoundary`](/docs/routing/errors) export. This will probably be refactored in the future to use a `<route>+error.js` file.
 
 Async routes cannot be statically filtered during development, so all files will be treated as routes even if they don't export a default component. After the component is bundled and loaded, then any invalid route will use a fallback warning screen. This behavior is development-only and will not be present in production.
 
