@@ -15,7 +15,7 @@ import {
   isMovingToSiblingRoute,
   NavigateAction,
 } from "./stateOperations";
-import { navigationRef, useLinkingContext } from "../navigationStore";
+import { ExpoRouterContext } from "../hooks";
 
 type NavStateParams = {
   params?: NavStateParams;
@@ -30,7 +30,7 @@ function isRemoteHref(href: string): boolean {
 }
 
 export function useLinkToPath() {
-  const linking = useLinkingContext();
+  const { navigationRef, linking } = React.useContext(ExpoRouterContext);
 
   const linkTo = React.useCallback(
     (href: string, event?: string) => {
@@ -51,10 +51,11 @@ export function useLinkToPath() {
       }
 
       if (href.startsWith(".")) {
-        let base = linking.getPathFromState?.(navigationRef.getRootState(), {
-          ...linking.config,
-          preserveGroups: true,
-        });
+        let base =
+          linking.getPathFromState?.(navigationRef.getRootState(), {
+            screens: [],
+            preserveGroups: true,
+          }) ?? "";
 
         if (base && !base.endsWith("/")) {
           base += "/..";

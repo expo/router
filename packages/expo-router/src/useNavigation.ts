@@ -12,9 +12,9 @@ import { getNameFromFilePath } from "./matchers";
  * @param parent Provide an absolute path like `/(root)` to the parent route or a relative path like `../../` to the parent route.
  * @returns the navigation object for the provided route.
  */
-export function useNavigation(
-  parent?: string
-): NavigationProp<ReactNavigation.RootParamList> {
+export function useNavigation<
+  T = NavigationProp<ReactNavigation.RootParamList>
+>(parent?: string): T {
   const navigation = useUpstreamNavigation<any>();
 
   const contextKey = useContextKey();

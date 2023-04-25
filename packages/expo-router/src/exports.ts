@@ -9,7 +9,7 @@ export {
   useSegments,
   useRootNavigation,
   useRootNavigationState,
-} from "./navigationStore";
+} from "./hooks";
 export { Link, Redirect } from "./link/Link";
 
 export { withLayoutContext } from "./layouts/withLayoutContext";

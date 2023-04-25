@@ -1,5 +1,5 @@
 import { HrefObject } from "./href";
-import { usePathname, useSearchParams, useSegments } from "../navigationStore";
+import { usePathname, useSearchParams, useSegments } from "../hooks";
 
 /** @deprecated */
 type RouteInfo = Omit<Required<HrefObject>, "query"> & {

@@ -13,7 +13,7 @@ import getStateFromPath from "../fork/getStateFromPath";
 // then `/index` would be used on web and `/settings` would be used on native.
 export function getInitialURL(): Promise<string | null> | string {
   if (process.env.NODE_ENV === "test") {
-    return Linking.getInitialURL();
+    return Linking.getInitialURL() ?? getRootURL();
   }
 
   if (Platform.OS === "web") {
@@ -99,7 +99,7 @@ export function addEventListener(listener: (url: string) => void) {
 
   return () => {
     // https://github.com/facebook/react-native/commit/6d1aca806cee86ad76de771ed3a1cc62982ebcd7
-    subscription.remove?.();
+    subscription?.remove?.();
   };
 }
 

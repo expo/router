@@ -30,7 +30,11 @@ export interface LinkProps extends Omit<TextProps, "href" | "hoverStyle"> {
 export function Redirect({ href }: { href: Href }) {
   const router = useRouter();
   useFocusEffect(() => {
-    router.replace(href);
+    try {
+      router.replace(href);
+    } catch (error) {
+      console.error(error);
+    }
   });
   return null;
 }

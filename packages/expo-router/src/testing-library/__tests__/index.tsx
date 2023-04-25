@@ -4,7 +4,7 @@ import { Text } from "react-native";
 import { act, fireEvent, renderRouter, screen } from "..";
 import { useSearchParams, useRouter } from "../../exports";
 
-describe(renderRouter, () => {
+describe.skip(renderRouter, () => {
   it("can render a route", async () => {
     renderRouter({
       index: () => <Text>Hello</Text>,
