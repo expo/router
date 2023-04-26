@@ -60,38 +60,47 @@ export function testPseudoClasses(
 }
 
 export function testContainerQuery(
-  containerQuery: ExtractedContainerQuery | undefined,
+  containerQuery: ExtractedContainerQuery[] | undefined,
   containers: Record<string, ContainerRuntime>
 ) {
   // If there is no query, we passed
-  if (!containerQuery) {
+  if (!containerQuery || containerQuery.length === 0) {
     return true;
   }
 
-  // If the query has a name, but the container doesn't exist, we failed
-  if (containerQuery.name && !containers[containerQuery.name]) {
-    return false;
-  }
+  return containerQuery.every((query) => {
+    // If the query has a name, but the container doesn't exist, we failed
+    if (query.name && !containers[query.name]) {
+      return false;
+    }
 
-  // If the query has a name, we use the container with that name
-  // Otherwise default to the last container
-  const container = containerQuery.name
-    ? containers[containerQuery.name]
-    : containers.__default;
+    // If the query has a name, we use the container with that name
+    // Otherwise default to the last container
+    const container = query.name
+      ? containers[query.name]
+      : containers.__default;
 
-  // We failed if the container doesn't exist (e.g no default container)
-  if (!container) {
-    return false;
-  }
+    // We failed if the container doesn't exist (e.g no default container)
+    if (!container) {
+      return false;
+    }
 
-  // If there is no condition, we passed (maybe only named as specified)
-  if (!containerQuery.condition) {
-    return true;
-  }
+    if (
+      query.pseudoClasses &&
+      !testPseudoClasses(container.interaction, query.pseudoClasses)
+    ) {
+      return false;
+    }
 
-  return testCondition(containerQuery.condition, {
-    width: container.interaction.layout.width,
-    height: container.interaction.layout.height,
+    // If there is no condition, we passed (maybe only named as specified)
+    if (!query.condition) {
+      return true;
+    }
+
+    return testCondition(query.condition, {
+      width: container.interaction.layout.width,
+      height: container.interaction.layout.height,
+    });
   });
 }
 

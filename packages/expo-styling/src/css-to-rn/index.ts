@@ -8,13 +8,14 @@ import {
   MediaRule,
   SelectorList,
   Rule,
-  Selector,
   ContainerType,
   ContainerRule,
+  Selector,
 } from "lightningcss";
 
 import { isRuntimeValue, kebabToCamelCase } from "../runtime/native/utils";
 import {
+  ExtractedContainerQuery,
   ExtractedKeyframe,
   ExtractedStyle,
   StyleSheetRegisterOptions,
@@ -24,6 +25,7 @@ import { exhaustiveCheck } from "./utils";
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
+  grouping?: (string | RegExp)[];
 };
 
 /*
@@ -36,12 +38,21 @@ export function cssToReactNativeRuntime(
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
   const keyframes = new Map<string, ExtractedKeyframe[]>();
 
+  const grouping =
+    options.grouping?.map((value) => {
+      return typeof value === "string" ? new RegExp(value) : value;
+    }) ?? [];
+
   lightningcss({
     filename: "style.css", // This is ignored, but required
     code,
     visitor: {
       Rule(rule) {
-        extractRule(rule, { ...options, declarations, keyframes }, options);
+        extractRule(
+          rule,
+          { ...options, grouping, declarations, keyframes },
+          options
+        );
         // We have processed this rule, so now delete it from the AST
         return [];
       },
@@ -62,6 +73,7 @@ interface ExtractRuleOptions {
   // Rules may be inside other rules, such as media queries.
   // We can build this this partial rule object as we traverse the tree
   style?: Partial<ExtractedStyle>;
+  grouping?: RegExp[];
 }
 
 function extractRule(
@@ -147,10 +159,12 @@ function extractedContainer(
   const newExtractOptions: ExtractRuleOptions = {
     ...extractOptions,
     style: {
-      containerQuery: {
-        name: containerRule.name,
-        condition: containerRule.condition,
-      },
+      containerQuery: [
+        {
+          name: containerRule.name,
+          condition: containerRule.condition,
+        },
+      ],
     },
   };
 
@@ -163,7 +177,7 @@ function extractedContainer(
 function setStyleForSelectorList(
   style: ExtractedStyle,
   selectorList: SelectorList,
-  { declarations }: ExtractRuleOptions
+  { declarations, grouping = [] }: ExtractRuleOptions
 ) {
   for (const selector of selectorList) {
     // There maybe multiple className selectors. The last one is the one we want to use
@@ -180,7 +194,11 @@ function setStyleForSelectorList(
 
     const conditions = groupSelector(selector.slice(0, classSelectorIndex));
 
-    if (conditions.length > 0) {
+    const conditionValid = conditions.every((c) => {
+      return grouping.some((g) => g.test(c.className));
+    });
+
+    if (!conditionValid) {
       continue;
     }
 
@@ -192,9 +210,27 @@ function setStyleForSelectorList(
           style: {},
           runtimeStyleProps: [],
           variableProps: [],
+          container: {
+            names: [condition.className],
+          },
         },
         declarations
       );
+    }
+
+    let containerQueries = style.containerQuery;
+
+    if (conditions.length > 0) {
+      containerQueries ??= [];
+
+      for (const condition of conditions) {
+        const containerQuery: ExtractedContainerQuery = {
+          name: condition.className,
+          pseudoClasses: condition.pseudoClasses,
+        };
+
+        containerQueries.push(containerQuery);
+      }
     }
 
     const groupedDelecarationSelectors = groupSelector(
@@ -207,9 +243,13 @@ function setStyleForSelectorList(
       continue;
     }
 
-    const [{ className }] = groupedDelecarationSelectors;
+    const [{ className, pseudoClasses }] = groupedDelecarationSelectors;
 
-    addDeclaration(className, { ...style }, declarations);
+    addDeclaration(
+      className,
+      { ...style, pseudoClasses, containerQuery: containerQueries },
+      declarations
+    );
   }
 }
 

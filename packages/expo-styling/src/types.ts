@@ -43,7 +43,7 @@ export type ExtractedStyle = {
   pseudoClasses?: PseudoClassesQuery;
   animations?: ExtractedAnimations;
   container?: Partial<ExtractedContainer>;
-  containerQuery?: ExtractedContainerQuery;
+  containerQuery?: ExtractedContainerQuery[];
 };
 
 export type StyleMeta = {
@@ -54,7 +54,7 @@ export type StyleMeta = {
   pseudoClasses?: PseudoClassesQuery;
   animations?: ExtractedAnimations;
   container?: ExtractedContainer;
-  containerQuery?: ExtractedContainerQuery;
+  containerQuery?: ExtractedContainerQuery[];
 };
 
 export interface SignalLike<T = unknown> {
@@ -89,7 +89,8 @@ export type ContainerRuntime = {
 
 export type ExtractedContainerQuery = {
   name?: string | null;
-  condition: MediaCondition;
+  condition?: MediaCondition;
+  pseudoClasses?: PseudoClassesQuery;
 };
 
 export type ExtractedAnimations = {

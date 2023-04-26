@@ -1,7 +1,10 @@
 import { Interaction, Style, StyleMeta, StyleProp } from "../../types";
-import { testContainerQuery, testMediaQuery } from "./conditions";
+import {
+  testContainerQuery,
+  testMediaQuery,
+  testPseudoClasses,
+} from "./conditions";
 import { rem, styleMetaMap, vh, vw } from "./globals";
-import { testPseudoClasses } from "./pseudoClasses";
 import { isRuntimeValue } from "./utils";
 
 export interface FlattenStyleOptions {
