@@ -55,7 +55,20 @@ Next, create a `public/.well-known/apple-app-site-association` file and add the 
         "paths": ["*"]
       }
     ]
-  }
+  },
+  "activitycontinuation": {
+    "apps": [
+      // Enable Handoff
+      "{APPLE_TEAM_ID}.{BUNDLE_ID}"
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      // Enable shared credentials
+      "{APPLE_TEAM_ID}.{BUNDLE_ID}"
+    ]
+  },
+
 }
 ```
 
