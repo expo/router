@@ -137,6 +137,11 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
       hasMeta = true;
     }
 
+    if (styles.transition) {
+      meta.transition = styles.transition;
+      hasMeta = true;
+    }
+
     if (hasMeta) {
       styleMetaMap.set(styles.style, meta);
     }

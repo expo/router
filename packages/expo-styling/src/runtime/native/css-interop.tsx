@@ -11,6 +11,7 @@ import {
 import { useInteractionHandlers, useInteractionSignals } from "./interaction";
 import { createComputation } from "./signals";
 import { StyleSheet } from "./stylesheet";
+import { useTransitions } from "./transitions";
 import { useDynamicMemo } from "./utils";
 import { ContainerRuntime, Interaction, Style } from "../../types";
 
@@ -94,6 +95,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
 
   const propEntries: [string, Style][] = [];
   const animatedProps: string[] = [];
+  const transitionProps: string[] = [];
 
   /* eslint-disable react-hooks/rules-of-hooks -- __styleKeys is consistent an immutable */
   for (const key of __styleKeys) {
@@ -142,6 +144,9 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
       }
       if (meta.animations) {
         animatedProps.push(key);
+      }
+      if (meta.transition) {
+        transitionProps.push(key);
       }
     }
   }
@@ -201,6 +206,21 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
         {children}
       </Animated>
     );
+  } else if (transitionProps.length > 0) {
+    return (
+      <Transitionable
+        {...props}
+        ref={ref}
+        __component={Component}
+        __propEntries={propEntries}
+        __variables={variables}
+        __containers={inheritedContainers}
+        __interaction={interaction}
+        __skipCssInterop
+      >
+        {children}
+      </Transitionable>
+    );
   } else {
     return (
       <Component
@@ -241,6 +261,23 @@ function Animated({
   }
   /* eslint-enable react-hooks/rules-of-hooks */
 
+  return <Component {...props} />;
+}
+
+function Transitionable({
+  __component: Component,
+  __propEntries,
+  __interaction,
+  __variables,
+  __containers,
+  ...props
+}: WrapperProps) {
+  /* eslint-disable react-hooks/rules-of-hooks */
+  for (const [name, style] of __propEntries) {
+    props[name] = useTransitions(style);
+  }
+  // console.log(props.style);
+  /* eslint-enable react-hooks/rules-of-hooks */
   return <Component {...props} />;
 }
 

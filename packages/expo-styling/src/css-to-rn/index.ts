@@ -19,6 +19,7 @@ import {
   ExtractedKeyframe,
   ExtractedStyle,
   StyleSheetRegisterOptions,
+  AnimatableCSSProperty,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 import { exhaustiveCheck } from "./utils";
@@ -538,6 +539,92 @@ function getExtractedStyle(
     }
   }
 
+  function addTransitionProp(
+    declaration: Extract<
+      Declaration,
+      {
+        property:
+          | "transition-property"
+          | "transition-duration"
+          | "transition-delay"
+          | "transition-timing-function"
+          | "transition";
+      }
+    >
+  ) {
+    extrtactedStyle.transition ??= {};
+
+    switch (declaration.property) {
+      case "transition-property":
+        extrtactedStyle.transition.property = declaration.value.map((v) => {
+          return kebabToCamelCase(v.property) as AnimatableCSSProperty;
+        });
+        break;
+      case "transition-duration":
+        extrtactedStyle.transition.duration = declaration.value;
+        break;
+      case "transition-delay":
+        extrtactedStyle.transition.delay = declaration.value;
+        break;
+      case "transition-timing-function":
+        extrtactedStyle.transition.timingFunction = declaration.value;
+        break;
+      case "transition": {
+        let setProperty = true;
+        let setDuration = true;
+        let setDelay = true;
+        let setTiming = true;
+
+        // Shorthand properties cannot override the longhand property
+        // So we skip setting the property if it already exists
+        // Otherwise, we need to set the property to an empty array
+
+        if (extrtactedStyle.transition.property) {
+          setProperty = false;
+        } else {
+          extrtactedStyle.transition.property = [];
+        }
+        if (extrtactedStyle.transition.duration) {
+          setDuration = false;
+        } else {
+          extrtactedStyle.transition.duration = [];
+        }
+        if (extrtactedStyle.transition.delay) {
+          setDelay = false;
+        } else {
+          extrtactedStyle.transition.delay = [];
+        }
+        if (extrtactedStyle.transition.timingFunction) {
+          setTiming = false;
+        } else {
+          extrtactedStyle.transition.timingFunction = [];
+        }
+
+        // Loop through each transition value and only set the properties that
+        // were not already set by the longhand property
+        for (const value of declaration.value) {
+          if (setProperty) {
+            extrtactedStyle.transition.property?.push(
+              kebabToCamelCase(value.property.property) as AnimatableCSSProperty
+            );
+          }
+          if (setDuration) {
+            extrtactedStyle.transition.duration?.push(value.duration);
+          }
+          if (setDelay) {
+            extrtactedStyle.transition.delay?.push(value.delay);
+          }
+          if (setTiming) {
+            extrtactedStyle.transition.timingFunction?.push(
+              value.timingFunction
+            );
+          }
+        }
+        break;
+      }
+    }
+  }
+
   function addAnimationProp(property: string, value: any) {
     if (property === "animation") {
       const groupedProperties: Record<string, any[]> = {};
@@ -572,6 +659,7 @@ function getExtractedStyle(
     addStyleProp,
     addAnimationProp,
     addContainerProp,
+    addTransitionProp,
   };
 
   for (const declaration of declarationArray) {

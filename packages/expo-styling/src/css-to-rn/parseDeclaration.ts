@@ -48,19 +48,39 @@ type AddContainerProp = (
     { property: "container" | "container-name" | "container-type" }
   >
 ) => void;
+type AddTransitionProp = (
+  declaration: Extract<
+    Declaration,
+    {
+      property:
+        | "transition-property"
+        | "transition-duration"
+        | "transition-delay"
+        | "transition-timing-function"
+        | "transition";
+    }
+  >
+) => void;
 
 export interface ParseDeclarationOptions {
   inlineRem?: number | false;
   addStyleProp: AddStyleProp;
   addAnimationProp: AddAnimationDefaultProp;
   addContainerProp: AddContainerProp;
+  addTransitionProp: AddTransitionProp;
 }
 
 export function parseDeclaration(
   declaration: Declaration,
   options: ParseDeclarationOptions
 ) {
-  const { addStyleProp, addAnimationProp, addContainerProp } = options;
+  const {
+    addStyleProp,
+    addAnimationProp,
+    addContainerProp,
+    addTransitionProp,
+  } = options;
+
   if (declaration.property === "unparsed") {
     return addStyleProp(
       declaration.value.propertyId.property,
@@ -975,7 +995,7 @@ export function parseDeclaration(
     case "transition-delay":
     case "transition-timing-function":
     case "transition":
-      return;
+      return addTransitionProp(declaration);
     case "animation-duration":
     case "animation-timing-function":
     case "animation-iteration-count":

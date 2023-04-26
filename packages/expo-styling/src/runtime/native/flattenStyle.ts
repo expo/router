@@ -62,6 +62,13 @@ export function flattenStyle(
     };
   }
 
+  if (styleMeta.transition) {
+    flatStyleMeta.transition = {
+      ...flatStyleMeta.transition,
+      ...styleMeta.transition,
+    };
+  }
+
   if (styleMeta.container) {
     flatStyleMeta.container ??= { type: "normal", names: [] };
 
