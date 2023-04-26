@@ -8,10 +8,10 @@
 import { Image, Pressable, StyleSheet, Text, View } from "@bacons/react-views";
 import React, { useEffect } from "react";
 
-import { ErrorToastMessage } from "./ErrorToastMessage";
 import * as LogBoxData from "../Data/LogBoxData";
 import { LogBoxLog } from "../Data/LogBoxLog";
 import * as LogBoxStyle from "../UI/LogBoxStyle";
+import { ErrorToastMessage } from "./ErrorToastMessage";
 
 type Props = {
   log: LogBoxLog;

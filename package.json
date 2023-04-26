@@ -32,7 +32,8 @@
     "metro-minify-uglify": "0.76.0",
     "metro-react-native-babel-preset": "0.76.0",
     "ws": "7.5.9",
-    "@expo/cli": "file:./expo-cli-29032023.tgz"
+    "@expo/cli": "file:./expo-cli-29032023.tgz",
+    "@typescript-eslint/typescript-estree": "^5.59.1"
   },
   "devDependencies": {
     "@testing-library/jest-native": "^5.4.2",

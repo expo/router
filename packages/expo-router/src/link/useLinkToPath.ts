@@ -7,6 +7,7 @@ import { TabActions } from "@react-navigation/routers";
 import * as Linking from "expo-linking";
 import * as React from "react";
 
+import { navigationRef, useLinkingContext } from "../navigationStore";
 import { resolve } from "./path";
 import {
   findTopRouteForTarget,
@@ -15,7 +16,6 @@ import {
   isMovingToSiblingRoute,
   NavigateAction,
 } from "./stateOperations";
-import { navigationRef, useLinkingContext } from "../navigationStore";
 
 type NavStateParams = {
   params?: NavStateParams;

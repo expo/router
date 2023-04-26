@@ -1,4 +1,5 @@
 import { useIsFocused } from "@react-navigation/core";
+// @ts-ignore: TODO -- extract these into a shared library to prevent cyclic dependencies
 import { useLocalSearchParams, usePathname, useSegments } from "expo-router";
 import React from "react";
 

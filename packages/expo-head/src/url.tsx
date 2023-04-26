@@ -26,7 +26,10 @@ function getUrlFromConstants(): string | null {
 
 function throwOrAlert(msg: string) {
   // Production apps fatally crash which is often not helpful.
-  if (process.env.NODE_ENV === "production") {
+  if (
+    // @ts-ignore: process is defined
+    process.env.NODE_ENV === "production"
+  ) {
     console.error(msg);
     alert(msg);
   } else {

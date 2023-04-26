@@ -12,8 +12,8 @@ import React from "react";
 import ReactDOMServer from "react-dom/server";
 import { AppRegistry } from "react-native-web";
 
-import { getRootComponent } from "./getRootComponent";
 import { NavigationStore, NavigationStoreContext } from "../navigationStore";
+import { getRootComponent } from "./getRootComponent";
 
 AppRegistry.registerComponent("App", () => App);
 
