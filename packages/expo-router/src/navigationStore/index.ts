@@ -8,7 +8,6 @@ import {
 } from "@react-navigation/native";
 import React from "react";
 
-import { getInitialState } from "./initialState";
 import { compareRouteInfo, getRouteInfoFromState } from "../LocationProvider";
 import { RouteNode } from "../Route";
 import getPathFromState, {
@@ -18,6 +17,7 @@ import { ResultState } from "../fork/getStateFromPath";
 import { getLinkingConfig } from "../getLinkingConfig";
 import { getRoutes } from "../getRoutes";
 import { RequireContext } from "../types";
+import { getInitialState } from "./initialState";
 
 export const navigationRef =
   createNavigationContainerRef<Record<string, unknown>>();

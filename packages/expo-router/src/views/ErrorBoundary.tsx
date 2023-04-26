@@ -3,8 +3,8 @@ import React from "react";
 import { Platform, ScrollView, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ErrorBoundaryProps } from "./Try";
 import { Link } from "../link/Link";
+import { ErrorBoundaryProps } from "./Try";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (
