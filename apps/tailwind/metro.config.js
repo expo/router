@@ -37,8 +37,6 @@ config.resolver.nodeModulesPaths = [
 // 3. Force Metro to resolve (sub)dependencies only from the `nodeModulesPaths`
 config.resolver.disableHierarchicalLookup = true;
 
-config.resolver.sourceExts = [...config.resolver.sourceExts, "css"];
-
 const { FileStore } = require("metro-cache");
 config.cacheStores = [
   // Ensure the cache isn't shared between projects

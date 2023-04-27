@@ -1,5 +1,6 @@
 import React, { ComponentType, useEffect, useReducer } from "react";
 
+import { ContainerRuntime, Interaction, Style } from "../../types";
 import { useAnimations } from "./animations";
 import { flattenStyle } from "./flattenStyle";
 import {
@@ -13,7 +14,6 @@ import { createComputation } from "./signals";
 import { StyleSheet } from "./stylesheet";
 import { useTransitions } from "./transitions";
 import { useDynamicMemo } from "./utils";
-import { ContainerRuntime, Interaction, Style } from "../../types";
 
 export type CSSInteropWrapperProps = {
   __component: ComponentType<any>;

@@ -1,3 +1,4 @@
+import { isRuntimeValue } from "../../shared";
 import { Interaction, Style, StyleMeta, StyleProp } from "../../types";
 import {
   testContainerQuery,
@@ -5,7 +6,6 @@ import {
   testPseudoClasses,
 } from "./conditions";
 import { rem, styleMetaMap, vh, vw } from "./globals";
-import { isRuntimeValue } from "./utils";
 
 export interface FlattenStyleOptions {
   variables: Record<string, any>;

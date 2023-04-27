@@ -8,6 +8,7 @@ import {
   withTiming,
 } from "react-native-reanimated";
 
+import { ExtractedAnimations, Style, TransformRecord } from "../../types";
 import { FlattenStyleOptions } from "./flattenStyle";
 import { animationMap, styleMetaMap } from "./globals";
 import {
@@ -15,7 +16,6 @@ import {
   cssTimeToNumber,
   cssTimingFunctionToEasing,
 } from "./utils";
-import { ExtractedAnimations, Style, TransformRecord } from "../../types";
 
 export interface AnimationStylesWrapperProps {
   component: ComponentType<any>;

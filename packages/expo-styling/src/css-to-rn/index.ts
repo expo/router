@@ -13,7 +13,7 @@ import {
   Selector,
 } from "lightningcss";
 
-import { isRuntimeValue, kebabToCamelCase } from "../runtime/native/utils";
+import { isRuntimeValue } from "../shared";
 import {
   ExtractedContainerQuery,
   ExtractedKeyframe,
@@ -22,7 +22,7 @@ import {
   AnimatableCSSProperty,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
-import { exhaustiveCheck } from "./utils";
+import { exhaustiveCheck, kebabToCamelCase } from "./utils";
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
