@@ -215,7 +215,9 @@ export function useLocalSearchParams<
   return (useOptionalLocalRoute()?.params ?? ({} as any)) as Partial<TParams>;
 }
 
-function useOptionalLocalRoute<T extends RouteProp<ParamListBase>>(): T | null {
+function useOptionalLocalRoute<T extends RouteProp<ParamListBase>>():
+  | T
+  | undefined {
   const route = React.useContext(NavigationRouteContext);
-  return route ?? null;
+  return route as T | undefined;
 }
