@@ -67,8 +67,7 @@ Next, create a `public/.well-known/apple-app-site-association` file and add the 
       // Enable shared credentials
       "{APPLE_TEAM_ID}.{BUNDLE_ID}"
     ]
-  },
-
+  }
 }
 ```
 
@@ -141,7 +140,7 @@ Expo CLI enables you to test your universal links without deploying a website. U
 3. Start your dev server with the `--tunnel` flag:
 
 ```bash
-yarn expo start --tunnel
+yarn expo start --tunnel --dev-client
 ```
 
 4. Build a development client: `yarn expo run:ios` or `yarn expo run:android`. This will install the development client on your device.
