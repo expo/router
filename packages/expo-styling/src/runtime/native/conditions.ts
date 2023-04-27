@@ -7,6 +7,8 @@ import {
 
 import { exhaustiveCheck } from "../../css-to-rn/utils";
 import {
+  ContainerRuntime,
+  ExtractedContainerQuery,
   Interaction,
   PseudoClassesQuery,
   SignalLike,
@@ -55,6 +57,42 @@ export function testPseudoClasses(
   }
 
   return true;
+}
+
+export function testContainerQuery(
+  containerQuery: ExtractedContainerQuery | undefined,
+  containers: Record<string, ContainerRuntime>
+) {
+  // If there is no query, we passed
+  if (!containerQuery) {
+    return true;
+  }
+
+  // If the query has a name, but the container doesn't exist, we failed
+  if (containerQuery.name && !containers[containerQuery.name]) {
+    return false;
+  }
+
+  // If the query has a name, we use the container with that name
+  // Otherwise default to the last container
+  const container = containerQuery.name
+    ? containers[containerQuery.name]
+    : containers.__default;
+
+  // We failed if the container doesn't exist (e.g no default container)
+  if (!container) {
+    return false;
+  }
+
+  // If there is no condition, we passed (maybe only named as specified)
+  if (!containerQuery.condition) {
+    return true;
+  }
+
+  return testCondition(containerQuery.condition, {
+    width: container.interaction.layout.width,
+    height: container.interaction.layout.height,
+  });
 }
 
 /**

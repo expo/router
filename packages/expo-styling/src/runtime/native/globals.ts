@@ -8,6 +8,7 @@ import {
 
 import { createSignal } from "./signals";
 import {
+  ContainerRuntime,
   ExtractedKeyframe,
   StyleMeta,
   StyleProp,
@@ -27,6 +28,9 @@ export const colorScheme = createColorScheme(Appearance);
 export const isReduceMotionEnabled = createIsReduceMotionEnabled();
 
 export const VariableContext = createContext<Record<string, any>>({});
+export const ContainerContext = createContext<Record<string, ContainerRuntime>>(
+  {}
+);
 
 export function getGlobalStyles(value: string): StyleProp[] {
   return value.split(/\s+/).map((v) => globalStyles.get(v));

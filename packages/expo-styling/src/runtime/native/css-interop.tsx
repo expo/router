@@ -3,6 +3,7 @@ import React, { ComponentType, useEffect, useReducer } from "react";
 import { useAnimations } from "./animations";
 import { flattenStyle } from "./flattenStyle";
 import {
+  ContainerContext,
   VariableContext,
   getGlobalStyles,
   styleMetaMap,
@@ -11,7 +12,7 @@ import { useInteractionHandlers, useInteractionSignals } from "./interaction";
 import { createComputation } from "./signals";
 import { StyleSheet } from "./stylesheet";
 import { useDynamicMemo } from "./utils";
-import { Interaction, Style } from "../../types";
+import { ContainerRuntime, Interaction, Style } from "../../types";
 
 export type CSSInteropWrapperProps = {
   __component: ComponentType<any>;
@@ -85,8 +86,10 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
 ) {
   const [, rerender] = React.useReducer((acc) => acc + 1, 0);
   const inheritedVariables = React.useContext(VariableContext);
+  const inheritedContainers = React.useContext(ContainerContext);
 
   const inlineVariables: Record<string, unknown>[] = [];
+  let inlineContainers: Record<string, ContainerRuntime> | undefined;
   const interaction = useInteractionSignals();
 
   const propEntries: [string, Style][] = [];
@@ -104,6 +107,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
           flattenStyle($props[key], {
             interaction,
             variables: inheritedVariables,
+            containers: inheritedContainers,
           })
         ),
       [$props[key], inheritedVariables]
@@ -118,6 +122,24 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
       if (meta.variables) {
         inlineVariables.push(meta.variables);
       }
+      if (meta.container) {
+        inlineContainers ??= {};
+        if (meta.container.names) {
+          for (const name of meta.container.names) {
+            inlineContainers[name] = {
+              type: meta.container.type,
+              interaction,
+              style,
+            };
+          }
+        }
+
+        inlineContainers.__default = {
+          type: meta.container.type,
+          interaction,
+          style,
+        };
+      }
       if (meta.animations) {
         animatedProps.push(key);
       }
@@ -130,12 +152,19 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     [inheritedVariables, ...inlineVariables]
   );
 
+  const inlineContainerValues = Object.values(inlineContainers ?? {});
+  const containers = useDynamicMemo(
+    () => Object.assign({}, inheritedContainers, inlineContainers),
+    [inheritedContainers, ...inlineContainerValues]
+  );
+
   const props = Object.assign(
     {},
     $props,
     useInteractionHandlers(
       $props,
       interaction,
+      inlineContainerValues.length > 0
     )
   );
 
@@ -149,6 +178,14 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     );
   }
 
+  if (inlineContainerValues.length > 0) {
+    children = (
+      <ContainerContext.Provider value={containers}>
+        {children}
+      </ContainerContext.Provider>
+    );
+  }
+
   if (animatedProps.length > 0) {
     return (
       <Animated
@@ -157,6 +194,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
         __component={Component}
         __propEntries={propEntries}
         __variables={variables}
+        __containers={inheritedContainers}
         __interaction={interaction}
         __skipCssInterop
       >
@@ -181,6 +219,7 @@ type WrapperProps = Record<string, unknown> & {
   __component: ComponentType<any>;
   __interaction: Interaction;
   __variables: Record<string, unknown>;
+  __containers: Record<string, ContainerRuntime>;
   __propEntries: [string, Style][];
 };
 
@@ -189,6 +228,7 @@ function Animated({
   __propEntries,
   __interaction,
   __variables,
+  __containers,
   ...props
 }: WrapperProps) {
   /* eslint-disable react-hooks/rules-of-hooks */
@@ -196,6 +236,7 @@ function Animated({
     props[name] = useAnimations(style, {
       variables: __variables,
       interaction: __interaction,
+      containers: __containers,
     });
   }
   /* eslint-enable react-hooks/rules-of-hooks */

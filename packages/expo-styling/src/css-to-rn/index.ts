@@ -9,6 +9,8 @@ import {
   SelectorList,
   Rule,
   Selector,
+  ContainerType,
+  ContainerRule,
 } from "lightningcss";
 
 import { isRuntimeValue, kebabToCamelCase } from "../runtime/native/utils";
@@ -72,6 +74,10 @@ function extractRule(
       extractKeyFrames(rule.value, extractOptions, parseOptions);
       break;
     }
+    case "container": {
+      extractedContainer(rule.value, extractOptions, parseOptions);
+      break;
+    }
     case "media": {
       extractMedia(rule.value, extractOptions, parseOptions);
       break;
@@ -130,6 +136,27 @@ function extractMedia(
     extractRule(rule, newExtractOptions, parseOptions);
   }
 
+  return undefined;
+}
+
+function extractedContainer(
+  containerRule: ContainerRule,
+  extractOptions: ExtractRuleOptions,
+  parseOptions: CssToReactNativeRuntimeOptions
+) {
+  const newExtractOptions: ExtractRuleOptions = {
+    ...extractOptions,
+    style: {
+      containerQuery: {
+        name: containerRule.name,
+        condition: containerRule.condition,
+      },
+    },
+  };
+
+  for (const rule of containerRule.rules) {
+    extractRule(rule, newExtractOptions, parseOptions);
+  }
   return undefined;
 }
 
@@ -426,10 +453,85 @@ function getExtractedStyle(
     }
   }
 
+  function addContainerProp(
+    declaration: Extract<
+      Declaration,
+      { property: "container" | "container-name" | "container-type" }
+    >
+  ) {
+    let names: false | string[] = false;
+    let type: ContainerType | undefined;
+
+    switch (declaration.property) {
+      case "container":
+        if (declaration.value.name.type === "none") {
+          names = false;
+        } else {
+          names = declaration.value.name.value;
+        }
+        type = declaration.value.containerType;
+        break;
+      case "container-name":
+        if (declaration.value.type === "none") {
+          names = false;
+        } else {
+          names = declaration.value.value;
+        }
+        break;
+      case "container-type":
+        type = declaration.value;
+        break;
+    }
+
+    if (names === false) {
+      return;
+    }
+
+    if (names) {
+      extrtactedStyle.container ??= {};
+      extrtactedStyle.container.names = names;
+    }
+
+    if (type) {
+      extrtactedStyle.container ??= {};
+      extrtactedStyle.container.type = type;
+    }
+  }
+
+  function addAnimationProp(property: string, value: any) {
+    if (property === "animation") {
+      const groupedProperties: Record<string, any[]> = {};
+
+      for (const animation of value as Animation[]) {
+        for (const [key, value] of Object.entries(animation)) {
+          groupedProperties[key] ??= [];
+          groupedProperties[key].push(value);
+        }
+      }
+
+      extrtactedStyle.animations ??= {};
+      for (const [property, value] of Object.entries(groupedProperties)) {
+        const key = property
+          .replace("animation-", "")
+          .replace(/-./g, (x) => x[1].toUpperCase()) as keyof Animation;
+
+        extrtactedStyle.animations[key] ??= value;
+      }
+    } else {
+      const key = property
+        .replace("animation-", "")
+        .replace(/-./g, (x) => x[1].toUpperCase()) as keyof Animation;
+
+      extrtactedStyle.animations ??= {};
+      extrtactedStyle.animations[key] = value;
+    }
+  }
+
   const parseDeclarationOptions: ParseDeclarationOptions = {
     ...options,
     addStyleProp,
     addAnimationProp,
+    addContainerProp,
   };
 
   for (const declaration of declarationArray) {

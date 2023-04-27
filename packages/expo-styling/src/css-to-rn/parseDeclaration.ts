@@ -42,18 +42,25 @@ type AddStyleProp = (
 ) => void;
 
 type AddAnimationDefaultProp = (property: string, value: unknown[]) => void;
+type AddContainerProp = (
+  declaration: Extract<
+    Declaration,
+    { property: "container" | "container-name" | "container-type" }
+  >
+) => void;
 
 export interface ParseDeclarationOptions {
   inlineRem?: number | false;
   addStyleProp: AddStyleProp;
   addAnimationProp: AddAnimationDefaultProp;
+  addContainerProp: AddContainerProp;
 }
 
 export function parseDeclaration(
   declaration: Declaration,
   options: ParseDeclarationOptions
 ) {
-  const { addStyleProp, addAnimationProp } = options;
+  const { addStyleProp, addAnimationProp, addContainerProp } = options;
   if (declaration.property === "unparsed") {
     return addStyleProp(
       declaration.value.propertyId.property,
@@ -1248,7 +1255,7 @@ export function parseDeclaration(
     case "container-type":
     case "container-name":
     case "container":
-      return;
+      return addContainerProp(declaration);
     default: {
       exhaustiveCheck(declaration);
     }

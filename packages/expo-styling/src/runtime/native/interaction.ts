@@ -24,7 +24,7 @@ export function useInteractionSignals(): Interaction {
 export function useInteractionHandlers(
   props: Record<string, any>,
   signals: Interaction,
-  containerName = ""
+  isContainer = false
 ) {
   const propsRef = React.useRef(props);
   propsRef.current = props;
@@ -63,16 +63,17 @@ export function useInteractionHandlers(
       },
     };
 
-    if (containerName) {
+    if (isContainer) {
       return {
         ...handlers,
         onLayout(event: LayoutChangeEvent) {
           propsRef.current.onLayout?.(event);
-          signals.layout.set(event.nativeEvent.layout);
+          signals.layout.width.set(event.nativeEvent.layout.width);
+          signals.layout.height.set(event.nativeEvent.layout.height);
         },
       };
     }
 
     return handlers;
-  }, [containerName]);
+  }, [isContainer]);
 }

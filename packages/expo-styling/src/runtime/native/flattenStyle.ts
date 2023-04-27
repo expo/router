@@ -1,5 +1,5 @@
 import { Interaction, Style, StyleMeta, StyleProp } from "../../types";
-import { testMediaQuery } from "./conditions";
+import { testContainerQuery, testMediaQuery } from "./conditions";
 import { rem, styleMetaMap, vh, vw } from "./globals";
 import { testPseudoClasses } from "./pseudoClasses";
 import { isRuntimeValue } from "./utils";
@@ -7,6 +7,7 @@ import { isRuntimeValue } from "./utils";
 export interface FlattenStyleOptions {
   variables: Record<string, any>;
   interaction: Interaction;
+  containers: Record<string, any>;
 }
 
 /**
@@ -58,6 +59,17 @@ export function flattenStyle(
     };
   }
 
+  if (styleMeta.container) {
+    flatStyleMeta.container ??= { type: "normal", names: [] };
+
+    if (styleMeta.container.names) {
+      flatStyleMeta.container.names = styleMeta.container.names;
+    }
+    if (styleMeta.container.type) {
+      flatStyleMeta.container.type = styleMeta.container.type;
+    }
+  }
+
   for (const [key, value] of Object.entries(styles)) {
     // Variables are prefixed with `--` and should not be flattened
     if (key.startsWith("--")) {
@@ -99,6 +111,10 @@ export function flattenStyle(
 
     // Skip failed media queries
     if (styleMeta.media && !styleMeta.media.every((m) => testMediaQuery(m))) {
+      continue;
+    }
+
+    if (!testContainerQuery(styleMeta.containerQuery, options.containers)) {
       continue;
     }
 

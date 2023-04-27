@@ -1,6 +1,7 @@
 import type {
   MediaQuery,
   Animation,
+  ContainerType,
   MediaCondition,
 } from "lightningcss";
 import type {
@@ -41,6 +42,8 @@ export type ExtractedStyle = {
   style: Record<string, ExtractedStyleValue>;
   pseudoClasses?: PseudoClassesQuery;
   animations?: ExtractedAnimations;
+  container?: Partial<ExtractedContainer>;
+  containerQuery?: ExtractedContainerQuery;
 };
 
 export type StyleMeta = {
@@ -50,6 +53,8 @@ export type StyleMeta = {
   variables?: Record<string, unknown>;
   pseudoClasses?: PseudoClassesQuery;
   animations?: ExtractedAnimations;
+  container?: ExtractedContainer;
+  containerQuery?: ExtractedContainerQuery;
 };
 
 export interface SignalLike<T = unknown> {
@@ -69,6 +74,22 @@ export type Interaction = {
     width: MutableSignal<number>;
     height: MutableSignal<number>;
   };
+};
+
+export type ExtractedContainer = {
+  names?: string[];
+  type: ContainerType;
+};
+
+export type ContainerRuntime = {
+  type: ContainerType;
+  interaction: Interaction;
+  style: Style;
+};
+
+export type ExtractedContainerQuery = {
+  name?: string | null;
+  condition: MediaCondition;
 };
 
 export type ExtractedAnimations = {

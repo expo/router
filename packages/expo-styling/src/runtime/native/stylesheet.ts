@@ -124,6 +124,19 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
       hasMeta = true;
     }
 
+    if (styles.container) {
+      meta.container = {
+        names: styles.container.names,
+        type: styles.container.type ?? "normal",
+      };
+      hasMeta = true;
+    }
+
+    if (styles.containerQuery) {
+      meta.containerQuery = styles.containerQuery;
+      hasMeta = true;
+    }
+
     if (hasMeta) {
       styleMetaMap.set(styles.style, meta);
     }
