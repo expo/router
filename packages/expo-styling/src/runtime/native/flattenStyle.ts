@@ -1,7 +1,7 @@
+import { Style, StyleMeta, StyleProp } from "../../types";
 import { testMediaQuery } from "./conditions";
 import { rem, styleMetaMap, vh, vw } from "./globals";
-import { isRuntimeValue } from "./guards";
-import { Style, StyleMeta, StyleProp } from "../../types";
+import { isRuntimeValue } from "./utils";
 
 /**
  * Reduce a StyleProp to a flat Style object.

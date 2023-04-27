@@ -9,8 +9,7 @@ import {
   Selector,
 } from "lightningcss";
 
-import { isRuntimeValue } from "../runtime/native/guards";
-import { kebabToCamelCase } from "../runtime/native/utils";
+import { isRuntimeValue, kebabToCamelCase } from "../runtime/native/utils";
 import { ExtractedStyle, StyleSheetRegisterOptions } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
 
