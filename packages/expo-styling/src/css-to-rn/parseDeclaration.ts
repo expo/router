@@ -29,12 +29,8 @@ import type {
   VerticalAlign,
 } from "lightningcss";
 
-import { exhaustiveCheck } from "./utils";
 import type { RuntimeValue, TransformRecord } from "../types";
-
-export interface ParseDeclarationOptions {
-  inlineRem?: number | false;
-}
+import { exhaustiveCheck } from "./utils";
 
 type AddStyleProp = (
   property: string,
@@ -45,11 +41,17 @@ type AddStyleProp = (
   }
 ) => void;
 
+export interface ParseDeclarationOptions {
+  inlineRem?: number | false;
+  addStyleProp: AddStyleProp;
+}
+
 export function parseDeclaration(
   declaration: Declaration,
-  addStyleProp: AddStyleProp,
   options: ParseDeclarationOptions
 ) {
+  const { addStyleProp } = options;
+
   if (declaration.property === "unparsed") {
     return addStyleProp(
       declaration.value.propertyId.property,
@@ -960,31 +962,19 @@ export function parseDeclaration(
     case "font-palette":
       return;
     case "transition-property":
-      return;
     case "transition-duration":
-      return;
     case "transition-delay":
-      return;
     case "transition-timing-function":
-      return;
     case "transition":
       return;
-    case "animation-name":
-      return;
     case "animation-duration":
-      return;
     case "animation-timing-function":
-      return;
     case "animation-iteration-count":
-      return;
     case "animation-direction":
-      return;
     case "animation-play-state":
-      return;
     case "animation-delay":
-      return;
     case "animation-fill-mode":
-      return;
+    case "animation-name":
     case "animation":
       return;
     case "transform": {
