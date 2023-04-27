@@ -17,13 +17,15 @@ export function registerCSS(
 
 type MockComponentProps = ViewProps & { className?: string };
 
-export function createMockComponent(): FunctionComponent<MockComponentProps> {
-  const component = jest.fn((props) => <View {...props} />);
+export function createMockComponent(
+  Component: React.ComponentType = View
+): FunctionComponent<MockComponentProps> {
+  const component = jest.fn((props) => <Component {...props} />);
 
   function mock(props: MockComponentProps) {
     return defaultCSSInterop(
-      (Component: ComponentType<any>, props: object, key: string) => {
-        return <Component {...props} key={key} />;
+      (ComponentType: ComponentType<any>, props: object, key: string) => {
+        return <ComponentType {...props} key={key} />;
       },
       component,
       props,

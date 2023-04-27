@@ -1,4 +1,6 @@
 import {
+  KeyframesRule,
+  Animation,
   Declaration,
   transform as lightningcss,
   DeclarationBlock,
@@ -10,8 +12,13 @@ import {
 } from "lightningcss";
 
 import { isRuntimeValue, kebabToCamelCase } from "../runtime/native/utils";
-import { ExtractedStyle, StyleSheetRegisterOptions } from "../types";
+import {
+  ExtractedKeyframe,
+  ExtractedStyle,
+  StyleSheetRegisterOptions,
+} from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
+import { exhaustiveCheck } from "./utils";
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
@@ -25,13 +32,14 @@ export function cssToReactNativeRuntime(
   options: CssToReactNativeRuntimeOptions = {}
 ): StyleSheetRegisterOptions {
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
+  const keyframes = new Map<string, ExtractedKeyframe[]>();
 
   lightningcss({
     filename: "style.css", // This is ignored, but required
     code,
     visitor: {
       Rule(rule) {
-        extractRule(rule, { ...options, declarations }, options);
+        extractRule(rule, { ...options, declarations, keyframes }, options);
         // We have processed this rule, so now delete it from the AST
         return [];
       },
@@ -40,12 +48,15 @@ export function cssToReactNativeRuntime(
 
   return {
     declarations: Object.fromEntries(declarations),
+    keyframes: Object.fromEntries(keyframes),
   };
 }
 
 interface ExtractRuleOptions {
   // The collection of declarations that have been extracted so far. This should be mutated
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
+  // The collection animations declarations that have been extracted so far. This should be mutated
+  keyframes: Map<string, ExtractedKeyframe[]>;
   // Rules may be inside other rules, such as media queries.
   // We can build this this partial rule object as we traverse the tree
   style?: Partial<ExtractedStyle>;
@@ -57,6 +68,10 @@ function extractRule(
   parseOptions: CssToReactNativeRuntimeOptions
 ) {
   switch (rule.type) {
+    case "keyframes": {
+      extractKeyFrames(rule.value, extractOptions, parseOptions);
+      break;
+    }
     case "media": {
       extractMedia(rule.value, extractOptions, parseOptions);
       break;
@@ -304,6 +319,50 @@ function groupSelector(selectors: Selector) {
   return groupedSelectors;
 }
 
+function extractKeyFrames(
+  keyframes: KeyframesRule<Declaration>,
+  extractOptions: ExtractRuleOptions,
+  options: CssToReactNativeRuntimeOptions
+) {
+  let frames: ExtractedKeyframe[] = [];
+
+  for (const frame of keyframes.keyframes) {
+    const { style } = getExtractedStyle(frame.declarations, options);
+
+    for (const selector of frame.selectors) {
+      const keyframe =
+        selector.type === "percentage"
+          ? selector.value * 100
+          : selector.type === "from"
+          ? 0
+          : selector.type === "to"
+          ? 100
+          : undefined;
+
+      if (keyframe === undefined) continue;
+
+      for (const selector of frame.selectors) {
+        switch (selector.type) {
+          case "percentage":
+            frames.push({ selector: selector.value, style });
+            break;
+          case "from":
+            frames.push({ selector: 0, style });
+            break;
+          case "to":
+            frames.push({ selector: 100, style });
+            break;
+          default:
+            exhaustiveCheck(selector);
+        }
+      }
+    }
+  }
+  frames = frames.sort((a, b) => a.selector - b.selector);
+
+  extractOptions.keyframes.set(keyframes.name.value, frames);
+}
+
 function getExtractedStyle(
   declarationBlock: DeclarationBlock<Declaration>,
   options: CssToReactNativeRuntimeOptions
@@ -370,6 +429,7 @@ function getExtractedStyle(
   const parseDeclarationOptions: ParseDeclarationOptions = {
     ...options,
     addStyleProp,
+    addAnimationProp,
   };
 
   for (const declaration of declarationArray) {

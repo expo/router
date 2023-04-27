@@ -41,17 +41,19 @@ type AddStyleProp = (
   }
 ) => void;
 
+type AddAnimationDefaultProp = (property: string, value: unknown[]) => void;
+
 export interface ParseDeclarationOptions {
   inlineRem?: number | false;
   addStyleProp: AddStyleProp;
+  addAnimationProp: AddAnimationDefaultProp;
 }
 
 export function parseDeclaration(
   declaration: Declaration,
   options: ParseDeclarationOptions
 ) {
-  const { addStyleProp } = options;
-
+  const { addStyleProp, addAnimationProp } = options;
   if (declaration.property === "unparsed") {
     return addStyleProp(
       declaration.value.propertyId.property,
@@ -976,7 +978,7 @@ export function parseDeclaration(
     case "animation-fill-mode":
     case "animation-name":
     case "animation":
-      return;
+      return addAnimationProp(declaration.property, declaration.value);
     case "transform": {
       const transforms: TransformRecord[] = [];
 

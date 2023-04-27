@@ -1,11 +1,17 @@
 import React, { ComponentType, useEffect, useReducer } from "react";
 
+import { useAnimations } from "./animations";
 import { flattenStyle } from "./flattenStyle";
-import { VariableContext, getGlobalStyles, styleMetaMap } from "./globals";
+import {
+  VariableContext,
+  getGlobalStyles,
+  styleMetaMap,
+} from "./globals";
+import { useInteractionHandlers, useInteractionSignals } from "./interaction";
 import { createComputation } from "./signals";
 import { StyleSheet } from "./stylesheet";
 import { useDynamicMemo } from "./utils";
-import { useInteractionHandlers, useInteractionSignals } from "./interaction";
+import { Interaction, Style } from "../../types";
 
 export type CSSInteropWrapperProps = {
   __component: ComponentType<any>;
@@ -77,12 +83,14 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
   { __component: Component, __styleKeys, ...$props }: CSSInteropWrapperProps,
   ref
 ) {
-  const { ...props } = $props;
   const [, rerender] = React.useReducer((acc) => acc + 1, 0);
   const inheritedVariables = React.useContext(VariableContext);
 
   const inlineVariables: Record<string, unknown>[] = [];
   const interaction = useInteractionSignals();
+
+  const propEntries: [string, Style][] = [];
+  const animatedProps: string[] = [];
 
   /* eslint-disable react-hooks/rules-of-hooks -- __styleKeys is consistent an immutable */
   for (const key of __styleKeys) {
@@ -98,29 +106,40 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
             variables: inheritedVariables,
           })
         ),
-      [props[key], inheritedVariables]
+      [$props[key], inheritedVariables]
     );
     useEffect(() => computation.subscribe(rerender), [computation]);
-    props[key] = computation.snapshot();
+    const style = computation.snapshot();
+    propEntries.push([key, style]);
 
-    const meta = styleMetaMap.get(props[key]);
+    const meta = styleMetaMap.get(style);
 
     if (meta) {
       if (meta.variables) {
         inlineVariables.push(meta.variables);
       }
+      if (meta.animations) {
+        animatedProps.push(key);
+      }
     }
   }
   /* eslint-enable react-hooks/rules-of-hooks */
-
-  Object.assign(props, useInteractionHandlers($props, interaction));
-
-  let children = <Component {...props} ref={ref} __skipCssInterop />;
 
   const variables = useDynamicMemo(
     () => Object.assign({}, inheritedVariables, ...inlineVariables),
     [inheritedVariables, ...inlineVariables]
   );
+
+  const props = Object.assign(
+    {},
+    $props,
+    useInteractionHandlers(
+      $props,
+      interaction,
+    )
+  );
+
+  let children: JSX.Element = props.children;
 
   if (inlineVariables.length > 0) {
     children = (
@@ -130,8 +149,59 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     );
   }
 
-  return children;
+  if (animatedProps.length > 0) {
+    return (
+      <Animated
+        {...props}
+        ref={ref}
+        __component={Component}
+        __propEntries={propEntries}
+        __variables={variables}
+        __interaction={interaction}
+        __skipCssInterop
+      >
+        {children}
+      </Animated>
+    );
+  } else {
+    return (
+      <Component
+        {...props}
+        {...Object.fromEntries(propEntries)}
+        ref={ref}
+        __skipCssInterop
+      >
+        {children}
+      </Component>
+    );
+  }
 });
+
+type WrapperProps = Record<string, unknown> & {
+  __component: ComponentType<any>;
+  __interaction: Interaction;
+  __variables: Record<string, unknown>;
+  __propEntries: [string, Style][];
+};
+
+function Animated({
+  __component: Component,
+  __propEntries,
+  __interaction,
+  __variables,
+  ...props
+}: WrapperProps) {
+  /* eslint-disable react-hooks/rules-of-hooks */
+  for (const [name, style] of __propEntries) {
+    props[name] = useAnimations(style, {
+      variables: __variables,
+      interaction: __interaction,
+    });
+  }
+  /* eslint-enable react-hooks/rules-of-hooks */
+
+  return <Component {...props} />;
+}
 
 function classNameToStyle(props: any) {
   if (typeof props.className === "string") {

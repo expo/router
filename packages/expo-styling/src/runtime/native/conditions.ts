@@ -5,10 +5,14 @@ import {
   MediaQuery,
 } from "lightningcss";
 
+import { exhaustiveCheck } from "../../css-to-rn/utils";
+import {
+  Interaction,
+  PseudoClassesQuery,
+  SignalLike,
+} from "../../types";
 import { colorScheme, isReduceMotionEnabled, vh, vw } from "./globals";
 import { unwrap } from "./utils";
-import { exhaustiveCheck } from "../../css-to-rn/utils";
-import { SignalLike } from "../../types";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -32,6 +36,25 @@ export function testMediaQuery(
     conditionReference
   );
   return mediaQuery.qualifier === "not" ? !conditionsPass : conditionsPass;
+}
+
+export function testPseudoClasses(
+  interaction: Interaction,
+  meta: PseudoClassesQuery
+) {
+  if (meta.active && !interaction.active.get()) {
+    return false;
+  }
+
+  if (meta.hover && !interaction.hover.get()) {
+    return false;
+  }
+
+  if (meta.focus && !interaction.focus.get()) {
+    return false;
+  }
+
+  return true;
 }
 
 /**
@@ -148,13 +171,13 @@ function testRange(
         case "equal":
           return value === unwrap(ref.height);
         case "greater-than":
-          return value > unwrap(ref.height);
+          return unwrap(ref.height) > value;
         case "greater-than-equal":
-          return value >= unwrap(ref.height);
+          return unwrap(ref.height) >= value;
         case "less-than":
-          return value < unwrap(ref.height);
+          return unwrap(ref.height) < value;
         case "less-than-equal":
-          return value <= unwrap(ref.height);
+          return unwrap(ref.height) <= value;
       }
       // break omitted - unreachable code
     }
@@ -163,13 +186,13 @@ function testRange(
         case "equal":
           return value === unwrap(ref.width);
         case "greater-than":
-          return value > unwrap(ref.width);
+          return unwrap(ref.width) > value;
         case "greater-than-equal":
-          return value >= unwrap(ref.width);
+          return unwrap(ref.width) >= value;
         case "less-than":
-          return value < unwrap(ref.width);
+          return unwrap(ref.width) < value;
         case "less-than-equal":
-          return value <= unwrap(ref.width);
+          return unwrap(ref.width) >= value;
       }
   }
 

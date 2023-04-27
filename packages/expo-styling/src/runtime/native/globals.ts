@@ -7,13 +7,18 @@ import {
 } from "react-native";
 
 import { createSignal } from "./signals";
-import { StyleMeta, StyleProp } from "../../types";
+import {
+  ExtractedKeyframe,
+  StyleMeta,
+  StyleProp,
+} from "../../types";
 
 export const globalStyles = new Map<string, StyleProp>();
 export const styleMetaMap = new WeakMap<
   NonNullable<StyleProp> | NonNullable<StyleProp>[],
   StyleMeta
 >();
+export const animationMap = new Map<string, ExtractedKeyframe[]>();
 
 export const rem = createRem(14);
 export const vw = viewportUnit("width", Dimensions);

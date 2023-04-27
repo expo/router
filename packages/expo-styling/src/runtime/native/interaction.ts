@@ -2,33 +2,22 @@ import React from "react";
 import {
   GestureResponderEvent,
   LayoutChangeEvent,
-  LayoutRectangle,
   NativeSyntheticEvent,
   TargetedEvent,
 } from "react-native";
 
-import { createSignal, Signal } from "./signals";
-
-export type Interaction = {
-  active: Signal<boolean>;
-  hover: Signal<boolean>;
-  focus: Signal<boolean>;
-  layout: Signal<LayoutRectangle>;
-};
-
-const defaultLayout = {
-  x: 0,
-  y: 0,
-  width: 0,
-  height: 0,
-};
+import { Interaction } from "../../types";
+import { createSignal } from "./signals";
 
 export function useInteractionSignals(): Interaction {
   return React.useState(() => ({
     active: createSignal(false),
     hover: createSignal(false),
     focus: createSignal(false),
-    layout: createSignal<LayoutRectangle>(defaultLayout),
+    layout: {
+      width: createSignal<number>(0),
+      height: createSignal<number>(0),
+    },
   }))[0];
 }
 

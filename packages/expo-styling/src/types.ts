@@ -1,4 +1,8 @@
-import { MediaQuery } from "lightningcss";
+import type {
+  MediaQuery,
+  Animation,
+  MediaCondition,
+} from "lightningcss";
 import type {
   ImageStyle,
   MatrixTransform,
@@ -18,10 +22,6 @@ import type {
   ViewStyle,
 } from "react-native";
 
-export type SignalLike<T = unknown> = {
-  get(): T;
-};
-
 export type RuntimeValue = {
   type: "runtime";
   name: string;
@@ -40,6 +40,7 @@ export type ExtractedStyle = {
   media?: MediaQuery[];
   style: Record<string, ExtractedStyleValue>;
   pseudoClasses?: PseudoClassesQuery;
+  animations?: ExtractedAnimations;
 };
 
 export type StyleMeta = {
@@ -48,6 +49,35 @@ export type StyleMeta = {
   media?: MediaQuery[];
   variables?: Record<string, unknown>;
   pseudoClasses?: PseudoClassesQuery;
+  animations?: ExtractedAnimations;
+};
+
+export interface SignalLike<T = unknown> {
+  get(): T;
+}
+
+export interface MutableSignal<T = unknown> {
+  get(): T;
+  set(value: T): void;
+}
+
+export type Interaction = {
+  active: MutableSignal<boolean>;
+  hover: MutableSignal<boolean>;
+  focus: MutableSignal<boolean>;
+  layout: {
+    width: MutableSignal<number>;
+    height: MutableSignal<number>;
+  };
+};
+
+export type ExtractedAnimations = {
+  [K in keyof Animation]?: Animation[K][];
+};
+
+export type ExtractedKeyframe = {
+  selector: number;
+  style: Record<string, ExtractedStyleValue>;
 };
 
 export type PseudoClassesQuery = {
@@ -58,6 +88,7 @@ export type PseudoClassesQuery = {
 
 export type StyleSheetRegisterOptions = {
   declarations?: Record<string, ExtractedStyle | ExtractedStyle[]>;
+  keyframes?: Record<string, ExtractedKeyframe[]>;
 };
 
 export type Style = ViewStyle | TextStyle | ImageStyle;
@@ -82,3 +113,18 @@ export type TransformRecord = Partial<
     SkewYTransform &
     MatrixTransform
 >;
+
+export type CamelToKebabCase<
+  T extends string,
+  A extends string = ""
+> = T extends `${infer F}${infer R}`
+  ? CamelToKebabCase<
+      R,
+      `${A}${F extends Lowercase<F> ? "" : "-"}${Lowercase<F>}`
+    >
+  : A;
+
+export type KebabToCamelCase<S extends string> =
+  S extends `${infer P1}-${infer P2}${infer P3}`
+    ? `${Lowercase<P1>}${Uppercase<P2>}${KebabToCamelCase<P3>}`
+    : Lowercase<S>;

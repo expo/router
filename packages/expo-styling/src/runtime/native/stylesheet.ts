@@ -5,6 +5,7 @@ import {
 } from "react-native";
 
 import {
+  animationMap,
   colorScheme,
   globalStyles,
   rem,
@@ -44,6 +45,12 @@ const parialStyleSheet = {
     if (options.declarations) {
       for (const [name, styles] of Object.entries(options.declarations)) {
         globalStyles.set(name, tagStyles(styles));
+      }
+    }
+
+    if (options.keyframes) {
+      for (const [name, keyframes] of Object.entries(options.keyframes)) {
+        animationMap.set(name, keyframes);
       }
     }
 
@@ -106,8 +113,14 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
       meta.media = styles.media;
       hasMeta = true;
     }
+
     if (styles.pseudoClasses) {
       meta.pseudoClasses = styles.pseudoClasses;
+      hasMeta = true;
+    }
+
+    if (styles.animations) {
+      meta.animations = styles.animations;
       hasMeta = true;
     }
 
