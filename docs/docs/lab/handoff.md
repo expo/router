@@ -36,6 +36,9 @@ Ensure your `public/.well-known/apple-app-site-association` file is configured c
   },
   "activitycontinuation": {
     "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
+  },
+  "webcredentials": {
+    "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
   }
 }
 ```
@@ -62,10 +65,12 @@ module.exports = {
       `applinks:${ngrokUrl}`,
       // highlight-next-line
       `activitycontinuation:${ngrokUrl}`,
-
+      // highlight-next-line
+      `webcredentials:${ngrokUrl}`,
       // Add additional production-URLs here.
       // `applinks:example.com`,
       // `activitycontinuation:example.com`,
+      // `webcredentials:example.com`,
     ],
   },
 
@@ -183,6 +188,9 @@ Ensure your `public/.well-known/apple-app-site-association` file matches all rou
     ]
   },
   "activitycontinuation": {
+    "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
+  },
+  "webcredentials": {
     "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
   }
 }
