@@ -4,7 +4,8 @@ import {
   ParamListBase,
   PartialState,
   createNavigationContainerRef,
-  useRoute,
+  NavigationRouteContext,
+  RouteProp,
 } from "@react-navigation/native";
 import React from "react";
 
@@ -211,5 +212,10 @@ export function useSearchParams() {
 export function useLocalSearchParams<
   TParams extends SearchParams = SearchParams
 >(): Partial<TParams> {
-  return (useRoute()?.params ?? ({} as any)) as Partial<TParams>;
+  return (useOptionalLocalRoute()?.params ?? ({} as any)) as Partial<TParams>;
+}
+
+function useOptionalLocalRoute<T extends RouteProp<ParamListBase>>(): T | null {
+  const route = React.useContext(NavigationRouteContext);
+  return route ?? null;
 }

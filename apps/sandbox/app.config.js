@@ -19,13 +19,16 @@ module.exports = {
   web: {
     bundler: "metro",
   },
-  extra: {
-    router: {
-      asyncRoutes: "development",
-      headOrigin: origin,
-      origin,
-    },
-  },
+  plugins: [
+    [
+      "expo-router",
+      {
+        asyncRoutes: "development",
+        headOrigin: origin,
+        origin,
+      },
+    ],
+  ],
   android: {
     package: "app.expo.router.sandbox",
   },

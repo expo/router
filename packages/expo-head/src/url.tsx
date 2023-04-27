@@ -11,16 +11,17 @@ function getUrlFromConstants(): string | null {
 
   if (!origin) {
     throwOrAlert(
-      'Expo Head: Add the handoff origin to the native manifest under "extra.router.headOrigin".'
+      'Expo Head: Add the handoff origin to the Expo Config (requires rebuild). Add the Config Plugin `{ plugins: [["expo-router", { origin: "..." }]] }`, where `origin` is the hosted URL.'
     );
     // Fallback value that shouldn't be used for real.
-    return "https://github.com";
+    return "https://expo.dev";
   }
 
   if (!/^https?:\/\//.test(origin)) {
     throwOrAlert('Expo Head: Web URL must start with "http://" or "https://".');
   }
 
+  // Return the development URL last so the user gets all production warnings first.
   return origin.replace(/\/$/, "");
 }
 
