@@ -1,5 +1,5 @@
 import { ConfigPlugin } from "expo/config-plugins";
-import validate from "schema-utils";
+import { validate } from "schema-utils";
 
 const schema = require("../options.json");
 
