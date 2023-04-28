@@ -36,6 +36,9 @@ Ensure your `public/.well-known/apple-app-site-association` file is configured c
   },
   "activitycontinuation": {
     "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
+  },
+  "webcredentials": {
+    "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
   }
 }
 ```
@@ -47,7 +50,10 @@ The associated domains must be configured and signed, even in development. You c
 Ensure you set the Handoff origin in your `app.config.js` file. This is the URL that will be used for the `webpageUrl` when the user switches to your app.
 
 ```js title=app.config.js
+// Be sure to change this to be unique to your project.
 process.env.EXPO_TUNNEL_SUBDOMAIN = "bacon-router-sandbox";
+
+const ngrokUrl = `${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`;
 
 /** @type {import('expo/config').ExpoConfig} */
 module.exports = {
@@ -56,22 +62,30 @@ module.exports = {
     bundleIdentifier: "...",
     associatedDomains: [
       // highlight-next-line
-      `applinks:${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
+      `applinks:${ngrokUrl}`,
       // highlight-next-line
-      `activitycontinuation:${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
-
+      `activitycontinuation:${ngrokUrl}`,
+      // highlight-next-line
+      `webcredentials:${ngrokUrl}`,
       // Add additional production-URLs here.
       // `applinks:example.com`,
       // `activitycontinuation:example.com`,
+      // `webcredentials:example.com`,
     ],
   },
 
-  extra: {
-    router: {
-      // highlight-next-line
-      headOrigin: `https://${process.env.EXPO_TUNNEL_SUBDOMAIN}.ngrok.io`,
-    },
-  },
+  plugins: [
+    [
+      "expo-router",
+      {
+        // highlight-next-line
+        headOrigin:
+          process.env.NODE_ENV === "development"
+            ? `https://${ngrokUrl}`
+            : "https://my-website-example.com",
+      },
+    ],
+  ],
 };
 ```
 
@@ -108,7 +122,7 @@ The `expo-router/head` component supports the following meta tags:
 
 - `expo:handoff` - Set to `true` to enable handoff for the current route. iOS-only. Defaults to `false`.
 - `expo:spotlight` - Set to `true` to enable spotlight search for the current route. iOS-only. Defaults to `false`.
-- `og:url` - Set the URL that should be opened when the user switches to your app. Defaults to the current URL in-app with `extra.router.headOrigin` as the baseURL. Passing a relative path will append the `headOrigin` to the path.
+- `og:url` - Set the URL that should be opened when the user switches to your app. Defaults to the current URL in-app with `headOrigin` prop in the `expo-router` Config Plugin, as the baseURL. Passing a relative path will append the `headOrigin` to the path.
 - `og:title` and `<title>` - Set the title for the `NSUserActivity` this is unused with handoff.
 - `og:description` - Set the description for the `NSUserActivity` this is unused with handoff.
 
@@ -175,6 +189,9 @@ Ensure your `public/.well-known/apple-app-site-association` file matches all rou
   },
   "activitycontinuation": {
     "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
+  },
+  "webcredentials": {
+    "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
   }
 }
 ```
@@ -203,7 +220,7 @@ Ensure you can access the Ngrok URL (via the browser for example), before buildi
 
 Handoff between your Mac and iPhone/iPad is not supported in the Expo Go app. You must build and install your app on your device.
 
-If you see the Safari icon in the App Switcher on your iPhone, then it means handoff is not working. Ensure you are not using the `?mode=developer` suffix when testing handoff to native.
+If you see the Safari icon in the App Switcher on your iPhone, then it means handoff is not working. Ensure you are not using the `?mode=developer` suffix when testing handoff to native. Also be sure you're not using the local development server URL, e.g. `http://localhost:8081` as this cannot be used as a valid app site association link, open the running Ngrok URL in your browser to test.
 
 Ensure your `public/.well-known/apple-app-site-association` file contains the `activitycontinuation` field.
 
