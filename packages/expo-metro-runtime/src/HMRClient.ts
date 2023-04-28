@@ -180,6 +180,13 @@ const HMRClient: HMRClientNativeInterface = {
         didConnect = true;
 
         if (client.isEnabled() && !isInitialUpdate) {
+          // TODO: Add Fast Refresh for static rendering...
+          if (
+            process.env.EXPO_PUBLIC_USE_STATIC &&
+            typeof window !== "undefined"
+          ) {
+            window.location.reload();
+          }
           LoadingView.showMessage("Refreshing...", "refresh");
         }
       }
