@@ -1,6 +1,7 @@
 import {
   MediaCondition,
   MediaFeature,
+  MediaFeatureComparison,
   MediaFeatureValue,
   MediaQuery,
 } from "lightningcss";
@@ -14,7 +15,6 @@ import {
   SignalLike,
 } from "../../types";
 import { colorScheme, isReduceMotionEnabled, vh, vw } from "./globals";
-import { unwrap } from "./utils";
 
 interface ConditionReference {
   width: number | SignalLike<number>;
@@ -33,29 +33,17 @@ export function testMediaQuery(
   mediaQuery: MediaQuery,
   conditionReference: ConditionReference = defaultConditionReference
 ) {
-  const conditionsPass = testCondition(
-    mediaQuery.condition,
-    conditionReference
-  );
-  return mediaQuery.qualifier === "not" ? !conditionsPass : conditionsPass;
+  const pass = testCondition(mediaQuery.condition, conditionReference);
+  return mediaQuery.qualifier === "not" ? !pass : pass;
 }
 
 export function testPseudoClasses(
   interaction: Interaction,
   meta: PseudoClassesQuery
 ) {
-  if (meta.active && !interaction.active.get()) {
-    return false;
-  }
-
-  if (meta.hover && !interaction.hover.get()) {
-    return false;
-  }
-
-  if (meta.focus && !interaction.focus.get()) {
-    return false;
-  }
-
+  if (meta.active && !interaction.active.get()) return false;
+  if (meta.hover && !interaction.hover.get()) return false;
+  if (meta.focus && !interaction.focus.get()) return false;
   return true;
 }
 
@@ -70,9 +58,7 @@ export function testContainerQuery(
 
   return containerQuery.every((query) => {
     // If the query has a name, but the container doesn't exist, we failed
-    if (query.name && !containers[query.name]) {
-      return false;
-    }
+    if (query.name && !containers[query.name]) return false;
 
     // If the query has a name, we use the container with that name
     // Otherwise default to the last container
@@ -81,9 +67,7 @@ export function testContainerQuery(
       : containers.__default;
 
     // We failed if the container doesn't exist (e.g no default container)
-    if (!container) {
-      return false;
-    }
+    if (!container) return false;
 
     if (
       query.pseudoClasses &&
@@ -93,9 +77,7 @@ export function testContainerQuery(
     }
 
     // If there is no condition, we passed (maybe only named as specified)
-    if (!query.condition) {
-      return true;
-    }
+    if (!query.condition) return true;
 
     return testCondition(query.condition, {
       width: container.interaction.layout.width,
@@ -165,17 +147,17 @@ function testPlainFeature(
     case "prefers-color-scheme":
       return colorScheme.get() === value;
     case "width":
-      return typeof value === "number" && unwrap(ref.width) === value;
+      return testComparision("equal", ref.width, value);
     case "min-width":
-      return typeof value === "number" && unwrap(ref.width) >= value;
+      return testComparision("greater-than-equal", ref.width, value);
     case "max-width":
-      return typeof value === "number" && unwrap(ref.width) <= value;
+      return testComparision("less-than-equal", ref.width, value);
     case "height":
-      return typeof value === "number" && unwrap(ref.height) === value;
+      return testComparision("equal", ref.height, value);
     case "min-height":
-      return typeof value === "number" && unwrap(ref.height) >= value;
+      return testComparision("greater-than-equal", ref.height, value);
     case "max-height":
-      return typeof value === "number" && unwrap(ref.height) <= value;
+      return testComparision("less-than-equal", ref.height, value);
     default:
       return false;
   }
@@ -213,37 +195,33 @@ function testRange(
 
   /*eslint no-fallthrough: ["error", { "commentPattern": "break[\\s\\w]*omitted" }]*/
   switch (feature.name) {
-    case "height": {
-      switch (feature.operator) {
-        case "equal":
-          return value === unwrap(ref.height);
-        case "greater-than":
-          return unwrap(ref.height) > value;
-        case "greater-than-equal":
-          return unwrap(ref.height) >= value;
-        case "less-than":
-          return unwrap(ref.height) < value;
-        case "less-than-equal":
-          return unwrap(ref.height) <= value;
-      }
-      // break omitted - unreachable code
-    }
+    case "height":
+      return testComparision(feature.operator, ref.height, value);
     case "width":
-      switch (feature.operator) {
-        case "equal":
-          return value === unwrap(ref.width);
-        case "greater-than":
-          return unwrap(ref.width) > value;
-        case "greater-than-equal":
-          return unwrap(ref.width) >= value;
-        case "less-than":
-          return unwrap(ref.width) < value;
-        case "less-than-equal":
-          return unwrap(ref.width) >= value;
-      }
+      return testComparision(feature.operator, ref.width, value);
   }
 
   return false;
+}
+
+function testComparision(
+  comparision: MediaFeatureComparison,
+  ref: number | SignalLike<number>,
+  value: unknown
+) {
+  if (typeof value !== "number") return false;
+  switch (comparision) {
+    case "equal":
+      return unwrap(ref) === value;
+    case "greater-than":
+      return unwrap(ref) > value;
+    case "greater-than-equal":
+      return unwrap(ref) >= value;
+    case "less-than":
+      return unwrap(ref) < value;
+    case "less-than-equal":
+      return unwrap(ref) < value;
+  }
 }
 
 function testBoolean(feature: Extract<MediaFeature, { type: "boolean" }>) {
@@ -252,4 +230,10 @@ function testBoolean(feature: Extract<MediaFeature, { type: "boolean" }>) {
       return isReduceMotionEnabled.get();
   }
   return false;
+}
+
+function unwrap<T>(value: T | SignalLike<T>): T {
+  return value && typeof value === "object" && "get" in value
+    ? value.get()
+    : value;
 }

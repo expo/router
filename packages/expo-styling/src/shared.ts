@@ -6,7 +6,7 @@ export function isRuntimeValue(value: unknown): value is RuntimeValue {
   } else if (Array.isArray(value)) {
     return value.some((v) => isRuntimeValue(v));
   } else if (typeof value === "object") {
-    if ("type" in value && value.type === "runtime") {
+    if ((value as Record<string, unknown>).type === "runtime") {
       return true;
     } else {
       return Object.values(value).some((v) => isRuntimeValue(v));

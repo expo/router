@@ -16,13 +16,13 @@ import {
 import { isRuntimeValue } from "../shared";
 import {
   ExtractedContainerQuery,
-  ExtractedKeyframe,
   ExtractedStyle,
   StyleSheetRegisterOptions,
   AnimatableCSSProperty,
+  ExtractedAnimation,
 } from "../types";
 import { ParseDeclarationOptions, parseDeclaration } from "./parseDeclaration";
-import { exhaustiveCheck, kebabToCamelCase } from "./utils";
+import { exhaustiveCheck } from "./utils";
 
 export type CssToReactNativeRuntimeOptions = {
   inlineRem?: number | false;
@@ -37,7 +37,7 @@ export function cssToReactNativeRuntime(
   options: CssToReactNativeRuntimeOptions = {}
 ): StyleSheetRegisterOptions {
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
-  const keyframes = new Map<string, ExtractedKeyframe[]>();
+  const keyframes = new Map<string, ExtractedAnimation>();
 
   const grouping =
     options.grouping?.map((value) => {
@@ -70,7 +70,7 @@ interface ExtractRuleOptions {
   // The collection of declarations that have been extracted so far. This should be mutated
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
   // The collection animations declarations that have been extracted so far. This should be mutated
-  keyframes: Map<string, ExtractedKeyframe[]>;
+  keyframes: Map<string, ExtractedAnimation>;
   // Rules may be inside other rules, such as media queries.
   // We can build this this partial rule object as we traverse the tree
   style?: Partial<ExtractedStyle>;
@@ -209,8 +209,6 @@ function setStyleForSelectorList(
         condition.className,
         {
           style: {},
-          runtimeStyleProps: [],
-          variableProps: [],
           container: {
             names: [condition.className],
           },
@@ -392,10 +390,16 @@ function extractKeyFrames(
   extractOptions: ExtractRuleOptions,
   options: CssToReactNativeRuntimeOptions
 ) {
-  let frames: ExtractedKeyframe[] = [];
+  const extractedAnimation: ExtractedAnimation = { frames: [] };
+  const frames = extractedAnimation.frames;
 
   for (const frame of keyframes.keyframes) {
-    const { style } = getExtractedStyle(frame.declarations, options);
+    const { style } = getExtractedStyle(frame.declarations, {
+      ...options,
+      requiresLayout() {
+        extractedAnimation.requiresLayout = true;
+      },
+    });
 
     for (const selector of frame.selectors) {
       const keyframe =
@@ -409,36 +413,42 @@ function extractKeyFrames(
 
       if (keyframe === undefined) continue;
 
-      for (const selector of frame.selectors) {
-        switch (selector.type) {
-          case "percentage":
-            frames.push({ selector: selector.value, style });
-            break;
-          case "from":
-            frames.push({ selector: 0, style });
-            break;
-          case "to":
-            frames.push({ selector: 100, style });
-            break;
-          default:
-            exhaustiveCheck(selector);
-        }
+      switch (selector.type) {
+        case "percentage":
+          frames.push({ selector: selector.value, style });
+          break;
+        case "from":
+          frames.push({ selector: 0, style });
+          break;
+        case "to":
+          frames.push({ selector: 1, style });
+          break;
+        default:
+          exhaustiveCheck(selector);
       }
     }
   }
-  frames = frames.sort((a, b) => a.selector - b.selector);
 
-  extractOptions.keyframes.set(keyframes.name.value, frames);
+  // Ensure there are always two frames, a start and end
+  if (frames.length === 1) {
+    frames.push({ selector: 0, style: {} });
+  }
+
+  extractedAnimation.frames = frames.sort((a, b) => a.selector - b.selector);
+
+  extractOptions.keyframes.set(keyframes.name.value, extractedAnimation);
+}
+
+interface GetExtractedStyleOptions extends CssToReactNativeRuntimeOptions {
+  requiresLayout?: () => void;
 }
 
 function getExtractedStyle(
   declarationBlock: DeclarationBlock<Declaration>,
-  options: CssToReactNativeRuntimeOptions
+  options: GetExtractedStyleOptions
 ): ExtractedStyle {
   const extrtactedStyle: ExtractedStyle = {
     style: {},
-    runtimeStyleProps: [],
-    variableProps: [],
   };
 
   const declarationArray = [
@@ -467,10 +477,10 @@ function getExtractedStyle(
     }
 
     if (property.startsWith("--")) {
-      extrtactedStyle.variableProps.push(property);
-    } else {
-      property = kebabToCamelCase(property);
+      return addVariable(property, value);
     }
+
+    property = kebabToCamelCase(property);
 
     const style = extrtactedStyle.style;
 
@@ -490,8 +500,13 @@ function getExtractedStyle(
     }
 
     if (isRuntimeValue(value)) {
-      extrtactedStyle.runtimeStyleProps.push(property);
+      extrtactedStyle.isDynamic = true;
     }
+  }
+
+  function addVariable(property: string, value: any) {
+    extrtactedStyle.variables ??= {};
+    extrtactedStyle.variables[property] = value;
   }
 
   function addContainerProp(
@@ -654,12 +669,17 @@ function getExtractedStyle(
     }
   }
 
+  function requiresLayout() {
+    extrtactedStyle.requiresLayout = true;
+  }
+
   const parseDeclarationOptions: ParseDeclarationOptions = {
-    ...options,
     addStyleProp,
     addAnimationProp,
     addContainerProp,
     addTransitionProp,
+    requiresLayout,
+    ...options,
   };
 
   for (const declaration of declarationArray) {
@@ -676,4 +696,8 @@ function findLastIndex<T>(array: T[], predicate: (arg: T) => boolean) {
     }
   }
   return -1;
+}
+
+function kebabToCamelCase(str: string) {
+  return str.replace(/-./g, (x) => x[1].toUpperCase());
 }

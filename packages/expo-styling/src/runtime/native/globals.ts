@@ -6,20 +6,20 @@ import {
   Appearance,
 } from "react-native";
 
-import { createSignal } from "./signals";
 import {
   ContainerRuntime,
-  ExtractedKeyframe,
+  ExtractedAnimation,
   StyleMeta,
   StyleProp,
 } from "../../types";
+import { createSignal } from "./signals";
 
 export const globalStyles = new Map<string, StyleProp>();
 export const styleMetaMap = new WeakMap<
   NonNullable<StyleProp> | NonNullable<StyleProp>[],
   StyleMeta
 >();
-export const animationMap = new Map<string, ExtractedKeyframe[]>();
+export const animationMap = new Map<string, ExtractedAnimation>();
 
 export const rem = createRem(14);
 export const vw = viewportUnit("width", Dimensions);
@@ -31,10 +31,6 @@ export const VariableContext = createContext<Record<string, any>>({});
 export const ContainerContext = createContext<Record<string, ContainerRuntime>>(
   {}
 );
-
-export function getGlobalStyles(value: string): StyleProp[] {
-  return value.split(/\s+/).map((v) => globalStyles.get(v));
-}
 
 function viewportUnit(key: "width" | "height", dimensions: Dimensions) {
   const signal = createSignal<number>(dimensions.get("window")[key] || 0);

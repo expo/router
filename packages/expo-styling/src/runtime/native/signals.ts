@@ -1,3 +1,4 @@
+import { useMemo, useEffect } from "react";
 /**
  * This file handles the reactivity of our "units"
  * It maybe a overkill solution - if you can suggest a better method please create a Github Issue.
@@ -92,7 +93,7 @@ function cleanup(running: Computation) {
   running.dependencies.clear();
 }
 
-export function createComputation<T = unknown>(fn: () => T) {
+function createComputation<T = unknown>(fn: () => T) {
   const computation: Computation<T> = {
     fn,
     waiting: 0,
@@ -141,4 +142,14 @@ export function createComputation<T = unknown>(fn: () => T) {
   computation.execute();
 
   return computation;
+}
+
+export function useComputation<T>(
+  fn: () => T,
+  dependencies: unknown[],
+  rerender: () => void
+): T {
+  const computation = useMemo(() => createComputation(fn), dependencies);
+  useEffect(() => computation.subscribe(rerender), [computation]);
+  return computation.snapshot();
 }

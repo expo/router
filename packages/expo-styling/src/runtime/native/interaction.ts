@@ -24,7 +24,7 @@ export function useInteractionSignals(): Interaction {
 export function useInteractionHandlers(
   props: Record<string, any>,
   signals: Interaction,
-  isContainer = false
+  requiresLayout = false
 ) {
   const propsRef = React.useRef(props);
   propsRef.current = props;
@@ -63,7 +63,7 @@ export function useInteractionHandlers(
       },
     };
 
-    if (isContainer) {
+    if (requiresLayout) {
       return {
         ...handlers,
         onLayout(event: LayoutChangeEvent) {
@@ -75,5 +75,5 @@ export function useInteractionHandlers(
     }
 
     return handlers;
-  }, [isContainer]);
+  }, [requiresLayout]);
 }

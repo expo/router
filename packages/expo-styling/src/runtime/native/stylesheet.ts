@@ -5,6 +5,12 @@ import {
 } from "react-native";
 
 import {
+  StyleSheetRegisterOptions,
+  ExtractedStyle,
+  StyleProp,
+  StyleMeta,
+} from "../../types";
+import {
   animationMap,
   colorScheme,
   globalStyles,
@@ -13,12 +19,6 @@ import {
   vh,
   vw,
 } from "./globals";
-import {
-  StyleSheetRegisterOptions,
-  ExtractedStyle,
-  StyleProp,
-  StyleMeta,
-} from "../../types";
 
 const subscriptions = new Set<() => void>();
 
@@ -42,15 +42,15 @@ const parialStyleSheet = {
     colorScheme.reset(appearance);
   },
   register: (options: StyleSheetRegisterOptions) => {
-    if (options.declarations) {
-      for (const [name, styles] of Object.entries(options.declarations)) {
-        globalStyles.set(name, tagStyles(styles));
-      }
-    }
-
     if (options.keyframes) {
       for (const [name, keyframes] of Object.entries(options.keyframes)) {
         animationMap.set(name, keyframes);
+      }
+    }
+
+    if (options.declarations) {
+      for (const [name, styles] of Object.entries(options.declarations)) {
+        globalStyles.set(name, tagStyles(styles));
       }
     }
 
@@ -93,19 +93,12 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
     const meta: StyleMeta = {};
     let hasMeta = false;
 
-    if (
-      Array.isArray(styles.runtimeStyleProps) &&
-      styles.runtimeStyleProps.length > 0
-    ) {
-      meta.runtimeStyleProps = new Set<string>(styles.runtimeStyleProps);
+    if (styles.isDynamic) {
       hasMeta = true;
     }
 
-    if (
-      Array.isArray(styles.variableProps) &&
-      styles.variableProps.length > 0
-    ) {
-      meta.variableProps = new Set<string>(styles.variableProps);
+    if (styles.variables) {
+      meta.variables = styles.variables;
       hasMeta = true;
     }
 
@@ -122,6 +115,15 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
     if (styles.animations) {
       meta.animations = styles.animations;
       hasMeta = true;
+
+      const requiresLayout = styles.animations.name?.some((nameObj) => {
+        const name = nameObj.type === "none" ? "none" : nameObj.value;
+        return animationMap.get(name)?.requiresLayout;
+      });
+
+      if (requiresLayout) {
+        meta.requiresLayout = true;
+      }
     }
 
     if (styles.container) {
@@ -139,6 +141,10 @@ function tagStyles(styles: ExtractedStyle | ExtractedStyle[]): StyleProp {
 
     if (styles.transition) {
       meta.transition = styles.transition;
+      hasMeta = true;
+    }
+    if (styles.requiresLayout) {
+      meta.requiresLayout = styles.requiresLayout;
       hasMeta = true;
     }
 

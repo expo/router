@@ -11,6 +11,8 @@ export interface FlattenStyleOptions {
   variables: Record<string, any>;
   interaction: Interaction;
   containers: Record<string, any>;
+  ch?: number;
+  cw?: number;
 }
 
 /**
@@ -53,19 +55,47 @@ export function flattenStyle(
   //
   // Note: This is different to flatStyleMeta, which is the metadata
   // for the FLATTENED style object
-  const styleMeta = styleMetaMap.get(styles) ?? {};
+  const styleMeta = styleMetaMap.get(styles) || {};
+
+  /*
+   * TODO: Investigate if we early exit if there is no styleMeta.
+   */
+
+  /*
+   * START OF CONDITIONS CHECK
+   *
+   * If any of these fail, this style and its metadata will be skipped
+   */
+  if (
+    styleMeta.pseudoClasses &&
+    !testPseudoClasses(options.interaction, styleMeta.pseudoClasses)
+  ) {
+    return flatStyle;
+  }
+
+  // Skip failed media queries
+  if (styleMeta.media && !styleMeta.media.every((m) => testMediaQuery(m))) {
+    return flatStyle;
+  }
+
+  if (!testContainerQuery(styleMeta.containerQuery, options.containers)) {
+    return flatStyle;
+  }
+  /*
+   * END OF CONDITIONS CHECK
+   */
 
   if (styleMeta.animations) {
     flatStyleMeta.animations = {
-      ...flatStyleMeta.animations,
       ...styleMeta.animations,
+      ...flatStyleMeta.animations,
     };
   }
 
   if (styleMeta.transition) {
     flatStyleMeta.transition = {
-      ...flatStyleMeta.transition,
       ...styleMeta.transition,
+      ...flatStyleMeta.transition,
     };
   }
 
@@ -80,11 +110,13 @@ export function flattenStyle(
     }
   }
 
-  for (const [key, value] of Object.entries(styles)) {
-    // Variables are prefixed with `--` and should not be flattened
-    if (key.startsWith("--")) {
-      flatStyleMeta.variables ??= {};
+  if (styleMeta.requiresLayout) {
+    flatStyleMeta.requiresLayout = true;
+  }
 
+  if (styleMeta.variables) {
+    flatStyleMeta.variables ??= {};
+    for (const [key, value] of Object.entries(styleMeta.variables)) {
       // Skip already set variables
       if (key in flatStyleMeta.variables) continue;
 
@@ -105,28 +137,12 @@ export function flattenStyle(
       } else {
         flatStyleMeta.variables[key] = getterOrValue;
       }
-      continue;
     }
+  }
 
+  for (const [key, value] of Object.entries(styles)) {
     // Skip already set keys
     if (key in flatStyle) continue;
-
-    // Skip failed interaction queries
-    if (
-      styleMeta.pseudoClasses &&
-      !testPseudoClasses(options.interaction, styleMeta.pseudoClasses)
-    ) {
-      continue;
-    }
-
-    // Skip failed media queries
-    if (styleMeta.media && !styleMeta.media.every((m) => testMediaQuery(m))) {
-      continue;
-    }
-
-    if (!testContainerQuery(styleMeta.containerQuery, options.containers)) {
-      continue;
-    }
 
     if (key === "transform") {
       const transform = [];
@@ -215,26 +231,64 @@ function extractValue(
 
           return undefined;
         };
-      case "ch":
-        return () => {
-          const multiplier = value.arguments[0] as number;
+      case "ch": {
+        const multiplier = value.arguments[0] as number;
 
-          if (typeof flatStyle.height === "number") {
-            return round((flatStyle.height || 0) * multiplier);
-          }
+        let reference: number | undefined;
 
-          return undefined;
-        };
-      case "cw":
-        return () => {
-          const multiplier = value.arguments[0] as number;
+        if (options.ch) {
+          reference = options.ch;
+        } else if (options.interaction.layout.height.get()) {
+          reference = options.interaction.layout.height.get();
+        } else if (typeof flatStyle.height === "number") {
+          reference = flatStyle.height;
+        }
 
-          if (typeof flatStyle.width === "number") {
-            return round((flatStyle.width || 0) * multiplier);
-          }
+        if (reference) {
+          return round(reference * multiplier);
+        } else {
+          return () => {
+            if (options.interaction.layout.height.get()) {
+              reference = options.interaction.layout.height.get();
+            } else if (typeof flatStyle.height === "number") {
+              reference = flatStyle.height;
+            } else {
+              reference = 0;
+            }
 
-          return undefined;
-        };
+            return round(reference * multiplier);
+          };
+        }
+      }
+      case "cw": {
+        const multiplier = value.arguments[0] as number;
+
+        let reference: number | undefined;
+
+        if (options.cw) {
+          reference = options.cw;
+        } else if (options.interaction.layout.width.get()) {
+          reference = options.interaction.layout.width.get();
+        } else if (typeof flatStyle.width === "number") {
+          reference = flatStyle.width;
+        }
+
+        if (reference) {
+          return round(reference * multiplier);
+        } else {
+          return () => {
+            if (options.interaction.layout.width.get()) {
+              reference = options.interaction.layout.width.get();
+            } else if (typeof flatStyle.width === "number") {
+              reference = flatStyle.width;
+            } else {
+              reference = 0;
+            }
+
+            return round(reference * multiplier);
+          };
+        }
+      }
       case "var":
         return () => {
           const name = value.arguments[0] as string;

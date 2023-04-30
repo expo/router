@@ -38,19 +38,50 @@ export type ExtractedStyleValue =
   | ExtractedStyleValue[];
 
 export type ExtractedStyle = {
-  runtimeStyleProps: string[];
-  variableProps: string[];
+  isDynamic?: boolean;
   media?: MediaQuery[];
+  variables?: Record<string, ExtractedStyleValue>;
   style: Record<string, ExtractedStyleValue>;
   pseudoClasses?: PseudoClassesQuery;
   animations?: ExtractedAnimations;
   container?: Partial<ExtractedContainer>;
   containerQuery?: ExtractedContainerQuery[];
   transition?: ExtractedTransition;
+  requiresLayout?: boolean;
+};
+
+export type InteropMeta = {
+  /* The processed styled props */
+  styledProps: Record<string, Style>;
+  /* The processed styled props */
+  styledPropsMeta: Record<string, PropInteropMeta>;
+  /* Inline variables */
+  variables: Record<string, unknown>;
+  /* Inline container runtime info */
+  containers: Record<string, ContainerRuntime>;
+  /* A list of props that will be processed by useAnimated  */
+  animatedProps: Set<string>;
+  /* A list of props that will be processed by useTransition  */
+  transitionProps: Set<string>;
+  /* Does this component need the onLayout handler  */
+  requiresLayout: boolean;
+  /* Does variables have any values  */
+  hasInlineVariables: boolean;
+  /* Does variables have any values  */
+  hasInlineContainers: boolean;
+  /* If defined, we should wrap in the AnimationInterop */
+  animationInteropKey?: string;
+};
+
+export type PropInteropMeta = {
+  variables?: Record<string, unknown>;
+  containers?: string[];
+  animated: boolean;
+  transition: boolean;
+  requiresLayout: boolean;
 };
 
 export type StyleMeta = {
-  runtimeStyleProps?: Set<string>;
   variableProps?: Set<string>;
   media?: MediaQuery[];
   variables?: Record<string, unknown>;
@@ -59,6 +90,7 @@ export type StyleMeta = {
   container?: ExtractedContainer;
   containerQuery?: ExtractedContainerQuery[];
   transition?: ExtractedTransition;
+  requiresLayout?: boolean;
 };
 
 export interface SignalLike<T = unknown> {
@@ -120,6 +152,11 @@ export type ExtractedTransition = {
   timingFunction?: EasingFunction[];
 };
 
+export type ExtractedAnimation = {
+  frames: ExtractedKeyframe[];
+  requiresLayout?: boolean;
+};
+
 export type ExtractedKeyframe = {
   selector: number;
   style: Record<string, ExtractedStyleValue>;
@@ -133,7 +170,7 @@ export type PseudoClassesQuery = {
 
 export type StyleSheetRegisterOptions = {
   declarations?: Record<string, ExtractedStyle | ExtractedStyle[]>;
-  keyframes?: Record<string, ExtractedKeyframe[]>;
+  keyframes?: Record<string, ExtractedAnimation>;
 };
 
 export type Style = ViewStyle | TextStyle | ImageStyle;

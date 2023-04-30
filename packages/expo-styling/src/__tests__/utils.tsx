@@ -1,4 +1,8 @@
-import React, { ComponentType, FunctionComponent } from "react";
+import React, {
+  ComponentType,
+  ForwardRefExoticComponent,
+  RefAttributes,
+} from "react";
 import { View, ViewProps } from "react-native";
 
 import {
@@ -18,20 +22,31 @@ export function registerCSS(
 type MockComponentProps = ViewProps & { className?: string };
 
 export function createMockComponent(
-  Component: React.ComponentType = View
-): FunctionComponent<MockComponentProps> {
-  const component = jest.fn((props) => <Component {...props} />);
+  Component: React.ComponentType<any> = View
+): ForwardRefExoticComponent<
+  MockComponentProps & RefAttributes<MockComponentProps>
+> {
+  const component = Object.assign(
+    jest.fn((props, ref) => <Component ref={ref} {...props} />)
+  );
+  const b = React.forwardRef(component);
 
-  function mock(props: MockComponentProps) {
-    return defaultCSSInterop(
-      (ComponentType: ComponentType<any>, props: object, key: string) => {
-        return <ComponentType {...props} key={key} />;
-      },
-      component,
-      props,
-      "key"
-    );
-  }
+  const componentWithRef = React.forwardRef<MockComponentProps>(
+    (props, ref) => {
+      return defaultCSSInterop(
+        (ComponentType: ComponentType<any>, props: object, key: string) => {
+          return <ComponentType ref={ref} {...props} key={key} />;
+        },
+        b,
+        props,
+        "key"
+      );
+    }
+  );
 
-  return Object.assign(mock, { component });
+  Object.assign(componentWithRef, {
+    component,
+  });
+
+  return componentWithRef;
 }
