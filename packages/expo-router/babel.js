@@ -41,7 +41,7 @@ function getExpoRouterImportMode(projectRoot, platform) {
 
   if (env === "production" && mode === "lazy") {
     throw new Error(
-      "Async routes are not supported in production yet. Set `extra.router.asyncRoutes` to `development`, `false`, or `undefined`."
+      "Async routes are not supported in production yet. Set the `expo-router` Config Plugin prop `asyncRoutes` to `development`, `false`, or `undefined`."
     );
   }
 

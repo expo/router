@@ -7,10 +7,10 @@ import type {
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
-import { findFocusedRoute } from "./findFocusedRoute";
-import validatePathConfig from "./validatePathConfig";
 import { RouteNode } from "../Route";
 import { matchGroupName, stripGroupSegmentsFromPath } from "../matchers";
+import { findFocusedRoute } from "./findFocusedRoute";
+import validatePathConfig from "./validatePathConfig";
 
 type Options<ParamList extends object> = {
   initialRouteName?: string;

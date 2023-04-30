@@ -16,15 +16,18 @@ No setup is required on web, and no polyfill is needed.
 
 In development, the `window.location` API is polyfilled to point to the development server. In production, the `window.location` API is polyfilled to point to the URL that your static assets are [hosted at](/docs/guides/hosting.md), this must be configured manually.
 
-In order to polyfill in production, the field `extra.router.origin` in the `app.config.js` (or `app.json`) must be set to the URL that your static assets are [hosted at](/docs/guides/hosting.md).
+In order to polyfill in production, the `expo-router` config plugin must be used, and the `origin` prop must be provided in the `app.config.js` (or `app.json`). `origin` must be set to the URL that your static assets are [hosted at](/docs/guides/hosting.md).
 
 ```js title=app.config.js
 module.exports = {
-  extra: {
-    router: {
-      origin: "https://acme.com",
-    },
-  },
+  plugins: [
+    [
+      "expo-router",
+      {
+        origin: "https://acme.com",
+      },
+    ],
+  ],
 };
 ```
 
@@ -68,16 +71,19 @@ If you run this, you should see the following output in the console:
 
 ## Disable Polyfill
 
-Setting the field `extra.router.origin: false` in the `app.config.js` (or `app.json`) will disable the `window.location` and `fetch` polyfills.
+Setting the field `origin: false` in the `app.config.js` (or `app.json`) will disable the `window.location` and `fetch` polyfills.
 
 ```json title=app.json
 {
   "expo": {
-    "extra": {
-      "router": {
-        "origin": false
-      }
-    }
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": false
+        }
+      ]
+    ]
   }
 }
 ```

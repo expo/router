@@ -7,10 +7,10 @@ import { findAll } from "@testing-library/react-native/build/helpers/findAll";
 import path from "path";
 import React from "react";
 
-import { initialUrlRef } from "./mocks";
-import requireContext from "./require-context-ponyfill";
 import { ExpoRoot } from "../ExpoRoot";
 import { RequireContext } from "../types";
+import { initialUrlRef } from "./mocks";
+import requireContext from "./require-context-ponyfill";
 
 // re-export everything
 export * from "@testing-library/react-native";
@@ -128,11 +128,11 @@ export function renderRouter(
         return node.type === BaseNavigationContainer;
       });
 
-      return new URLSearchParams(
-        containers.reduce((acc, route) => {
-          return { ...acc, ...route.props.initialState.routes[0].params };
-        }, {} satisfies Record<string, string>)
-      );
+      const params = containers.reduce<Record<string, string>>((acc, route) => {
+        return { ...acc, ...route.props.initialState.routes[0].params };
+      }, {});
+
+      return new URLSearchParams(params);
     },
   });
 }

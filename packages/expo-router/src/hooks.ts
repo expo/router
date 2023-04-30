@@ -1,5 +1,8 @@
 import {
   NavigationContainerRefWithCurrent,
+  NavigationRouteContext,
+  ParamListBase,
+  RouteProp,
   useNavigationContainerRef,
   useRoute,
 } from "@react-navigation/native";
@@ -96,5 +99,12 @@ export function useSearchParams() {
 export function useLocalSearchParams<
   TParams extends SearchParams = SearchParams
 >(): Partial<TParams> {
-  return (useRoute()?.params ?? ({} as any)) as Partial<TParams>;
+  return (useOptionalLocalRoute()?.params ?? ({} as any)) as Partial<TParams>;
+}
+
+function useOptionalLocalRoute<T extends RouteProp<ParamListBase>>():
+  | T
+  | undefined {
+  const route = React.useContext(NavigationRouteContext);
+  return route as T | undefined;
 }

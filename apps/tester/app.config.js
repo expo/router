@@ -12,12 +12,15 @@ module.exports = {
   web: {
     bundler: "metro",
   },
-  extra: {
-    router: {
-      asyncRoutes: process.env.E2E_ROUTER_ASYNC,
-      // THIS DOES NOT WORK -- DO NOT USE
-      unstable_src: process.env.E2E_ROUTER_SRC,
-      origin: "https://smart-symbiote.netlify.app/",
-    },
-  },
+  plugins: [
+    [
+      "expo-router",
+      {
+        asyncRoutes: process.env.E2E_ROUTER_ASYNC,
+        // THIS DOES NOT WORK -- DO NOT USE
+        unstable_src: process.env.E2E_ROUTER_SRC,
+        origin: "https://smart-symbiote.netlify.app/",
+      },
+    ],
+  ],
 };

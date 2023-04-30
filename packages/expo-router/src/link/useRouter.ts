@@ -1,9 +1,9 @@
 import { useCallback, useContext } from "react";
 
+import { ExpoRouterContext } from "../hooks";
 import { Href, resolveHref } from "./href";
 import { useLinkToPath } from "./useLinkToPath";
 import { useLoadedNavigation } from "./useLoadedNavigation";
-import { ExpoRouterContext } from "../hooks";
 
 // Wraps useLinkTo to provide an API which is similar to the Link component.
 export function useLink() {
