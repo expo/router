@@ -1,4 +1,4 @@
-import { usePathname, useSearchParams, useSegments } from "../navigationStore";
+import { usePathname, useSearchParams, useSegments } from "../hooks";
 import { HrefObject } from "./href";
 
 /** @deprecated */

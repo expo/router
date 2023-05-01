@@ -13,3 +13,37 @@ jest.mock("react-native-reanimated", () => {
 
 // Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
 jest.mock("react-native/Libraries/Animated/NativeAnimatedHelper");
+
+export const initialUrlRef = {
+  value: "",
+  then(onfulfilled: (v: string) => string) {
+    const nextValue = onfulfilled?.(this.value);
+    if (nextValue !== undefined) {
+      this.value = nextValue;
+    }
+    return this;
+  },
+  catch() {
+    return this;
+  },
+};
+
+jest.mock("expo-linking", () => {
+  const module: typeof import("expo-linking") = {
+    ...jest.requireActual("expo-linking"),
+    createURL(path: string) {
+      return "yourscheme://" + path;
+    },
+    resolveScheme() {
+      return "yourscheme";
+    },
+    addEventListener() {
+      return { remove() {} } as any;
+    },
+    getInitialURL() {
+      return initialUrlRef as unknown as Promise<string>;
+    },
+  };
+
+  return module;
+});

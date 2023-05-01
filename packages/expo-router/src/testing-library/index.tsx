@@ -1,5 +1,4 @@
 /// <reference types="../../types/jest.d.ts" />
-import "./mocks";
 import "./expect";
 
 import { BaseNavigationContainer } from "@react-navigation/core";
@@ -9,7 +8,9 @@ import path from "path";
 import React from "react";
 
 import { ExpoRoot } from "../ExpoRoot";
+import { stateCache } from "../getLinkingConfig";
 import { RequireContext } from "../types";
+import { initialUrlRef } from "./mocks";
 import requireContext from "./require-context-ponyfill";
 
 // re-export everything
@@ -23,33 +24,10 @@ type RouteOverrideFunction = () => React.ReactElement<any, any> | null;
 
 type RouteOverride = { default: RouteOverrideFunction } | RouteOverrideFunction;
 
-const initialUrlRef = {
-  value: "/",
-  then(onfulfilled: (v: string) => string) {
-    const nextValue = onfulfilled?.(this.value);
-    if (nextValue !== undefined) {
-      this.value = nextValue;
-    }
-    return this;
-  },
-  catch() {
-    return this;
-  },
+type Result = ReturnType<typeof render> & {
+  getPathname(): string;
+  getSearchParams(): URLSearchParams;
 };
-
-jest.mock("expo-linking", () => {
-  const module: typeof import("expo-linking") = {
-    ...jest.requireActual("expo-linking"),
-    addEventListener() {
-      return { remove() {} } as any;
-    },
-    getInitialURL() {
-      return initialUrlRef as unknown as Promise<string>;
-    },
-  };
-
-  return module;
-});
 
 function isOverrideContext(
   context: object
@@ -60,28 +38,31 @@ function isOverrideContext(
 export function renderRouter(
   context?: string,
   options?: RenderRouterOptions
-): ReturnType<typeof render>;
+): Result;
 export function renderRouter(
   context: Record<string, RouteOverride>,
   options?: RenderRouterOptions
-): ReturnType<typeof render>;
+): Result;
 export function renderRouter(
   context: { appDir: string; overrides: Record<string, RouteOverride> },
   options?: RenderRouterOptions
-): ReturnType<typeof render>;
+): Result;
 export function renderRouter(
   context:
     | string
     | { appDir: string; overrides: Record<string, RouteOverride> }
     | Record<string, RouteOverride> = "./app",
   { initialUrl = "/", ...options }: RenderRouterOptions = {}
-): ReturnType<typeof render> {
+): Result {
   jest.useFakeTimers();
 
   let ctx: RequireContext;
 
   // Reset the initial URL
   initialUrlRef.value = initialUrl;
+
+  // Force the render to be synchronous
+  process.env.EXPO_ROUTER_IMPORT_MODE = "sync";
 
   if (typeof context === "string") {
     ctx = requireContext(path.resolve(process.cwd(), context));
@@ -111,23 +92,29 @@ export function renderRouter(
   } else {
     ctx = Object.assign(
       function (id: string) {
+        id = id.replace(/^\.\//, "").replace(/\.js$/, "");
         return typeof context[id] === "function"
           ? { default: context[id] }
           : context[id];
       },
       {
-        keys: () => Object.keys(context),
+        keys: () => Object.keys(context).map((key) => "./" + key + ".js"),
         resolve: (key: string) => key,
         id: "0",
       }
     );
   }
 
-  const result = render(<ExpoRoot context={ctx} />, {
-    ...options,
-  });
+  stateCache.clear();
 
-  Object.assign(result, {
+  const result = render(
+    <ExpoRoot context={ctx} location={new URL(initialUrl, "test://test")} />,
+    {
+      ...options,
+    }
+  );
+
+  return Object.assign(result, {
     getPathname(this: RenderResult): string {
       const containers = findAll(this.root, (node) => {
         return node.type === BaseNavigationContainer;
@@ -154,6 +141,4 @@ export function renderRouter(
       return new URLSearchParams(params);
     },
   });
-
-  return result;
 }

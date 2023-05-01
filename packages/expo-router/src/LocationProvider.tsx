@@ -1,8 +1,8 @@
-import { State, deepEqual } from "./fork/getPathFromState";
+import { State } from "./fork/getPathFromState";
 
 type SearchParams = Record<string, string | string[]>;
 
-type UrlObject = {
+export type UrlObject = {
   pathname: string;
   readonly params: SearchParams;
   segments: string[];
@@ -21,22 +21,6 @@ export function getRouteInfoFromState(
     pathname: path.split("?")["0"],
     ...getNormalizedStatePath(qualified),
   };
-}
-
-export function compareRouteInfo(a: UrlObject, b: UrlObject) {
-  return (
-    a.segments.length === b.segments.length &&
-    a.segments.every((segment, index) => segment === b.segments[index]) &&
-    a.pathname === b.pathname &&
-    compareUrlSearchParams(a.params, b.params)
-  );
-}
-
-export function compareUrlSearchParams(
-  a: SearchParams,
-  b: SearchParams
-): boolean {
-  return deepEqual(a, b);
 }
 
 // TODO: Split up getPathFromState to return all this info at once.

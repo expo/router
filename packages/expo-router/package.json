@@ -52,6 +52,9 @@
     "preset": "jest-expo",
     "roots": [
       "src"
+    ],
+    "setupFilesAfterEnv": [
+      "./src/testing-library/mocks.ts"
     ]
   },
   "peerDependencies": {
