@@ -18,7 +18,7 @@ If an `app/+html.js` does not exist, then the default value will be used.
 import React from "react";
 import { ScrollViewStyleReset } from "expo-router/html";
 
-export function Root({ children }: { children: React.ReactNode }) {
+export default function Root({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
