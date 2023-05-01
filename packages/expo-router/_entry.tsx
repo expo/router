@@ -25,6 +25,11 @@ export default function ExpoRouterRoot({ location }: { location: URL }) {
 /** Get the linking manifest from a Node.js process. */
 export async function getManifest(options: any) {
   const routeTree = getRoutes(ctx, options);
+
+  if (!routeTree) {
+    throw new Error("No routes found");
+  }
+
   // Evaluate all static params
   await loadStaticParamsAsync(routeTree);
 

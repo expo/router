@@ -1,13 +1,13 @@
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { useCallback, useState, useEffect, useRef, useContext } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 
-import { ExpoRouterContext } from "../hooks";
+import { useExpoRouterContext } from "../hooks";
 
 type GenericNavigation = NavigationProp<ReactNavigation.RootParamList>;
 
 /** Returns a callback which is invoked when the navigation state has loaded. */
 export function useLoadedNavigation() {
-  const { navigationRef } = useContext(ExpoRouterContext);
+  const { navigationRef } = useExpoRouterContext();
   const navigation = useNavigation();
   const isMounted = useRef(true);
   const pending = useRef<((navigation: GenericNavigation) => void)[]>([]);

@@ -356,16 +356,12 @@ export function assertDuplicateRoutes(filenames: string[]) {
 export function getRoutes(
   contextModule: RequireContext,
   options?: Options
-): RouteNode {
+): RouteNode | null {
   const route = getExactRoutes(contextModule, options);
+
+  // If there is no route, return an empty route.
   if (!route) {
-    return {
-      loadRoute: () => ({ default: () => null }),
-      children: [],
-      dynamic: null,
-      route: "",
-      contextKey: "",
-    };
+    return null;
   }
 
   appendSitemapRoute(route);

@@ -508,6 +508,6 @@ describe(getRoutes, () => {
     });
   });
   it(`should convert an empty context module to routes`, () => {
-    expect(getRoutes(createMockContextModule({}))).toEqual(null);
+    expect(getRoutes(createMockContextModule({}))).toBeNull();
   });
 });

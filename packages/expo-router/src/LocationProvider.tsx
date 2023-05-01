@@ -2,7 +2,7 @@ import { State } from "./fork/getPathFromState";
 
 type SearchParams = Record<string, string | string[]>;
 
-type UrlObject = {
+export type UrlObject = {
   pathname: string;
   readonly params: SearchParams;
   segments: string[];

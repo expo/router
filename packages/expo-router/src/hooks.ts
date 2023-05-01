@@ -3,97 +3,72 @@ import {
   NavigationRouteContext,
   ParamListBase,
   RouteProp,
-  useNavigationContainerRef,
-  useRoute,
 } from "@react-navigation/native";
 import React from "react";
 
-import { getRouteInfoFromState } from "./LocationProvider";
+import { UrlObject } from "./LocationProvider";
 import { RouteNode } from "./Route";
-import getPathFromState, {
-  getPathDataFromState,
-} from "./fork/getPathFromState";
 import { ResultState } from "./fork/getStateFromPath";
 import { ExpoLinkingOptions } from "./getLinkingConfig";
-import { useNavigation } from "./useNavigation";
 
 type SearchParams = Record<string, string | string[]>;
 
-export type ExpoRouteContextType = {
+export type ExpoRouterContextType = {
   routeNode: RouteNode;
   linking: ExpoLinkingOptions;
   navigationRef: NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>;
   initialState: ResultState | undefined;
+  getRouteInfo: (state: ResultState) => UrlObject;
 };
 
-export const ExpoRouterContext = React.createContext<ExpoRouteContextType>({
-  routeNode: {
-    loadRoute: () => ({ default: () => null }),
-    children: [],
-    dynamic: null,
-    route: "",
-    contextKey: "",
-  },
-  initialState: undefined,
-  linking: { prefixes: [] },
-  navigationRef:
-    {} as NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>,
-});
+// If there is no routeNode we should show the onboarding screen
+export type OnboardingExpoRouterContextType = Omit<
+  ExpoRouterContextType,
+  "routeNode"
+> & { routeNode: null };
 
-export function useRootNavigation() {
-  return useNavigationContainerRef();
-}
+export const ExpoRouterContext = React.createContext<
+  ExpoRouterContextType | undefined
+>(undefined);
 
-export function useLinkingContext() {
-  return React.useContext(ExpoRouterContext).linking;
-}
+export type RootStateContextType = {
+  state?: ResultState;
+  routeInfo?: UrlObject;
+};
+
+export const RootStateContext = React.createContext<RootStateContextType>({});
 
 export function useRootNavigationState() {
-  const { initialState, navigationRef } = React.useContext(ExpoRouterContext);
-  return navigationRef.current?.getRootState() ?? initialState;
+  return React.useContext(RootStateContext);
 }
 
 export function useRouteInfo() {
-  const { linking, initialState } = React.useContext(ExpoRouterContext);
-  const navigation = useNavigation();
-  const state = navigation.getState() ?? initialState;
+  return React.useContext(RootStateContext).routeInfo!;
+}
 
-  return React.useMemo(() => {
-    if (!linking) {
-      throw new Error("No screens in the linking config found.");
-    }
-    if (!state) {
-      // This should never occur, as the root state is always set.
-      return {
-        pathname: "",
-        params: {},
-        segments: [],
-      };
-    }
-    return getRouteInfoFromState(
-      (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
-        return getPathDataFromState(state, {
-          screens: [],
-          ...linking.config,
-          preserveDynamicRoutes: asPath,
-          preserveGroups: asPath,
-        });
-      },
-      state
-    );
-  }, [state, linking]);
+export function useExpoRouterContext() {
+  return React.useContext(ExpoRouterContext)!;
+}
+
+export function useRootNavigation() {
+  const { navigationRef } = useExpoRouterContext();
+  return navigationRef.current;
+}
+
+export function useLinkingContext() {
+  return useExpoRouterContext().linking;
 }
 
 export function useSegments() {
-  return useRouteInfo()?.segments;
+  return useRouteInfo().segments;
 }
 
 export function usePathname() {
-  return useRouteInfo()?.pathname;
+  return useRouteInfo().pathname;
 }
 
 export function useSearchParams() {
-  return useRouteInfo()?.params;
+  return useRouteInfo().params;
 }
 
 export function useLocalSearchParams<

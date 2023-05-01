@@ -1,6 +1,6 @@
-import { useCallback, useContext } from "react";
+import { useCallback } from "react";
 
-import { ExpoRouterContext } from "../hooks";
+import { useExpoRouterContext } from "../hooks";
 import { Href, resolveHref } from "./href";
 import { useLinkToPath } from "./useLinkToPath";
 import { useLoadedNavigation } from "./useLoadedNavigation";
@@ -23,7 +23,7 @@ type Router = {
 };
 
 export function useRouter(): Router {
-  const { navigationRef } = useContext(ExpoRouterContext);
+  const { navigationRef } = useExpoRouterContext();
   const pending = useLoadedNavigation();
   const linkTo = useLinkToPath();
 

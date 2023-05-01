@@ -8,6 +8,7 @@ import path from "path";
 import React from "react";
 
 import { ExpoRoot } from "../ExpoRoot";
+import { stateCache } from "../getLinkingConfig";
 import { RequireContext } from "../types";
 import { initialUrlRef } from "./mocks";
 import requireContext from "./require-context-ponyfill";
@@ -51,7 +52,7 @@ export function renderRouter(
     | string
     | { appDir: string; overrides: Record<string, RouteOverride> }
     | Record<string, RouteOverride> = "./app",
-  { initialUrl = "", ...options }: RenderRouterOptions = {}
+  { initialUrl = "/", ...options }: RenderRouterOptions = {}
 ): Result {
   jest.useFakeTimers();
 
@@ -104,9 +105,14 @@ export function renderRouter(
     );
   }
 
-  const result = render(<ExpoRoot context={ctx} />, {
-    ...options,
-  });
+  stateCache.clear();
+
+  const result = render(
+    <ExpoRoot context={ctx} location={new URL(initialUrl, "test://test")} />,
+    {
+      ...options,
+    }
+  );
 
   return Object.assign(result, {
     getPathname(this: RenderResult): string {

@@ -52,7 +52,7 @@ export function getLinkingConfig(routes: RouteNode): ExpoLinkingOptions {
   };
 }
 
-const stateCache = new Map<string, any>();
+export const stateCache = new Map<string, any>();
 
 /** We can reduce work by memoizing the state by the pathname. This only works because the options (linking config) theoretically never change.  */
 function getStateFromPathMemoized(

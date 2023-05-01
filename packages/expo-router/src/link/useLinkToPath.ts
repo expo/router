@@ -7,7 +7,7 @@ import { TabActions } from "@react-navigation/routers";
 import * as Linking from "expo-linking";
 import * as React from "react";
 
-import { ExpoRouterContext } from "../hooks";
+import { useExpoRouterContext } from "../hooks";
 import { resolve } from "./path";
 import {
   findTopRouteForTarget,
@@ -30,7 +30,7 @@ function isRemoteHref(href: string): boolean {
 }
 
 export function useLinkToPath() {
-  const { navigationRef, linking } = React.useContext(ExpoRouterContext);
+  const { navigationRef, linking } = useExpoRouterContext();
 
   const linkTo = React.useCallback(
     (href: string, event?: string) => {

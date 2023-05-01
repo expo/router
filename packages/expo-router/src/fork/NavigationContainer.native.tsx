@@ -115,8 +115,6 @@ function NavigationContainerInner(
 
   const isReady = rest.initialState != null || !isLinkingEnabled || isResolved;
 
-  console.log(666666666666666666666666);
-
   const onReadyRef = React.useRef(onReady);
 
   React.useEffect(() => {

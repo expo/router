@@ -11,7 +11,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RouteNode, sortRoutes } from "../Route";
-import { ExpoRouterContext } from "../hooks";
+import { useExpoRouterContext } from "../hooks";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName } from "../matchers";
 
@@ -22,7 +22,7 @@ function sortRouteNodeRoutes(routeNode: RouteNode) {
 }
 
 function useSortedRoutes() {
-  const { routeNode } = React.useContext(ExpoRouterContext);
+  const { routeNode } = useExpoRouterContext();
   const sortedRoutes = React.useMemo(
     () => sortRouteNodeRoutes(routeNode),
     [routeNode]
