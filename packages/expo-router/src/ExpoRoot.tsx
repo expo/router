@@ -63,11 +63,14 @@ export function ExpoRoot({ context, location }: ExpoRootProps) {
   );
 }
 
+const initialUrl =
+  Platform.OS === "web" && typeof window !== "undefined"
+    ? new URL(window.location.href)
+    : undefined;
+
 function ContextNavigator({
   context,
-  location: initialLocation = Platform.OS === "web"
-    ? new URL(window.location.href)
-    : undefined,
+  location: initialLocation = initialUrl,
 }: ExpoRootProps) {
   const navigationRef = useNavigationContainerRef();
   const [shouldShowSplash, setShowSplash] = React.useState(
