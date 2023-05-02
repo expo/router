@@ -221,7 +221,10 @@ Ensure you can access the Ngrok URL (via the browser for example), before buildi
 
 Handoff between your Mac and iPhone/iPad is not supported in the Expo Go app. You must build and install your app on your device.
 
-If you see the Safari icon in the App Switcher on your iPhone, then it means handoff is not working. Ensure you are not using the `?mode=developer` suffix when testing handoff to native. Also be sure you're not using the local development server URL, e.g. `http://localhost:8081` as this cannot be used as a valid app site association link, open the running Ngrok URL in your browser to test.
+**If you see the Safari icon in the App Switcher on your iPhone**, then it means handoff is not working. 
+- Ensure you are not using the `?mode=developer` suffix when testing handoff to native. 
+- Also be sure you're not using the local development server URL, e.g. `http://localhost:8081` as this cannot be used as a valid app site association link, open the running Ngrok URL in your browser to test.
+- We've observed that in iOS 16.3.1 and macOS 13.0 (Ventura), bundle identifiers starting with `app.` and `io.` will _sometimes_ not trigger the native app to show up in the iOS task switcher. Use `com.` as the first part of your bundle identifier.
 
 Ensure your `public/.well-known/apple-app-site-association` file contains the `activitycontinuation` field.
 
