@@ -17,14 +17,14 @@ The following restrictions and considerations are very important:
 - Handoff requires [universal links](/docs/guides/universal-links) to be configured.
 - Handoff requires the `expo-router/head` component to be used on each page that you want to support.
 
-Ensure your `public/.well-known/apple-app-site-association` file is configured correctly. It must contain the `activitycontinuation` key with the `apps` array containing your app's bundle ID and Team ID formatted as `<TEAM ID>.<BUNDLE ID>`.
+Ensure your `public/.well-known/apple-app-site-association` file is configured correctly. It must contain the `activitycontinuation` key with the `apps` array containing your app's bundle ID and Team ID formatted as `<APPLE_TEAM_ID>.<IOS_BUNDLE_ID>`, e.g. `QQ57RJ5UTD.app.expo.acme` where `QQ57RJ5UTD` is the Team ID and `app.expo.acme` is the bundle identifier.
 
 ```json title=public/.well-known/apple-app-site-association
 {
   "applinks": {
     "details": [
       {
-        "appIDs": ["QQ57RJ5UTD.app.expo.router.sandbox"],
+        "appIDs": ["<APPLE_TEAM_ID>.<IOS_BUNDLE_ID>"],
         "components": [
           {
             "/": "*",
@@ -35,10 +35,10 @@ Ensure your `public/.well-known/apple-app-site-association` file is configured c
     ]
   },
   "activitycontinuation": {
-    "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
+    "apps": ["<APPLE_TEAM_ID>.<IOS_BUNDLE_ID>"]
   },
   "webcredentials": {
-    "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
+    "apps": ["<APPLE_TEAM_ID>.<IOS_BUNDLE_ID>"]
   }
 }
 ```
@@ -175,7 +175,7 @@ Ensure your `public/.well-known/apple-app-site-association` file matches all rou
   "applinks": {
     "details": [
       {
-        "appIDs": ["QQ57RJ5UTD.app.expo.router.sandbox"],
+        "appIDs": ["<APPLE_TEAM_ID>.<IOS_BUNDLE_ID>"],
         "components": [
           {
             // highlight-next-line
@@ -188,10 +188,10 @@ Ensure your `public/.well-known/apple-app-site-association` file matches all rou
     ]
   },
   "activitycontinuation": {
-    "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
+    "apps": ["<APPLE_TEAM_ID>.<IOS_BUNDLE_ID>"]
   },
   "webcredentials": {
-    "apps": ["QQ57RJ5UTD.app.expo.router.sandbox"]
+    "apps": ["<APPLE_TEAM_ID>.<IOS_BUNDLE_ID>"]
   }
 }
 ```
@@ -204,6 +204,7 @@ In the application, ensure you are not rendering the `<Head />` element conditio
   "expo": {
     "ios": {
       "associatedDomains": [
+        // THIS IS NOT ALLOWED! YOU MUST USE THE QUALIFIED URL.
         "applinks:*.ngrok.io",
         "activitycontinuation:*.ngrok.io"
       ]
