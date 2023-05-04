@@ -31,7 +31,6 @@ export const Tabs = withLayoutContext<
         ...screen,
         options: {
           ...options,
-          // Force the button to go to the user's profile
           tabBarButton: (props) => {
             if (href == null) {
               return null;
