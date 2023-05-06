@@ -12,7 +12,27 @@ Native support can be found in the [handoff guide](/docs/lab/handoff).
 
 ## Usage
 
-The `<Head />` component can be imported in any route in the `app` directory, simply import using `expo-router/head`:
+Be sure to use the `expo-router` Config Plugin if you're planning to use on iOS:
+
+```json title=app.json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-router",
+        {
+          // Set this to the URL where your iOS universal links can be accessed.
+          // For example, if I build an app "Bacon Blog" and host at `evanbacon.dev`
+          // then `origin` should be `https://evanbacon.dev`.
+          "origin": "<PRODUCTION_URL>"
+        }
+      ]
+    ]
+  }
+}
+```
+
+The `<Head />` component can be imported in any route in the `app` directory, import using `expo-router/head`:
 
 ```tsx title=app/index.js
 import { Text } from "react-native";
