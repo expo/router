@@ -1,6 +1,10 @@
 import { useIsFocused } from "@react-navigation/core";
 // @ts-ignore: TODO -- extract these into a shared library to prevent cyclic dependencies
-import { useLocalSearchParams, usePathname, useSegments } from "expo-router";
+import {
+  useLocalSearchParams,
+  useUnstableGlobalHref,
+  useSegments,
+} from "expo-router";
 import React from "react";
 
 import { ExpoHead, UserActivity } from "./ExpoHeadModule";
@@ -19,13 +23,9 @@ function getLastSegment(path: string) {
 // TODO: Use Head Provider to collect all props so only one Head is rendered for a given route.
 
 function useAddressableLink() {
-  const pathname = usePathname();
+  const pathname = useUnstableGlobalHref();
   const params = useLocalSearchParams<any>();
-  const qs = new URLSearchParams(params).toString();
   let url = getStaticUrlFromExpoRouter(pathname);
-  if (qs) {
-    url += "?" + qs;
-  }
   return { url, pathname, params };
 }
 
@@ -181,7 +181,8 @@ function useActivityFromMetaChildren(meta: MetaNode[]) {
     webpageURL: url,
     activityType: ExpoHead!.activities.INDEXED_ROUTE,
     userInfo: {
-      href: pathname,
+      // TODO: This may need to be  versioned in the future, e.g. `_v1` if we change the format.
+      href,
     },
   };
 

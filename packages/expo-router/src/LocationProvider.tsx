@@ -3,6 +3,7 @@ import { State } from "./fork/getPathFromState";
 type SearchParams = Record<string, string | string[]>;
 
 export type UrlObject = {
+  unstable_globalHref: string;
   pathname: string;
   readonly params: SearchParams;
   segments: string[];
@@ -18,6 +19,8 @@ export function getRouteInfoFromState(
   const { path } = getPathFromState(state, false);
   const qualified = getPathFromState(state, true);
   return {
+    // TODO: This may have a predefined origin attached in the future.
+    unstable_globalHref: path,
     pathname: path.split("?")["0"],
     ...getNormalizedStatePath(qualified),
   };
@@ -30,7 +33,7 @@ export function getNormalizedStatePath({
 }: {
   path: string;
   params: any;
-}): Omit<UrlObject, "pathname"> {
+}): Pick<UrlObject, "segments" | "params"> {
   const [pathname] = statePath.split("?");
   return {
     // Strip empty path at the start

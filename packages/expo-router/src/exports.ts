@@ -3,6 +3,7 @@ import { Navigator, Slot } from "./views/Navigator";
 
 export { useRouter } from "./link/useRouter";
 export {
+  useUnstableGlobalHref,
   usePathname,
   useLocalSearchParams,
   useSearchParams,
