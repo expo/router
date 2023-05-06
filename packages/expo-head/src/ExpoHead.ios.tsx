@@ -3,6 +3,7 @@ import { useIsFocused } from "@react-navigation/core";
 import {
   useLocalSearchParams,
   useUnstableGlobalHref,
+  usePathname,
   useSegments,
 } from "expo-router";
 import React from "react";
@@ -219,22 +220,26 @@ const activities: Map<string, UserActivity> = new Map();
 function useRegisterCurrentActivity(activity: UserActivity) {
   // ID is tied to Expo Router and agnostic of URLs to ensure dynamic parameters are not considered.
   // Using all segments ensures that cascading routes are considered.
-  const activityId = urlToId(useSegments().join("-") || "-");
+  const activityId = urlToId(usePathname());
+  const cascadingId = urlToId(useSegments().join("-") || "-");
   const activityIds = Array.from(activities.keys());
   const cascadingActivity: UserActivity = React.useMemo(() => {
-    const cascadingActivity = activities.has(activityId)
+    // Get all nested activities together, then update the id to match the current pathname.
+    // This enables cases like `/user/[name]/post/[id]` to match all nesting, while still having a URL-specific ID, i.e. `/user/evanbacon/post/123`
+    const cascadingActivity = activities.has(cascadingId)
       ? {
-          ...activities.get(activityId),
+          ...activities.get(cascadingId),
           ...activity,
+          id: activityId,
         }
       : {
           ...activity,
           id: activityId,
         };
-    activities.set(activityId, cascadingActivity);
+    activities.set(cascadingId, cascadingActivity);
 
     return cascadingActivity;
-  }, [activityId, activity, activityIds]);
+  }, [cascadingId, activityId, activity, activityIds]);
 
   const previousActivity = React.useRef<UserActivity | null>(null);
 

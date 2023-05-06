@@ -130,6 +130,7 @@ public class ExpoHeadModule: Module {
         }
         
         // TODO: https://gist.github.com/alexruperez/ea81aa3e371f7d0d7ea5e594d7e9ad08
+        activity.targetContentIdentifier = value.id
         activity.persistentIdentifier = value.id
         activity.isEligibleForHandoff = value.isEligibleForHandoff
         activity.isEligibleForPrediction = value.isEligibleForPrediction;
