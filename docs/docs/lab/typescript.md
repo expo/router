@@ -8,7 +8,7 @@ sidebar_class_name: hidden
 
 Expo Router provides an integrated TypeScript experience. To get started:
 
-- Install TypeScript either by `yarn -D typescript` or `npm i -D typescript`
+- Install TypeScript either by `yarn add -D typescript` or `npm i -D typescript`
 - Run `npx tsc --init` or `yarn tsc --init` to initialise TypeScript
 - Set the environment variable `EXPO_USE_TYPED_ROUTER=true`
 
