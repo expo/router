@@ -5,7 +5,7 @@ export function defaultCSSInterop(
   key: string
 ) {
   if (typeof className === "string") {
-    const classNameStyle = { $$css: true, [className]: props.className };
+    const classNameStyle = { $$css: true, [className]: className };
     props.style = Array.isArray(props.style)
       ? [classNameStyle, ...props.style]
       : props.style

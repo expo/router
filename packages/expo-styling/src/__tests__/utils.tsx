@@ -39,7 +39,8 @@ export function createMockComponent(
         },
         b,
         props,
-        "key"
+        "key",
+        true
       );
     }
   );

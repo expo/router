@@ -22,6 +22,7 @@ import { StyleSheet } from "./stylesheet";
 type CSSInteropWrapperProps = {
   __component: ComponentType<any>;
   __styleKeys: string[];
+  __next: boolean;
 } & Record<string, any>;
 
 export function defaultCSSInterop(
@@ -29,7 +30,8 @@ export function defaultCSSInterop(
   type: ComponentType<any>,
   // Props are frozen in development so they need to be cloned
   { ...props }: any,
-  key: string
+  key: string,
+  next = false
 ) {
   /*
    * Most styles are static so the CSSInteropWrapper is not needed
@@ -37,6 +39,7 @@ export function defaultCSSInterop(
 
   props.__component = type;
   props.__styleKeys = ["style"];
+  props.__next = next;
 
   /**
    * In development, we need to wrap every component due to possible async style changes.
@@ -60,7 +63,12 @@ export function defaultCSSInterop(
  */
 const DevOnlyCSSInteropWrapper = React.forwardRef(
   function DevOnlyCSSInteropWrapper(
-    { __component: Component, __styleKeys, ...props }: CSSInteropWrapperProps,
+    {
+      __component: Component,
+      __styleKeys,
+      __next,
+      ...props
+    }: CSSInteropWrapperProps,
     ref
   ) {
     const [, render] = useReducer(rerenderReducer, 0);
@@ -75,6 +83,7 @@ const DevOnlyCSSInteropWrapper = React.forwardRef(
         __component={Component}
         __styleKeys={__styleKeys}
         __skipCssInterop
+        __next={__next}
       />
     ) : (
       <Component {...props} ref={ref} __skipCssInterop />
@@ -83,7 +92,12 @@ const DevOnlyCSSInteropWrapper = React.forwardRef(
 );
 
 const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
-  { __component: Component, __styleKeys, ...$props }: CSSInteropWrapperProps,
+  {
+    __component: Component,
+    __styleKeys,
+    __next: isNext,
+    ...$props
+  }: CSSInteropWrapperProps,
   ref
 ) {
   const [, rerender] = React.useReducer(rerenderReducer, 0);
@@ -240,7 +254,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     );
   }
 
-  if (interopMeta.animationInteropKey) {
+  if (isNext && interopMeta.animationInteropKey) {
     return (
       <AnimationInterop
         {...props}

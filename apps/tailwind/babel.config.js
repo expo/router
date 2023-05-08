@@ -6,7 +6,7 @@ module.exports = function (api) {
         "babel-preset-expo",
         {
           useTransformReactJSXExperimental: true,
-          jsxImportSource: "@expo/styling",
+          jsxImportSource: "@expo/styling/next",
         },
       ],
     ],
