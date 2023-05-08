@@ -11,9 +11,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RouteNode, sortRoutes } from "../Route";
+import { useExpoRouterContext } from "../hooks";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName } from "../matchers";
-import { NavigationStoreContext } from "../navigationStore";
 
 const INDENT = 24;
 
@@ -22,17 +22,10 @@ function sortRouteNodeRoutes(routeNode: RouteNode) {
 }
 
 function useSortedRoutes() {
-  const navigationStore = React.useContext(NavigationStoreContext);
-  const [sortedRoutes, setSortedRoutes] = React.useState(() => {
-    return sortRouteNodeRoutes(navigationStore.routeNode);
-  });
-
-  React.useEffect(
-    () =>
-      navigationStore.subscribeRootState(() => {
-        setSortedRoutes(sortRouteNodeRoutes(navigationStore.routeNode));
-      }),
-    []
+  const { routeNode } = useExpoRouterContext();
+  const sortedRoutes = React.useMemo(
+    () => sortRouteNodeRoutes(routeNode),
+    [routeNode]
   );
 
   return sortedRoutes;

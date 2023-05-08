@@ -358,6 +358,8 @@ export function getRoutes(
   options?: Options
 ): RouteNode | null {
   const route = getExactRoutes(contextModule, options);
+
+  // If there is no route, return an empty route.
   if (!route) {
     return null;
   }

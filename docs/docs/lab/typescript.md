@@ -1,5 +1,7 @@
 ---
 title: TypeScript
+# TODO
+sidebar_class_name: hidden
 ---
 
 > This guide refers to upcoming Expo Router features, all of which are experimental.
@@ -7,7 +9,7 @@ title: TypeScript
 Expo Router provides an integrated TypeScript experience. To get started:
 
 - Install TypeScript either by `yarn add -D typescript` or `npm i -D typescript`
-- Run `npx tsc init` or `yarn tsc init` to initialise TypeScript
+- Run `npx tsc --init` or `yarn tsc --init` to initialise TypeScript
 - Set the environment variable `EXPO_USE_TYPED_ROUTER=true`
 
 When enabled, Expo Router will automatically adjust your environment to ensure Expo Router types are picked up by the TypeScript compiler.

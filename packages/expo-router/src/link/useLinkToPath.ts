@@ -7,6 +7,7 @@ import { TabActions } from "@react-navigation/routers";
 import * as Linking from "expo-linking";
 import * as React from "react";
 
+import { useExpoRouterContext } from "../hooks";
 import { resolve } from "./path";
 import {
   findTopRouteForTarget,
@@ -15,7 +16,6 @@ import {
   isMovingToSiblingRoute,
   NavigateAction,
 } from "./stateOperations";
-import { navigationRef, useLinkingContext } from "../navigationStore";
 
 type NavStateParams = {
   params?: NavStateParams;
@@ -30,7 +30,7 @@ function isRemoteHref(href: string): boolean {
 }
 
 export function useLinkToPath() {
-  const linking = useLinkingContext();
+  const { navigationRef, linking } = useExpoRouterContext();
 
   const linkTo = React.useCallback(
     (href: string, event?: string) => {
@@ -51,10 +51,11 @@ export function useLinkToPath() {
       }
 
       if (href.startsWith(".")) {
-        let base = linking.getPathFromState?.(navigationRef.getRootState(), {
-          ...linking.config,
-          preserveGroups: true,
-        });
+        let base =
+          linking.getPathFromState?.(navigationRef.getRootState(), {
+            screens: [],
+            preserveGroups: true,
+          }) ?? "";
 
         if (base && !base.endsWith("/")) {
           base += "/..";

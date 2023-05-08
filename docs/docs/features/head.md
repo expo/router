@@ -8,9 +8,7 @@ sidebar_class_name: hidden
 
 The Expo `<Head />` component provides a simple and flexible way to manage the meta tags and other important elements of the page head in a universal Expo application. The Expo Head component is designed to be used in both web and mobile applications built with Expo Router. By using this component, developers can easily enhance the search engine optimization (SEO) of their applications.
 
-<!-- TODO -->
-
-> Native support is still in development.
+Native support can be found in the [handoff guide](/docs/lab/handoff).
 
 ## Usage
 
