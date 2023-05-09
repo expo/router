@@ -1,4 +1,5 @@
 import { useMemo, useEffect } from "react";
+import { Signal } from "../../types";
 /**
  * This file handles the reactivity of our "units"
  * It maybe a overkill solution - if you can suggest a better method please create a Github Issue.
@@ -31,14 +32,6 @@ interface Computation<T = unknown> {
   dependencies: Set<Set<Computation | (() => void)>>;
   subscribe(callback: () => void): () => void;
   stale(change: 1 | -1, fresh: boolean): void;
-}
-
-export interface Signal<T = unknown> {
-  get(): T;
-  snapshot(): T;
-  set(value: T): void;
-  stale(change: 1 | -1, fresh: boolean): void;
-  subscribe(callback: () => void): () => void;
 }
 
 const context: Computation[] = [];

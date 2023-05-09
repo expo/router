@@ -1,31 +1,32 @@
-import { AnimationIterationCount, EasingFunction, Time } from "lightningcss";
-import React, { ComponentType, useState, useMemo, forwardRef } from "react";
-import { View, Text } from "react-native";
-import Animated, {
-  Easing,
-  interpolate,
-  interpolateColor,
+import { AnimationIterationCount, AnimationName, Time } from "lightningcss";
+import React, {
+  ComponentType,
+  useMemo,
+  forwardRef,
+  useState,
+  useEffect,
+} from "react";
+import {
+  AnimatableValue,
+  SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withSequence,
   withTiming,
-  useAnimatedReaction,
 } from "react-native-reanimated";
 
-import { exhaustiveCheck } from "../../css-to-rn/utils";
 import {
+  AnimatableCSSProperty,
   ContainerRuntime,
   ExtractedAnimation,
   Interaction,
   InteropMeta,
   Style,
-  StyleProp,
 } from "../../types";
-import { flattenStyle, FlattenStyleOptions } from "./flattenStyle";
+import { createAnimatedComponent } from "./animated-component";
+import { flattenStyle } from "./flattenStyle";
 import { animationMap, styleMetaMap } from "./globals";
-
-const defaultAnimation: ExtractedAnimation = { frames: [] };
 
 type AnimationInteropProps = Record<string, unknown> & {
   __component: ComponentType<any>;
@@ -43,7 +44,7 @@ export const AnimationInterop = forwardRef(function Animated(
   {
     __component: Component,
     __propEntries,
-    __interaction,
+    __interaction: interaction,
     __variables,
     __containers,
     __interopMeta: interopMeta,
@@ -53,499 +54,325 @@ export const AnimationInterop = forwardRef(function Animated(
 ) {
   Component = createAnimatedComponent(Component);
 
-  /* eslint-disable react-hooks/rules-of-hooks */
+  // If the animation requires layout, we need to rerender once layout is available
+  const [layoutReady, setLayoutReady] = useState(
+    interopMeta.requiresLayout ? interaction.layout.width.get() !== 0 : true
+  );
+
+  useEffect(() => {
+    if (!layoutReady) {
+      const subscription = interaction.layout.width.subscribe(() =>
+        setLayoutReady(true)
+      );
+      return () => subscription();
+    }
+    return undefined;
+  }, [layoutReady]);
+
   for (const prop of new Set([
     ...interopMeta.transitionProps,
     ...interopMeta.animatedProps,
   ])) {
-    const value = props[prop] as Style;
-
-    if (
-      interopMeta.transitionProps.has(prop) &&
-      interopMeta.animatedProps.has(prop)
-    ) {
-      props[prop] = [
-        value,
-        useTransitions(value),
-        useAnimations(value, {
-          variables: __variables,
-          interaction: __interaction,
-          containers: __containers,
-        }),
-      ];
-    } else if (interopMeta.transitionProps.has(prop)) {
-      props[prop] = [value, useTransitions(value)];
-    } else {
-      props[prop] = [
-        value,
-        useAnimations(value, {
-          variables: __variables,
-          interaction: __interaction,
-          containers: __containers,
-        }),
-      ];
-    }
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    props[prop] = useAnimationAndTransitions(
+      props[prop] as Record<string, unknown>,
+      __variables,
+      interaction,
+      layoutReady
+    );
   }
-  /* eslint-enable react-hooks/rules-of-hooks */
 
   return <Component ref={ref} {...props} />;
 });
 
-const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>([
-  [View, Animated.View],
-  [Animated.View, Animated.View],
-  [Text, Animated.Text],
-  [Animated.Text, Animated.Text],
-  [Text, Animated.Text],
-]);
+type TimingFrameProperties = {
+  duration: number;
+  progress: number;
+  value: AnimatableValue;
+};
 
-function createAnimatedComponent(
-  Component: ComponentType<any>
-): ComponentType<any> {
-  if (animatedCache.has(Component)) {
-    return animatedCache.get(Component)!;
-  } else if (Component.displayName?.startsWith("AnimatedComponent")) {
-    return Component;
-  }
+function useAnimationAndTransitions(
+  style: Record<string, unknown>,
+  variables: Record<string, unknown>,
+  interaction: Interaction,
+  isLayoutReady: boolean
+) {
+  const {
+    animations: {
+      name: animationNames = emptyArray,
+      duration: animationDurations = emptyArray,
+      iterationCount: animationIterationCounts = emptyArray,
+    } = {},
+    transition: {
+      property: transitions = emptyArray,
+      duration: transitionDurations = emptyArray,
+    } = {},
+  } = styleMetaMap.get(style) || {};
 
-  if (
-    !(
-      typeof Component !== "function" ||
-      (Component.prototype && Component.prototype.isReactComponent)
-    )
-  ) {
-    throw new Error(
-      `Looks like you're passing an animation style to a function component \`${Component.name}\`. Please wrap your function component with \`React.forwardRef()\` or use a class component instead.`
-    );
-  }
-
-  const AnimatedComponent = Animated.createAnimatedComponent(
-    Component as React.ComponentClass
+  const [transitionProps, transitionValues] = useTransitions(
+    transitions,
+    transitionDurations,
+    style
   );
 
-  animatedCache.set(Component, AnimatedComponent);
+  const [animationProps, animationValues] = useAnimations(
+    animationNames,
+    animationDurations,
+    animationIterationCounts,
+    style,
+    variables,
+    interaction,
+    isLayoutReady
+  );
 
-  return AnimatedComponent;
-}
-
-function useAnimations(style: Style, options: FlattenStyleOptions): StyleProp {
-  const styleMetadata = styleMetaMap.get(style);
-  const animations = styleMetadata?.animations;
-  const names = animations?.name;
-
-  if (!animations || !names) {
-    return style;
-  }
-
-  const $style: Style[] = [];
-
-  /* eslint-disable react-hooks/rules-of-hooks */
-  for (let index = 0; index < names.length; index++) {
-    const name = getValue(names, index, { type: "none" });
-
-    if (!name || name.type === "none") {
-      continue;
-    }
-
-    const flattenStyleOptions = {
-      ...options,
-      ch: typeof style.height === "number" ? style.height : undefined,
-      cw: typeof style.width === "number" ? style.width : undefined,
+  return useAnimatedStyle(() => {
+    const transformProps = new Set(Object.keys(defaultTransform));
+    const result: Record<string, unknown> = {
+      ...style,
+      // Reanimated crashes if the fontWeight is numeric
+      fontWeight: style.fontWeight?.toString(),
     };
 
-    const progress = useSharedValue(0);
-    const keyframes = (
-      animationMap.get(name.value) ?? defaultAnimation
-    ).frames.map((frame) => ({
-      ...frame,
-      style: flattenStyle(frame.style, flattenStyleOptions),
-    }));
+    function doAnimation(
+      props: string[],
+      values: SharedValue<AnimatableValue>[]
+    ) {
+      for (const [index, prop] of props.entries()) {
+        const value = values[index].value;
 
-    const iterationCount = countToInteger(
-      getValue(animations.iterationCount, index, {
-        type: "number",
-        value: 1,
+        if (value !== undefined) {
+          if (transformProps.has(prop)) {
+            result.transform ??= [];
+            (result.transform as any[]).push({ [prop]: value });
+          } else {
+            result[prop] = value;
+          }
+        }
+      }
+    }
+    doAnimation(transitionProps, transitionValues);
+    doAnimation(animationProps, animationValues);
+    return result;
+  }, [...transitionValues, ...animationValues]);
+}
+
+function useTransitions(
+  transitions: AnimatableCSSProperty[],
+  transitionDurations: Time[],
+  style: Record<string, unknown>
+) {
+  const transitionProps: string[] = [];
+  const transitionValues: SharedValue<AnimatableValue>[] = [];
+
+  /* eslint-disable react-hooks/rules-of-hooks */
+  for (let index = 0; index < transitions.length; index++) {
+    const prop = transitions[index];
+    const value = style[prop] as AnimatableValue;
+    const duration = timeToMS(
+      getValue(transitionDurations, index, {
+        type: "seconds",
+        value: 0,
       })
     );
 
-    const timingFrames = useMemo(() => {
-      const getValue = <T extends any>(
-        array: T[] | undefined,
-        index: number,
-        defaultValue: T
-      ) => (array ? array[index % array.length] : defaultValue);
-      const fillMode = getValue(animations.fillMode, index, "none");
-      const direction = getValue(animations.direction, index, "normal");
-      const duration = timeToMS(
-        getValue(animations.duration, index, { type: "seconds", value: 0 })
-      );
-      const timingFunction = timingToEasing(
-        getValue(animations.timingFunction, index, { type: "linear" })
-      );
+    const sharedValue = useSharedValue(value);
+    transitionProps.push(prop);
+    transitionValues.push(sharedValue);
 
-      const timingFrames: number[] = [];
-      for (let index = 1; index < keyframes.length; index++) {
-        const from = keyframes[index - 1];
-        const to = keyframes[index];
-        timingFrames.push(
-          withTiming(index, {
-            duration: duration * (to.selector - from.selector),
-            easing: timingFunction,
-          })
-        );
-      }
-
-      switch (direction) {
-        case "normal":
-        case "reverse":
-        case "alternate":
-        case "alternate-reverse":
-          break;
-      }
-
-      switch (fillMode) {
-        case "none":
-        case "backwards":
-        case "forwards":
-        case "both":
-          break;
-      }
-
-      return timingFrames;
-    }, [keyframes.length]);
-
-    useAnimatedReaction(
-      () => ({ timingFrames, iterationCount }),
-      ({ timingFrames, iterationCount }) => {
-        progress.value = withRepeat(
-          withSequence(
-            // Reset to 0, then play the animation
-            withTiming(0, { duration: 0 }),
-            ...timingFrames
-          ),
-          iterationCount
-        );
-      },
-      [timingFrames, iterationCount]
-    );
-
-    const animatedStyle = useAnimatedStyle(() => {
-      function interpolateWithUnits(
-        progress: number,
-        from: unknown = 0,
-        to: unknown = 0
-      ) {
-        if (typeof from === "number" && typeof to === "number") {
-          return interpolate(progress, [0, 1], [from, to]);
-        } else if (
-          (typeof from === "string" && typeof to === "string") ||
-          (typeof from === "string" && to === 0)
-        ) {
-          const unit = from.match(/[a-z%]+$/)?.[0];
-
-          if (unit) {
-            return `${interpolate(
-              progress,
-              [0, 1],
-              [Number.parseFloat(from), Number.parseFloat(to.toString())]
-            )}${unit}`;
-          }
-        } else if (typeof to === "string" && from === 0) {
-          const unit = to.match(/[a-z%]+$/)?.[0];
-
-          if (unit) {
-            return `${interpolate(
-              progress,
-              [0, 1],
-              [from, Number.parseFloat(to)]
-            )}${unit}`;
-          }
-        }
-
-        return 0;
-      }
-
-      const frameProgress = progress.value % 1;
-
-      // The initial frame needs no interpolation
-      if (progress.value === 0) {
-        return keyframes[0].style;
-      }
-
-      // Same with the last
-      if (progress.value === keyframes.length - 1) {
-        return keyframes[keyframes.length - 1].style;
-      }
-
-      const from = Math.floor(progress.value);
-      const fromStyles = keyframes[from].style;
-      const to = Math.ceil(progress.value);
-      const toStyles = keyframes[to].style;
-
-      const style: Record<string, unknown> = {};
-
-      for (const entry of Object.entries(toStyles)) {
-        const key = entry[0] as keyof Style;
-        const toValue = entry[1];
-
-        let fromValue = fromStyles[key];
-
-        // If the current key is not in the from styles, try to find it in the previous styles
-        if (fromValue === undefined) {
-          for (let index = from; index >= 0; index--) {
-            if (fromStyles[key]) {
-              fromValue = fromStyles[key];
-              break;
-            }
-          }
-        }
-
-        if (key === "transform") {
-          let fromTransform = Object.assign(
-            {},
-            ...((fromValue as unknown as Record<string, unknown>[]) ?? [])
-          );
-
-          let toTransform = Object.assign(
-            {},
-            ...(toValue as Record<string, unknown>[])
-          );
-
-          const transformKeys = Array.from(
-            new Set([
-              ...Object.keys(fromTransform),
-              ...Object.keys(toTransform),
-            ])
-          );
-
-          const styleTransform =
-            (style.transform as unknown[] | undefined) ?? [];
-
-          fromTransform = Object.assign(
-            {},
-            defaultTransform,
-            ...styleTransform,
-            fromTransform
-          );
-
-          toTransform = Object.assign({}, defaultTransform, toTransform);
-
-          style[key] = transformKeys.map((k) => {
-            return {
-              [k]: interpolateWithUnits(
-                frameProgress,
-                fromTransform[k],
-                toTransform[k]
-              ),
-            };
-          });
-        } else {
-          style[key] = interpolateWithUnits(frameProgress, fromValue, toValue);
-        }
-      }
-
-      return style;
-    }, [progress]);
-
-    $style.push(animatedStyle);
+    if (value !== undefined && value !== sharedValue.value) {
+      sharedValue.value = withTiming(value, { duration });
+    }
   }
-  /* eslint-enable react-hooks/rules-of-hooks */
 
-  return $style;
+  return [transitionProps, transitionValues] as const;
 }
 
-function useTransitions(style: Style): StyleProp {
-  const {
-    duration: durations = [{ type: "milliseconds", value: 0 }],
-    property: properties = [],
-  } = styleMetaMap.get(style)?.transition ?? {};
+function useAnimations(
+  animationNames: AnimationName[],
+  animationDurations: Time[],
+  animationIterationCounts: AnimationIterationCount[],
+  style: Record<string, unknown>,
+  variables: Record<string, unknown>,
+  interaction: Interaction,
+  isLayoutReady: boolean
+) {
+  const animations = useMemo(() => {
+    const animations = new Map<string, TimingFrameProperties[]>();
 
-  const numOfProperties = properties.length;
-  const animatedTyped = useState(() =>
-    properties.map((p) => {
-      let type: string | undefined;
-      if (numericTransitions.has(p)) {
-        type = "numeric";
-      } else if (colorTransitions.has(p)) {
-        type = "color";
+    for (let index = 0; index < animationNames.length; index++) {
+      const name = getValue(animationNames, index, { type: "none" });
+      const totalDuration = timeToMS(
+        getValue(animationDurations, index, {
+          type: "seconds",
+          value: 0,
+        })
+      );
+
+      let keyframes: ExtractedAnimation;
+      if (name.type === "none") {
+        keyframes = defaultAnimation;
+      } else {
+        keyframes = animationMap.get(name.value) || defaultAnimation;
       }
 
-      return [p, type] as const;
-    })
-  )[0];
+      const propProgressValues: Record<
+        string,
+        Record<number, AnimatableValue>
+      > = {};
 
-  if (__DEV__) {
-    if (numOfProperties !== animatedTyped.length) {
-      throw new Error(
-        "Number of transition properties must match between renders"
-      );
-    }
-  }
+      for (const { style: $style, selector: progress } of keyframes.frames) {
+        const flatStyle = flattenStyle($style, {
+          variables,
+          interaction,
+          ch: typeof style.height === "number" ? style.height : undefined,
+          cw: typeof style.width === "number" ? style.width : undefined,
+        });
 
-  const outputs = useSharedValue<any[]>([]);
-  const progresses: any[] = [];
-  let $outputs = outputs.value;
-
-  /* eslint-disable react-hooks/rules-of-hooks */
-  for (let index = 0; index < numOfProperties; index++) {
-    const prop = properties[index];
-    const value = style[prop as keyof Style];
-    const output = $outputs[index];
-
-    progresses.push(useSharedValue(1));
-
-    const duration = getValue(durations, index, {
-      type: "milliseconds",
-      value: 0,
-    }).value;
-
-    if (output === undefined && value) {
-      $outputs[index] = [value, value];
-      $outputs = [...$outputs];
-      progresses[index].value = withSequence(
-        withTiming(0, { duration: 0 }),
-        withTiming(1, { duration })
-      );
-    } else if (output && output[1] !== value) {
-      $outputs[index] = [output[1], value];
-      $outputs = [...$outputs];
-      progresses[index].value = withSequence(
-        withTiming(0, { duration: 0 }),
-        withTiming(1, { duration })
-      );
-    }
-  }
-  /* eslint-enable react-hooks/rules-of-hooks */
-
-  if (outputs.value !== $outputs) {
-    outputs.value = $outputs;
-  }
-
-  return useAnimatedStyle(() => {
-    const style: Record<string, unknown> = {};
-    for (let index = 0; index < numOfProperties; index++) {
-      const [prop, type] = animatedTyped[index];
-      const progress = progresses[index].value;
-      const output = outputs.value[index];
-
-      if (output === undefined) {
-        continue;
+        for (let [prop, value] of Object.entries(flatStyle)) {
+          if (prop === "transform") {
+            if (value.length === 0) {
+              value = defaultTransformEntries;
+            }
+            for (const transformValue of value) {
+              const [[$prop, $value]] = Object.entries(transformValue);
+              propProgressValues[$prop] ??= {};
+              propProgressValues[$prop][progress] = $value as AnimatableValue;
+            }
+          } else {
+            propProgressValues[prop] ??= {};
+            propProgressValues[prop][progress] = value as AnimatableValue;
+          }
+        }
       }
 
-      if (type === "color") {
-        style[prop] = interpolateColor(progress, input, output);
-      } else if (type === "numeric") {
-        style[prop] = interpolate(progress, input, output);
+      for (const [prop, progressValues] of Object.entries(propProgressValues)) {
+        const orderedProgress = Object.keys(progressValues)
+          .map((v) => parseFloat(v))
+          .sort((a, b) => a - b);
+
+        const frames: TimingFrameProperties[] = [];
+
+        if (orderedProgress[0] !== 0) {
+          frames.push({
+            progress: 0,
+            duration: 0,
+            value: PLACEHOLDER,
+          });
+        }
+
+        for (let i = 0; i < orderedProgress.length; i++) {
+          const progress = orderedProgress[i];
+          const value = progressValues[progress];
+          const previousProgress =
+            progress === 0 || i === 0 ? 0 : orderedProgress[i - 1];
+
+          frames.push({
+            duration: totalDuration * (progress - previousProgress),
+            progress,
+            value,
+          });
+        }
+
+        // if (prop === "translateY") {
+        //   console.warn(frames);
+        // }
+
+        animations.set(prop, frames);
       }
     }
-    return style;
-  }, [outputs, ...progresses]);
+
+    return animations;
+  }, [animationNames, isLayoutReady]);
+
+  /*
+   * Create a shared value for each animation property with a default value
+   */
+  const animationProps: string[] = [];
+  const animationValues: SharedValue<AnimatableValue>[] = [];
+  for (const [prop, [first]] of animations.entries()) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    animationValues.push(useSharedValue(getInitialValue(prop, first, style)));
+    animationProps.push(prop);
+  }
+
+  /*
+   * If the frames ever change, reset the animation
+   * This also prevents the animation from resetting when other state changes
+   */
+  useMemo(() => {
+    const entries = Array.from(animations.entries());
+    for (const [index, [prop, [first, ...rest]]] of entries.entries()) {
+      const sharedValue = animationValues[index];
+      const iterations = getIterations(animationIterationCounts, index);
+
+      // Reset the value to the first frame
+      sharedValue.value = getInitialValue(prop, first, style);
+
+      // Create timing animations for the rest of the frames
+      const timing = rest.map(({ duration, value }) => {
+        return withTiming(value, { duration });
+      }) as [AnimatableValue, ...AnimatableValue[]];
+
+      sharedValue.value = withRepeat(withSequence(...timing), iterations);
+    }
+  }, [animations, animationIterationCounts]);
+
+  return [animationProps, animationValues] as const;
+}
+
+function getInitialValue(
+  prop: string,
+  frame: TimingFrameProperties,
+  style: Style
+): AnimatableValue {
+  if (frame.value === PLACEHOLDER) {
+    if (transformProps.has(prop)) {
+      const initialTransform = style.transform?.find((t) => {
+        return t[prop as keyof typeof t] !== undefined;
+      });
+      return initialTransform
+        ? initialTransform[prop as keyof typeof initialTransform]
+        : defaultTransform[prop];
+    } else {
+      return style[prop as keyof Style] as AnimatableValue;
+    }
+  } else {
+    return frame.value;
+  }
 }
 
 function getValue<T>(array: T[] | undefined, index: number, defaultValue: T) {
   return array ? array[index % array.length] : defaultValue;
 }
 
-function timeToMS(time: Time) {
-  return time.type === "milliseconds" ? time.value : time.value * 1000;
-}
-
-function countToInteger(count: AnimationIterationCount) {
-  return count.type === "infinite" ? Infinity : count.value;
-}
-
-const defaultTransform = {
-  perspective: 0,
+const PLACEHOLDER = {} as AnimatableValue;
+const emptyArray: any[] = [];
+const defaultAnimation: ExtractedAnimation = { frames: [] };
+const defaultTransform: Record<string, AnimatableValue> = {
+  perspective: 1,
   translateX: 0,
   translateY: 0,
-  scaleX: 0,
-  scaleY: 0,
-  rotate: 0,
-  rotateX: 0,
-  rotateY: 0,
-  rotateZ: 0,
-  skewX: 0,
-  skewY: 0,
-  scale: 0,
+  scaleX: 1,
+  scaleY: 1,
+  rotate: "0deg",
+  rotateX: "0deg",
+  rotateY: "0deg",
+  rotateZ: "0deg",
+  skewX: "0deg",
+  skewY: "0deg",
+  scale: 1,
 };
-
-function timingToEasing(timingFunction: EasingFunction) {
-  switch (timingFunction.type) {
-    case "linear":
-    case "ease":
-    case "ease-in":
-    case "ease-out":
-    case "ease-in-out":
-      return Easing.linear;
-    case "cubic-bezier":
-      return Easing.bezier(
-        timingFunction.x1,
-        timingFunction.y1,
-        timingFunction.x2,
-        timingFunction.y2
-      );
-    case "steps":
-      throw new Error("Not supported");
-    default:
-      exhaustiveCheck(timingFunction);
-      throw new Error("Unknown timing function");
-  }
-}
-
-const input = [0, 1] as const;
-const numericTransitions = new Set([
-  "borderBottomLeftRadius",
-  "borderBottomRightRadius",
-  "borderBottomWidth",
-  "borderLeftWidth",
-  "borderRadius",
-  "borderRightWidth",
-  "borderTopWidth",
-  "borderWidth",
-  "bottom",
-  "flex",
-  "flexBasis",
-  "flexGrow",
-  "flexShrink",
-  "fontSize",
-  "fontWeight",
-  "gap",
-  "height",
-  "left",
-  "letterSpacing",
-  "lineHeight",
-  "margin",
-  "marginBottom",
-  "marginLeft",
-  "marginRight",
-  "marginTop",
-  "maxHeight",
-  "maxWidth",
-  "minHeight",
-  "minWidth",
-  "objectPosition",
-  "opacity",
-  "padding",
-  "paddingBottom",
-  "paddingLeft",
-  "paddingRight",
-  "paddingTop",
-  "right",
-  "textDecoration",
-  "top",
-  "transformOrigin",
-  "verticalAlign",
-  "visibility",
-  "width",
-  "wordSpacing",
-  "zIndex",
-]);
-
-const colorTransitions = new Set([
-  "backgroundColor",
-  "borderBottomColor",
-  "borderLeftColor",
-  "borderRightColor",
-  "borderTopColor",
-  "color",
-]);
+const defaultTransformEntries = Object.entries(defaultTransform).map(
+  ([key, value]) => ({ [key]: value })
+);
+const transformProps = new Set(Object.keys(defaultTransform));
+const timeToMS = (time: Time) => {
+  return time.type === "milliseconds" ? time.value : time.value * 1000;
+};
+const getIterations = (
+  iterations: AnimationIterationCount[],
+  index: number
+) => {
+  const iteration = getValue(iterations, index, { type: "infinite" });
+  return iteration.type === "infinite" ? Infinity : iteration.value;
+};

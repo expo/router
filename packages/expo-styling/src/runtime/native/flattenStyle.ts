@@ -9,8 +9,8 @@ import { rem, styleMetaMap, vh, vw } from "./globals";
 
 export interface FlattenStyleOptions {
   variables: Record<string, any>;
-  interaction: Interaction;
-  containers: Record<string, any>;
+  interaction?: Interaction;
+  containers?: Record<string, any>;
   ch?: number;
   cw?: number;
 }
@@ -238,7 +238,7 @@ function extractValue(
 
         if (options.ch) {
           reference = options.ch;
-        } else if (options.interaction.layout.height.get()) {
+        } else if (options.interaction?.layout.height.get()) {
           reference = options.interaction.layout.height.get();
         } else if (typeof flatStyle.height === "number") {
           reference = flatStyle.height;
@@ -248,7 +248,7 @@ function extractValue(
           return round(reference * multiplier);
         } else {
           return () => {
-            if (options.interaction.layout.height.get()) {
+            if (options.interaction?.layout.height.get()) {
               reference = options.interaction.layout.height.get();
             } else if (typeof flatStyle.height === "number") {
               reference = flatStyle.height;

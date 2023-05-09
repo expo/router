@@ -38,18 +38,18 @@ export function testMediaQuery(
 }
 
 export function testPseudoClasses(
-  interaction: Interaction,
+  interaction: Interaction | undefined,
   meta: PseudoClassesQuery
 ) {
-  if (meta.active && !interaction.active.get()) return false;
-  if (meta.hover && !interaction.hover.get()) return false;
-  if (meta.focus && !interaction.focus.get()) return false;
+  if (meta.active && !interaction?.active.get()) return false;
+  if (meta.hover && !interaction?.hover.get()) return false;
+  if (meta.focus && !interaction?.focus.get()) return false;
   return true;
 }
 
 export function testContainerQuery(
   containerQuery: ExtractedContainerQuery[] | undefined,
-  containers: Record<string, ContainerRuntime>
+  containers: Record<string, ContainerRuntime> = {}
 ) {
   // If there is no query, we passed
   if (!containerQuery || containerQuery.length === 0) {

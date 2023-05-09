@@ -97,18 +97,21 @@ export interface SignalLike<T = unknown> {
   get(): T;
 }
 
-export interface MutableSignal<T = unknown> {
+export interface Signal<T = unknown> {
   get(): T;
+  snapshot(): T;
   set(value: T): void;
+  stale(change: 1 | -1, fresh: boolean): void;
+  subscribe(callback: () => void): () => void;
 }
 
 export type Interaction = {
-  active: MutableSignal<boolean>;
-  hover: MutableSignal<boolean>;
-  focus: MutableSignal<boolean>;
+  active: Signal<boolean>;
+  hover: Signal<boolean>;
+  focus: Signal<boolean>;
   layout: {
-    width: MutableSignal<number>;
-    height: MutableSignal<number>;
+    width: Signal<number>;
+    height: Signal<number>;
   };
 };
 
@@ -215,62 +218,63 @@ export type KebabToCamelCase<S extends string> =
  * This is a list of all the CSS properties that can be animated
  * Source: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animated_properties
  */
-export type AnimatableCSSProperty = KebabToCamelCase<
-  | "background-color"
-  | "border-bottom-color"
-  | "border-bottom-left-radius"
-  | "border-bottom-right-radius"
-  | "border-bottom-width"
-  | "border-color"
-  | "border-left-color"
-  | "border-left-width"
-  | "border-radius"
-  | "border-right-color"
-  | "border-right-width"
-  | "border-top-color"
-  | "border-top-width"
-  | "border-width"
-  | "bottom"
-  | "color"
-  | "flex"
-  | "flex-basis"
-  | "flex-grow"
-  | "flex-shrink"
-  | "font-size"
-  | "font-weight"
-  | "gap"
-  | "height"
-  | "left"
-  | "letter-spacing"
-  | "line-height"
-  | "margin"
-  | "margin-bottom"
-  | "margin-left"
-  | "margin-right"
-  | "margin-top"
-  | "max-height"
-  | "max-width"
-  | "min-height"
-  | "min-width"
-  | "object-position"
-  | "opacity"
-  | "order"
-  | "padding"
-  | "padding-bottom"
-  | "padding-left"
-  | "padding-right"
-  | "padding-top"
-  | "right"
-  | "rotate"
-  | "scale"
-  | "text-decoration"
-  | "top"
-  | "transform"
-  | "transform-origin"
-  | "translate"
-  | "vertical-align"
-  | "visibility"
-  | "width"
-  | "word-spacing"
-  | "z-index"
->;
+export type AnimatableCSSProperty = keyof Style &
+  KebabToCamelCase<
+    | "background-color"
+    | "border-bottom-color"
+    | "border-bottom-left-radius"
+    | "border-bottom-right-radius"
+    | "border-bottom-width"
+    | "border-color"
+    | "border-left-color"
+    | "border-left-width"
+    | "border-radius"
+    | "border-right-color"
+    | "border-right-width"
+    | "border-top-color"
+    | "border-top-width"
+    | "border-width"
+    | "bottom"
+    | "color"
+    | "flex"
+    | "flex-basis"
+    | "flex-grow"
+    | "flex-shrink"
+    | "font-size"
+    | "font-weight"
+    | "gap"
+    | "height"
+    | "left"
+    | "letter-spacing"
+    | "line-height"
+    | "margin"
+    | "margin-bottom"
+    | "margin-left"
+    | "margin-right"
+    | "margin-top"
+    | "max-height"
+    | "max-width"
+    | "min-height"
+    | "min-width"
+    | "object-position"
+    | "opacity"
+    | "order"
+    | "padding"
+    | "padding-bottom"
+    | "padding-left"
+    | "padding-right"
+    | "padding-top"
+    | "right"
+    | "rotate"
+    | "scale"
+    | "text-decoration"
+    | "top"
+    | "transform"
+    | "transform-origin"
+    | "translate"
+    | "vertical-align"
+    | "visibility"
+    | "width"
+    | "word-spacing"
+    | "z-index"
+  >;
