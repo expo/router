@@ -31,7 +31,7 @@ npx create-expo-app@latest --example with-router
 
 ## Getting Started
 
-> Expo Router supports `expo@46.0.13` and greater.
+> Expo Router supports `expo@48.0.0` and greater.
 
 Ensure your computer is [setup for running an Expo app](https://docs.expo.dev/get-started/installation/).
 
