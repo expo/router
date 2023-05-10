@@ -1,7 +1,23 @@
-import { ConfigPlugin } from "expo/config-plugins";
+import { ConfigPlugin, withInfoPlist } from "expo/config-plugins";
 import { validate } from "schema-utils";
 
 const schema = require("../options.json");
+
+const withExpoHeadIos: ConfigPlugin = (config) => {
+  return withInfoPlist(config, (config) => {
+    // $(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route
+    if (!Array.isArray(config.modResults.NSUserActivityTypes)) {
+      config.modResults.NSUserActivityTypes = [];
+    }
+    // This ensures that stored `NSUserActivityType`s can be opened in-app.
+    // This is important for moving between native devices or from opening a link that was saved
+    // in a Quick Note or Siri Reminder.
+    config.modResults.NSUserActivityTypes.push(
+      "$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route"
+    );
+    return config;
+  });
+};
 
 const withRouter: ConfigPlugin<{
   /** Production origin URL where assets in the public folder are hosted. The fetch function is polyfilled to support relative requests from this origin in production, development origin is inferred using the Expo CLI development server. */
@@ -14,6 +30,8 @@ const withRouter: ConfigPlugin<{
   asyncRoutes?: string;
 }> = (config, props) => {
   validate(schema, props);
+
+  withExpoHeadIos(config);
 
   return {
     ...config,

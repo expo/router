@@ -126,6 +126,7 @@ function ContextNavigator({
     } else {
       return {
         routeInfo: {
+          unstable_globalHref: "",
           pathname: "",
           params: {},
           segments: [],

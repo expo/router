@@ -59,6 +59,14 @@ export function useLinkingContext() {
   return useExpoRouterContext().linking;
 }
 
+/**
+ * @private
+ * @returns the current global pathname with query params attached. This may change in the future to include the hostname from a predefined universal link, i.e. `/foobar?hey=world` becomes `https://acme.dev/foobar?hey=world`
+ */
+export function useUnstableGlobalHref(): string {
+  return useRouteInfo().unstable_globalHref;
+}
+
 export function useSegments() {
   return useRouteInfo().segments;
 }

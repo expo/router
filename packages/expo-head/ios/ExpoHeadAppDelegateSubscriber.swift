@@ -53,29 +53,26 @@ func userInfoToQueryString(_ userInfo: [String : NSSecureCoding]?) -> String {
     return queryString
 }
 
+func prefixDeepLink(fragment: String) -> String {
+    // This can happen when an NSUserActivity href is used to activate the app.
+    if fragment.starts(with: "/") {
+        let schemes = InfoPlist.bundleURLSchemes()
+        
+        return "\(schemes[0]):/\(fragment)"
+    }
+    
+    return fragment
+}
+
 public class ExpoHeadAppDelegateSubscriber: ExpoAppDelegateSubscriber {
     public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         launchedActivity = userActivity
         
         if let wellKnownHref = userActivity.userInfo?["href"] as? String {
+            // TODO: Maybe just use the `webpageUrl` prop from the NSUserActivity.
+            // From a stored NSUserActivity, e.g. Quick Note or Siri Reminder
             // From other native device to app
-            sendFakeDeepLinkEventToReactNative(obj: self, url: wellKnownHref)
-        } else if var url = userActivity.webpageURL {
-            // From website to app
-            
-            let schemes = InfoPlist.bundleURLSchemes()
-            
-            var deepLink = "\(schemes[0])://\(url.relativePath)"
-                        
-            let components = URLComponents(string: url.absoluteString)
-            if let qs = components?.query {
-                deepLink += "?\(qs)"
-                deepLink += "&ref=web-handoff"
-            } else {
-                deepLink += "?ref=web-handoff"
-            }
-            
-            sendFakeDeepLinkEventToReactNative(obj: self, url: deepLink)
+            sendFakeDeepLinkEventToReactNative(obj: self, url: prefixDeepLink(fragment: wellKnownHref))
         } else if (userActivity.activityType == CSQueryContinuationActionType) {
             // From Spotlight search
             if let query = userActivity.userInfo?[CSSearchQueryString] as? String {

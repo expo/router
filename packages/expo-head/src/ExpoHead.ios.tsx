@@ -1,6 +1,11 @@
 import { useIsFocused } from "@react-navigation/core";
-// @ts-ignore: TODO -- extract these into a shared library to prevent cyclic dependencies
-import { useLocalSearchParams, usePathname, useSegments } from "expo-router";
+import {
+  useLocalSearchParams,
+  useUnstableGlobalHref,
+  usePathname,
+  useSegments,
+  // @ts-ignore: TODO -- extract these into a shared library to prevent cyclic dependencies
+} from "expo-router";
 import React from "react";
 
 import { ExpoHead, UserActivity } from "./ExpoHeadModule";
@@ -19,13 +24,9 @@ function getLastSegment(path: string) {
 // TODO: Use Head Provider to collect all props so only one Head is rendered for a given route.
 
 function useAddressableLink() {
-  const pathname = usePathname();
+  const pathname = useUnstableGlobalHref();
   const params = useLocalSearchParams<any>();
-  const qs = new URLSearchParams(params).toString();
   let url = getStaticUrlFromExpoRouter(pathname);
-  if (qs) {
-    url += "?" + qs;
-  }
   return { url, pathname, params };
 }
 
@@ -181,7 +182,8 @@ function useActivityFromMetaChildren(meta: MetaNode[]) {
     webpageURL: url,
     activityType: ExpoHead!.activities.INDEXED_ROUTE,
     userInfo: {
-      href: pathname,
+      // TODO: This may need to be  versioned in the future, e.g. `_v1` if we change the format.
+      href,
     },
   };
 
@@ -218,22 +220,26 @@ const activities: Map<string, UserActivity> = new Map();
 function useRegisterCurrentActivity(activity: UserActivity) {
   // ID is tied to Expo Router and agnostic of URLs to ensure dynamic parameters are not considered.
   // Using all segments ensures that cascading routes are considered.
-  const activityId = urlToId(useSegments().join("-") || "-");
+  const activityId = urlToId(usePathname());
+  const cascadingId = urlToId(useSegments().join("-") || "-");
   const activityIds = Array.from(activities.keys());
   const cascadingActivity: UserActivity = React.useMemo(() => {
-    const cascadingActivity = activities.has(activityId)
+    // Get all nested activities together, then update the id to match the current pathname.
+    // This enables cases like `/user/[name]/post/[id]` to match all nesting, while still having a URL-specific ID, i.e. `/user/evanbacon/post/123`
+    const cascadingActivity = activities.has(cascadingId)
       ? {
-          ...activities.get(activityId),
+          ...activities.get(cascadingId),
           ...activity,
+          id: activityId,
         }
       : {
           ...activity,
           id: activityId,
         };
-    activities.set(activityId, cascadingActivity);
+    activities.set(cascadingId, cascadingActivity);
 
     return cascadingActivity;
-  }, [activityId, activity, activityIds]);
+  }, [cascadingId, activityId, activity, activityIds]);
 
   const previousActivity = React.useRef<UserActivity | null>(null);
 
