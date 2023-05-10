@@ -117,6 +117,7 @@ function ContextNavigator({
 
   const { routeNode, initialState, linking, getRouteInfo } = expoContext;
 
+  const [isReady, setIsReady] = React.useState(false);
   const [rootState, setRootState] = React.useState<RootStateContextType>(() => {
     if (initialState) {
       return {
@@ -167,10 +168,13 @@ function ContextNavigator({
           ref={navigationRef}
           initialState={initialState}
           linking={linking}
-          onReady={() => requestAnimationFrame(() => setShowSplash(false))}
+          onReady={() => {
+            setIsReady(true);
+            requestAnimationFrame(() => setShowSplash(false));
+          }}
         >
           <RootStateContext.Provider value={rootState}>
-            {!shouldShowSplash && <Component />}
+            {isReady && <Component />}
           </RootStateContext.Provider>
         </UpstreamNavigationContainer>
       </ExpoRouterContext.Provider>
