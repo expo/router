@@ -25,7 +25,7 @@ import {
   Style,
 } from "../../types";
 import { createAnimatedComponent } from "./animated-component";
-import { flattenStyle } from "./flattenStyle";
+import { flattenStyle } from "./flatten-style";
 import { animationMap, styleMetaMap } from "./globals";
 
 type AnimationInteropProps = Record<string, unknown> & {
@@ -131,6 +131,7 @@ function useAnimationAndTransitions(
       ...style,
       // Reanimated crashes if the fontWeight is numeric
       fontWeight: style.fontWeight?.toString(),
+      transform: style.transform ? [] : undefined,
     };
 
     function doAnimation(
@@ -273,10 +274,6 @@ function useAnimations(
           });
         }
 
-        // if (prop === "translateY") {
-        //   console.warn(frames);
-        // }
-
         animations.set(prop, frames);
       }
     }
@@ -330,6 +327,7 @@ function getInitialValue(
       const initialTransform = style.transform?.find((t) => {
         return t[prop as keyof typeof t] !== undefined;
       });
+
       return initialTransform
         ? initialTransform[prop as keyof typeof initialTransform]
         : defaultTransform[prop];
@@ -342,7 +340,7 @@ function getInitialValue(
 }
 
 function getValue<T>(array: T[] | undefined, index: number, defaultValue: T) {
-  return array ? array[index % array.length] : defaultValue;
+  return array && array.length > 0 ? array[index % array.length] : defaultValue;
 }
 
 const PLACEHOLDER = {} as AnimatableValue;

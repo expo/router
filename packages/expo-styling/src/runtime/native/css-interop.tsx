@@ -8,7 +8,7 @@ import React, {
 
 import { ContainerRuntime, InteropMeta, StyleMeta } from "../../types";
 import { AnimationInterop } from "./animations";
-import { flattenStyle } from "./flattenStyle";
+import { flattenStyle } from "./flatten-style";
 import {
   ContainerContext,
   VariableContext,

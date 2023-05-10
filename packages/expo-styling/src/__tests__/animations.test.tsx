@@ -148,20 +148,59 @@ test("bounce", () => {
 
   expect(testComponent).toHaveAnimatedStyle({
     height: 100,
-    transform: [{ translateY: -25 }],
+    transform: [
+      { translateY: -25 },
+      { perspective: 1 },
+      { translateX: 0 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
+      { scale: 1 },
+    ],
   });
 
   jest.advanceTimersByTime(500);
 
   expect(testComponent).toHaveAnimatedStyle({
     height: 100,
-    transform: [{ translateY: 0 }],
+    transform: [
+      { translateY: 0 },
+      { perspective: 1 },
+      { translateX: 0 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
+      { scale: 1 },
+    ],
   });
 
   jest.advanceTimersByTime(500);
 
   expect(testComponent).toHaveAnimatedStyle({
     height: 100,
-    transform: [{ translateY: -25 }],
+    transform: [
+      { translateY: -25 },
+      { perspective: 1 },
+      { translateX: 0 },
+      { scaleX: 1 },
+      { scaleY: 1 },
+      { rotate: "0deg" },
+      { rotateX: "0deg" },
+      { rotateY: "0deg" },
+      { rotateZ: "0deg" },
+      { skewX: "0deg" },
+      { skewY: "0deg" },
+      { scale: 1 },
+    ],
   });
 });

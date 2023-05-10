@@ -267,7 +267,7 @@ function extractValue(
 
         if (options.cw) {
           reference = options.cw;
-        } else if (options.interaction.layout.width.get()) {
+        } else if (options.interaction?.layout.width.get()) {
           reference = options.interaction.layout.width.get();
         } else if (typeof flatStyle.width === "number") {
           reference = flatStyle.width;
@@ -277,7 +277,7 @@ function extractValue(
           return round(reference * multiplier);
         } else {
           return () => {
-            if (options.interaction.layout.width.get()) {
+            if (options.interaction?.layout.width.get()) {
               reference = options.interaction.layout.width.get();
             } else if (typeof flatStyle.width === "number") {
               reference = flatStyle.width;
