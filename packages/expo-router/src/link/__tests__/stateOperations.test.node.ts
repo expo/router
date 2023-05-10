@@ -329,38 +329,49 @@ describe(isMovingToSiblingRoute, () => {
     ).toBe(false);
   });
   it(`returns true`, () => {
+    // Moving from /index to /compose
     expect(
       isMovingToSiblingRoute(
         {
-          type: "tab",
-          index: 1,
+          stale: false,
+          type: "stack",
+          key: "stack-ufSP1t4BKV-9JHUrsMFje",
+          index: 0,
+          routeNames: ["(app)", "_sitemap", "(auth)/sign-in", "[...404]"],
           routes: [
             {
-              name: "index",
-            },
-            {
-              name: "two",
+              name: "(app)",
               state: {
+                stale: false,
                 type: "stack",
+                key: "stack-WGuvSdOQTVdKFB0xn02sG",
                 index: 0,
+                routeNames: ["index", "compose", "note/[note]"],
                 routes: [
                   {
-                    name: "beta",
+                    name: "index",
+                    path: "/",
+                    key: "index-t4yhmcdkL8Uw_YvZDshj4",
                   },
                 ],
               },
+              key: "(app)-HJs7pocOQpWMG1CKd6Be-",
             },
           ],
         },
         {
           routes: [
             {
-              name: "two",
+              name: "(app)",
               state: {
+                index: 1,
                 routes: [
                   {
                     name: "index",
-                    path: "/two",
+                  },
+                  {
+                    name: "compose",
+                    path: "/compose",
                   },
                 ],
               },
