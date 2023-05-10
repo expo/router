@@ -33,15 +33,9 @@ function createQualifiedPathname(
     const dynamicKey = `[${key}]`;
     const deepDynamicKey = `[...${key}]`;
     if (pathname.includes(dynamicKey)) {
-      pathname = pathname.replace(
-        dynamicKey,
-        Array.isArray(value) ? value.join("/") : value
-      );
+      pathname = pathname.replace(dynamicKey, encodeParam(value));
     } else if (pathname.includes(deepDynamicKey)) {
-      pathname = pathname.replace(
-        deepDynamicKey,
-        Array.isArray(value) ? value.join("/") : value
-      );
+      pathname = pathname.replace(deepDynamicKey, encodeParam(value));
     } else {
       continue;
     }
@@ -49,6 +43,14 @@ function createQualifiedPathname(
     delete params[key];
   }
   return { pathname, params };
+}
+
+function encodeParam(param: any): string {
+  if (Array.isArray(param)) {
+    return param.map((p) => encodeParam(p)).join("/");
+  }
+
+  return encodeURIComponent(param.toString());
 }
 
 function createQueryParams(params: Record<string, any>): string {

@@ -424,7 +424,17 @@ function getPathFromResolvedState(
     }
   }
 
-  return { path: basicSanitizePath(path), params: allParams };
+  return { path: basicSanitizePath(path), params: decodeParams(allParams) };
+}
+
+function decodeParams(params: Record<string, string>) {
+  const parsed: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(params)) {
+    parsed[key] = decodeURIComponent(value);
+  }
+
+  return parsed;
 }
 
 function getPathWithConventionsCollapsed({
