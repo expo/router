@@ -12,7 +12,6 @@ import React from "react";
 import ReactDOMServer from "react-dom/server";
 import { AppRegistry } from "react-native-web";
 
-import { NavigationStore, NavigationStoreContext } from "../navigationStore";
 import { getRootComponent } from "./getRootComponent";
 
 AppRegistry.registerComponent("App", () => App);
@@ -42,17 +41,13 @@ export function getStaticContent(location: URL): string {
         {
           id: "root",
         },
-        <App />
+        <App location={location} />
       ),
   });
 
   const html = ReactDOMServer.renderToString(
     <Head.Provider context={headContext}>
-      <ServerContainer ref={ref} location={location}>
-        <NavigationStoreContext.Provider value={new NavigationStore(location)}>
-          {out}
-        </NavigationStoreContext.Provider>
-      </ServerContainer>
+      <ServerContainer ref={ref}>{out}</ServerContainer>
     </Head.Provider>
   );
 

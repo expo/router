@@ -18,15 +18,16 @@ export const ctx = require.context(
 );
 
 // Must be exported or Fast Refresh won't update the context >:[
-export default function ExpoRouterRoot() {
-  return <ExpoRoot context={ctx} />;
+export default function ExpoRouterRoot({ location }: { location: URL }) {
+  return <ExpoRoot context={ctx} location={location} />;
 }
 
 /** Get the linking manifest from a Node.js process. */
 export async function getManifest(options: any) {
   const routeTree = getRoutes(ctx, options);
+
   if (!routeTree) {
-    return null;
+    throw new Error("No routes found");
   }
 
   // Evaluate all static params

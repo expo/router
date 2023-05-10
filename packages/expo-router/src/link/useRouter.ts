@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { navigationRef } from "../navigationStore";
+import { useExpoRouterContext } from "../hooks";
 import { Href, resolveHref } from "./href";
 import { useLinkToPath } from "./useLinkToPath";
 import { useLoadedNavigation } from "./useLoadedNavigation";
@@ -23,6 +23,7 @@ type Router = {
 };
 
 export function useRouter(): Router {
+  const { navigationRef } = useExpoRouterContext();
   const pending = useLoadedNavigation();
   const linkTo = useLinkToPath();
 
@@ -46,7 +47,8 @@ export function useRouter(): Router {
     back,
     replace,
     setParams: (params = {}) => {
-      navigationRef?.current?.setParams(params);
+      // TODO: Type this correctly
+      (navigationRef?.current?.setParams as any)(params);
     },
     // TODO(EvanBacon): add `reload`
     // TODO(EvanBacon): add `canGoBack` but maybe more like a `hasContext`

@@ -30,6 +30,8 @@ export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
       if (json) {
         const loadedNotes = JSON.parse(json);
         setNotes(loadedNotes ?? []);
+      } else {
+        setNotes([]);
       }
     });
 
