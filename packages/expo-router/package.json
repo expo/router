@@ -48,6 +48,15 @@
     "react-native",
     "expo"
   ],
+  "jest": {
+    "preset": "jest-expo",
+    "roots": [
+      "src"
+    ],
+    "setupFilesAfterEnv": [
+      "./src/testing-library/mocks.ts"
+    ]
+  },
   "peerDependencies": {
     "@react-navigation/drawer": "^6.5.8",
     "expo": "^48.0.0",
