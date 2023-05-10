@@ -2,6 +2,7 @@ import {
   InitialState,
   NavigationState,
   ParamListBase,
+  PartialState,
   getActionFromState,
 } from "@react-navigation/native";
 
@@ -42,38 +43,40 @@ export function findTopRouteForTarget(state: ResultState) {
 
 /** @returns true if moving to a sibling inside the same navigator. */
 export function isMovingToSiblingRoute(
-  rootState: InitialState,
-  targetState: ResultState
+  currentState: NavigationState | PartialState<NavigationState> | undefined,
+  targetState: ResultState | undefined
 ): boolean {
-  let current: InitialState | undefined = targetState;
-  let currentRoot: InitialState | undefined = rootState;
-
-  while (current?.routes?.[current?.routes?.length - 1].state != null) {
-    const nextRoute: any = current?.routes?.[current?.routes?.length - 1];
-
-    if (
-      // Has more
-      nextRoute.state?.routes.length &&
-      // No match
-      !currentRoot
-    ) {
-      return false;
-    }
-
-    const absCurrent = currentRoot!.routes[currentRoot?.index ?? 0];
-
-    if (absCurrent.name !== nextRoute.name) {
-      return false;
-    }
-
-    currentRoot = currentRoot?.routes?.find(
-      (route) => route.name === nextRoute.name
-    )?.state;
-
-    current = nextRoute.state;
+  if (!currentState || !targetState) {
+    return false;
   }
 
-  return true;
+  // Need to type this, as the current types are not compaitble with the `find`
+  const targetRoute = targetState.routes[0];
+
+  // Make sure we're in the same navigator
+  if (!currentState.routeNames?.includes(targetRoute.name)) {
+    return false;
+  }
+
+  // If there's no state, we're at the end of the path
+  if (!targetRoute.state) {
+    return true;
+  }
+
+  // Coerce the types into a more common form
+  const currentRoutes:
+    | {
+        name: string;
+        state?: NavigationState | PartialState<NavigationState>;
+      }[]
+    | undefined = currentState?.routes;
+  const locatedState = currentRoutes?.find((r) => r.name === targetRoute.name);
+
+  if (!locatedState) {
+    return false;
+  }
+
+  return isMovingToSiblingRoute(locatedState.state, targetRoute.state);
 }
 
 // Given the root state and a target state from `getStateFromPath`,
