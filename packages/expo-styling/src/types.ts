@@ -71,6 +71,12 @@ export type InteropMeta = {
   hasInlineContainers: boolean;
   /* If defined, we should wrap in the AnimationInterop */
   animationInteropKey?: string;
+  /* Should we add press handlers */
+  hasActive?: boolean;
+  /* Should we add hover handlers */
+  hasHover?: boolean;
+  /* Should we add focus handlers */
+  hasFocus?: boolean;
 };
 
 export type PropInteropMeta = {
@@ -79,6 +85,9 @@ export type PropInteropMeta = {
   animated: boolean;
   transition: boolean;
   requiresLayout: boolean;
+  hasActive?: boolean;
+  hasHover?: boolean;
+  hasFocus?: boolean;
 };
 
 export type StyleMeta = {

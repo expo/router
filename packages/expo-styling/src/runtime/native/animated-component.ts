@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import Animated from "react-native-reanimated";
 
 const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>([
@@ -8,6 +8,7 @@ const animatedCache = new WeakMap<ComponentType<any>, ComponentType<any>>([
   [Text, Animated.Text],
   [Animated.Text, Animated.Text],
   [Text, Animated.Text],
+  [Pressable, Animated.createAnimatedComponent(Pressable)],
 ]);
 
 export function createAnimatedComponent(

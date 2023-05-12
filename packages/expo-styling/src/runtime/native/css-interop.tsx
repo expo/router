@@ -159,6 +159,9 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
             requiresLayout: Boolean(meta.requiresLayout),
             variables: meta.variables,
             containers: meta.container?.names,
+            hasActive: meta.pseudoClasses?.active,
+            hasHover: meta.pseudoClasses?.hover,
+            hasFocus: meta.pseudoClasses?.focus,
           },
         },
       };
@@ -170,6 +173,9 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     let hasInlineVariables = false;
     let hasInlineContainers = false;
     let requiresLayout = false;
+    let hasActive: boolean | undefined = false;
+    let hasHover: boolean | undefined = false;
+    let hasFocus: boolean | undefined = false;
 
     const variables = {};
     const containers: Record<string, ContainerRuntime> = {};
@@ -199,6 +205,9 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
       }
 
       requiresLayout ||= hasInlineContainers || meta.requiresLayout;
+      hasActive ||= hasInlineContainers || meta.hasActive;
+      hasHover ||= hasInlineContainers || meta.hasHover;
+      hasFocus ||= hasInlineContainers || meta.hasFocus;
     }
 
     let animationInteropKey = undefined;
@@ -216,6 +225,9 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
       hasInlineVariables,
       hasInlineContainers,
       animationInteropKey,
+      hasActive,
+      hasHover,
+      hasFocus,
     });
   }
 
@@ -233,7 +245,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
   const props: Record<string, any> = {
     ...$props,
     ...$interopMeta.styledProps,
-    ...useInteractionHandlers($props, interaction, interopMeta.requiresLayout),
+    ...useInteractionHandlers($props, interaction, $interopMeta),
   };
 
   let children: JSX.Element = props.children;

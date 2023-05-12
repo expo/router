@@ -1285,6 +1285,42 @@ export function parseDeclaration(
     }
   }
 }
+
+function reduceParseUnparsed(
+  tokenOrValues: TokenOrValue[],
+  options: ParseDeclarationOptions,
+  allowUnwrap = false
+) {
+  const result = tokenOrValues
+    .flatMap((tokenOrValue) => parseUnparsed(tokenOrValue, options))
+    .filter((v) => v !== undefined);
+
+  if (result.length === 0) {
+    return undefined;
+  } else if (result.length === 1 && allowUnwrap) {
+    return result[0];
+  } else {
+    return result;
+  }
+}
+
+function unparsedToUnparsedLonghand(
+  type: string,
+  longhands: string[],
+  args: TokenOrValue[],
+  options: ParseDeclarationOptions
+) {
+  return longhands
+    .map((longhand, i) => {
+      return {
+        type,
+        name: longhand,
+        arguments: [parseUnparsed(args[i], options)],
+      };
+    })
+    .filter((v) => v.arguments.length);
+}
+
 /**
  * When the CSS cannot be parsed (often due to a runtime condition like a CSS variable)
  * This function best efforts parsing it into a function that we can evaluate at runtime
@@ -1298,9 +1334,7 @@ function parseUnparsed(
   }
 
   if (Array.isArray(tokenOrValue)) {
-    return tokenOrValue.length === 1
-      ? parseUnparsed(tokenOrValue[0], options)
-      : tokenOrValue.map((v) => parseUnparsed(v, options));
+    return reduceParseUnparsed(tokenOrValue, options, true);
   }
 
   switch (tokenOrValue.type) {
@@ -1337,20 +1371,34 @@ function parseUnparsed(
         arguments: [tokenOrValue.value.name.ident, tokenOrValue.value.fallback],
       };
     }
-    case "function":
-      return {
-        type: tokenOrValue.type,
-        name: tokenOrValue.value.name,
-        arguments: tokenOrValue.value.arguments
-          .map((v) => parseUnparsed(v, options))
-          .filter((v) => v !== undefined),
-      };
+    case "function": {
+      switch (tokenOrValue.value.name) {
+        case "translate":
+          return unparsedToUnparsedLonghand(
+            "function",
+            ["translateX", "translateY"],
+            tokenOrValue.value.arguments,
+            options
+          );
+        default: {
+          return {
+            type: tokenOrValue.type,
+            name: tokenOrValue.value.name,
+            arguments: reduceParseUnparsed(
+              tokenOrValue.value.arguments,
+              options
+            ),
+          };
+        }
+      }
+    }
     case "length":
       return parseLength(tokenOrValue.value, options);
+    case "angle":
+      return parseAngle(tokenOrValue.value);
     case "color":
     case "url":
     case "env":
-    case "angle":
     case "time":
     case "resolution":
     case "dashed-ident":

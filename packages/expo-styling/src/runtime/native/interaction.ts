@@ -6,25 +6,28 @@ import {
   TargetedEvent,
 } from "react-native";
 
-import { Interaction } from "../../types";
+import { Interaction, InteropMeta } from "../../types";
 import { createSignal } from "./signals";
 
 export function useInteractionSignals(): Interaction {
-  return React.useState(() => ({
-    active: createSignal(false),
-    hover: createSignal(false),
-    focus: createSignal(false),
-    layout: {
-      width: createSignal<number>(0),
-      height: createSignal<number>(0),
-    },
-  }))[0];
+  return React.useMemo(
+    () => ({
+      active: createSignal(false, `active ${Math.random()}`),
+      hover: createSignal(false),
+      focus: createSignal(false),
+      layout: {
+        width: createSignal<number>(0),
+        height: createSignal<number>(0),
+      },
+    }),
+    []
+  );
 }
 
 export function useInteractionHandlers(
   props: Record<string, any>,
   signals: Interaction,
-  requiresLayout = false
+  meta: InteropMeta
 ) {
   const propsRef = React.useRef(props);
   propsRef.current = props;
@@ -35,8 +38,12 @@ export function useInteractionHandlers(
    *
    * onLayout is only used when there is a containerName, we can easily make that optional
    */
-  return React.useMemo(() => {
-    const handlers = {
+  const memoHandlers = React.useMemo(
+    () => ({
+      // You need onPress for onPressIn and onPressOut to work?
+      onPress(event: GestureResponderEvent) {
+        propsRef.current.onPress?.(event);
+      },
       onPressIn(event: GestureResponderEvent) {
         propsRef.current.onPressIn?.(event);
         signals.active.set(true);
@@ -61,19 +68,31 @@ export function useInteractionHandlers(
         propsRef.current.onBlur?.(event);
         signals.focus.set(false);
       },
-    };
+      onLayout(event: LayoutChangeEvent) {
+        propsRef.current.onLayout?.(event);
+        signals.layout.width.set(event.nativeEvent.layout.width);
+        signals.layout.height.set(event.nativeEvent.layout.height);
+      },
+    }),
+    []
+  );
 
-    if (requiresLayout) {
-      return {
-        ...handlers,
-        onLayout(event: LayoutChangeEvent) {
-          propsRef.current.onLayout?.(event);
-          signals.layout.width.set(event.nativeEvent.layout.width);
-          signals.layout.height.set(event.nativeEvent.layout.height);
-        },
-      };
-    }
+  const handlers: Partial<typeof memoHandlers> = {};
 
-    return handlers;
-  }, [requiresLayout]);
+  if (meta.requiresLayout) handlers.onLayout = memoHandlers.onLayout;
+  if (meta.hasActive) {
+    handlers.onPress = memoHandlers.onPress;
+    handlers.onPressIn = memoHandlers.onPressIn;
+    handlers.onPressOut = memoHandlers.onPressOut;
+  }
+  if (meta.hasHover) {
+    handlers.onHoverIn = memoHandlers.onHoverIn;
+    handlers.onHoverOut = memoHandlers.onHoverOut;
+  }
+  if (meta.hasFocus) {
+    handlers.onFocus = memoHandlers.onFocus;
+    handlers.onBlur = memoHandlers.onBlur;
+  }
+
+  return handlers;
 }

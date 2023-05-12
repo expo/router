@@ -1,5 +1,11 @@
 import { isRuntimeValue } from "../../shared";
-import { Interaction, Style, StyleMeta, StyleProp } from "../../types";
+import {
+  Interaction,
+  RuntimeValue,
+  Style,
+  StyleMeta,
+  StyleProp,
+} from "../../types";
 import {
   testContainerQuery,
   testMediaQuery,
@@ -66,11 +72,15 @@ export function flattenStyle(
    *
    * If any of these fail, this style and its metadata will be skipped
    */
-  if (
-    styleMeta.pseudoClasses &&
-    !testPseudoClasses(options.interaction, styleMeta.pseudoClasses)
-  ) {
-    return flatStyle;
+  if (styleMeta.pseudoClasses) {
+    flatStyleMeta.pseudoClasses = {
+      ...styleMeta.pseudoClasses,
+      ...flatStyleMeta.pseudoClasses,
+    };
+
+    if (!testPseudoClasses(options.interaction, styleMeta.pseudoClasses)) {
+      return flatStyle;
+    }
   }
 
   // Skip failed media queries
@@ -84,7 +94,6 @@ export function flattenStyle(
   /*
    * END OF CONDITIONS CHECK
    */
-
   if (styleMeta.animations) {
     flatStyleMeta.animations = {
       ...styleMeta.animations,
@@ -145,38 +154,61 @@ export function flattenStyle(
     if (key in flatStyle) continue;
 
     if (key === "transform") {
-      const transform = [];
+      const transforms = [];
 
-      for (const transformObject of value) {
-        for (const [transformKey, transformValue] of Object.entries(
-          transformObject
-        )) {
-          const _transform: Record<string, any> = {};
-
+      for (const transform of value) {
+        // Transform is either an React Native transform object OR
+        // A extracted value with type: "function"
+        if ("type" in transform) {
           const getterOrValue = extractValue(
-            transformValue,
+            transform,
             flatStyle,
             flatStyleMeta,
             options
           );
 
-          if (typeof getterOrValue === "function") {
-            Object.defineProperty(_transform, transformKey, {
-              configurable: true,
-              enumerable: true,
-              get() {
-                return getterOrValue();
-              },
-            });
-          } else {
-            _transform[transformKey] = getterOrValue;
+          if (getterOrValue === undefined) {
+            continue;
+          } else if (typeof getterOrValue === "function") {
+            transforms.push(
+              Object.defineProperty({}, transform.name, {
+                configurable: true,
+                enumerable: true,
+                get() {
+                  return getterOrValue();
+                },
+              })
+            );
           }
+        } else {
+          for (const [tKey, tValue] of Object.entries(transform)) {
+            const $transform: Record<string, any> = {};
 
-          transform.push(_transform);
+            const getterOrValue = extractValue(
+              tValue,
+              flatStyle,
+              flatStyleMeta,
+              options
+            );
+
+            if (typeof getterOrValue === "function") {
+              Object.defineProperty($transform, tKey, {
+                configurable: true,
+                enumerable: true,
+                get() {
+                  return getterOrValue();
+                },
+              });
+            } else {
+              $transform[tKey] = getterOrValue;
+            }
+
+            transforms.push($transform);
+          }
         }
       }
 
-      flatStyle.transform = transform as any;
+      flatStyle.transform = transforms as any;
     } else {
       const getterOrValue = extractValue(
         value,
@@ -298,38 +330,77 @@ function extractValue(
             ? resolvedValue()
             : resolvedValue;
         };
+
+      case "perspective":
+      case "translateX":
+      case "translateY":
+      case "scaleX":
+      case "scaleY":
+      case "scale":
+        return extractRuntimeFunction(
+          value,
+          flatStyle,
+          flatStyleMeta,
+          options,
+          { shouldRunwrap: true, shouldParseFloat: true }
+        );
+      case "rotate":
+      case "rotateX":
+      case "rotateY":
+      case "rotateZ":
+      case "skewX":
+      case "skewY":
+        return extractRuntimeFunction(
+          value,
+          flatStyle,
+          flatStyleMeta,
+          options,
+          { shouldRunwrap: true }
+        );
       default: {
-        let isStatic = true;
-        const args: unknown[] = [];
-
-        for (const arg of value.arguments) {
-          const getterOrValue = extractValue(
-            arg,
-            flatStyle,
-            flatStyleMeta,
-            options
-          );
-
-          if (typeof getterOrValue === "function") {
-            isStatic = false;
-          }
-
-          args.push(getterOrValue);
-        }
-
-        if (isStatic) {
-          return `${value.name}(${args.join(", ")})`;
-        } else {
-          return () => {
-            const _args = args.map((a) => (typeof a === "function" ? a() : a));
-            return `${value.name}(${_args.join(", ")})`;
-          };
-        }
+        return extractRuntimeFunction(value, flatStyle, flatStyleMeta, options);
       }
     }
   }
 
   return value;
+}
+
+function extractRuntimeFunction(
+  value: RuntimeValue,
+  flatStyle: Style,
+  flatStyleMeta: StyleMeta,
+  options: FlattenStyleOptions,
+  { shouldRunwrap = false, shouldParseFloat = false } = {}
+) {
+  let isStatic = true;
+  const args: unknown[] = [];
+
+  for (const arg of value.arguments) {
+    const getterOrValue = extractValue(arg, flatStyle, flatStyleMeta, options);
+
+    if (typeof getterOrValue === "function") {
+      isStatic = false;
+    }
+
+    args.push(getterOrValue);
+  }
+
+  const valueFn = () => {
+    const $args = args
+      .map((a) => (typeof a === "function" ? a() : a))
+      .filter((a) => a !== undefined)
+      .join(", ");
+
+    if ($args === "") {
+      return;
+    }
+
+    const result = shouldRunwrap ? $args : `${value.name}(${$args})`;
+    return shouldParseFloat ? parseFloat(result) : result;
+  };
+
+  return isStatic ? valueFn() : valueFn;
 }
 
 function round(number: number) {

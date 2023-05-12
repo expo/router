@@ -27,7 +27,17 @@ export const vh = viewportUnit("height", Dimensions);
 export const colorScheme = createColorScheme(Appearance);
 export const isReduceMotionEnabled = createIsReduceMotionEnabled();
 
-export const VariableContext = createContext<Record<string, any>>({});
+export const VariableContext = createContext<Record<string, any>>({
+  "--tw-border-spacing-x": 0,
+  "--tw-border-spacing-y": 0,
+  "--tw-translate-x": 0,
+  "--tw-translate-y": 0,
+  "--tw-rotate": 0,
+  "--tw-skew-x": "0deg",
+  "--tw-skew-y": "0deg",
+  "--tw-scale-x": 1,
+  "--tw-scale-y": 1,
+});
 export const ContainerContext = createContext<Record<string, ContainerRuntime>>(
   {}
 );

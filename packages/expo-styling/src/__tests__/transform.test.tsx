@@ -1,8 +1,8 @@
 import { render } from "@testing-library/react-native";
 import React from "react";
 
-import { createMockComponent, registerCSS } from "./utils";
 import { StyleSheet } from "../runtime/native/stylesheet";
+import { createMockComponent, registerCSS } from "./utils";
 
 const A = createMockComponent();
 
@@ -29,5 +29,39 @@ test("translateY percentage", () => {
   expect(A).styleToEqual({
     height: 120,
     transform: [{ translateY: 12 }],
+  });
+});
+
+test("rotate-180", () => {
+  registerCSS(`
+    .rotate-180 {
+      --tw-rotate: 180deg;
+      transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+    }
+  `);
+
+  render(<A className="rotate-180" />);
+
+  expect(A).styleToEqual({
+    transform: [
+      {
+        translateX: 0,
+      },
+      {
+        rotate: "180deg",
+      },
+      {
+        skewX: "0",
+      },
+      {
+        skewY: "0",
+      },
+      {
+        scaleX: 1,
+      },
+      {
+        scaleY: 1,
+      },
+    ],
   });
 });
