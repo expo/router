@@ -2,7 +2,7 @@
 title: Handoff
 ---
 
-> This guide refers to upcoming Expo Router features, all of which are experimental.
+> This guide requires `expo@49.0.0-alpha.3` or greater––everything listed here is still experimental. You may need to [use Expo CLI on `main`](https://github.com/expo/expo/tree/main/packages/%40expo/cli#contributing) to use these features.
 
 Handoff is a feature that enables users to continue browsing your app or website on another device. This functionality is generally very useful for users, but it can be difficult to implement. Expo Router streamlines a lot of the complexity of handoff by providing a simple API.
 
@@ -221,8 +221,9 @@ Ensure you can access the Ngrok URL (via the browser for example), before buildi
 
 Handoff between your Mac and iPhone/iPad is not supported in the Expo Go app. You must build and install your app on your device.
 
-**If you see the Safari icon in the App Switcher on your iPhone**, then it means handoff is not working. 
-- Ensure you are not using the `?mode=developer` suffix when testing handoff to native. 
+**If you see the Safari icon in the App Switcher on your iPhone**, then it means handoff is not working.
+
+- Ensure you are not using the `?mode=developer` suffix when testing handoff to native.
 - Also be sure you're not using the local development server URL, e.g. `http://localhost:8081` as this cannot be used as a valid app site association link, open the running Ngrok URL in your browser to test.
 - We've observed that in iOS 16.3.1 and macOS 13.0 (Ventura), bundle identifiers starting with `app.` and `io.` will _sometimes_ not trigger the native app to show up in the iOS task switcher. Use `com.` as the first part of your bundle identifier.
 

@@ -10,7 +10,7 @@ The preferred way to style your application is to use the `StyleSheet` API. This
 
 ## Global Styles
 
-> First available in `expo-router@1.2.2`.
+> This guide requires `expo@49.0.0-alpha.3` or greater––everything listed here is still experimental.
 
 > Warning: Global styles are web-only, usage will cause your application to diverge visually on native.
 
@@ -46,39 +46,13 @@ import "emoji-mart/css/emoji-mart.css";
 
 To enable CSS support, add the following changes to your Metro configuration:
 
-- Add `css` to the list of source extensions.
-- Use the Expo Babel transformer.
-
 ```js title=metro.config.js
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require("expo/metro-config");
 
-const config = getDefaultConfig(__dirname);
-
-config.transformer = {
-  ...config.transformer,
-  // Use the Expo transformer.
-  babelTransformerPath: require.resolve("@expo/metro-runtime/transformer"),
-};
-
-// Ensure CSS is treated as a source file.
-config.resolver.sourceExts.push("css");
+const config = getDefaultConfig(__dirname, {
+  isCSSEnabled: true,
+});
 
 module.exports = config;
-```
-
-### Advanced Setup
-
-If you need to apply other transformations to your source before using the CSS transformer, you can create a custom Metro transformer.
-
-```js title=transformer.js
-const ExpoTransformer = require("@expo/metro-runtime/transformer");
-
-module.exports.transform = async (props) => {
-  // Mutate the `props` as needed before passing it to the Expo transformer.
-
-  // The Expo transformer will apply any changes then run through the default
-  // Metro transformer.
-  return ExpoTransformer.transform(props);
-};
 ```
