@@ -29,26 +29,34 @@ export type CssToReactNativeRuntimeOptions = {
   grouping?: (string | RegExp)[];
 };
 
-/*
+/**
  * Converts a CSS file to a collection of style declarations that can be used with the StyleSheet API
+ *
+ * @param {Buffer} code - The CSS file contents as a buffer
+ * @param {CssToReactNativeRuntimeOptions} options - (Optional) Options for the conversion process
+ * @returns {StyleSheetRegisterOptions} - An object containing the extracted style declarations and animations
  */
 export function cssToReactNativeRuntime(
   code: Buffer,
   options: CssToReactNativeRuntimeOptions = {}
 ): StyleSheetRegisterOptions {
+  // Create maps to store the extracted style declarations and animations
   const declarations = new Map<string, ExtractedStyle | ExtractedStyle[]>();
   const keyframes = new Map<string, ExtractedAnimation>();
 
+  // Parse the grouping options to create an array of regular expressions
   const grouping =
     options.grouping?.map((value) => {
       return typeof value === "string" ? new RegExp(value) : value;
     }) ?? [];
 
+  // Use the lightningcss library to traverse the CSS AST and extract style declarations and animations
   lightningcss({
     filename: "style.css", // This is ignored, but required
     code,
     visitor: {
       Rule(rule) {
+        // Extract the style declarations and animations from the current rule
         extractRule(
           rule,
           { ...options, grouping, declarations, keyframes },
@@ -60,42 +68,60 @@ export function cssToReactNativeRuntime(
     },
   });
 
+  // Convert the extracted style declarations and animations from maps to objects and return them
   return {
     declarations: Object.fromEntries(declarations),
     keyframes: Object.fromEntries(keyframes),
   };
 }
 
+/**
+ * Options object for extracting CSS rules from a stylesheet.
+ *
+ * @interface ExtractRuleOptions
+ * @property {Map<string, ExtractedStyle | ExtractedStyle[]>} declarations - A map of extracted style declarations.
+ * @property {Map<string, ExtractedAnimation>} keyframes - A map of extracted animation declarations.
+ * @property {Partial<ExtractedStyle>} [style] - A partial style object representing the current rule. This should be built up as the tree is traversed.
+ * @property {RegExp[]} [grouping] - An array of regular expressions for grouping related rules together.
+ */
 interface ExtractRuleOptions {
-  // The collection of declarations that have been extracted so far. This should be mutated
   declarations: Map<string, ExtractedStyle | ExtractedStyle[]>;
-  // The collection animations declarations that have been extracted so far. This should be mutated
   keyframes: Map<string, ExtractedAnimation>;
-  // Rules may be inside other rules, such as media queries.
-  // We can build this this partial rule object as we traverse the tree
   style?: Partial<ExtractedStyle>;
   grouping?: RegExp[];
 }
 
+/**
+ * Extracts style declarations and animations from a given CSS rule, based on its type.
+ *
+ * @param {Rule} rule - The CSS rule to extract style declarations and animations from.
+ * @param {ExtractRuleOptions} extractOptions - Options for the extraction process, including maps for storing extracted data.
+ * @param {CssToReactNativeRuntimeOptions} parseOptions - Options for parsing the CSS code, such as grouping related rules together.
+ */
 function extractRule(
   rule: Rule,
   extractOptions: ExtractRuleOptions,
   parseOptions: CssToReactNativeRuntimeOptions
 ) {
+  // Check the rule's type to determine which extraction function to call
   switch (rule.type) {
     case "keyframes": {
+      // If the rule is a keyframe animation, extract it with the `extractKeyFrames` function
       extractKeyFrames(rule.value, extractOptions, parseOptions);
       break;
     }
     case "container": {
+      // If the rule is a container, extract it with the `extractedContainer` function
       extractedContainer(rule.value, extractOptions, parseOptions);
       break;
     }
     case "media": {
+      // If the rule is a media query, extract it with the `extractMedia` function
       extractMedia(rule.value, extractOptions, parseOptions);
       break;
     }
     case "style": {
+      // If the rule is a style declaration, extract it with the `getExtractedStyle` function and store it in the `declarations` map
       if (rule.value.declarations) {
         setStyleForSelectorList(
           {
@@ -111,29 +137,38 @@ function extractRule(
   }
 }
 
-/*
- * Extracts styles from a media query
+/**
+ * This function takes in a MediaRule object, an ExtractRuleOptions object and a CssToReactNativeRuntimeOptions object,
+ * and returns an array of MediaQuery objects representing styles extracted from screen media queries.
+ *
+ * @param mediaRule - The MediaRule object containing the media query and its rules.
+ * @param extractOptions - The ExtractRuleOptions object to use when extracting styles.
+ * @param parseOptions - The CssToReactNativeRuntimeOptions object to use when parsing styles.
+ *
+ * @returns undefined if no screen media queries are found in the mediaRule, else it returns the extracted styles.
  */
 function extractMedia(
   mediaRule: MediaRule,
   extractOptions: ExtractRuleOptions,
   parseOptions: CssToReactNativeRuntimeOptions
 ) {
+  // Initialize an empty array to store screen media queries
   const media: MediaQuery[] = [];
 
-  // We only want to extract styles for screen media queries
+  // Iterate over all media queries in the mediaRule
   for (const mediaQuery of mediaRule.query.mediaQueries) {
+    // Check if the media type is screen
     let isScreen = mediaQuery.mediaType !== "print";
     if (mediaQuery.qualifier === "not") {
       isScreen = !isScreen;
     }
 
+    // If it's a screen media query, add it to the media array
     if (isScreen) {
       media.push(mediaQuery);
     }
   }
 
-  // If there are no screen media queries, we don't need to extract anything
   if (media.length === 0) {
     return;
   }
@@ -145,18 +180,23 @@ function extractMedia(
     },
   };
 
+  // Iterate over all rules in the mediaRule and extract their styles using the updated ExtractRuleOptions
   for (const rule of mediaRule.rules) {
     extractRule(rule, newExtractOptions, parseOptions);
   }
-
-  return undefined;
 }
 
+/**
+ * @param containerRule - The ContainerRule object containing the container query and its rules.
+ * @param extractOptions - The ExtractRuleOptions object to use when extracting styles.
+ * @param parseOptions - The CssToReactNativeRuntimeOptions object to use when parsing styles.
+ */
 function extractedContainer(
   containerRule: ContainerRule,
   extractOptions: ExtractRuleOptions,
   parseOptions: CssToReactNativeRuntimeOptions
 ) {
+  // Create a new ExtractRuleOptions object with the updated container query information
   const newExtractOptions: ExtractRuleOptions = {
     ...extractOptions,
     style: {
@@ -169,41 +209,48 @@ function extractedContainer(
     },
   };
 
+  // Iterate over all rules inside the containerRule and extract their styles using the updated ExtractRuleOptions
   for (const rule of containerRule.rules) {
     extractRule(rule, newExtractOptions, parseOptions);
   }
-  return undefined;
 }
 
+/**
+ * @param style - The ExtractedStyle object to use when setting styles.
+ * @param selectorList - The SelectorList object containing the selectors to use when setting styles.
+ * @param declarations - The declarations object to use when adding declarations.
+ */
 function setStyleForSelectorList(
   style: ExtractedStyle,
   selectorList: SelectorList,
   { declarations, grouping = [] }: ExtractRuleOptions
 ) {
   for (const selector of selectorList) {
-    // There maybe multiple className selectors. The last one is the one we want to use
-    // The others are conditions
+    // Find the last className selector in the selector list
     const classSelectorIndex = findLastIndex(
       selector,
       (s) => s.type === "class"
     );
 
-    // No class selecor, so we can't extract anything
+    // If no className selector is found, skip this selector
     if (classSelectorIndex === -1) {
       continue;
     }
 
+    // Extract the conditions before the className selector
     const conditions = groupSelector(selector.slice(0, classSelectorIndex));
 
+    // Check if all the conditions are valid based on the grouping in the ExtractRuleOptions
     const conditionValid = conditions.every((c) => {
       return grouping.some((g) => g.test(c.className));
     });
 
+    // If not all the conditions are valid, skip this selector
     if (!conditionValid) {
       continue;
     }
 
-    // These conditions need to be added to the declarations
+    // Add the conditions to the declarations object
     for (const condition of conditions) {
       addDeclaration(
         condition.className,
@@ -219,6 +266,7 @@ function setStyleForSelectorList(
 
     let containerQueries = style.containerQuery;
 
+    // If there are any conditions, add them to the container queries
     if (conditions.length > 0) {
       containerQueries ??= [];
 
@@ -232,18 +280,19 @@ function setStyleForSelectorList(
       }
     }
 
+    // Extract the className selector and its pseudo-classes
     const groupedDelecarationSelectors = groupSelector(
       selector.slice(classSelectorIndex)
     );
 
-    // We started at the last className, but that doesn't guarentee that we will get a single
-    // groupSelector. If we get anything else but one, ignore this selector
+    // If there is more than one selector, skip this selector
     if (groupedDelecarationSelectors.length !== 1) {
       continue;
     }
 
     const [{ className, pseudoClasses }] = groupedDelecarationSelectors;
 
+    // Add the className selector and its pseudo-classes to the declarations object, with the extracted style and container queries
     addDeclaration(
       className,
       { ...style, pseudoClasses, containerQuery: containerQueries },
@@ -310,75 +359,10 @@ function groupSelector(selectors: Selector) {
             current.pseudoClasses ??= {};
             current.pseudoClasses[selector.kind] = true;
             break;
-          case "not":
-          case "first-child":
-          case "last-child":
-          case "only-child":
-          case "root":
-          case "empty":
-          case "scope":
-          case "nth-child":
-          case "nth-last-child":
-          case "nth-col":
-          case "nth-last-col":
-          case "nth-of-type":
-          case "nth-last-of-type":
-          case "first-of-type":
-          case "last-of-type":
-          case "only-of-type":
-          case "host":
-          case "where":
-          case "is":
-          case "any":
-          case "has":
-          case "lang":
-          case "dir":
-          case "focus-visible":
-          case "focus-within":
-          case "current":
-          case "past":
-          case "future":
-          case "playing":
-          case "paused":
-          case "seeking":
-          case "buffering":
-          case "stalled":
-          case "muted":
-          case "volume-locked":
-          case "fullscreen":
-          case "defined":
-          case "any-link":
-          case "link":
-          case "local-link":
-          case "target":
-          case "target-within":
-          case "visited":
-          case "enabled":
-          case "disabled":
-          case "read-only":
-          case "read-write":
-          case "placeholder-shown":
-          case "default":
-          case "checked":
-          case "indeterminate":
-          case "blank":
-          case "valid":
-          case "invalid":
-          case "in-range":
-          case "out-of-range":
-          case "required":
-          case "optional":
-          case "user-valid":
-          case "user-invalid":
-          case "autofill":
-          case "local":
-          case "global":
-          case "webkit-scrollbar":
-          case "custom":
-          case "custom-function":
-            break;
         }
         break;
+      default:
+        exhaustiveCheck(selector);
     }
   }
 
@@ -593,7 +577,6 @@ function getExtractedStyle(
         // Shorthand properties cannot override the longhand property
         // So we skip setting the property if it already exists
         // Otherwise, we need to set the property to an empty array
-
         if (extrtactedStyle.transition.property) {
           setProperty = false;
         } else {
