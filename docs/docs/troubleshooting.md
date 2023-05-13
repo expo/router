@@ -39,3 +39,10 @@ registerRootComponent(App);
 - This can happen if you are using an `expo` version lower than `expo@^46.0.13`. The version `46.0.13` enables context modules and injects `process.env.EXPO_ROUTER_APP_ROOT` into the process.
 - This can also be the result of using a custom version of `@expo/metro-config` that does not enable context modules.
 - Expo Router requires the project `metro.config.js` file to use `expo-router/metro` as the default configuration. Delete the `metro.config.js` file, or extend `expo/metro-config`. [Learn more](https://docs.expo.dev/guides/customizing-metro/)
+
+## `main.jsbundle does not exist`, build errors involving metro
+
+- This generally means an error ended metro's bundling process early.
+- This can happen if `metro-` package versions are mismatched.
+- If using newer versions of `metro` than the specific version in the installation guide, you may need to override additional `metro-` packages to the version you're using.
+- See the `resolutions` in the [router package.json](https://github.com/expo/router/blob/main/package.json) for a complete list of `metro-` packages.

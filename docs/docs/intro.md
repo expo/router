@@ -85,7 +85,9 @@ If you use **Yarn**:
 {
   "resolutions": {
     "metro": "0.76.0",
-    "metro-resolver": "0.76.0"
+    "metro-resolver": "0.76.0",
+    "metro-config": "0.76.0",
+    "metro-transform-worker": "0.76.0"
   }
 }
 ```
