@@ -1,7 +1,5 @@
 ---
 title: Head
-# TODO
-sidebar_class_name: hidden
 ---
 
 > This guide refers to upcoming Expo Router features, all of which are experimental.

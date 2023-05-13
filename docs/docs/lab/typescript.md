@@ -1,10 +1,8 @@
 ---
 title: TypeScript
-# TODO
-sidebar_class_name: hidden
 ---
 
-> This guide refers to upcoming Expo Router features, all of which are experimental.
+> This guide requires `expo@49.0.0-alpha.3` or greater––everything listed here is still experimental.
 
 Expo Router provides an integrated TypeScript experience. To get started:
 

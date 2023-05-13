@@ -1,12 +1,10 @@
 ---
-title: Bundle Splitting
-# TODO
-sidebar_class_name: hidden
+title: Async Routes
 ---
 
-> This guide refers to upcoming Expo Router features, all of which are experimental. You may need to [use Expo CLI on `main`](https://github.com/expo/expo/tree/main/packages/%40expo/cli#contributing) to use these features.
+> This guide requires `expo@49.0.0-alpha.3` or greater––everything listed here is still experimental. You may need to [use Expo CLI on `main`](https://github.com/expo/expo/tree/main/packages/%40expo/cli#contributing) to use these features.
 
-Unlike standard projects, Expo Router can automatically split your JavaScript bundle based on the route files, using [React Suspense](https://react.dev/reference/react/Suspense). This enables faster development as only the routes you navigate to will be bundled/loaded into memory. This can also be useful for reducing the initial bundle size for your application.
+Expo Router can automatically split your JavaScript bundle based on the route files, using [React Suspense](https://react.dev/reference/react/Suspense). This enables faster development as only the routes you navigate to will be bundled/loaded into memory. This can also be useful for reducing the initial bundle size for your application.
 
 ## Setup
 
@@ -35,11 +33,16 @@ Next, enable the feature:
 ```json title=app.json
 {
   "expo": {
-    "extra": {
-      "router": {
-        "asyncRoutes": "development"
-      }
-    }
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://acme.com",
+          // highlight-next-line
+          "asyncRoutes": "development"
+        }
+      ]
+    ]
   }
 }
 ```
