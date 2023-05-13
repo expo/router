@@ -75,7 +75,7 @@ export const AnimationInterop = forwardRef(function Animated(
   ])) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     props[prop] = useAnimationAndTransitions(
-      props[prop] as Record<string, unknown>,
+      props[prop] as Record<string, AnimatableValue>,
       __variables,
       interaction,
       layoutReady
@@ -92,7 +92,7 @@ type TimingFrameProperties = {
 };
 
 function useAnimationAndTransitions(
-  style: Record<string, unknown>,
+  style: Record<string, AnimatableValue>,
   variables: Record<string, unknown>,
   interaction: Interaction,
   isLayoutReady: boolean
@@ -160,15 +160,14 @@ function useAnimationAndTransitions(
 function useTransitions(
   transitions: AnimatableCSSProperty[],
   transitionDurations: Time[],
-  style: Record<string, unknown>
+  style: Record<string, AnimatableValue>
 ) {
   const transitionProps: string[] = [];
   const transitionValues: SharedValue<AnimatableValue>[] = [];
 
-  /* eslint-disable react-hooks/rules-of-hooks */
   for (let index = 0; index < transitions.length; index++) {
     const prop = transitions[index];
-    const value = style[prop] as AnimatableValue;
+    const value = style[prop];
     const duration = timeToMS(
       getValue(transitionDurations, index, {
         type: "seconds",
@@ -176,12 +175,30 @@ function useTransitions(
       })
     );
 
-    const sharedValue = useSharedValue(value);
-    transitionProps.push(prop);
-    transitionValues.push(sharedValue);
+    if (prop === "transform") {
+      const valueObj = Object.assign({}, ...((value || []) as any[]));
 
-    if (value !== undefined && value !== sharedValue.value) {
-      sharedValue.value = withTiming(value, { duration });
+      for (const tProp of transformProps) {
+        const tValue = valueObj[tProp];
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const sharedValue = useSharedValue(
+          valueObj[tProp] ?? defaultTransform[tProp]
+        );
+        transitionProps.push(tProp);
+        transitionValues.push(sharedValue);
+        if (tValue !== undefined && tValue !== sharedValue.value) {
+          sharedValue.value = withTiming(tValue, { duration });
+        }
+      }
+    } else {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const sharedValue = useSharedValue(value ?? animationDefaults[prop] ?? 0);
+      transitionProps.push(prop);
+      transitionValues.push(sharedValue);
+
+      if (value !== undefined && value !== sharedValue.value) {
+        sharedValue.value = withTiming(value, { duration });
+      }
     }
   }
 
@@ -346,7 +363,65 @@ function getValue<T>(array: T[] | undefined, index: number, defaultValue: T) {
 const PLACEHOLDER = {} as AnimatableValue;
 const emptyArray: any[] = [];
 const defaultAnimation: ExtractedAnimation = { frames: [] };
-const defaultTransform: Record<string, AnimatableValue> = {
+const timeToMS = (time: Time) => {
+  return time.type === "milliseconds" ? time.value : time.value * 1000;
+};
+const getIterations = (
+  iterations: AnimationIterationCount[],
+  index: number
+) => {
+  const iteration = getValue(iterations, index, { type: "infinite" });
+  return iteration.type === "infinite" ? Infinity : iteration.value;
+};
+
+export const animationDefaults: {
+  [K in AnimatableCSSProperty]?: Style[K];
+} = {
+  backgroundColor: "transparent",
+  borderBottomColor: "transparent",
+  borderBottomLeftRadius: 0,
+  borderBottomRightRadius: 0,
+  borderBottomWidth: 0,
+  borderColor: "transparent",
+  borderLeftColor: "transparent",
+  borderLeftWidth: 0,
+  borderRadius: 0,
+  borderRightColor: "transparent",
+  borderRightWidth: 0,
+  borderTopColor: "transparent",
+  borderTopWidth: 0,
+  borderWidth: 0,
+  bottom: 0,
+  color: "transparent",
+  flex: 1,
+  flexBasis: 1,
+  flexGrow: 1,
+  flexShrink: 1,
+  fontSize: 14,
+  fontWeight: "400",
+  gap: 0,
+  left: 0,
+  lineHeight: 14,
+  margin: 0,
+  marginBottom: 0,
+  marginLeft: 0,
+  marginRight: 0,
+  marginTop: 0,
+  maxHeight: 0,
+  maxWidth: 0,
+  minHeight: 0,
+  minWidth: 0,
+  opacity: 1,
+  padding: 0,
+  paddingBottom: 0,
+  paddingLeft: 0,
+  paddingRight: 0,
+  paddingTop: 0,
+  right: 0,
+  top: 0,
+  zIndex: 0,
+};
+export const defaultTransform: Record<string, AnimatableValue> = {
   perspective: 1,
   translateX: 0,
   translateY: 0,
@@ -360,17 +435,7 @@ const defaultTransform: Record<string, AnimatableValue> = {
   skewY: "0deg",
   scale: 1,
 };
-const defaultTransformEntries = Object.entries(defaultTransform).map(
+export const transformProps = new Set(Object.keys(defaultTransform));
+export const defaultTransformEntries = Object.entries(defaultTransform).map(
   ([key, value]) => ({ [key]: value })
 );
-const transformProps = new Set(Object.keys(defaultTransform));
-const timeToMS = (time: Time) => {
-  return time.type === "milliseconds" ? time.value : time.value * 1000;
-};
-const getIterations = (
-  iterations: AnimationIterationCount[],
-  index: number
-) => {
-  const iteration = getValue(iterations, index, { type: "infinite" });
-  return iteration.type === "infinite" ? Infinity : iteration.value;
-};

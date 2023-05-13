@@ -185,7 +185,7 @@ export type StyleSheetRegisterOptions = {
   keyframes?: Record<string, ExtractedAnimation>;
 };
 
-export type Style = ViewStyle | TextStyle | ImageStyle;
+export type Style = ViewStyle & TextStyle & ImageStyle;
 export type StyleProp = Style | StyleProp[] | undefined;
 
 export type NamedStyles<T> = {

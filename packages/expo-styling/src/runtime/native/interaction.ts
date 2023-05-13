@@ -12,7 +12,7 @@ import { createSignal } from "./signals";
 export function useInteractionSignals(): Interaction {
   return React.useMemo(
     () => ({
-      active: createSignal(false, `active ${Math.random()}`),
+      active: createSignal(false),
       hover: createSignal(false),
       focus: createSignal(false),
       layout: {
