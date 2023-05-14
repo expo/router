@@ -5,6 +5,7 @@ import React, {
   useReducer,
   useState,
 } from "react";
+import { View, Pressable } from "react-native";
 
 import { ContainerRuntime, InteropMeta, StyleMeta } from "../../types";
 import { AnimationInterop } from "./animations";
@@ -257,6 +258,13 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     };
 
     setInteropMeta(interopMeta);
+  }
+
+  if (
+    Component === View &&
+    (interopMeta.hasActive || interopMeta.hasHover || interopMeta.hasFocus)
+  ) {
+    Component = Pressable;
   }
 
   const variables = useMemo(
