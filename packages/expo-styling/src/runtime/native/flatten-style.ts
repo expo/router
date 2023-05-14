@@ -23,9 +23,16 @@ export interface FlattenStyleOptions {
 
 /**
  * Reduce a StyleProp to a flat Style object.
+ *
+ * @remarks
  * As we loop over keys & values, we will resolve any dynamic values.
  * Some values cannot be calculated until the entire style has been flattened.
- * These values are defined as a getter and will be resolved lazily
+ * These values are defined as a getter and will be resolved lazily.
+ *
+ * @param styles The style or styles to flatten.
+ * @param options The options for flattening the styles.
+ * @param flatStyle The flat style object to add the flattened styles to.
+ * @returns The flattened style object.
  */
 export function flattenStyle(
   styles: StyleProp,
@@ -234,10 +241,14 @@ export function flattenStyle(
   return flatStyle;
 }
 
-/*
- * Most styles we can calculate immediately however styles that use CSS variables
- * can only be calculated once the style has been completely flattened
- * We use a getter to delay calculation until the value is actually needed
+/**
+ * Extracts a value from a StyleProp.
+ * If the value is a dynamic value, it will be resolved.
+ * @param value - The value to extract.
+ * @param flatStyle - The flat Style object being built.
+ * @param flatStyleMeta - Metadata for the flat Style object.
+ * @param options - Options for flattening the StyleProp.
+ * @returns The extracted value.
  */
 function extractValue(
   value: unknown,
@@ -251,16 +262,23 @@ function extractValue(
         return round((vh.get() / 100) * (value.arguments[0] as number));
       case "vw":
         return round((vw.get() / 100) * (value.arguments[0] as number));
+      case "var":
+        return () => {
+          const name = value.arguments[0] as string;
+          const resolvedValue =
+            flatStyleMeta.variables?.[name] ?? options.variables[name];
+          return typeof resolvedValue === "function"
+            ? resolvedValue()
+            : resolvedValue;
+        };
       case "rem":
         return round(rem.get() * (value.arguments[0] as number));
       case "em":
         return () => {
           const multiplier = value.arguments[0] as number;
-
           if ("fontSize" in flatStyle) {
             return round((flatStyle.fontSize || 0) * multiplier);
           }
-
           return undefined;
         };
       case "ch": {
@@ -321,16 +339,6 @@ function extractValue(
           };
         }
       }
-      case "var":
-        return () => {
-          const name = value.arguments[0] as string;
-          const resolvedValue =
-            flatStyleMeta.variables?.[name] ?? options.variables[name];
-          return typeof resolvedValue === "function"
-            ? resolvedValue()
-            : resolvedValue;
-        };
-
       case "perspective":
       case "translateX":
       case "translateY":

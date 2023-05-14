@@ -25,41 +25,47 @@ type CSSInteropWrapperProps = {
   __next: boolean;
 } & Record<string, any>;
 
+/**
+ * This is the default implementation of the CSS interop function. It is used to add CSS styles to React Native components.
+ * @param jsx The JSX function that should be used to create the React elements.
+ * @param type The React component type that should be rendered.
+ * @param props The props object that should be passed to the component.
+ * @param key The optional key to use for the component.
+ * @param next Indicates whether this component should be rendered as a next.js component.
+ * @returns The element rendered via the suppled JSX function
+ */
 export function defaultCSSInterop(
   jsx: Function,
   type: ComponentType<any>,
-  // Props are frozen in development so they need to be cloned
   { ...props }: any,
   key: string,
   next = false
 ) {
-  /*
-   * Most styles are static so the CSSInteropWrapper is not needed
-   */
-
+  // This sets the component type and specifies the style keys that should be used.
   props.__component = type;
   props.__styleKeys = ["style"];
   props.__next = next;
 
   /**
-   * In development, we need to wrap every component due to possible async style changes.
-   * This wrapper only subscibes to StyleSheet.register, so it is not a huge performance hit.
+   * If the development environment is enabled, we should use the DevOnlyCSSInteropWrapper to wrap every component.
+   * This wrapper subscribes to StyleSheet.register, so it can handle hot reloading of styles.
    */
   if (__DEV__) {
     return jsx(DevOnlyCSSInteropWrapper, props, key);
   }
 
+  // Rewrite the className prop to a style object.
   props = classNameToStyle(props);
 
+  // If the styles are dynamic, we need to wrap the component with the CSSInteropWrapper to handle style updates.
   return areStylesDynamic(props.style)
     ? jsx(CSSInteropWrapper, props, key)
     : jsx(type, props, key);
 }
 
 /**
- * During development, the user may be using a CSS Postprocess (like Tailwind).
- * React doesn't know when these updates will occur, so we need to subscribe to them.
- * As CSS is static in production, we only need this in development.
+ * This is the DevOnlyCSSInteropWrapper that should be used in development environments to handle async style updates.
+ * It subscribes to StyleSheet.register, so it can handle style changes that may occur asynchronously.
  */
 const DevOnlyCSSInteropWrapper = React.forwardRef(
   function DevOnlyCSSInteropWrapper(
@@ -71,11 +77,14 @@ const DevOnlyCSSInteropWrapper = React.forwardRef(
     }: CSSInteropWrapperProps,
     ref
   ) {
+    // This uses a reducer and the useEffect hook to subscribe to StyleSheet.register.
     const [, render] = useReducer(rerenderReducer, 0);
     useEffect(() => StyleSheet.__subscribe(render), []);
 
+    // This applies the styles using the classNameToStyle function, which returns the style object.
     props = classNameToStyle(props);
 
+    // If the styles are dynamic, we need to wrap the component with the CSSInteropWrapper to handle style updates.
     return areStylesDynamic(props.style) ? (
       <CSSInteropWrapper
         {...props}
@@ -91,6 +100,20 @@ const DevOnlyCSSInteropWrapper = React.forwardRef(
   }
 );
 
+/**
+ * This component is a wrapper that handles the styling interop between React Native and CSS functionality
+ *
+ * @remarks
+ * The CSSInteropWrapper function has an internal state, interopMeta, which holds information about the styling props,
+ * like if it's animated, if it requires a layout listener, if it has inline containers, etc. When a style prop changes, the component
+ * calculates the new style and meta again using a helper function called flattenStyle.
+ *
+ * @param __component - Component to be rendered
+ * @param __styleKeys - List of keys with the style props that need to be computed
+ * @param __next - Flag indicating if should we should advanced featuers
+ * @param $props - Any other props to be passed to the component
+ * @param ref - Ref to the component
+ */
 const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
   {
     __component: Component,
@@ -105,27 +128,28 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
   const inheritedContainers = React.useContext(ContainerContext);
   const interaction = useInteractionSignals();
 
-  /*
-   * The purpose of interopMeta is to reduce how many operations are performed in the render function.
-   * The meta is entirely derived by the computed styles, so we only need to calculate it when a style changes.
+  /**
+   * The purpose of interopMeta is to reduce the number of operations performed in the render function.
+   * The meta is entirely derived from the computed styles, so we only need to calculate it when a style changes.
    *
-   * Its ok to store normalised data here
+   * The interopMeta object holds information about the styling props, like if it's animated, if it requires layout,
+   * if it has inline containers, etc.
    *
-   * I'm not sure if using the derived state pattern is the best for performance
-   * But apparently reading/writing to refs are not recommended?
+   * The object is updated using the derived state pattern. The computation is done in the for loop below and
+   * is stored in a variable $interopMeta. After that, the component checks if $interopMeta is different from interopMeta
+   * to update the state.
    */
-  const [interopMeta, setInteropMeta] = useState<InteropMeta>(initialMeta);
-  let $interopMeta = interopMeta;
+  const [$interopMeta, setInteropMeta] = useState<InteropMeta>(initialMeta);
+  let interopMeta = $interopMeta;
 
   for (const key of __styleKeys) {
-    /*
+    /**
      * Create a computation that will flatten the style object.
      * Any signals read while the computation is running will be subscribed to.
      *
      * useComputation handles the reactivity/memoization
      * flattenStyle handles converting the schema to a style object and collecting the metadata
      */
-
     /* eslint-disable react-hooks/rules-of-hooks -- __styleKeys is immutable */
     const style = useComputation(
       () => {
@@ -141,18 +165,19 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     /* eslint-enable react-hooks/rules-of-hooks */
 
     /*
-     * The style has changed so we need to update the interop meta
-     * Instead of diffing what has changed we recalculate the entire meta.
-     * We do this by updating styledPropsMeta and then flattening it later
+     * Recalculate the interop meta when a style change occurs, due to a style update.
+     * Rather than comparing the changes, we recalculate the entire meta.
+     * To update the interop meta, we modify the `styledProps` and `styledPropsMeta` properties,
+     * which will be flattened later.
      */
     if (interopMeta.styledProps[key] !== style) {
       const meta = styleMetaMap.get(style) ?? defaultMeta;
 
-      $interopMeta = {
-        ...$interopMeta,
-        styledProps: { ...$interopMeta.styledProps, [key]: style },
+      interopMeta = {
+        ...interopMeta,
+        styledProps: { ...interopMeta.styledProps, [key]: style },
         styledPropsMeta: {
-          ...$interopMeta.styledPropsMeta,
+          ...interopMeta.styledPropsMeta,
           [key]: {
             animated: Boolean(meta.animations),
             transition: Boolean(meta.transition),
@@ -168,8 +193,9 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     }
   }
 
-  // This is where we flatten styledPropsMeta
-  if ($interopMeta !== interopMeta) {
+  // interopMeta has changed since last render (or it's the first render)
+  // Recalculate the derived attributes and rerender
+  if (interopMeta !== $interopMeta) {
     let hasInlineVariables = false;
     let hasInlineContainers = false;
     let requiresLayout = false;
@@ -183,7 +209,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     const transitionProps = new Set<string>();
 
     for (const key of __styleKeys) {
-      const meta = $interopMeta.styledPropsMeta[key];
+      const meta = interopMeta.styledPropsMeta[key];
 
       Object.assign(variables, meta.variables);
 
@@ -195,7 +221,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
         const runtime: ContainerRuntime = {
           type: "normal",
           interaction,
-          style: $interopMeta.styledProps[key],
+          style: interopMeta.styledProps[key],
         };
 
         containers.__default = runtime;
@@ -215,8 +241,8 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
       animationInteropKey = [...animatedProps, ...transitionProps].join(":");
     }
 
-    setInteropMeta({
-      ...$interopMeta,
+    interopMeta = {
+      ...interopMeta,
       variables,
       containers,
       animatedProps,
@@ -228,29 +254,31 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
       hasActive,
       hasHover,
       hasFocus,
-    });
+    };
+
+    setInteropMeta(interopMeta);
   }
 
   const variables = useMemo(
-    () => Object.assign({}, inheritedVariables, interopMeta.variables),
-    [inheritedVariables, interopMeta.variables]
+    () => Object.assign({}, inheritedVariables, $interopMeta.variables),
+    [inheritedVariables, $interopMeta.variables]
   );
 
   const containers = useMemo(
-    () => Object.assign({}, inheritedContainers, interopMeta.containers),
-    [inheritedContainers, interopMeta.containers]
+    () => Object.assign({}, inheritedContainers, $interopMeta.containers),
+    [inheritedContainers, $interopMeta.containers]
   );
 
   // This doesn't need to be memoized as it's values will be spread across the component
   const props: Record<string, any> = {
     ...$props,
-    ...$interopMeta.styledProps,
-    ...useInteractionHandlers($props, interaction, $interopMeta),
+    ...interopMeta.styledProps,
+    ...useInteractionHandlers($props, interaction, interopMeta),
   };
 
   let children: JSX.Element = props.children;
 
-  if (interopMeta.hasInlineVariables) {
+  if ($interopMeta.hasInlineVariables) {
     children = (
       <VariableContext.Provider value={variables}>
         {children}
@@ -258,7 +286,7 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     );
   }
 
-  if (interopMeta.hasInlineContainers) {
+  if ($interopMeta.hasInlineContainers) {
     children = (
       <ContainerContext.Provider value={containers}>
         {children}
@@ -266,17 +294,17 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
     );
   }
 
-  if (isNext && interopMeta.animationInteropKey) {
+  if (isNext && $interopMeta.animationInteropKey) {
     return (
       <AnimationInterop
         {...props}
         ref={ref}
-        key={interopMeta.animationInteropKey}
+        key={$interopMeta.animationInteropKey}
         __component={Component}
         __variables={variables}
         __containers={inheritedContainers}
         __interaction={interaction}
-        __interopMeta={interopMeta}
+        __interopMeta={$interopMeta}
         __skipCssInterop
       >
         {children}
@@ -291,33 +319,53 @@ const CSSInteropWrapper = React.forwardRef(function CSSInteropWrapper(
   }
 });
 
+/**
+ * Maps each class name in the `className` property of the input object
+ * to its corresponding global style object and combines the resulting
+ * array of styles with any existing styles in the `style` property of
+ * the input object.
+ *
+ * @param props - An object that may contain a `className` property and a `style` property
+ * @returns The modified input object with updated `style` property
+ */
 function classNameToStyle({ className, ...props }: Record<string, unknown>) {
   if (typeof className === "string") {
+    // Split className string into an array of class names, then map each class
+    // name to its corresponding global style object, if one exists.
     const classNameStyle = className
       .split(/\s+/)
       .map((s) => globalStyles.get(s));
 
+    // Combine the resulting array of styles with any existing styles in the `style` property
+    // of the input object.
     props.style = Array.isArray(props.style)
       ? [...classNameStyle, ...props.style]
       : props.style
       ? [...classNameStyle, props.style]
       : classNameStyle;
 
+    // If there is only one style in the resulting array, replace the array with that single style.
     if (Array.isArray(props.style) && props.style.length <= 1) {
       props.style = props.style[0];
     }
   }
+
   return props;
 }
 
-function areStylesDynamic(style: any) {
-  if (!style) return false; // If there is no style, it can't be dynamic
-  if (styleMetaMap.has(style)) return true; // If it's already tagged, it's dynamic
+/**
+ * Determines whether a style object or array of style objects contains dynamic styles.
+ * @param style The style object or array of style objects to check.
+ * @returns True if the style object or array contains dynamic styles; otherwise, false.
+ */
+function areStylesDynamic(style: any): boolean {
+  if (!style) return false; // If there is no style, it can't be dynamic.
+  if (styleMetaMap.has(style)) return true; // If it's already tagged, it's dynamic.
 
-  // If we have an array of styles, check each one
-  // We can then tag the array so we don't have to check it again
+  // If we have an array of styles, check each one.
+  // We can then tag the array so we don't have to check it again.
   if (Array.isArray(style) && style.some(areStylesDynamic)) {
-    styleMetaMap.set(style, {});
+    styleMetaMap.set(style, {}); // Tag the array so we don't have to check it again.
     return true;
   }
 
