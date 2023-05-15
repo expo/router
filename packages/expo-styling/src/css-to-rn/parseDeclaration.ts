@@ -13,6 +13,7 @@ import type {
   FontStyle,
   FontVariantCaps,
   FontWeight,
+  GapValue,
   JustifyContent,
   Length,
   LengthPercentageOrAuto,
@@ -682,11 +683,12 @@ export function parseDeclaration(
     case "place-items":
       return;
     case "row-gap":
-      return;
+      return addStyleProp("row-gap", parseGap(declaration.value, options));
     case "column-gap":
-      return;
+      return addStyleProp("row-gap", parseGap(declaration.value, options));
     case "gap":
-      // TODO
+      addStyleProp("row-gap", parseGap(declaration.value.row, options));
+      addStyleProp("column-gap", parseGap(declaration.value.column, options));
       return;
     case "box-orient":
       return;
@@ -1972,6 +1974,14 @@ function parseLengthOrCoercePercentageToRuntime(
   } else {
     return parseLength(value, options);
   }
+}
+
+function parseGap(value: GapValue, options: ParseDeclarationOptions) {
+  if (value.type === "normal") {
+    return;
+  }
+
+  return parseLength(value.value, options);
 }
 
 function round(number: number) {
