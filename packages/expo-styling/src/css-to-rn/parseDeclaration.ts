@@ -624,24 +624,22 @@ export function parseDeclaration(
     case "outline-width":
       return;
     case "flex-direction":
-      // TODO
-      return;
+      return addStyleProp(declaration.property, declaration.value);
     case "flex-wrap":
-      // TODO
-      return;
+      return addStyleProp(declaration.property, declaration.value);
     case "flex-flow":
       addStyleProp("flexWrap", declaration.value.wrap);
       addStyleProp("flexDirection", declaration.value.direction);
       break;
     case "flex-grow":
-      // TODO
-      return;
+      return addStyleProp(declaration.property, declaration.value);
     case "flex-shrink":
-      // TODO
-      return;
+      return addStyleProp(declaration.property, declaration.value);
     case "flex-basis":
-      // TODO
-      return;
+      return addStyleProp(
+        declaration.property,
+        parseLengthPercentageOrAuto(declaration.value, options)
+      );
     case "flex":
       addStyleProp("flex-grow", declaration.value.grow);
       addStyleProp("flex-shrink", declaration.value.shrink);
