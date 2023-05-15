@@ -167,7 +167,7 @@ function useTransitions(
 
   for (let index = 0; index < transitions.length; index++) {
     const prop = transitions[index];
-    const value = style[prop];
+    const value = style[prop] ?? defaultValues[prop];
     const duration = timeToMS(
       getValue(transitionDurations, index, {
         type: "seconds",
@@ -179,26 +179,19 @@ function useTransitions(
       const valueObj = Object.assign({}, ...((value || []) as any[]));
 
       for (const tProp of transformProps) {
-        const tValue = valueObj[tProp];
+        const tValue = valueObj[tProp] ?? defaultTransform[tProp];
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        const sharedValue = useSharedValue(
-          valueObj[tProp] ?? defaultTransform[tProp]
-        );
+        const sharedValue = useSharedValue(tValue);
         transitionProps.push(tProp);
         transitionValues.push(sharedValue);
-        if (tValue !== undefined && tValue !== sharedValue.value) {
-          sharedValue.value = withTiming(tValue, { duration });
-        }
+        sharedValue.value = withTiming(tValue, { duration });
       }
     } else {
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const sharedValue = useSharedValue(value ?? animationDefaults[prop] ?? 0);
+      const sharedValue = useSharedValue(value);
       transitionProps.push(prop);
       transitionValues.push(sharedValue);
-
-      if (value !== undefined && value !== sharedValue.value) {
-        sharedValue.value = withTiming(value, { duration });
-      }
+      sharedValue.value = withTiming(value, { duration });
     }
   }
 
@@ -374,7 +367,7 @@ const getIterations = (
   return iteration.type === "infinite" ? Infinity : iteration.value;
 };
 
-export const animationDefaults: {
+export const defaultValues: {
   [K in AnimatableCSSProperty]?: Style[K];
 } = {
   backgroundColor: "transparent",
