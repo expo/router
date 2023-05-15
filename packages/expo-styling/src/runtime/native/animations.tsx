@@ -54,20 +54,7 @@ export const AnimationInterop = forwardRef(function Animated(
 ) {
   Component = createAnimatedComponent(Component);
 
-  // If the animation requires layout, we need to rerender once layout is available
-  const [layoutReady, setLayoutReady] = useState(
-    interopMeta.requiresLayout ? interaction.layout.width.get() !== 0 : true
-  );
-
-  useEffect(() => {
-    if (!layoutReady) {
-      const subscription = interaction.layout.width.subscribe(() =>
-        setLayoutReady(true)
-      );
-      return () => subscription();
-    }
-    return undefined;
-  }, [layoutReady]);
+  const isLayoutReady = useIsLayoutReady(interopMeta, interaction);
 
   for (const prop of new Set([
     ...interopMeta.transitionProps,
@@ -78,12 +65,36 @@ export const AnimationInterop = forwardRef(function Animated(
       props[prop] as Record<string, AnimatableValue>,
       __variables,
       interaction,
-      layoutReady
+      isLayoutReady
     );
   }
 
   return <Component ref={ref} {...props} />;
 });
+
+/**
+ * Returns if the component layout is calculated. If layout is not required, this will always return true
+ */
+function useIsLayoutReady(interopMeta: InteropMeta, interaction: Interaction) {
+  const [layoutReady, setLayoutReady] = useState(
+    interopMeta.requiresLayout ? interaction.layout.width.get() !== 0 : true
+  );
+
+  useEffect(() => {
+    if (layoutReady) {
+      return undefined;
+    }
+
+    // We only need to listen for a single layout change
+    const subscription = interaction.layout.width.subscribe(() => {
+      setLayoutReady(true);
+      subscription();
+    });
+    return () => subscription();
+  }, [layoutReady]);
+
+  return layoutReady;
+}
 
 type TimingFrameProperties = {
   duration: number;
