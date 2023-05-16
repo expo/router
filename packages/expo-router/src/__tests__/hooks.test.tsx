@@ -3,7 +3,6 @@ import { expectType } from "tsd";
 import {
   useGlobalSearchParams,
   useLocalSearchParams,
-  useSearchParams,
   useSegments,
 } from "../hooks";
 
