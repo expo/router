@@ -97,7 +97,8 @@
     "react-native-reanimated": "~2.14.4",
     "react-native-safe-area-context": "~4.5.0",
     "react-native-screens": "~3.20.0",
-    "tree-kill": "^1.2.2"
+    "tree-kill": "^1.2.2",
+    "tsd": "^0.28.1"
   },
   "dependencies": {
     "@bacons/react-views": "^1.1.3",
