@@ -1,43 +1,58 @@
-import Head from "expo-router/head";
-import { Tabs } from "expo-router";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { Text, View } from "react-native";
+import TabbedSlot, { TabbedNavigator, TabLink } from "../nav/tab-slot";
+
 export default function Layout() {
   return (
-    <>
-      <Head>
-        {/* <meta property="expo:handoff" content="true" /> */}
-        {/* <meta property="expo:spotlight" content="true" /> */}
-      </Head>
-      <Tabs>
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "Home",
-            tabBarIcon(props) {
-              return (
-                <Ionicons
-                  {...props}
-                  name={props.focused ? "ios-planet" : "ios-planet-outline"}
-                />
-              );
-            },
-          }}
-        />
-        <Tabs.Screen
-          name="search"
-          options={{
-            title: "Search",
-            tabBarIcon(props) {
-              return (
-                <Ionicons
-                  {...props}
-                  name={props.focused ? "ios-search" : "ios-search-outline"}
-                />
-              );
-            },
-          }}
-        />
-      </Tabs>
-    </>
+    <TabbedNavigator>
+      <TabbedSlot />
+      <TabBar />
+    </TabbedNavigator>
+  );
+}
+
+function TabBar() {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-around",
+        padding: 24,
+      }}
+    >
+      <TabLink name="(index)">
+        {(isFocused) => (
+          <Text
+            style={[
+              {
+                fontSize: 16,
+                color: "black",
+              },
+              isFocused && {
+                color: "blue",
+              },
+            ]}
+          >
+            Home
+          </Text>
+        )}
+      </TabLink>
+      <TabLink name="(user)" params={{ user: "bacon" }}>
+        {(isFocused) => (
+          <Text
+            style={[
+              {
+                fontSize: 16,
+                color: "black",
+              },
+              isFocused && {
+                color: "blue",
+              },
+            ]}
+          >
+            Profile
+          </Text>
+        )}
+      </TabLink>
+    </View>
   );
 }
