@@ -116,7 +116,7 @@ export function useGlobalSearchParams<
 export function useSearchParams<
   TParams extends SearchParams = SearchParams
 >(): Partial<TParams> {
-  return useRouteInfo().params as Partial<TParams>;
+  return useGlobalSearchParams<TParams>();
 }
 
 /**
