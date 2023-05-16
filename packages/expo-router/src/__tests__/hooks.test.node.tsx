@@ -6,6 +6,19 @@ import {
   useSegments,
 } from "../hooks";
 
+jest.mock("react", () => {
+  return {
+    ...jest.requireActual("react"),
+    useContext: () => ({
+      routeInfo: { segments: [], pathname: "", params: {} },
+    }),
+  };
+});
+
+afterAll(() => {
+  jest.unmock("react");
+});
+
 describe(useSegments, () => {
   it(`defaults abstract types`, () => {
     const segments = useSegments();
