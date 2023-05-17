@@ -1,3 +1,4 @@
+import "@expo/styling/polyfill";
 import { Tabs } from "expo-router";
 import "../global.css";
 
