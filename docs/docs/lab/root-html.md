@@ -4,7 +4,7 @@ title: Root HTML
 
 > This guide requires `expo@49.0.0-alpha.3` or greater––everything listed here is still experimental. You may need to [use Expo CLI on `main`](https://github.com/expo/expo/tree/main/packages/%40expo/cli#contributing) to use these features.
 
-When you statically render an Expo website (`EXPO_USE_STATIC=1 yarn expo start` cite needed), the root HTML element for each page can be customized by creating an `apps/+html.js` file that exports a default HTML component.
+When you statically render an Expo website (`web.output: 'static'` in `app.json`), the root HTML element for each page can be customized by creating an `apps/+html.js` file that exports a default HTML component.
 
 > Notice: Global context providers should go in the [Root Layout](/docs/guides/root-layout) component, not the Root HTML component.
 

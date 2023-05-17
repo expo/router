@@ -75,9 +75,9 @@ The `<Head />` component accepts any web meta tags as children. The `<Head />` c
 
 ## Rendering
 
-> `EXPO_USE_STATIC` is [available on main](https://github.com/expo/expo/pull/21572) and not currently published.
+> Static rendering is experimentally available starting in SDK 49
 
-The `<Head />` component can be used for static rendering with `EXPO_USE_STATIC=1 yarn expo` (cite needed). The `<Head />` component can also be used to update during runtime or in single-page applications, this is useful for updating the page title and favicon to reflect dynamic interactions.
+The `<Head />` component can be used for static rendering, be setting `web.output: 'static'` in `app.json`. The `<Head />` component can also be used to update during runtime or in single-page applications, this is useful for updating the page title and favicon to reflect dynamic interactions.
 
 ## Beta Notice
 
