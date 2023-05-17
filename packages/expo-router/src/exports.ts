@@ -5,6 +5,7 @@ export { useRouter } from "./link/useRouter";
 export {
   useUnstableGlobalHref,
   usePathname,
+  useGlobalSearchParams,
   useLocalSearchParams,
   useSearchParams,
   useSegments,

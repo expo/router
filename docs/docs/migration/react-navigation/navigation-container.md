@@ -44,7 +44,7 @@ Unlike React Navigation, Expo Router can reliably represent any route with a str
 
 #### `getCurrentOptions`
 
-Use the [`useSearchParams()`](/docs/features/linking#useSearchParams) hook to get the current route's query parameters.
+Use the [`useLocalSearchParams()`](/docs/features/linking#useLocalSearchParams) hook to get the current route's query parameters.
 
 #### `addListener`
 
@@ -56,7 +56,7 @@ Use the [`usePathname()`](/docs/features/linking#usepathname) or [`useSegments()
 
 ##### `options`
 
-Use the [`useSearchParams()`](/docs/features/linking#useSearchParams) hook to get the current route's query parameters. Use in conjunction with `useEffect(() => {}, [...])` to observe changes.
+Use the [`useLocalSearchParams()`](/docs/features/linking#useLocalSearchParams) hook to get the current route's query parameters. Use in conjunction with `useEffect(() => {}, [...])` to observe changes.
 
 ## props
 
@@ -70,7 +70,7 @@ Avoid using this pattern in favor of deep linking (e.g. user opens your app to `
 
 ### `onStateChange`
 
-Use the [`usePathname()`](/docs/features/linking#usepathname), [`useSegments()`](/docs/features/linking#usesegments), and [`useSearchParams()`](/docs/features/linking#useSearchParams) hooks to identify the current route state. Use in conjunction with `useEffect(() => {}, [...])` to observe changes.
+Use the [`usePathname()`](/docs/features/linking#usepathname), [`useSegments()`](/docs/features/linking#usesegments), and [`useGlobalSearchParams()`](/docs/features/linking#useGlobalSearchParams) hooks to identify the current route state. Use in conjunction with `useEffect(() => {}, [...])` to observe changes.
 
 - If you're attempting to track screen changes, follow the [Screen Tracking guide](/docs/migration/react-navigation/screen-tracking).
 - React Navigation recommends avoiding [`onStateChange`](https://reactnavigation.org/docs/navigation-container/#onstatechange).
