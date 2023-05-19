@@ -61,7 +61,7 @@ Create a new file `index.js` in the root of your project. If it exists already, 
 import "expo-router/entry";
 ```
 
-Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guides/customizing-metro/#web-support-how) in your `app.json` (or `app.config.js`):
+Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guides/customizing-metro/#web-support) in your `app.json` (or `app.config.js`):
 
 ```json
 {
