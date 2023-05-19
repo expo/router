@@ -75,6 +75,11 @@ export function useLinkToPath() {
 
       const rootState = navigationRef.getRootState();
 
+      // If the root state is null, we can't do anything
+      if(!rootState) {
+        return;
+      }
+
       // Ensure simple operations are used when moving between siblings
       // in the same navigator. This ensures that the state is not reset.
       // TODO: We may need to apply this at a larger scale in the future.
