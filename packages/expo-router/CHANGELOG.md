@@ -10,6 +10,24 @@
 
 ### 💡 Others
 
+## [Fri, 19 May 2023 11:10:36 -0500](https://github.com/expo/router/commit/590b4c8c0ce18ae701ae0509181679ebcbc3a5de)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- rename `useSearchParams` to `useGlobalSearchParams` and deprecate the `useSearchParams` function. ([#578](https://github.com/expo/router/issues/578))
+- automatically urlencode path params ([#553](https://github.com/expo/router/issues/553))
+
+### 🐛 Bug fixes
+
+- fix ssg warning ([#589](https://github.com/expo/router/issues/589))
+- fix: isMovingToSiblingRoute incorrectly detecting parent as sibling ([#532](https://github.com/expo/router/issues/532))
+- inifinite rerenders due to default prop value ([#531](https://github.com/expo/router/issues/531))
+- remove navigation store ([#527](https://github.com/expo/router/issues/527))
+
+### 💡 Others
+
 ## [Thu, 27 Apr 2023 19:28:53 -0500](https://github.com/expo/router/commit/100817c4e91eac21cd2416827144bd8da963f8af)
 
 ### 🛠 Breaking changes

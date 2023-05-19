@@ -10,6 +10,18 @@
 
 ### 💡 Others
 
+## [Fri, 19 May 2023 11:10:36 -0500](https://github.com/expo/router/commit/590b4c8c0ce18ae701ae0509181679ebcbc3a5de)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+- fix(head): ensure handoff works when moving between two native devices ([#549](https://github.com/expo/router/issues/549))
+
+### 💡 Others
+
 ## [Thu, 27 Apr 2023 19:28:53 -0500](https://github.com/expo/router/commit/100817c4e91eac21cd2416827144bd8da963f8af)
 
 ### 🛠 Breaking changes
