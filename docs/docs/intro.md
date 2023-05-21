@@ -44,7 +44,7 @@ npx create-expo-app
 Install `expo-router` and peer dependencies:
 
 ```bash
-npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar react-native-gesture-handler
 ```
 
 Then delete the entry point in your `package.json`, or replace it with `index.js` to be explicit:
