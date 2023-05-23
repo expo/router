@@ -25,59 +25,64 @@ const initialUrl =
     ? new URL(window.location.href)
     : undefined;
 
-export function useCreateExpoRouterContext({
+/** @private */
+export function createExpoRouterContext({
   context,
   location = initialUrl,
 }: ExpoRootProps) {
+  const routeNode = getRoutes(context);
+
+  // No app dir exists
+  if (!routeNode) {
+    return {
+      routeNode,
+      linking: { prefixes: [] },
+      initialState: undefined,
+      getRouteInfo() {
+        throw new Error("invalid");
+      },
+    };
+  }
+
+  const linking = getLinkingConfig(routeNode);
+  let initialState: ResultState | undefined;
+
+  if (location) {
+    initialState = linking.getStateFromPath?.(
+      location.pathname + location.search,
+      linking.config
+    );
+  }
+
+  function getRouteInfo(state: ResultState) {
+    return getRouteInfoFromState(
+      (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
+        return getPathDataFromState(state, {
+          screens: [],
+          ...linking.config,
+          preserveDynamicRoutes: asPath,
+          preserveGroups: asPath,
+        });
+      },
+      state
+    );
+  }
+
+  // This looks redundant but it makes TypeScript correctly infer the union return type.
+  return {
+    routeNode,
+    linking,
+
+    initialState,
+    getRouteInfo,
+  };
+}
+
+export function useCreateExpoRouterContext(props: ExpoRootProps) {
   return React.useMemo<
     | Omit<ExpoRouterContextType, "navigationRef">
     | Omit<OnboardingExpoRouterContextType, "navigationRef">
   >(() => {
-    const routeNode = getRoutes(context);
-
-    // No app dir exists
-    if (!routeNode) {
-      return {
-        routeNode,
-        linking: { prefixes: [] },
-        initialState: undefined,
-        getRouteInfo() {
-          throw new Error("invalid");
-        },
-      };
-    }
-
-    const linking = getLinkingConfig(routeNode);
-    let initialState: ResultState | undefined;
-
-    if (location) {
-      initialState = linking.getStateFromPath?.(
-        location.pathname + location.search,
-        linking.config
-      );
-    }
-
-    function getRouteInfo(state: ResultState) {
-      return getRouteInfoFromState(
-        (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
-          return getPathDataFromState(state, {
-            screens: [],
-            ...linking.config,
-            preserveDynamicRoutes: asPath,
-            preserveGroups: asPath,
-          });
-        },
-        state
-      );
-    }
-
-    // This looks redundant but it makes TypeScript correctly infer the union return type.
-    return {
-      routeNode,
-      linking,
-
-      initialState,
-      getRouteInfo,
-    };
-  }, [context, location]);
+    return createExpoRouterContext(props);
+  }, [props.context, props.location]);
 }

@@ -5,7 +5,99 @@ import { RequireContext } from "../types";
 import {
   ExpoRootProps,
   useCreateExpoRouterContext,
+  createExpoRouterContext,
 } from "../useCreateExpoRouterContext";
+
+describe(createExpoRouterContext, () => {
+  it(`creates mock context with empty routes`, () => {
+    expect(
+      createExpoRouterContext({
+        context: createMockContextModule({}),
+      })
+    ).toEqual({
+      getRouteInfo: expect.any(Function),
+      initialState: undefined,
+      linking: {
+        prefixes: [],
+      },
+      routeNode: null,
+    });
+  });
+  it(`creates qualified context with routes`, () => {
+    const ctx = createExpoRouterContext({
+      context: createMockContextModule({
+        "./index.tsx": {
+          default: () => null,
+        },
+      }),
+    });
+
+    expect(ctx.linking).toEqual({
+      config: {
+        initialRouteName: undefined,
+        screens: { "[...404]": "*404", _sitemap: "_sitemap", index: "" },
+      },
+      getActionFromState: expect.any(Function),
+      getInitialURL: expect.any(Function),
+      getPathFromState: expect.any(Function),
+      getStateFromPath: expect.any(Function),
+      prefixes: [],
+      subscribe: expect.any(Function),
+    });
+
+    // Important
+    expect(ctx.initialState).toEqual(undefined);
+
+    expect(ctx.routeNode).toEqual({
+      children: [
+        {
+          children: [],
+          contextKey: "./index.tsx",
+          dynamic: null,
+          loadRoute: expect.any(Function),
+          route: "index",
+        },
+        {
+          children: [],
+          contextKey: "./_sitemap.tsx",
+          dynamic: null,
+          generated: true,
+          internal: true,
+          loadRoute: expect.any(Function),
+          route: "_sitemap",
+        },
+        {
+          children: [],
+          contextKey: "./[...404].tsx",
+          dynamic: [{ deep: true, name: "404" }],
+          generated: true,
+          internal: true,
+          loadRoute: expect.any(Function),
+          route: "[...404]",
+        },
+      ],
+      contextKey: "./_layout.tsx",
+      dynamic: null,
+      generated: true,
+      loadRoute: expect.any(Function),
+      route: "",
+    });
+  });
+  it(`creates qualified context with routes and initial state`, () => {
+    const ctx = createExpoRouterContext({
+      location: new URL("/", "http://acme.com"),
+      context: createMockContextModule({
+        "./index.tsx": {
+          default: () => null,
+        },
+      }),
+    });
+
+    expect(ctx.initialState).toEqual({
+      routes: [{ name: "index", path: "/" }],
+    });
+  });
+});
 
 function createMockContextModule(
   map: Record<string, Record<string, any>> = {}
