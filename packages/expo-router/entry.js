@@ -1,6 +1,8 @@
+// `@expo/metro-runtime` MUST be the first import to ensure Fast Refresh works
+// on web.
+import "@expo/metro-runtime";
 import { ExpoRoot } from "expo-router";
 import Head from "expo-router/head";
-import "@expo/metro-runtime";
 import { renderRootComponent } from "expo-router/src/renderRootComponent";
 
 const ctx = require.context(
