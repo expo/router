@@ -4,22 +4,17 @@ import React from "react";
 import { Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { getRouteInfoFromState } from "./LocationProvider";
 import UpstreamNavigationContainer from "./fork/NavigationContainer";
-import getPathFromState, {
-  getPathDataFromState,
-} from "./fork/getPathFromState";
 import { ResultState } from "./fork/getStateFromPath";
-import { getLinkingConfig } from "./getLinkingConfig";
-import { getRoutes } from "./getRoutes";
 import {
-  ExpoRouterContextType,
   ExpoRouterContext,
   RootStateContext,
   RootStateContextType,
-  OnboardingExpoRouterContextType,
 } from "./hooks";
-import { RequireContext } from "./types";
+import {
+  ExpoRootProps,
+  useCreateExpoRouterContext,
+} from "./useCreateExpoRouterContext";
 import { getQualifiedRouteComponent } from "./useScreens";
 import { SplashScreen } from "./views/Splash";
 
@@ -43,11 +38,6 @@ const INITIAL_METRICS = {
   insets: { top: 0, left: 0, right: 0, bottom: 0 },
 };
 
-export type ExpoRootProps = {
-  context: RequireContext;
-  location?: URL;
-};
-
 export function ExpoRoot({ context, location }: ExpoRootProps) {
   return (
     <GestureHandlerRootView>
@@ -63,57 +53,13 @@ export function ExpoRoot({ context, location }: ExpoRootProps) {
   );
 }
 
-const initialUrl =
-  Platform.OS === "web" && typeof window !== "undefined"
-    ? new URL(window.location.href)
-    : undefined;
-
-function ContextNavigator({
-  context,
-  location: initialLocation = initialUrl,
-}: ExpoRootProps) {
+function ContextNavigator(props: ExpoRootProps) {
   const navigationRef = useNavigationContainerRef();
   const [shouldShowSplash, setShowSplash] = React.useState(
     Platform.OS !== "web"
   );
 
-  const expoContext = React.useMemo<
-    ExpoRouterContextType | OnboardingExpoRouterContextType
-  >(() => {
-    const routeNode = getRoutes(context);
-    const linking = getLinkingConfig(routeNode!);
-    let initialState: ResultState | undefined;
-
-    if (initialLocation) {
-      initialState = linking.getStateFromPath?.(
-        initialLocation.pathname + initialLocation.search,
-        linking.config
-      );
-    }
-
-    function getRouteInfo(state: ResultState) {
-      return getRouteInfoFromState(
-        (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {
-          return getPathDataFromState(state, {
-            screens: [],
-            ...linking.config,
-            preserveDynamicRoutes: asPath,
-            preserveGroups: asPath,
-          });
-        },
-        state
-      );
-    }
-
-    // This looks redundant but it makes TypeScript correctly infer the union return type.
-    return {
-      routeNode,
-      linking,
-      navigationRef,
-      initialState,
-      getRouteInfo,
-    };
-  }, [context, navigationRef, initialLocation]);
+  const expoContext = useCreateExpoRouterContext(props);
 
   const { routeNode, initialState, linking, getRouteInfo } = expoContext;
 
@@ -162,7 +108,7 @@ function ContextNavigator({
   return (
     <>
       {shouldShowSplash && <SplashScreen />}
-      <ExpoRouterContext.Provider value={expoContext}>
+      <ExpoRouterContext.Provider value={{ ...expoContext, navigationRef }}>
         <UpstreamNavigationContainer
           ref={navigationRef}
           initialState={initialState}
