@@ -1,21 +1,10 @@
-import { useNavigationContainerRef } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useState } from "react";
 import { Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import UpstreamNavigationContainer from "./fork/NavigationContainer";
-import { ResultState } from "./fork/getStateFromPath";
-import {
-  ExpoRouterContext,
-  RootStateContext,
-  RootStateContextType,
-} from "./hooks";
-import {
-  ExpoRootProps,
-  useCreateExpoRouterContext,
-} from "./useCreateExpoRouterContext";
-import { getQualifiedRouteComponent } from "./useScreens";
+import { useInitializeExpoRouter } from "./global-state";
 import { SplashScreen } from "./views/Splash";
 
 function getGestureHandlerRootView() {
@@ -59,73 +48,44 @@ export function ExpoRoot({ context, location }: ExpoRootProps) {
   );
 }
 
-function ContextNavigator(props: ExpoRootProps) {
-  const navigationRef = useNavigationContainerRef();
+const initialUrl =
+  Platform.OS === "web" && typeof window !== "undefined"
+    ? new URL(window.location.href)
+    : undefined;
+
+function ContextNavigator({
+  context,
+  location: initialLocation = initialUrl,
+}: ExpoRootProps) {
+  const store = useInitializeExpoRouter(context, initialLocation);
+  const [isReady, setIsReady] = useState(store.isReady);
   const [shouldShowSplash, setShowSplash] = React.useState(
     Platform.OS !== "web"
   );
 
-  const expoContext = useCreateExpoRouterContext(props);
-
-  const { routeNode, initialState, linking, getRouteInfo } = expoContext;
-
-  const [rootState, setRootState] = React.useState<RootStateContextType>(() => {
-    if (initialState) {
-      return {
-        state: initialState,
-        routeInfo: getRouteInfo(initialState),
-      };
-    } else {
-      return {
-        routeInfo: {
-          unstable_globalHref: "",
-          pathname: "",
-          params: {},
-          segments: [],
-        },
-      };
-    }
-  });
-
-  React.useEffect(() => {
-    const subscription = navigationRef.addListener("state", (data) => {
-      const state = data.data.state as ResultState;
-      setRootState({
-        state,
-        routeInfo: getRouteInfo(state),
-      });
-    });
-
-    return () => subscription?.();
-  }, [navigationRef, getRouteInfo]);
-
-  if (!routeNode) {
-    if (process.env.NODE_ENV === "development") {
-      const Tutorial = require("./onboard/Tutorial").Tutorial;
-      SplashScreen.hideAsync();
-      return <Tutorial />;
-    } else {
-      throw new Error("No routes found");
-    }
+  if (store.shouldShowTutorial()) {
+    const Tutorial = require("./onboard/Tutorial").Tutorial;
+    SplashScreen.hideAsync();
+    return <Tutorial />;
   }
 
-  const Component = getQualifiedRouteComponent(routeNode);
+  const Component = store.getQualifiedRouteComponent();
 
   return (
     <>
       {shouldShowSplash && <SplashScreen />}
-      <ExpoRouterContext.Provider value={{ ...expoContext, navigationRef }}>
-        <UpstreamNavigationContainer
-          ref={navigationRef}
-          initialState={initialState}
-          linking={linking}
-          onReady={() => requestAnimationFrame(() => setShowSplash(false))}
-        >
-          <RootStateContext.Provider value={rootState}>
-            {!shouldShowSplash && <Component />}
-          </RootStateContext.Provider>
-        </UpstreamNavigationContainer>
-      </ExpoRouterContext.Provider>
+      <UpstreamNavigationContainer
+        ref={store.navigationRef}
+        initialState={store.initialState}
+        linking={store.linking}
+        onReady={() => {
+          store.onReady();
+          setIsReady(true);
+          requestAnimationFrame(() => setShowSplash(false));
+        }}
+      >
+        {isReady && <Component />}
+      </UpstreamNavigationContainer>
     </>
   );
 }

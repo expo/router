@@ -2,9 +2,8 @@ import { StyleSheet, Text, View } from "@bacons/react-views";
 import { createURL } from "expo-linking";
 import React from "react";
 
-import { usePathname } from "../hooks";
+import { usePathname, useRouter } from "../hooks";
 import { Link } from "../link/Link";
-import { useRouter } from "../link/useRouter";
 import { useNavigation } from "../useNavigation";
 
 const useLayoutEffect =

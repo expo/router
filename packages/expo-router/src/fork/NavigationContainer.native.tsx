@@ -70,6 +70,8 @@ function NavigationContainerInner(
 ) {
   const isLinkingEnabled = linking ? linking.enabled !== false : false;
 
+  debugger;
+
   if (linking?.config) {
     validatePathConfig(linking.config);
   }

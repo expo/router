@@ -5,10 +5,10 @@ import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
+import { useRouter } from "../hooks";
 import { useFocusEffect } from "../useFocusEffect";
 import { Href, resolveHref } from "./href";
 import useLinkToPathProps from "./useLinkToPathProps";
-import { useRouter } from "./useRouter";
 
 export interface LinkProps extends Omit<TextProps, "href" | "hoverStyle"> {
   /** Path to route to. */

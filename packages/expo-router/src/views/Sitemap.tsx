@@ -10,26 +10,12 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { RouteNode, sortRoutes } from "../Route";
-import { useExpoRouterContext } from "../hooks";
+import { RouteNode } from "../Route";
+import { useExpoRouter } from "../global-state";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName } from "../matchers";
 
 const INDENT = 24;
-
-function sortRouteNodeRoutes(routeNode: RouteNode) {
-  return routeNode.children.filter((route) => !route.internal).sort(sortRoutes);
-}
-
-function useSortedRoutes() {
-  const { routeNode } = useExpoRouterContext();
-  const sortedRoutes = React.useMemo(
-    () => sortRouteNodeRoutes(routeNode),
-    [routeNode]
-  );
-
-  return sortedRoutes;
-}
 
 export function getNavOptions(): NativeStackNavigationOptions {
   return {
@@ -86,7 +72,7 @@ export function Sitemap() {
 }
 
 function FileSystemView() {
-  const routes = useSortedRoutes();
+  const routes = useExpoRouter().getSortedRoutes();
 
   return (
     <>

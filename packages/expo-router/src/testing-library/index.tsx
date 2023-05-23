@@ -22,7 +22,7 @@ import { initialUrlRef } from "./mocks";
 export * from "@testing-library/react-native";
 
 type RenderRouterOptions = Parameters<typeof render>[1] & {
-  initialUrl?: string;
+  initialUrl?: any;
 };
 
 type Result = ReturnType<typeof render> & {
@@ -60,7 +60,7 @@ export function renderRouter(
   let ctx: RequireContext;
 
   // Reset the initial URL
-  initialUrlRef.value = initialUrl;
+  initialUrlRef.value = initialUrl as any;
 
   // Force the render to be synchronous
   process.env.EXPO_ROUTER_IMPORT_MODE = "sync";
@@ -75,12 +75,17 @@ export function renderRouter(
 
   stateCache.clear();
 
-  const result = render(
-    <ExpoRoot context={ctx} location={new URL(initialUrl, "test://test")} />,
-    {
-      ...options,
-    }
-  );
+  let location: URL | undefined;
+
+  if (typeof initialUrl === "string") {
+    location = new URL(initialUrl, "test://test");
+  } else if (initialUrl instanceof URL) {
+    location = initialUrl;
+  }
+
+  const result = render(<ExpoRoot context={ctx} location={location} />, {
+    ...options,
+  });
 
   return Object.assign(result, {
     getPathname(this: RenderResult): string {

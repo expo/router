@@ -1,8 +1,8 @@
 // Expo Router API
 import { Navigator, Slot } from "./views/Navigator";
 
-export { useRouter } from "./link/useRouter";
 export {
+  useRouter,
   useUnstableGlobalHref,
   usePathname,
   useGlobalSearchParams,
@@ -12,6 +12,9 @@ export {
   useRootNavigation,
   useRootNavigationState,
 } from "./hooks";
+
+export { router } from "./imperative-api";
+
 export { Link, Redirect } from "./link/Link";
 
 export { withLayoutContext } from "./layouts/withLayoutContext";

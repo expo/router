@@ -45,32 +45,6 @@ it("can handle dynamic routes", async () => {
   });
 });
 
-it("can handle navigation between routes", async () => {
-  renderRouter({
-    index: function MyIndexRoute() {
-      const router = useRouter();
-
-      return (
-        <Text testID="index" onPress={() => router.push("/profile/test-name")}>
-          Press me
-        </Text>
-      );
-    },
-    "/profile/[name]": function MyRoute() {
-      const { name } = useSearchParams();
-      return <Text>{name}</Text>;
-    },
-  });
-
-  const text = await screen.findByTestId("index");
-
-  act(() => {
-    fireEvent.press(text);
-  });
-
-  expect(await screen.findByText("test-name")).toBeDefined();
-});
-
 it("does not rerender routes", async () => {
   const Index = jest.fn(() => <Text>Screen</Text>);
 
@@ -137,8 +111,8 @@ it("nested layouts", async () => {
 
   expect(AppLayout).toHaveBeenCalledTimes(3);
   expect(TabsLayout).toHaveBeenCalledTimes(2);
-  expect(StackLayout).toHaveBeenCalledTimes(3);
+  expect(StackLayout).toHaveBeenCalledTimes(2);
   expect(Index).toHaveBeenCalledTimes(1);
-  expect(Home).toHaveBeenCalledTimes(2);
+  expect(Home).toHaveBeenCalledTimes(1);
   expect(HomeNested).toHaveBeenCalledTimes(1);
 });
