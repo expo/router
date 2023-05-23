@@ -10,8 +10,13 @@ import React from "react";
 import { ExpoRoot } from "../ExpoRoot";
 import { stateCache } from "../getLinkingConfig";
 import { RequireContext } from "../types";
+import {
+  FileStub,
+  inMemoryContext,
+  requireContext,
+  requireContextWithOverrides,
+} from "./context-stubs";
 import { initialUrlRef } from "./mocks";
-import requireContext from "./require-context-ponyfill";
 
 // re-export everything
 export * from "@testing-library/react-native";
@@ -20,10 +25,6 @@ type RenderRouterOptions = Parameters<typeof render>[1] & {
   initialUrl?: string;
 };
 
-type RouteOverrideFunction = () => React.ReactElement<any, any> | null;
-
-type RouteOverride = { default: RouteOverrideFunction } | RouteOverrideFunction;
-
 type Result = ReturnType<typeof render> & {
   getPathname(): string;
   getSearchParams(): URLSearchParams;
@@ -31,7 +32,7 @@ type Result = ReturnType<typeof render> & {
 
 function isOverrideContext(
   context: object
-): context is { appDir: string; overrides: Record<string, RouteOverride> } {
+): context is { appDir: string; overrides: Record<string, FileStub> } {
   return Boolean(typeof context === "object" && "appDir" in context);
 }
 
@@ -40,18 +41,18 @@ export function renderRouter(
   options?: RenderRouterOptions
 ): Result;
 export function renderRouter(
-  context: Record<string, RouteOverride>,
+  context: Record<string, FileStub>,
   options?: RenderRouterOptions
 ): Result;
 export function renderRouter(
-  context: { appDir: string; overrides: Record<string, RouteOverride> },
+  context: { appDir: string; overrides: Record<string, FileStub> },
   options?: RenderRouterOptions
 ): Result;
 export function renderRouter(
   context:
     | string
-    | { appDir: string; overrides: Record<string, RouteOverride> }
-    | Record<string, RouteOverride> = "./app",
+    | { appDir: string; overrides: Record<string, FileStub> }
+    | Record<string, FileStub> = "./app",
   { initialUrl = "/", ...options }: RenderRouterOptions = {}
 ): Result {
   jest.useFakeTimers();
@@ -67,42 +68,9 @@ export function renderRouter(
   if (typeof context === "string") {
     ctx = requireContext(path.resolve(process.cwd(), context));
   } else if (isOverrideContext(context)) {
-    const existingContext = requireContext(
-      path.resolve(process.cwd(), context.appDir)
-    );
-
-    ctx = Object.assign(
-      function (id: string) {
-        if (id in context.overrides) {
-          const route = context.overrides[id];
-          return typeof route === "function" ? { default: route } : route;
-        } else {
-          return existingContext(id);
-        }
-      },
-      {
-        keys: () => [
-          ...Object.keys(context.overrides),
-          ...existingContext.keys(),
-        ],
-        resolve: (key: string) => key,
-        id: "0",
-      }
-    );
+    ctx = requireContextWithOverrides(context.appDir, context.overrides);
   } else {
-    ctx = Object.assign(
-      function (id: string) {
-        id = id.replace(/^\.\//, "").replace(/\.js$/, "");
-        return typeof context[id] === "function"
-          ? { default: context[id] }
-          : context[id];
-      },
-      {
-        keys: () => Object.keys(context).map((key) => "./" + key + ".js"),
-        resolve: (key: string) => key,
-        id: "0",
-      }
-    );
+    ctx = inMemoryContext(context);
   }
 
   stateCache.clear();
