@@ -23,9 +23,15 @@ function getGestureHandlerRootView() {
     const { GestureHandlerRootView } =
       require("react-native-gesture-handler") as typeof import("react-native-gesture-handler");
 
-    return function GestureHandler(props: any) {
+    // eslint-disable-next-line no-inner-declarations
+    function GestureHandler(props: any) {
       return <GestureHandlerRootView style={{ flex: 1 }} {...props} />;
-    };
+    }
+    if (process.env.NODE_ENV === "development") {
+      // @ts-expect-error
+      GestureHandler.displayName = "GestureHandlerRootView";
+    }
+    return GestureHandler;
   } catch {
     return React.Fragment;
   }
