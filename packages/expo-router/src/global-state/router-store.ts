@@ -4,6 +4,7 @@ import {
   useNavigationContainerRef,
 } from "@react-navigation/native";
 import { useSyncExternalStore, useMemo } from "react";
+import { Platform } from "react-native";
 
 import { UrlObject, getRouteInfoFromState } from "../LocationProvider";
 import { RouteNode } from "../Route";
@@ -48,8 +49,8 @@ export class RouterStore {
     navigationRef: NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>,
     initialLocation?: URL
   ) {
-    // Clean up any previous listeners.
-    this.isReady = false;
+    // Clean up any previous state
+    this.isReady = Boolean(initialLocation);
     this.initialState = undefined;
     this.rootState = undefined;
     this.routeInfo = undefined;
@@ -144,6 +145,9 @@ export class RouterStore {
   /** Make sure these are arrow functions so `this` is correctly bound */
   onReady = () => {
     this.isReady = true;
+  };
+  shouldShowSplash = () => {
+    return Platform.OS !== "web" && !this.isReady;
   };
   subscribeToRootState = (subscriber: () => void) => {
     this.rootStateSubscribers.add(subscriber);

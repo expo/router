@@ -66,7 +66,7 @@ function ContextNavigator({
   const store = useInitializeExpoRouter(context, initialLocation);
   const [isReady, setIsReady] = useState(store.isReady);
   const [shouldShowSplash, setShowSplash] = React.useState(
-    Platform.OS !== "web"
+    store.shouldShowSplash
   );
 
   if (store.shouldShowTutorial()) {
