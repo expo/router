@@ -1,10 +1,10 @@
 import React, { Text } from "react-native";
 
-import { Slot, useRouter, useSearchParams } from "../exports";
+import { Slot, useGlobalSearchParams } from "../exports";
 import { Stack } from "../layouts/Stack";
 import { Tabs } from "../layouts/Tabs";
 import { Redirect } from "../link/Link";
-import { act, fireEvent, renderRouter, screen } from "../testing-library";
+import { renderRouter, screen } from "../testing-library";
 
 it("404", async () => {
   const Index = jest.fn(() => <Redirect href="/404" />);
@@ -28,7 +28,7 @@ it("can handle dynamic routes", async () => {
   renderRouter(
     {
       "[slug]": function Path() {
-        const { slug } = useSearchParams();
+        const { slug } = useGlobalSearchParams();
         return <Text>{slug}</Text>;
       },
     },
