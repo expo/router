@@ -54,4 +54,9 @@ describe(resolveHref, () => {
       })
     ).toBe("/alpha/some?gamma=another");
   });
+  it("encodes query parameters", () => {
+    expect(
+      resolveHref({ pathname: "/fake/path", params: { value: "++test++" } })
+    ).toBe("/fake/path?value=%2B%2Btest%2B%2B");
+  });
 });
