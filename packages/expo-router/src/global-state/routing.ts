@@ -15,36 +15,36 @@ import {
   getQualifiedStateForTopOfTargetState,
   isMovingToSiblingRoute,
 } from "../link/stateOperations";
-import type { ExpoRouterStore } from "./index";
+import type { RouterStore } from "./router-store";
 
-function assertIsReady(store: ExpoRouterStore) {
+function assertIsReady(store: RouterStore) {
   if (!store.isReady) {
     throw new Error("Attempted to use navigation outside of Expo Router");
   }
 }
 
-export function push(this: ExpoRouterStore, url: Href) {
+export function push(this: RouterStore, url: Href) {
   return this.linkTo(resolveHref(url));
 }
 
-export function replace(this: ExpoRouterStore, url: Href) {
+export function replace(this: RouterStore, url: Href) {
   return this.linkTo(resolveHref(url), "REPLACE");
 }
 
-export function goBack(this: ExpoRouterStore) {
+export function goBack(this: RouterStore) {
   assertIsReady(this);
   this.navigationRef?.current?.goBack();
 }
 
 export function setParams(
-  this: ExpoRouterStore,
+  this: RouterStore,
   params: Record<string, string | number> = {}
 ) {
   assertIsReady(this);
   return (this.navigationRef?.current?.setParams as any)(params);
 }
 
-export function linkTo(this: ExpoRouterStore, href: string, event?: string) {
+export function linkTo(this: RouterStore, href: string, event?: string) {
   if (isRemoteHref(href)) {
     Linking.openURL(href);
     return;

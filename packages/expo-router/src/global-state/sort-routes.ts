@@ -1,8 +1,8 @@
-import { ExpoRouterStore } from ".";
 import { RouteNode } from "../Route";
 import { matchGroupName } from "../matchers";
+import type { RouterStore } from "./router-store";
 
-export function getSortedRoutes(this: ExpoRouterStore) {
+export function getSortedRoutes(this: RouterStore) {
   if (!this.routeNode) {
     throw new Error("No routes found");
   }
