@@ -10,7 +10,7 @@ import {
   useStoreRootState,
   useStoreRouteInfo,
   useExpoRouter,
-} from "./global-state";
+} from "./global-state/router-store";
 import { Router } from "./types";
 
 type SearchParams = Record<string, string | string[]>;

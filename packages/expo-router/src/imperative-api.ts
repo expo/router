@@ -1,4 +1,4 @@
-import { store } from "./global-state";
+import { store } from "./global-state/router-store";
 import { Router } from "./types";
 
 export const router: Router = {

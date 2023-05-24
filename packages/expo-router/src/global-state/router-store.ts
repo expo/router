@@ -21,7 +21,7 @@ import { getSortedRoutes } from "./sort-routes";
  *
  * There should only be one instance of this class and be initialized via `useInitializeExpoRouter`
  */
-export class ExpoRouterStore {
+export class RouterStore {
   routeNode!: RouteNode | null;
   linking: ExpoLinkingOptions | undefined;
   isReady: boolean = false;
@@ -46,13 +46,14 @@ export class ExpoRouterStore {
   initialize(
     context: RequireContext,
     navigationRef: NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>,
-    initialLocation: URL | undefined
+    initialLocation?: URL
   ) {
     // Clean up any previous listeners.
     this.isReady = false;
     this.initialState = undefined;
     this.rootState = undefined;
     this.routeInfo = undefined;
+    this.linking = undefined;
     this.navigationRefSubscription?.();
     this.rootStateSubscribers.clear();
     this.storeSubscribers.clear();
@@ -163,7 +164,7 @@ export class ExpoRouterStore {
   };
 }
 
-export const store = new ExpoRouterStore();
+export const store = new RouterStore();
 
 export function useExpoRouter() {
   return useSyncExternalStore(

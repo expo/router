@@ -4,8 +4,14 @@ import { Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import UpstreamNavigationContainer from "./fork/NavigationContainer";
-import { useInitializeExpoRouter } from "./global-state";
+import { useInitializeExpoRouter } from "./global-state/router-store";
+import { RequireContext } from "./types";
 import { SplashScreen } from "./views/Splash";
+
+export type ExpoRootProps = {
+  context: RequireContext;
+  location?: URL;
+};
 
 function getGestureHandlerRootView() {
   try {

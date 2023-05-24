@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-native";
 import { expectType } from "tsd";
 
-import { useInitializeExpoRouter } from "../global-state";
+import { useInitializeExpoRouter } from "../global-state/router-store";
 import {
   useGlobalSearchParams,
   useLocalSearchParams,
