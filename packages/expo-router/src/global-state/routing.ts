@@ -19,7 +19,7 @@ import type { ExpoRouterStore } from "./index";
 
 function assertIsReady(store: ExpoRouterStore) {
   if (!store.isReady) {
-    throw new Error("Navigation state is not ready");
+    throw new Error("Attempted to use navigation outside of Expo Router");
   }
 }
 

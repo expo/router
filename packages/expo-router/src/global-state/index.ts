@@ -96,6 +96,10 @@ export class ExpoRouterStore {
       (data) => {
         const state = data.data.state as ResultState;
 
+        if (navigationRef.isReady()) {
+          this.onReady();
+        }
+
         if (state !== this.rootState) {
           this.rootState = state;
           this.routeInfo = this.getRouteInfo(state);
@@ -108,9 +112,6 @@ export class ExpoRouterStore {
     );
   }
 
-  /**
-   * Prive method to get the route info from the state.
-   */
   getRouteInfo(state: ResultState) {
     return getRouteInfoFromState(
       (state: Parameters<typeof getPathFromState>[0], asPath: boolean) => {

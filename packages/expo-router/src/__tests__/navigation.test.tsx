@@ -55,7 +55,7 @@ describe("imperative only", () => {
       act(() => {
         router.push("/profile/test-name");
       });
-    }).toThrowError("Navigation state is not ready");
+    }).toThrowError("Attempted to use navigation outside of Expo Router");
   });
 
   it("can handle navigation between routes", async () => {
