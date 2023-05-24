@@ -55,6 +55,6 @@ function encodeParam(param: any): string {
 
 function createQueryParams(params: Record<string, any>): string {
   return Object.entries(params)
-    .map((props) => props.join("="))
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
     .join("&");
 }
