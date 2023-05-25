@@ -3,7 +3,7 @@ title: Routing
 sidebar_position: 1
 ---
 
-The file-based routing convention enables developers to structure their app in a logic and intuitive way. Expo Router uses this convention to optimize the app by generating native deep links and web routes automatically.
+The file-based routing convention enables developers to structure their app in a logical and intuitive way. Expo Router uses this convention to optimize the app by generating native deep links and web routes automatically.
 
 The convention is based on the concept of nesting routes inside each other to create shared UI elements like tab bars and headers across multiple children. This format should feel familiar to React developers.
 
