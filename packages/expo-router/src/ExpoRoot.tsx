@@ -147,6 +147,15 @@ function ContextNavigator({
     return () => subscription?.();
   }, [navigationRef, getRouteInfo]);
 
+  const Component = routeNode ? getQualifiedRouteComponent(routeNode) : null;
+
+  const comp = React.useMemo(() => {
+    if (!Component) {
+      return null;
+    }
+    return <Component />;
+  }, [Component, shouldShowSplash]);
+
   if (!routeNode) {
     if (process.env.NODE_ENV === "development") {
       const Tutorial = require("./onboard/Tutorial").Tutorial;
@@ -156,8 +165,6 @@ function ContextNavigator({
       throw new Error("No routes found");
     }
   }
-
-  const Component = getQualifiedRouteComponent(routeNode);
 
   return (
     <>
@@ -170,7 +177,7 @@ function ContextNavigator({
           onReady={() => requestAnimationFrame(() => setShowSplash(false))}
         >
           <RootStateContext.Provider value={rootState}>
-            {!shouldShowSplash && <Component />}
+            {!shouldShowSplash && comp}
           </RootStateContext.Provider>
         </UpstreamNavigationContainer>
       </ExpoRouterContext.Provider>
