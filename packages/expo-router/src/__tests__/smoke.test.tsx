@@ -137,8 +137,8 @@ it("nested layouts", async () => {
 
   expect(AppLayout).toHaveBeenCalledTimes(3);
   expect(TabsLayout).toHaveBeenCalledTimes(2);
-  expect(StackLayout).toHaveBeenCalledTimes(3);
+  expect(StackLayout).toHaveBeenCalledTimes(2);
   expect(Index).toHaveBeenCalledTimes(1);
-  expect(Home).toHaveBeenCalledTimes(2);
+  expect(Home).toHaveBeenCalledTimes(1);
   expect(HomeNested).toHaveBeenCalledTimes(1);
 });
