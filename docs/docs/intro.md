@@ -98,7 +98,9 @@ If you use **npm**, this requires npm 8.3.0 or higher. You can install this with
 {
   "overrides": {
     "metro": "0.76.0",
-    "metro-resolver": "0.76.0"
+    "metro-resolver": "0.76.0",
+    "metro-config": "0.76.0",
+    "metro-transform-worker": "0.76.0"
   }
 }
 ```
