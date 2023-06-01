@@ -139,13 +139,20 @@ if (__DEV__) {
         return;
       }
 
-      const { message } = parseLogBoxLog(args);
+      const { category, message, componentStack } = parseLogBoxLog(args);
 
       if (!LogBoxData.isMessageIgnored(message.content)) {
         // Interpolate the message so they are formatted for adb and other CLIs.
         // This is different than the message.content above because it includes component stacks.
         const interpolated = parseInterpolation(args);
         originalConsoleError?.(interpolated.message.content);
+
+        LogBoxData.addLog({
+          level: "error",
+          category,
+          message,
+          componentStack,
+        });
       }
     } catch (err) {
       LogBoxData.reportUnexpectedLogBoxError(err);
