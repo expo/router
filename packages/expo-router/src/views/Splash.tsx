@@ -83,12 +83,10 @@ export const _internal_maybeHideAsync = () => {
   if (_userControlledAutoHideEnabled) {
     return;
   }
-  console.log("3. maybeHideAsync");
   SplashScreen.hideAsync();
 };
 
 SplashScreen.preventAutoHideAsync = () => {
-  console.log("1. userControlledAutoHideEnabled");
   _userControlledAutoHideEnabled = true;
   _internal_preventAutoHideAsync();
 };

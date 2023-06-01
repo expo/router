@@ -86,10 +86,13 @@ function ContextNavigator(props: ExpoRootProps) {
   React.useEffect(() => {
     const subscription = navigationRef.addListener("state", (data) => {
       const state = data.data.state as ResultState;
-      setRootState({
-        state,
-        routeInfo: getRouteInfo(state),
-      });
+      // This can sometimes be undefined when an error is thrown in the Root Layout Route.
+      if (state) {
+        setRootState({
+          state,
+          routeInfo: getRouteInfo(state),
+        });
+      }
     });
 
     return () => subscription?.();
