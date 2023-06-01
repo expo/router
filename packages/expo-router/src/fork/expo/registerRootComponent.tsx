@@ -65,7 +65,9 @@ export default function registerRootComponent<P extends InitialProps>(
     // Using React 18 directly because `react-native-web` still uses the old API:
     // https://github.com/necolas/react-native-web/blob/e8098fd029102d7801c32c1ede792bce01808c00/packages/react-native-web/src/exports/render/index.js#L10
     if (process.env.EXPO_PUBLIC_USE_STATIC) {
-      hydrateRoot(tag, React.createElement(qualifiedComponent));
+      React.startTransition(() => {
+        hydrateRoot(tag!, React.createElement(qualifiedComponent));
+      });
     } else {
       const rootTag = createRoot(tag);
       rootTag.render(React.createElement(qualifiedComponent));
