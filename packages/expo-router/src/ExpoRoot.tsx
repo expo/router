@@ -16,7 +16,7 @@ import {
   useCreateExpoRouterContext,
 } from "./useCreateExpoRouterContext";
 import { getQualifiedRouteComponent } from "./useScreens";
-import { SplashScreen } from "./views/Splash";
+import { SplashScreen, _internal_maybeHideAsync } from "./views/Splash";
 
 function getGestureHandlerRootView() {
   try {
@@ -61,9 +61,6 @@ export function ExpoRoot({ context, location }: ExpoRootProps) {
 
 function ContextNavigator(props: ExpoRootProps) {
   const navigationRef = useNavigationContainerRef();
-  const [shouldShowSplash, setShowSplash] = React.useState(
-    Platform.OS !== "web"
-  );
 
   const expoContext = useCreateExpoRouterContext(props);
 
@@ -101,12 +98,12 @@ function ContextNavigator(props: ExpoRootProps) {
 
   const Component = routeNode ? getQualifiedRouteComponent(routeNode) : null;
 
-  const comp = React.useMemo(() => {
+  const memoizedRootComponent = React.useMemo(() => {
     if (!Component) {
       return null;
     }
     return <Component />;
-  }, [Component, shouldShowSplash]);
+  }, [Component]);
 
   if (!routeNode) {
     if (process.env.NODE_ENV === "development") {
@@ -120,16 +117,20 @@ function ContextNavigator(props: ExpoRootProps) {
 
   return (
     <>
-      {shouldShowSplash && <SplashScreen />}
       <ExpoRouterContext.Provider value={{ ...expoContext, navigationRef }}>
         <UpstreamNavigationContainer
           ref={navigationRef}
           initialState={initialState}
           linking={linking}
-          onReady={() => requestAnimationFrame(() => setShowSplash(false))}
+          onReady={() =>
+            // Give one last frame to allow the user to opt-out of auto-hiding splash screen.
+            requestAnimationFrame(() => {
+              _internal_maybeHideAsync();
+            })
+          }
         >
           <RootStateContext.Provider value={rootState}>
-            {!shouldShowSplash && comp}
+            {memoizedRootComponent}
           </RootStateContext.Provider>
         </UpstreamNavigationContainer>
       </ExpoRouterContext.Provider>
