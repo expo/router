@@ -61,17 +61,11 @@ export async function getStaticContent(location: URL): Promise<string> {
   // "Warning: Detected multiple renderers concurrently rendering the same context provider. This is currently unsupported."
   resetReactNavigationContexts();
 
-  const pipeableStream = ReactDOMServer.renderToStaticNodeStream(
+  const html = await renderToStaticMarkupAsync(
     <Head.Provider context={headContext}>
       <ServerContainer ref={ref}>{out}</ServerContainer>
     </Head.Provider>
   );
-
-  let html = "";
-
-  for await (const chunk of pipeableStream) {
-    html += chunk;
-  }
 
   // Eval the CSS after the HTML is rendered so that the CSS is in the same order
   const css = ReactDOMServer.renderToStaticMarkup(getStyleElement());
@@ -81,6 +75,25 @@ export async function getStaticContent(location: URL): Promise<string> {
   output = output.replace("</head>", `${css}</head>`);
 
   return "<!DOCTYPE html>" + output;
+}
+
+async function renderToStaticMarkupAsync(
+  ...args: Parameters<typeof ReactDOMServer.renderToStaticNodeStream>
+): Promise<string> {
+  try {
+    const pipeableStream = ReactDOMServer.renderToStaticNodeStream(...args);
+
+    let html: string = "";
+
+    for await (const chunk of pipeableStream) {
+      html += chunk;
+    }
+
+    return html;
+  } catch (error) {
+    console.error("Failed to statically render HTML", error);
+    throw error;
+  }
 }
 
 function mixHeadComponentsWithStaticResults(helmet: any, html: string) {
