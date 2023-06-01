@@ -220,7 +220,7 @@ const activities: Map<string, UserActivity> = new Map();
 function useRegisterCurrentActivity(activity: UserActivity) {
   // ID is tied to Expo Router and agnostic of URLs to ensure dynamic parameters are not considered.
   // Using all segments ensures that cascading routes are considered.
-  const activityId = urlToId(usePathname());
+  const activityId = urlToId(usePathname() || "/");
   const cascadingId = urlToId(useSegments().join("-") || "-");
   const activityIds = Array.from(activities.keys());
   const cascadingActivity: UserActivity = React.useMemo(() => {
@@ -255,7 +255,6 @@ function useRegisterCurrentActivity(activity: UserActivity) {
     }
 
     previousActivity.current = cascadingActivity;
-
     if (!cascadingActivity.id) {
       throw new Error("Activity must have an ID");
     }
