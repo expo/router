@@ -10,6 +10,27 @@
 
 ### 💡 Others
 
+## [Thu, 1 Jun 2023 16:16:35 -0500](https://github.com/expo/router/commit/c75864b0bc2d05bde4c6f1cf409e2a7dd26a2248)
+
+### 🛠 Breaking changes
+
+- Remove `useHref` ([#602](https://github.com/expo/router/issues/602))
+
+### 🎉 New features
+
+- Symbolicate ErrorBoundary stack ([#617](https://github.com/expo/router/issues/617))
+- Encode query parameter values when resolving href ([#608](https://github.com/expo/router/issues/608))
+
+### 🐛 Bug fixes
+
+- Fix fast refresh on web. ([#606](https://github.com/expo/router/issues/606))
+- Fix showing tutorial page when no app directory is found. ([#605](https://github.com/expo/router/issues/605))
+- Prevent root rerender. ([#612](https://github.com/expo/router/issues/612))
+
+### 💡 Others
+
+- Move the context stubs into a new file ([#599](https://github.com/expo/router/issues/599))
+
 ## [Fri, 19 May 2023 11:10:36 -0500](https://github.com/expo/router/commit/590b4c8c0ce18ae701ae0509181679ebcbc3a5de)
 
 ### 🛠 Breaking changes
