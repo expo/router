@@ -9,7 +9,7 @@ import { ServerContainer, ServerContainerRef } from "@react-navigation/native";
 import App, { getManifest } from "expo-router/_entry";
 import Head from "expo-router/head";
 import React from "react";
-import ReactDOMServer from "react-dom/server";
+import ReactDOMServer from "react-dom/server.node";
 import { AppRegistry } from "react-native-web";
 
 import { getRootComponent } from "./getRootComponent";
@@ -27,7 +27,7 @@ function resetReactNavigationContexts() {
   global[contexts] = new Map<string, React.Context<any>>();
 }
 
-export function getStaticContent(location: URL): string {
+export async function getStaticContent(location: URL): Promise<string> {
   const headContext: { helmet?: any } = {};
 
   const ref = React.createRef<ServerContainerRef>();
@@ -60,11 +60,17 @@ export function getStaticContent(location: URL): string {
   // "Warning: Detected multiple renderers concurrently rendering the same context provider. This is currently unsupported."
   resetReactNavigationContexts();
 
-  const html = ReactDOMServer.renderToString(
+  const pipeableStream = ReactDOMServer.renderToStaticNodeStream(
     <Head.Provider context={headContext}>
       <ServerContainer ref={ref}>{out}</ServerContainer>
     </Head.Provider>
   );
+
+  let html = "";
+
+  for await (const chunk of pipeableStream) {
+    html += chunk;
+  }
 
   // Eval the CSS after the HTML is rendered so that the CSS is in the same order
   const css = ReactDOMServer.renderToStaticMarkup(getStyleElement());
