@@ -1,7 +1,6 @@
 import { useNavigationContainerRef } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import UpstreamNavigationContainer from "./fork/NavigationContainer";

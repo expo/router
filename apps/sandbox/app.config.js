@@ -20,6 +20,7 @@ module.exports = {
     bundler: "metro",
   },
   plugins: [
+    "expo-head",
     [
       "expo-router",
       {
@@ -43,5 +44,4 @@ module.exports = {
       CoreSpotlightContinuation: true,
     },
   },
-  plugins: ["expo-head"],
 };
