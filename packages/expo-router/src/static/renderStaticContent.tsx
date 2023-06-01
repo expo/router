@@ -9,11 +9,12 @@ import { ServerContainer, ServerContainerRef } from "@react-navigation/native";
 import App, { getManifest } from "expo-router/_entry";
 import Head from "expo-router/head";
 import React from "react";
-import ReactDOMServer from "react-dom/server.node";
 import { AppRegistry } from "react-native-web";
 
 import { getRootComponent } from "./getRootComponent";
 
+const ReactDOMServer =
+  require("react-dom/server.node") as typeof import("react-dom/server");
 AppRegistry.registerComponent("App", () => App);
 
 function resetReactNavigationContexts() {
