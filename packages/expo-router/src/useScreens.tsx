@@ -8,6 +8,7 @@ import {
   sortRoutesWithInitial,
   useRouteNode,
 } from "./Route";
+import EXPO_ROUTER_IMPORT_MODE from "./import-mode";
 import { Screen } from "./primitives";
 import { EmptyRoute } from "./views/EmptyRoute";
 import { SuspenseFallback } from "./views/SuspenseFallback";
@@ -141,7 +142,7 @@ export function getQualifiedRouteComponent(value: RouteNode) {
   let getLoadable: (props: any, ref: any) => JSX.Element;
 
   // TODO: This ensures sync doesn't use React.lazy, but it's not ideal.
-  if (process.env.EXPO_ROUTER_IMPORT_MODE === "sync") {
+  if (EXPO_ROUTER_IMPORT_MODE === "sync") {
     const SyncComponent = React.forwardRef((props, ref) => {
       const res = value.loadRoute();
       const Component = fromImport(res).default;

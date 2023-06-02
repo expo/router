@@ -3,6 +3,21 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$ref": "#/definitions/Props",
     "definitions": {
+        "AsyncRouteOption": {
+            "description": "Should Async Routes be enabled, currently only `development` is supported.",
+            "oneOf": [
+                {
+                    "type": "string",
+                    "enum": [
+                        "development",
+                        "production"
+                    ]
+                },
+                {
+                    "type": "boolean"
+                }
+            ]
+        },
         "Props": {
             "type": "object",
             "properties": {
@@ -29,14 +44,25 @@
                     "description": "Should Async Routes be enabled, currently only `development` is supported.",
                     "oneOf": [
                         {
-                            "type": "string",
-                            "enum": [
-                                "development",
-                                "production"
-                            ]
+                            "$ref": "#/definitions/AsyncRouteOption"
                         },
                         {
-                            "type": "boolean"
+                            "type": "object",
+                            "properties": {
+                                "ios": {
+                                    "$ref": "#/definitions/AsyncRouteOption"
+                                },
+                                "android": {
+                                    "$ref": "#/definitions/AsyncRouteOption"
+                                },
+                                "web": {
+                                    "$ref": "#/definitions/AsyncRouteOption"
+                                },
+                                "default": {
+                                    "$ref": "#/definitions/AsyncRouteOption"
+                                }
+                            },
+                            "additionalProperties": true
                         }
                     ]
                 }

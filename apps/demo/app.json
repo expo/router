@@ -14,7 +14,10 @@
       [
         "expo-router",
         {
-          "asyncRoutes": "development",
+          "asyncRoutes": {
+            "default": "development",
+            "android": false
+          },
           "origin": "https://smart-symbiote.netlify.app"
         }
       ]

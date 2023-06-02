@@ -27,15 +27,26 @@ function getConfigMemo(projectRoot) {
 }
 
 function getExpoRouterImportMode(projectRoot, platform) {
-  if (process.env.EXPO_ROUTER_IMPORT_MODE) {
-    return process.env.EXPO_ROUTER_IMPORT_MODE;
+  const envVar = "EXPO_ROUTER_IMPORT_MODE_" + platform.toUpperCase();
+  if (process.env[envVar]) {
+    return process.env[envVar];
   }
   const env = process.env.NODE_ENV || process.env.BABEL_ENV;
 
   const { exp } = getConfigMemo(projectRoot);
-  let mode = [env, true].includes(exp.extra?.router?.asyncRoutes)
-    ? "lazy"
-    : "sync";
+
+  let asyncRoutesSetting;
+
+  if (exp.extra?.router?.asyncRoutes) {
+    const asyncRoutes = exp.extra?.router?.asyncRoutes;
+    if (typeof asyncRoutes === "string") {
+      asyncRoutesSetting = asyncRoutes;
+    } else if (typeof asyncRoutes === "object") {
+      asyncRoutesSetting = asyncRoutes[platform] ?? asyncRoutes.default;
+    }
+  }
+
+  let mode = [env, true].includes(asyncRoutesSetting) ? "lazy" : "sync";
 
   // TODO: Production bundle splitting
 
@@ -53,7 +64,7 @@ function getExpoRouterImportMode(projectRoot, platform) {
   // Development
   debug("Router import mode", mode);
 
-  process.env.EXPO_ROUTER_IMPORT_MODE = mode;
+  process.env[envVar] = mode;
   return mode;
 }
 
@@ -167,7 +178,7 @@ module.exports = function (api) {
         // Expose the app route import mode.
         if (
           t.isIdentifier(parent.node.property, {
-            name: "EXPO_ROUTER_IMPORT_MODE",
+            name: "EXPO_ROUTER_IMPORT_MODE_" + platform.toUpperCase(),
           }) &&
           !parent.parentPath.isAssignmentExpression()
         ) {
