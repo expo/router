@@ -1,6 +1,10 @@
 import Head from "expo-router/head";
 import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+export { ErrorBoundary } from "expo-router";
+
 export default function Layout() {
   return (
     <>
