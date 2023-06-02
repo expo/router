@@ -379,7 +379,6 @@ export function getRoutes(
   // Auto add not found route if it doesn't exist
   appendUnmatchedRoute(route);
 
-  console.log("a");
   if (
     require("react-native").Platform.OS === "web" &&
     typeof window !== "undefined"
@@ -387,7 +386,6 @@ export function getRoutes(
     const skipTo = decodeURIComponent(
       window.location.search.match(/__skip=(\w+)/)?.[1] ?? ""
     );
-    console.log("skipTo", skipTo);
     if (skipTo) {
       const segments = skipTo.split("/");
       // recurse down the tree to find the route to skip to
@@ -422,6 +420,31 @@ export async function getRoutesAsync(
 
   // Auto add not found route if it doesn't exist
   appendUnmatchedRoute(route);
+
+  if (
+    require("react-native").Platform.OS === "web" &&
+    typeof window !== "undefined"
+  ) {
+    const skipTo = decodeURIComponent(
+      window.location.search.match(/__skip=(\w+)/)?.[1] ?? ""
+    );
+    if (skipTo) {
+      const segments = skipTo.split("/");
+      // recurse down the tree to find the route to skip to
+      let currentRoute = route;
+      for (const segment of segments) {
+        const child = currentRoute.children.find(
+          (child) => child.route === segment
+        );
+        if (!child) {
+          break;
+        }
+
+        currentRoute = child;
+      }
+      return currentRoute;
+    }
+  }
 
   return route;
 }
