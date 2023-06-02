@@ -31,10 +31,8 @@ interface ILogBox {
  */
 if (__DEV__) {
   const LogBoxData = require("./Data/LogBoxData");
-  const {
-    parseLogBoxLog,
-    parseInterpolation,
-  } = require("./Data/parseLogBoxLog");
+  const { parseLogBoxLog, parseInterpolation } =
+    require("./Data/parseLogBoxLog") as typeof import("./Data/parseLogBoxLog");
 
   let originalConsoleError: typeof console.error | undefined;
   let consoleErrorImpl: typeof console.error | undefined;
@@ -148,7 +146,11 @@ if (__DEV__) {
         originalConsoleError?.(interpolated.message.content);
 
         LogBoxData.addLog({
-          level: "error",
+          // Always show the static rendering issues as full screen since they
+          // are too confusing otherwise.
+          level: /did not match\. Server:/.test(message.content)
+            ? "fatal"
+            : "error",
           category,
           message,
           componentStack,
