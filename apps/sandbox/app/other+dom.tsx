@@ -1,17 +1,23 @@
 import * as Device from "expo-device";
 import { useEffect } from "react";
 import { Text } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 export default function Page() {
   useEffect(() => {
-    Device.getDeviceTypeAsync().then((data) => alert("device:" + data));
+    Device.getDeviceTypeAsync().then((data) => console.log("device:" + data));
   }, []);
   return (
     <div>
       <Text
         onPress={() => {
-          alert("start");
-          Device.getDeviceTypeAsync().then((data) => alert("device:" + data));
+          // alert("start");
+          // Device.getDeviceTypeAsync().then((data) =>
+          //   console.log("device:" + data)
+          // );
+          ImagePicker.launchImageLibraryAsync().then((data) =>
+            console.log("image:" + data)
+          );
         }}
       >
         Hello Web World

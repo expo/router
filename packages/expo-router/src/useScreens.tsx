@@ -64,6 +64,7 @@ function DomBoundary() {
 
   return res;
 }
+// import { NativeModulesProxy } from "expo-modules-core";
 
 const ExpoRuntimeWebView: React.FC<React.ComponentProps<typeof WebView>> = (
   props
@@ -108,7 +109,9 @@ const ExpoRuntimeWebView: React.FC<React.ComponentProps<typeof WebView>> = (
     };
     if (message.type === "invoke") {
       try {
+        // const nativeModule = NativeModulesProxy[message.module];
         const nativeModule = requireNativeModule(message.module);
+        console.log("nativeModule", nativeModule);
         const result = nativeModule[message.method](...message.args);
 
         if (result instanceof Promise) {
