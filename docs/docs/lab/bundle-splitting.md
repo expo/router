@@ -8,27 +8,7 @@ Expo Router can automatically split your JavaScript bundle based on the route fi
 
 ## Setup
 
-Configure Metro to use Expo's bundle splitting features:
-
-```js title=metro.config.js
-const { getDefaultConfig } = require("@expo/metro-config");
-
-const config = getDefaultConfig(__dirname);
-
-config.transformer = {
-  ...config.transformer,
-  asyncRequireModulePath: require.resolve("@expo/metro-runtime/async-require"),
-};
-
-config.server = {
-  ...config.server,
-  experimentalImportBundleSupport: true,
-};
-
-module.exports = config;
-```
-
-Next, enable the feature:
+Enable the feature:
 
 ```json title=app.json
 {
