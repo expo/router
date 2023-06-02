@@ -23,10 +23,10 @@ export function getContextKey(name: string): string {
   // The root path is `` (empty string) so always prepend `/` to ensure
   // there is some value.
   const normal = "/" + getNameFromFilePath(name);
-  if (!normal.endsWith("_layout")) {
+  if (!normal.match(/_layout(\+dom)?$/)) {
     return normal;
   }
-  return normal.replace(/\/?_layout$/, "");
+  return normal.replace(/\/?_layout(\+dom)$/, "");
 }
 
 /** Remove `.js`, `.ts`, `.jsx`, `.tsx` */
