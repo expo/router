@@ -2,7 +2,7 @@
 title: Async Routes
 ---
 
-> This guide requires `expo@49.0.0-alpha.3` or greater––everything listed here is still experimental. You may need to [use Expo CLI on `main`](https://github.com/expo/expo/tree/main/packages/%40expo/cli#contributing) to use these features.
+> This guide requires `expo@49.0.0-alpha.3` or greater and `metro@0.76.3`––everything listed here is still experimental. You may need to [use Expo CLI on `main`](https://github.com/expo/expo/tree/main/packages/%40expo/cli#contributing) to use these features.
 
 Expo Router can automatically split your JavaScript bundle based on the route files, using [React Suspense](https://react.dev/reference/react/Suspense). This enables faster development as only the routes you navigate to will be bundled/loaded into memory. This can also be useful for reducing the initial bundle size for your application.
 
