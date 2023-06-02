@@ -1,7 +1,7 @@
 import HMRClient from "../../HMRClient";
 import LoadingView from "../../LoadingView";
 import { fetchThenEvalAsync } from "../fetchThenEval";
-import { loadBundleAsync } from "../loadBundlePolyfill";
+import { loadBundleAsync } from "../loadBundle";
 
 jest.mock("../../getDevServer", () =>
   jest.fn(() => ({
