@@ -43,7 +43,7 @@ export function getRecursiveTree(files: FileNode[]): TreeNode {
     for (let i = 0; i < parts.length; i++) {
       const part = parts[i];
 
-      if (i === parts.length - 1 && part === "_layout") {
+      if (i === parts.length - 1 && part.match(/^_layout(\+dom)?$/)) {
         if (currentNode.node) {
           const overwritten = currentNode.node.contextKey;
           throw new Error(
@@ -319,7 +319,7 @@ function hasCustomRootLayoutNode(routes: RouteNode[]) {
 
   if (
     route.route === "" &&
-    route.contextKey.match(/^\.\/_layout\.([jt]sx?)$/)
+    route.contextKey.match(/^\.\/_layout(\+dom)?\.([jt]sx?)$/)
   ) {
     return true;
   }
