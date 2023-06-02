@@ -18,5 +18,5 @@ export function buildUrlForBundle(bundlePath: string): string {
   }
   const { url: serverUrl } = getDevServer();
 
-  return serverUrl.replace(/\/+$/, "") + "/" + bundlePath;
+  return serverUrl.replace(/\/+$/, "") + "/" + bundlePath.replace(/^\/+/, "");
 }
