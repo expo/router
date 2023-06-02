@@ -384,10 +384,12 @@ export function getRoutes(
     typeof window !== "undefined"
   ) {
     const skipTo = decodeURIComponent(
-      window.location.search.match(/__skip=(\w+)/)?.[1] ?? ""
+      window.location.search.match(/__skip=([\w%\d\W]+)/)?.[1] ?? ""
     );
     if (skipTo) {
       const segments = skipTo.split("/");
+      // alert("Skipping to route " + window.location.search);
+      console.log("Skipping to route", segments);
       // recurse down the tree to find the route to skip to
       let currentRoute = route;
       for (const segment of segments) {
@@ -428,6 +430,7 @@ export async function getRoutesAsync(
     const skipTo = decodeURIComponent(
       window.location.search.match(/__skip=(\w+)/)?.[1] ?? ""
     );
+    console.log("skipTo", skipTo);
     if (skipTo) {
       const segments = skipTo.split("/");
       // recurse down the tree to find the route to skip to

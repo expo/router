@@ -15,30 +15,55 @@ import { Try } from "./views/Try";
 import { WebView } from "react-native-webview";
 import { Platform } from "react-native";
 import { usePathname, useSegments } from "./hooks";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 
 function DomBoundary() {
+  const [selected, setSelected] = React.useState(null);
+  // const focused = useIsFocused();
   // all but the last segment
-  const segments = encodeURIComponent(useSegments().join("/"));
+  const segments = useSegments().join("/");
   const pathname = usePathname();
-  console.log("segments", segments);
-  let url = window.location.origin + "/" + pathname.replace(/^\/+/, "");
 
-  // add new query param: __dom=true
-  if (url.indexOf("?") === -1) {
-    url += "?__skip=" + segments;
-  } else {
-    url += "&__skip=" + segments;
-  }
+  useFocusEffect(() => {
+    console.log("segments", segments);
+    let url = window.location.origin + "/" + pathname.replace(/^\/+/, "");
 
-  return (
-    <WebView
-      source={{
-        uri: url,
-      }}
-      scrollEnabled={false}
-      style={{ flex: 1 }}
-    />
-  );
+    // add new query param: __dom=true
+    if (url.indexOf("?") === -1) {
+      url += "?__skip=" + segments;
+    } else {
+      url += "&__skip=" + segments;
+    }
+
+    if (url === selected) return;
+
+    console.log("webview:", url);
+    setSelected(url);
+  });
+
+  const res = React.useMemo(() => {
+    if (!selected) return null;
+    console.log("render:", selected);
+    return (
+      <WebView
+        allowFileAccess
+        allowFileAccessFromFileURLs
+        allowUniversalAccessFromFileURLs
+        allowsAirPlayForMediaPlayback
+        allowsBackForwardNavigationGestures={false}
+        allowsInlineMediaPlayback
+        allowsPictureInPictureMediaPlayback
+        allowsLinkPreview={false}
+        source={{
+          uri: selected,
+        }}
+        scrollEnabled={false}
+        style={{ flex: 1 }}
+      />
+    );
+  }, [selected]);
+
+  return res;
 }
 
 export type ScreenProps<
