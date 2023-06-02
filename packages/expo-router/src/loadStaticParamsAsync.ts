@@ -171,6 +171,7 @@ async function loadStaticParamsRecursive(
         contextKey: generatedContextKey,
         // Convert the dynamic route to a static route.
         dynamic: null,
+        dom: route.dom,
         route: parsedRoute,
         children: uniqBy(
           (

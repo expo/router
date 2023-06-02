@@ -10,7 +10,7 @@ import {
 } from "./matchers";
 import type { RequireContext } from "./types";
 
-export type FileNode = Pick<RouteNode, "contextKey" | "loadRoute"> & {
+export type FileNode = Pick<RouteNode, "contextKey" | "loadRoute" | "dom"> & {
   /** Like `(tab)/index` */
   normalizedName: string;
 };
@@ -235,6 +235,7 @@ function fileNodeToRouteNode(tree: TreeNode): RouteNode[] | null {
     loadRoute: node.loadRoute,
     route: name,
     contextKey: node.contextKey,
+    dom: node.dom,
     children: getTreeNodesAsRouteNodes(children),
     dynamic,
   };
@@ -248,6 +249,7 @@ function fileNodeToRouteNode(tree: TreeNode): RouteNode[] | null {
   return [
     applyDefaultInitialRouteName({
       loadRoute: node.loadRoute,
+      dom: node.dom,
       route: name,
       contextKey: node.contextKey,
       children: getTreeNodesAsRouteNodes(children),
@@ -276,6 +278,13 @@ function contextModuleToFileNodes(
         // If the user has set the `EXPO_ROUTER_IMPORT_MODE` to `sync` then we should
         // filter the missing routes.
         if (process.env.EXPO_ROUTER_IMPORT_MODE === "sync") {
+          if (
+            !key.match(/\+dom(\.(native|ios|android|web))?\.[tj]sx$/) &&
+            !contextModule(key)?.default
+          ) {
+            return null;
+          }
+
           if (!contextModule(key)?.default) {
             return null;
           }
@@ -286,6 +295,7 @@ function contextModuleToFileNodes(
           return contextModule(key);
         },
         normalizedName: getNameFromFilePath(key),
+        dom: !!key.match(/\+dom(\.(native|ios|android|web))?\.[tj]sx$/),
         contextKey: key,
       };
 
@@ -369,6 +379,33 @@ export function getRoutes(
   // Auto add not found route if it doesn't exist
   appendUnmatchedRoute(route);
 
+  console.log("a");
+  if (
+    require("react-native").Platform.OS === "web" &&
+    typeof window !== "undefined"
+  ) {
+    const skipTo = decodeURIComponent(
+      window.location.search.match(/__skip=(\w+)/)?.[1] ?? ""
+    );
+    console.log("skipTo", skipTo);
+    if (skipTo) {
+      const segments = skipTo.split("/");
+      // recurse down the tree to find the route to skip to
+      let currentRoute = route;
+      for (const segment of segments) {
+        const child = currentRoute.children.find(
+          (child) => child.route === segment
+        );
+        if (!child) {
+          break;
+        }
+
+        currentRoute = child;
+      }
+      return currentRoute;
+    }
+  }
+
   return route;
 }
 
@@ -444,6 +481,7 @@ function appendSitemapRoute(routes: RouteNode) {
     generated: true,
     internal: true,
     dynamic: null,
+    dom: false,
     children: [],
   });
   return routes;
@@ -463,6 +501,7 @@ function appendUnmatchedRoute(routes: RouteNode) {
       children: [],
       generated: true,
       internal: true,
+      dom: false,
     });
   }
   return routes;
@@ -514,6 +553,7 @@ function withOptionalRootLayout(routes: RouteNode[] | null): RouteNode | null {
     route: "",
     generated: true,
     dynamic: null,
+    dom: false,
     children: routes,
   };
 }

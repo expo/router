@@ -24,6 +24,8 @@ export type RouteNode = {
   children: RouteNode[];
   /** Is the route a dynamic path */
   dynamic: null | DynamicConvention[];
+  /** Is a dom route */
+  dom: boolean;
   /** `index`, `error-boundary`, etc. */
   route: string;
   /** Context Module ID, used for matching children. */

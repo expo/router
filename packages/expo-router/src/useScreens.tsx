@@ -12,6 +12,34 @@ import { Screen } from "./primitives";
 import { EmptyRoute } from "./views/EmptyRoute";
 import { SuspenseFallback } from "./views/SuspenseFallback";
 import { Try } from "./views/Try";
+import { WebView } from "react-native-webview";
+import { Platform } from "react-native";
+import { usePathname, useSegments } from "./hooks";
+
+function DomBoundary() {
+  // all but the last segment
+  const segments = encodeURIComponent(useSegments().join("/"));
+  const pathname = usePathname();
+  console.log("segments", segments);
+  let url = window.location.origin + "/" + pathname.replace(/^\/+/, "");
+
+  // add new query param: __dom=true
+  if (url.indexOf("?") === -1) {
+    url += "?__skip=" + segments;
+  } else {
+    url += "&__skip=" + segments;
+  }
+
+  return (
+    <WebView
+      source={{
+        uri: url,
+      }}
+      scrollEnabled={false}
+      style={{ flex: 1 }}
+    />
+  );
+}
 
 export type ScreenProps<
   TOptions extends Record<string, any> = Record<string, any>
@@ -144,6 +172,11 @@ export function getQualifiedRouteComponent(value: RouteNode) {
   if (process.env.EXPO_ROUTER_IMPORT_MODE === "sync") {
     const SyncComponent = React.forwardRef((props, ref) => {
       const res = value.loadRoute();
+
+      if (value.dom && Platform.OS !== "web") {
+        return <DomBoundary {...props} />;
+      }
+
       const Component = fromImport(res).default;
       return <Component {...props} ref={ref} />;
     });
