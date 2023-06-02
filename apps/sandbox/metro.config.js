@@ -15,6 +15,11 @@ config.transformer = {
   asyncRequireModulePath: require.resolve("@expo/metro-runtime/async-require"),
 };
 
+config.server = {
+  ...config.server,
+  // add your IP here
+  allowedHosts: ["192.168.1.200"],
+};
 config.resolver.sourceExts.push("css");
 
 config.server = {

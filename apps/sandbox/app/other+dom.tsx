@@ -1,7 +1,21 @@
+import * as Device from "expo-device";
+import { useEffect } from "react";
+import { Text } from "react-native";
+
 export default function Page() {
+  useEffect(() => {
+    Device.getDeviceTypeAsync().then((data) => alert("device:" + data));
+  }, []);
   return (
     <div>
-      <h1>Hello Web World</h1>
+      <Text
+        onPress={() => {
+          alert("start");
+          Device.getDeviceTypeAsync().then((data) => alert("device:" + data));
+        }}
+      >
+        Hello Web World
+      </Text>
       <TerminalIcon />
     </div>
   );

@@ -14,6 +14,7 @@
     "@react-navigation/drawer": "^6.4.4",
     "expo": "~48.0.10",
     "expo-auth-session": "~4.0.3",
+    "expo-device": "^5.2.1",
     "expo-random": "~13.1.1",
     "expo-router": "*",
     "expo-secure-store": "~12.1.1",

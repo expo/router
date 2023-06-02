@@ -15,11 +15,11 @@ import { Try } from "./views/Try";
 import { WebView } from "react-native-webview";
 import { Platform } from "react-native";
 import { usePathname, useSegments } from "./hooks";
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
+import { requireNativeModule } from "expo-modules-core";
 
 function DomBoundary() {
   const [selected, setSelected] = React.useState(null);
-  // const focused = useIsFocused();
   // all but the last segment
   const segments = useSegments().join("/");
   const pathname = usePathname();
@@ -45,14 +45,13 @@ function DomBoundary() {
     if (!selected) return null;
     console.log("render:", selected);
     return (
-      <WebView
+      <ExpoRuntimeWebView
         allowFileAccess
         allowFileAccessFromFileURLs
         allowUniversalAccessFromFileURLs
         allowsAirPlayForMediaPlayback
         allowsBackForwardNavigationGestures={false}
         allowsInlineMediaPlayback
-        allowsPictureInPictureMediaPlayback
         allowsLinkPreview={false}
         source={{
           uri: selected,
@@ -65,6 +64,129 @@ function DomBoundary() {
 
   return res;
 }
+
+const ExpoRuntimeWebView: React.FC<React.ComponentProps<typeof WebView>> = (
+  props
+) => {
+  const webViewRef = React.useRef<WebView>(null);
+
+  const sendMessageToWebContent = (message: any) => {
+    webViewRef.current?.injectJavaScript(`
+    window.postMessage(${JSON.stringify(message)}, '*');void(0);
+  `);
+
+    // webViewRef.current?.injectJavaScript(
+    //   `window.dispatchEvent(new MessageEvent('message', { data: ${JSON.stringify(
+    //     message,
+    //     (key, value) => {
+    //       if (typeof value === "function" || typeof value === "undefined") {
+    //         return null; // ignore functions and undefined
+    //       }
+    //       return value;
+    //     }
+    //   )} })); true;`
+    // );
+  };
+
+  // TODO: Some way to load constants synchronously
+
+  const onWebViewMessage = (event: any) => {
+    let message = event?.nativeEvent?.data || {};
+    try {
+      message = JSON.parse(message);
+    } catch (error) {
+      message = {};
+    }
+
+    console.log("onWebViewMessage", message);
+    const respond = (result: any) => {
+      sendMessageToWebContent({
+        type: "invokeResult",
+        result: result,
+        id: message.id,
+      });
+    };
+    if (message.type === "invoke") {
+      try {
+        const nativeModule = requireNativeModule(message.module);
+        const result = nativeModule[message.method](...message.args);
+
+        if (result instanceof Promise) {
+          result
+            .then((res: any) => {
+              console.log("result>>", res);
+              respond(res);
+            })
+            .catch((err: any) => respond({ error: err.message }));
+        } else {
+          respond(result);
+        }
+      } catch (error) {
+        respond({ error: error.message });
+      }
+    } else {
+      respond({ error: "Unknown message type: " + message.type });
+    }
+  };
+
+  return (
+    <WebView
+      ref={webViewRef}
+      javaScriptEnabled
+      injectedJavaScriptBeforeContentLoaded={`
+      window.$$EXPO_RUNTIME = true;
+      window.$$web_requireNativeModule = (moduleName) => {
+        // Return a proxy object that will send messages to the native module
+        return new Proxy({}, {
+          get: (target, name) => {
+            return (...args) => {
+              // Create a unique ID for this method call
+              const id = Math.random().toString(36).slice(2);
+
+              // Send a message to the native module
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'invoke',
+                module: moduleName,
+                method: name,
+                args,
+                id,
+              }));
+
+              // Return a promise that will resolve when the native module responds
+              return new Promise((resolve, reject) => {
+                const handleMessage = (event) => {
+                  try {
+                    const message = event.data;
+                    if (message.type === 'invokeResult' && message.id === id) {
+                      window.removeEventListener('message', handleMessage);
+                      if (message.error) {
+                        reject(new Error(message.error));
+                      } else {
+                        resolve(message.result);
+                      }
+                    }
+                  } catch (error) {
+                    reject(error);
+                  }
+                };
+                window.addEventListener('message', handleMessage);
+              });
+             
+            };
+          },
+        });
+      };
+      true; // note: this is required, or you'll sometimes get silent failures
+    `}
+      onShouldStartLoadWithRequest={(event) => {
+        console.log("onShouldStartLoadWithRequest", event);
+        return true;
+      }}
+      onMessage={onWebViewMessage}
+      {...props}
+    />
+  );
+};
 
 export type ScreenProps<
   TOptions extends Record<string, any> = Record<string, any>
