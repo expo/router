@@ -31,10 +31,8 @@ interface ILogBox {
  */
 if (__DEV__) {
   const LogBoxData = require("./Data/LogBoxData");
-  const {
-    parseLogBoxLog,
-    parseInterpolation,
-  } = require("./Data/parseLogBoxLog");
+  const { parseLogBoxLog, parseInterpolation } =
+    require("./Data/parseLogBoxLog") as typeof import("./Data/parseLogBoxLog");
 
   let originalConsoleError: typeof console.error | undefined;
   let consoleErrorImpl: typeof console.error | undefined;
@@ -139,13 +137,24 @@ if (__DEV__) {
         return;
       }
 
-      const { message } = parseLogBoxLog(args);
+      const { category, message, componentStack } = parseLogBoxLog(args);
 
       if (!LogBoxData.isMessageIgnored(message.content)) {
         // Interpolate the message so they are formatted for adb and other CLIs.
         // This is different than the message.content above because it includes component stacks.
         const interpolated = parseInterpolation(args);
         originalConsoleError?.(interpolated.message.content);
+
+        LogBoxData.addLog({
+          // Always show the static rendering issues as full screen since they
+          // are too confusing otherwise.
+          level: /did not match\. Server:/.test(message.content)
+            ? "fatal"
+            : "error",
+          category,
+          message,
+          componentStack,
+        });
       }
     } catch (err) {
       LogBoxData.reportUnexpectedLogBoxError(err);
