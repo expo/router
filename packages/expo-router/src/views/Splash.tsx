@@ -25,6 +25,11 @@ const globalStack: string[] = [];
  */
 export function SplashScreen() {
   useGlobalSplash();
+  React.useEffect(() => {
+    console.warn(
+      "The <SplashScreen /> component is deprecated. Use `SplashScreen.preventAutoHideAsync()` and `SplashScreen.hideAsync` from `expo-router` instead."
+    );
+  }, []);
   return null;
 }
 
@@ -48,9 +53,14 @@ SplashScreen.hideAsync = () => {
   globalStack.length = 0;
 };
 
+let _userControlledAutoHideEnabled = false;
 let _preventAutoHideAsyncInvoked = false;
 
-SplashScreen.preventAutoHideAsync = () => {
+// Expo Router uses this internal method to ensure that we can detect if the user
+// has explicitly opted into preventing the splash screen from hiding. This means
+// they will also explicitly hide it. If they don't, we will hide it for them after
+// the navigation render completes.
+export const _internal_preventAutoHideAsync = () => {
   // Memoize, this should only be called once.
   if (_preventAutoHideAsyncInvoked) {
     return;
@@ -65,6 +75,20 @@ SplashScreen.preventAutoHideAsync = () => {
     });
   }
   SplashModule.preventAutoHideAsync();
+};
+
+export const _internal_maybeHideAsync = () => {
+  // If the user has explicitly opted into preventing the splash screen from hiding,
+  // we should not hide it for them. This is often used for animated splash screens.
+  if (_userControlledAutoHideEnabled) {
+    return;
+  }
+  SplashScreen.hideAsync();
+};
+
+SplashScreen.preventAutoHideAsync = () => {
+  _userControlledAutoHideEnabled = true;
+  _internal_preventAutoHideAsync();
 };
 
 SplashScreen._pushEntry = (): any => {
