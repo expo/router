@@ -4,6 +4,7 @@ import {
   useNavigationBuilder,
 } from "@react-navigation/native";
 import * as React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useContextKey } from "../Route";
 import { useFilterScreenChildren } from "../layouts/withLayoutContext";
@@ -148,9 +149,11 @@ export function QualifiedSlot() {
 
 export function DefaultNavigator() {
   return (
-    <Navigator>
-      <QualifiedSlot />
-    </Navigator>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Navigator>
+        <QualifiedSlot />
+      </Navigator>
+    </SafeAreaView>
   );
 }
 
