@@ -60,7 +60,7 @@ function getUrlFromConstants(): string | null {
   }
 
   // Without this, the URL will go to an IP address which is not allowed.
-  if (!origin.match(/http(s)?:\/\//)) {
+  if (!origin.match(/^http(s)?:\/\//)) {
     console.warn(
       `Expo Head: origin "${origin}" is missing a \`https://\` protocol. ${protocolWarningString}.`
     );
