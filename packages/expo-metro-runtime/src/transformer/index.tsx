@@ -19,6 +19,6 @@ export async function transform(props: BabelTransformerArgs) {
   // Then pass it to the upstream transformer.
   return upstreamTransformer.transform(
     // Transpile CSS first.
-    await CssTransformer.transform(props)
+    props
   );
 }

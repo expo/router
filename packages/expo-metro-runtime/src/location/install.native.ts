@@ -1,3 +1,4 @@
+import "react-native/Libraries/Core/InitializeCore";
 import Constants from "expo-constants";
 import URL from "url-parse";
 
