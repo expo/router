@@ -59,6 +59,13 @@ function getUrlFromConstants(): string | null {
     return "https://expo.dev";
   }
 
+  // Without this, the URL will go to an IP address which is not allowed.
+  if (!origin.match(/http(s)?:\/\//)) {
+    console.warn(
+      `Expo Head: origin "${origin}" is missing a \`https://\` protocol. ${protocolWarningString}.`
+    );
+  }
+
   // Return the development URL last so the user gets all production warnings first.
   return memoSanitizeUrl(origin);
 }
