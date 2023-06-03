@@ -1,6 +1,8 @@
 const { getConfig } = require("expo/config");
+const fs = require("fs");
 const nodePath = require("path");
 const resolveFrom = require("resolve-from");
+
 const { getExpoConstantsManifest } = require("./node/getExpoConstantsManifest");
 
 const debug = require("debug")("expo:router:babel");
@@ -68,6 +70,25 @@ function getExpoRouterImportMode(projectRoot, platform) {
   return mode;
 }
 
+function directoryExistsSync(file) {
+  try {
+    return fs.statSync(file)?.isDirectory() ?? false;
+  } catch {
+    return false;
+  }
+}
+
+function getRouterDirectory(projectRoot) {
+  // more specific directories first
+  if (directoryExistsSync(nodePath.join(projectRoot, "src/app"))) {
+    // Log.log(chalk.gray('Using src/app as the root directory for Expo Router.'));
+    return "./src/app";
+  }
+
+  // Log.debug('Using app as the root directory for Expo Router.');
+  return "./app";
+}
+
 function getExpoRouterAppRoot(projectRoot) {
   // Bump to v2 to prevent the CLI from setting the variable anymore.
   // TODO: Bump to v3 to revert back to the CLI setting the variable again, but with custom value
@@ -78,7 +99,8 @@ function getExpoRouterAppRoot(projectRoot) {
   const routerEntry = resolveFrom.silent(projectRoot, "expo-router/entry");
 
   const { exp } = getConfigMemo(projectRoot);
-  const customSrc = exp.extra?.router?.unstable_src || "./app";
+  const customSrc =
+    exp.extra?.router?.unstable_src || getRouterDirectory(projectRoot);
   const isAbsolute = customSrc.startsWith("/");
   // It doesn't matter if the app folder exists.
   const appFolder = isAbsolute

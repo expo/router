@@ -13,7 +13,15 @@ export function createEntryFileAsync() {
     method: "POST",
     body: JSON.stringify({
       contents: TEMPLATE,
+      // Legacy
       path: "./app/index.js",
+      // New
+      absolutePath:
+        process.env.EXPO_PROJECT_ROOT +
+        "/" +
+        process.env.EXPO_ROUTER_APP_ROOT +
+        "/" +
+        "./index.js",
     }),
   });
 }
