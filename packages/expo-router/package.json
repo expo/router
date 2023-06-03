@@ -23,7 +23,8 @@
     "types",
     "plugin",
     "app.plugin.js",
-    "!**/__tests__"
+    "!**/__tests__",
+    "_ctx.*"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",

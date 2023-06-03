@@ -12,15 +12,9 @@ const config = getDefaultConfig(__dirname);
 config.transformer = {
   ...config.transformer,
   babelTransformerPath: require.resolve("@expo/metro-runtime/transformer"),
-  asyncRequireModulePath: require.resolve("@expo/metro-runtime/async-require"),
 };
 
 config.resolver.sourceExts.push("css");
-
-config.server = {
-  ...config.server,
-  experimentalImportBundleSupport: true,
-};
 
 config.watcher = {
   // +73.3
