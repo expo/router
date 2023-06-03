@@ -27,6 +27,8 @@ Alternatively, you can use `npx uri-scheme` to generate a URI scheme for your na
 
 ## iOS
 
+> Universal links require a paid Apple Developer account.
+
 Add your website URL to the iOS [associated domains entitlement](https://docs.expo.dev/versions/latest/config/app/#associateddomains) in your Expo config:
 
 ```json title=app.json
@@ -40,6 +42,8 @@ Add your website URL to the iOS [associated domains entitlement](https://docs.ex
 ```
 
 Build your native app with EAS Build to ensure the entitlement is registered with Apple. You can also use the [Apple Developer Portal](https://developer.apple.com/account/resources/identifiers/list) to add the entitlement manually.
+
+> You can use an **experimental** CLI `npx setup-safari` to automatically register a bundle identifier to your Apple account, assign entitlements to the ID, and create an iTunes app entry in the store. The local setup will be printed and you can skip most the following. This is the easiest way to get started with universal links, but it's an _unofficial Bacon side-project™_ which will likely be rolled into EAS in the future.
 
 Next, create a `public/.well-known/apple-app-site-association` file and add the following:
 
