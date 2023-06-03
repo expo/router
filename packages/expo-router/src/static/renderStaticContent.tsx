@@ -6,7 +6,7 @@
  */
 
 import { ServerContainer, ServerContainerRef } from "@react-navigation/native";
-import App, { getManifest } from "expo-router/_entry";
+import App, { getManifest, getDomEndpoints } from "expo-router/_entry";
 import Head from "expo-router/head";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
@@ -100,4 +100,4 @@ function mixHeadComponentsWithStaticResults(helmet: any, html: string) {
 }
 
 // Re-export for use in server
-export { getManifest };
+export { getManifest, getDomEndpoints };

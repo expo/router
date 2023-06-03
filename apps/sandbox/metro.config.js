@@ -1,5 +1,7 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
-const { getDefaultConfig } = require("expo/metro-config");
+const {
+  getDefaultConfig,
+} = require("../../../expo/packages/@expo/metro-config");
 const path = require("path");
 
 // Find the project and workspace directories

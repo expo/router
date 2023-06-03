@@ -18,6 +18,7 @@ module.exports = {
   },
   web: {
     bundler: "metro",
+    output: "static",
   },
   plugins: [
     [
