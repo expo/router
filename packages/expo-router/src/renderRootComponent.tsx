@@ -54,7 +54,6 @@ export function renderRootComponent(Component: React.ComponentType<any>) {
   try {
     // This must be delayed so the user has a chance to call it first.
     setTimeout(() => {
-      console.log("2. internal_preventAutoHideAsync");
       _internal_preventAutoHideAsync();
     });
 
