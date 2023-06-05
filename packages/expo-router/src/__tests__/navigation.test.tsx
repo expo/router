@@ -4,7 +4,6 @@ import {
   useRouter,
   useGlobalSearchParams,
   router,
-  useSearchParams,
   useLocalSearchParams,
   Redirect,
 } from "../exports";

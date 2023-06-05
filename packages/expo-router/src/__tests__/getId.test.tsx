@@ -1,11 +1,11 @@
 import React from "react";
 import { Text } from "react-native";
 
+import { Link, router } from "../exports";
 import { generateDynamic } from "../getRoutes";
 import { useLocalSearchParams } from "../hooks";
 import { act, renderRouter, screen } from "../testing-library";
 import { createGetIdForRoute } from "../useScreens";
-import { Link, router } from "../exports";
 
 function createMockRoute(routeName: string) {
   return {
