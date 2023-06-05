@@ -1,4 +1,4 @@
-/// <reference types="../../types/jest.d.ts" />
+/// <reference types="../../types/jest" />
 import "./expect";
 
 import { BaseNavigationContainer } from "@react-navigation/core";

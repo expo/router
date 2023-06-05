@@ -11666,7 +11666,7 @@ metro-file-map@0.76.3:
   optionalDependencies:
     fsevents "^2.3.2"
 
-metro-hermes-compiler@0.76.3:
+metro-hermes-compiler@0.76.0:
   version "0.76.0"
   resolved "https://registry.yarnpkg.com/metro-hermes-compiler/-/metro-hermes-compiler-0.76.0.tgz#2c4cca498011cab799434527544c0303eb12b806"
   integrity sha512-ZW1jHtErMp327aPEkhHP69dLmtbzGj7ajsNFEwayoz/tZtyrTXT+f/8j6QVynIBMMpnAJkSIlinNo9fgIbE08w==
