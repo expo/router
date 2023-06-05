@@ -7,7 +7,7 @@ export interface RequireContext {
   /** **Unimplemented:** Return the module identifier for a user request. */
   resolve(id: string): string;
   /** **Unimplemented:** Readable identifier for the context module. */
-  id: string;
+  id: string | number;
 }
 
 /** The list of input keys will become optional, everything else will remain the same. */

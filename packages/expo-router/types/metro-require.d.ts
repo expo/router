@@ -13,7 +13,7 @@ declare namespace __MetroModuleApi {
     /** **Unimplemented:** Return the module identifier for a user request. */
     resolve(id: string): string;
     /** **Unimplemented:** Readable identifier for the context module. */
-    id: string;
+    id: string | number;
   }
 
   interface RequireFunction {
