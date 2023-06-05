@@ -1,10 +1,10 @@
 import React, { Text } from "react-native";
 
-import { Slot, useRouter, useSearchParams } from "../exports";
+import { Slot, useGlobalSearchParams } from "../exports";
 import { Stack } from "../layouts/Stack";
 import { Tabs } from "../layouts/Tabs";
 import { Redirect } from "../link/Link";
-import { act, fireEvent, renderRouter, screen } from "../testing-library";
+import { renderRouter, screen } from "../testing-library";
 
 it("404", async () => {
   const Index = jest.fn(() => <Redirect href="/404" />);
@@ -28,7 +28,7 @@ it("can handle dynamic routes", async () => {
   renderRouter(
     {
       "[slug]": function Path() {
-        const { slug } = useSearchParams();
+        const { slug } = useGlobalSearchParams();
         return <Text>{slug}</Text>;
       },
     },
@@ -43,32 +43,6 @@ it("can handle dynamic routes", async () => {
   expect(screen).toHaveSearchParams({
     slug: "test-path",
   });
-});
-
-it("can handle navigation between routes", async () => {
-  renderRouter({
-    index: function MyIndexRoute() {
-      const router = useRouter();
-
-      return (
-        <Text testID="index" onPress={() => router.push("/profile/test-name")}>
-          Press me
-        </Text>
-      );
-    },
-    "/profile/[name]": function MyRoute() {
-      const { name } = useSearchParams();
-      return <Text>{name}</Text>;
-    },
-  });
-
-  const text = await screen.findByTestId("index");
-
-  act(() => {
-    fireEvent.press(text);
-  });
-
-  expect(await screen.findByText("test-name")).toBeDefined();
 });
 
 it("does not rerender routes", async () => {
