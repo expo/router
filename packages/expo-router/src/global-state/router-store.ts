@@ -3,8 +3,7 @@ import {
   getPathFromState,
   useNavigationContainerRef,
 } from "@react-navigation/native";
-import { useSyncExternalStore, useMemo } from "react";
-import { Platform } from "react-native";
+import { useSyncExternalStore, useMemo, ComponentType, Fragment } from "react";
 
 import { UrlObject, getRouteInfoFromState } from "../LocationProvider";
 import { RouteNode } from "../Route";
@@ -16,6 +15,7 @@ import { RequireContext } from "../types";
 import { getQualifiedRouteComponent } from "../useScreens";
 import { goBack, linkTo, push, replace, setParams } from "./routing";
 import { getSortedRoutes } from "./sort-routes";
+import { _internal_maybeHideAsync } from "../views/Splash";
 
 /**
  * This is the global state for the router. It is used to keep track of the current route, and to provide a way to navigate to other routes.
@@ -24,6 +24,7 @@ import { getSortedRoutes } from "./sort-routes";
  */
 export class RouterStore {
   routeNode!: RouteNode | null;
+  rootComponent!: ComponentType;
   linking: ExpoLinkingOptions | undefined;
   isReady: boolean = false;
 
@@ -60,6 +61,9 @@ export class RouterStore {
     this.storeSubscribers.clear();
 
     this.routeNode = getRoutes(context);
+    this.rootComponent = this.routeNode
+      ? getQualifiedRouteComponent(this.routeNode)
+      : Fragment;
 
     // Only error in production, in development we will show the onboarding screen
     if (!this.routeNode && process.env.NODE_ENV === "production") {
@@ -102,7 +106,8 @@ export class RouterStore {
           this.onReady();
         }
 
-        if (state !== this.rootState) {
+        // This can sometimes be undefined when an error is thrown in the Root Layout Route.
+        if (state && state !== this.rootState) {
           this.rootState = state;
           this.routeInfo = this.getRouteInfo(state);
 
@@ -112,6 +117,10 @@ export class RouterStore {
         }
       }
     );
+
+    for (const subscriber of this.storeSubscribers) {
+      subscriber();
+    }
   }
 
   getRouteInfo(state: ResultState) {
@@ -134,20 +143,10 @@ export class RouterStore {
     return !this.routeNode && process.env.NODE_ENV === "development";
   }
 
-  getQualifiedRouteComponent() {
-    if (!this.routeNode) {
-      // This will never throw, as either the onboarding screen will be shown or it will have errored during initialization
-      throw new Error("No routes found");
-    }
-    return getQualifiedRouteComponent(this.routeNode);
-  }
-
   /** Make sure these are arrow functions so `this` is correctly bound */
   onReady = () => {
     this.isReady = true;
-  };
-  shouldShowSplash = () => {
-    return Platform.OS !== "web" && !this.isReady;
+    requestAnimationFrame(() => _internal_maybeHideAsync());
   };
   subscribeToRootState = (subscriber: () => void) => {
     this.rootStateSubscribers.add(subscriber);

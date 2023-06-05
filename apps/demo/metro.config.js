@@ -9,16 +9,6 @@ const workspaceRoot = path.resolve(projectRoot, "../..");
 
 const config = getDefaultConfig(__dirname);
 
-config.transformer = {
-  ...config.transformer,
-  asyncRequireModulePath: require.resolve("@expo/metro-runtime/async-require"),
-};
-
-config.server = {
-  ...config.server,
-  experimentalImportBundleSupport: true,
-};
-
 config.watcher = {
   // +73.3
   ...config.watcher,

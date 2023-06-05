@@ -6,4 +6,6 @@
  */
 import { buildAsyncRequire } from "./buildAsyncRequire";
 
-module.exports = buildAsyncRequire(require as any);
+// @ts-ignore
+global[`${global.__METRO_GLOBAL_PREFIX__ ?? ""}__loadBundleAsync`] =
+  buildAsyncRequire();

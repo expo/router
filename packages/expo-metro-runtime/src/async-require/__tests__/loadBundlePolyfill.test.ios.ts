@@ -1,7 +1,7 @@
 import HMRClient from "../../HMRClient";
 import LoadingView from "../../LoadingView";
 import { fetchThenEvalAsync } from "../fetchThenEval";
-import { loadBundleAsync } from "../loadBundlePolyfill";
+import { loadBundleAsync } from "../loadBundle";
 
 jest.mock("../../getDevServer", () =>
   jest.fn(() => ({
@@ -24,7 +24,9 @@ jest.mock("../../LoadingView", () => ({
 // Android uses a native impl
 
 it("loads a bundle", async () => {
-  await loadBundleAsync("Second");
+  await loadBundleAsync(
+    "Second.bundle?platform=ios&modulesOnly=true&runModule=false&runtimeBytecodeVersion="
+  );
   expect(LoadingView.showMessage).toBeCalledWith("Downloading...", "load");
   expect(LoadingView.hide).toBeCalledWith();
   const url =

@@ -1,7 +1,7 @@
 import HMRClient from "../../HMRClient";
 import LoadingView from "../../LoadingView";
 import { fetchThenEvalAsync } from "../fetchThenEval";
-import { loadBundleAsync } from "../loadBundlePolyfill";
+import { loadBundleAsync } from "../loadBundle";
 
 jest.mock("../../getDevServer", () =>
   jest.fn(() => ({
@@ -23,10 +23,10 @@ jest.mock("../../LoadingView", () => ({
 }));
 
 it("loads a bundle", async () => {
-  await loadBundleAsync("Second");
+  await loadBundleAsync("/Second.bundle?modulesOnly=true");
   expect(LoadingView.showMessage).toBeCalledWith("Downloading...", "load");
   expect(LoadingView.hide).toBeCalledWith();
-  const url = `/Second.bundle?modulesOnly=true&runModule=false&platform=web&runtimeBytecodeVersion=`;
+  const url = `/Second.bundle?modulesOnly=true`;
   expect(HMRClient.registerBundle).toBeCalledWith(url);
   expect(fetchThenEvalAsync).toBeCalledWith(url);
 });

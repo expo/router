@@ -2,7 +2,7 @@ import React from "react";
 import { Platform, View } from "react-native";
 
 import registerRootComponent from "./fork/expo/registerRootComponent";
-import { SplashScreen } from "./views/Splash";
+import { SplashScreen, _internal_preventAutoHideAsync } from "./views/Splash";
 
 function isBaseObject(obj: any) {
   if (Object.prototype.toString.call(obj) !== "[object Object]") {
@@ -52,7 +52,10 @@ function convertError(error: any) {
  */
 export function renderRootComponent(Component: React.ComponentType<any>) {
   try {
-    SplashScreen.preventAutoHideAsync();
+    // This must be delayed so the user has a chance to call it first.
+    setTimeout(() => {
+      _internal_preventAutoHideAsync();
+    });
 
     registerRootComponent(Component);
   } catch (e) {

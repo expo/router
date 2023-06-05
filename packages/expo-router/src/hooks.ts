@@ -9,7 +9,6 @@ import {
   store,
   useStoreRootState,
   useStoreRouteInfo,
-  useExpoRouter,
 } from "./global-state/router-store";
 import { Router } from "./types";
 
@@ -27,10 +26,6 @@ export function useRootNavigation() {
   return store.navigationRef.current;
 }
 
-export function useLinkingContext() {
-  return useExpoRouter().linking;
-}
-
 // Wraps useLinkTo to provide an API which is similar to the Link component.
 export function useLink() {
   console.warn("`useLink()` is deprecated in favor of `useRouter()`");
@@ -38,8 +33,6 @@ export function useLink() {
 }
 
 export function useRouter(): Router {
-  const store = useExpoRouter();
-
   return {
     push: store.push,
     back: store.goBack,

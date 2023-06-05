@@ -1,12 +1,13 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React from "react";
 import { Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import UpstreamNavigationContainer from "./fork/NavigationContainer";
 import { useInitializeExpoRouter } from "./global-state/router-store";
 import { RequireContext } from "./types";
-import { SplashScreen } from "./views/Splash";
+
+import { SplashScreen, _internal_maybeHideAsync } from "./views/Splash";
 
 export type ExpoRootProps = {
   context: RequireContext;
@@ -64,10 +65,6 @@ function ContextNavigator({
   location: initialLocation = initialUrl,
 }: ExpoRootProps) {
   const store = useInitializeExpoRouter(context, initialLocation);
-  const [isReady, setIsReady] = useState(store.isReady);
-  const [shouldShowSplash, setShowSplash] = React.useState(
-    store.shouldShowSplash
-  );
 
   if (store.shouldShowTutorial()) {
     const Tutorial = require("./onboard/Tutorial").Tutorial;
@@ -75,23 +72,16 @@ function ContextNavigator({
     return <Tutorial />;
   }
 
-  const Component = store.getQualifiedRouteComponent();
+  const Component = store.rootComponent;
 
   return (
-    <>
-      {shouldShowSplash && <SplashScreen />}
-      <UpstreamNavigationContainer
-        ref={store.navigationRef}
-        initialState={store.initialState}
-        linking={store.linking}
-        onReady={() => {
-          store.onReady();
-          setIsReady(true);
-          requestAnimationFrame(() => setShowSplash(false));
-        }}
-      >
-        {isReady && <Component />}
-      </UpstreamNavigationContainer>
-    </>
+    <UpstreamNavigationContainer
+      ref={store.navigationRef}
+      initialState={store.initialState}
+      linking={store.linking}
+      onReady={store.onReady}
+    >
+      <Component />
+    </UpstreamNavigationContainer>
   );
 }
