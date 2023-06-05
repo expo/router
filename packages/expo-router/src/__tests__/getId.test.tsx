@@ -71,7 +71,7 @@ describe(createGetIdForRoute, () => {
   });
 });
 
-describe.only(`${createGetIdForRoute.name} - integration test`, () => {
+describe(`${createGetIdForRoute.name} - integration test`, () => {
   it("automatically generates a unique id per screen", async () => {
     renderRouter(
       {
