@@ -86,7 +86,7 @@ function fromDeepLink(url: string): string {
   return results;
 }
 
-export function extractExpoPathFromURL(url: string) {
+export function extractExpoPathFromURL(url: string = "") {
   // TODO: We should get rid of this, dropping specificities is not good
   return extractExactPathFromURL(url).replace(/^\//, "");
 }

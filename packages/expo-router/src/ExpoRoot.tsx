@@ -1,21 +1,17 @@
-import { useNavigationContainerRef } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
+import { Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import UpstreamNavigationContainer from "./fork/NavigationContainer";
-import { ResultState } from "./fork/getStateFromPath";
-import {
-  ExpoRouterContext,
-  RootStateContext,
-  RootStateContextType,
-} from "./hooks";
-import {
-  ExpoRootProps,
-  useCreateExpoRouterContext,
-} from "./useCreateExpoRouterContext";
-import { getQualifiedRouteComponent } from "./useScreens";
-import { SplashScreen, _internal_maybeHideAsync } from "./views/Splash";
+import { useInitializeExpoRouter } from "./global-state/router-store";
+import { RequireContext } from "./types";
+import { SplashScreen } from "./views/Splash";
+
+export type ExpoRootProps = {
+  context: RequireContext;
+  location?: URL;
+};
 
 function getGestureHandlerRootView() {
   try {
@@ -58,84 +54,33 @@ export function ExpoRoot({ context, location }: ExpoRootProps) {
   );
 }
 
-function ContextNavigator(props: ExpoRootProps) {
-  const navigationRef = useNavigationContainerRef();
+const initialUrl =
+  Platform.OS === "web" && typeof window !== "undefined"
+    ? new URL(window.location.href)
+    : undefined;
 
-  const expoContext = useCreateExpoRouterContext(props);
+function ContextNavigator({
+  context,
+  location: initialLocation = initialUrl,
+}: ExpoRootProps) {
+  const store = useInitializeExpoRouter(context, initialLocation);
 
-  const { routeNode, initialState, linking, getRouteInfo } = expoContext;
-
-  const [rootState, setRootState] = React.useState<RootStateContextType>(() => {
-    if (initialState) {
-      return {
-        state: initialState,
-        routeInfo: getRouteInfo(initialState),
-      };
-    } else {
-      return {
-        routeInfo: {
-          unstable_globalHref: "",
-          pathname: "",
-          params: {},
-          segments: [],
-        },
-      };
-    }
-  });
-
-  React.useEffect(() => {
-    const subscription = navigationRef.addListener("state", (data) => {
-      const state = data.data.state as ResultState;
-      // This can sometimes be undefined when an error is thrown in the Root Layout Route.
-      if (state) {
-        setRootState({
-          state,
-          routeInfo: getRouteInfo(state),
-        });
-      }
-    });
-
-    return () => subscription?.();
-  }, [navigationRef, getRouteInfo]);
-
-  const Component = routeNode ? getQualifiedRouteComponent(routeNode) : null;
-
-  const memoizedRootComponent = React.useMemo(() => {
-    if (!Component) {
-      return null;
-    }
-    return <Component />;
-  }, [Component]);
-
-  if (!routeNode) {
-    if (process.env.NODE_ENV === "development") {
-      const Tutorial = require("./onboard/Tutorial").Tutorial;
-      SplashScreen.hideAsync();
-      return <Tutorial />;
-    } else {
-      throw new Error("No routes found");
-    }
+  if (store.shouldShowTutorial()) {
+    const Tutorial = require("./onboard/Tutorial").Tutorial;
+    SplashScreen.hideAsync();
+    return <Tutorial />;
   }
 
+  const Component = store.rootComponent;
+
   return (
-    <>
-      <ExpoRouterContext.Provider value={{ ...expoContext, navigationRef }}>
-        <UpstreamNavigationContainer
-          ref={navigationRef}
-          initialState={initialState}
-          linking={linking}
-          onReady={() =>
-            // Give one last frame to allow the user to opt-out of auto-hiding splash screen.
-            requestAnimationFrame(() => {
-              _internal_maybeHideAsync();
-            })
-          }
-        >
-          <RootStateContext.Provider value={rootState}>
-            {memoizedRootComponent}
-          </RootStateContext.Provider>
-        </UpstreamNavigationContainer>
-      </ExpoRouterContext.Provider>
-    </>
+    <UpstreamNavigationContainer
+      ref={store.navigationRef}
+      initialState={store.initialState}
+      linking={store.linking}
+      onReady={store.onReady}
+    >
+      <Component />
+    </UpstreamNavigationContainer>
   );
 }
