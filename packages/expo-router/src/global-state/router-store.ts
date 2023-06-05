@@ -13,9 +13,9 @@ import { ExpoLinkingOptions, getLinkingConfig } from "../getLinkingConfig";
 import { getRoutes } from "../getRoutes";
 import { RequireContext } from "../types";
 import { getQualifiedRouteComponent } from "../useScreens";
+import { _internal_maybeHideAsync } from "../views/Splash";
 import { goBack, linkTo, push, replace, setParams } from "./routing";
 import { getSortedRoutes } from "./sort-routes";
-import { _internal_maybeHideAsync } from "../views/Splash";
 
 /**
  * This is the global state for the router. It is used to keep track of the current route, and to provide a way to navigate to other routes.
