@@ -25,9 +25,7 @@ function renderHook<T>(
     wrapper: function Wrapper({ children }) {
       const context = {};
       for (const key of routes) {
-        context[key] = () => {
-          return <>{children}</>;
-        };
+        context[key] = () => <>{children}</>;
       }
 
       return (
