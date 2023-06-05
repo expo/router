@@ -1,91 +1,166 @@
-import { renderHook } from "@testing-library/react-native";
+import { renderHook as tlRenderHook } from "@testing-library/react-native";
+import React from "react";
 import { expectType } from "tsd";
 
-import { useInitializeExpoRouter } from "../global-state/router-store";
+import { ExpoRoot, router } from "../exports";
 import {
   useGlobalSearchParams,
   useLocalSearchParams,
+  usePathname,
   useSegments,
 } from "../hooks";
-import { FileStub, inMemoryContext } from "../testing-library/context-stubs";
+import { act } from "../testing-library";
+import { inMemoryContext } from "../testing-library/context-stubs";
 
-function initialiseExpoRouter(
-  context: Record<string, FileStub>,
-  initialUrl = "/"
+/*
+ * Creates an Expo Router context around the hook, where every router renders the hook
+ * This allows you full navigation
+ */
+function renderHook<T>(
+  renderCallback: () => T,
+  routes: string[] = ["index"],
+  { initialUrl = "/" }: { initialUrl?: string } = {}
 ) {
-  return function Wrapper({ children }) {
-    useInitializeExpoRouter(
-      inMemoryContext(context),
-      new URL(initialUrl, "test://test")
-    );
-    return children;
-  };
+  return tlRenderHook(renderCallback, {
+    wrapper: function Wrapper({ children }) {
+      const context = {};
+      for (const key of routes) {
+        context[key] = () => {
+          return <>{children}</>;
+        };
+      }
+
+      return (
+        <ExpoRoot
+          context={inMemoryContext(context)}
+          location={new URL(initialUrl, "test://test")}
+        />
+      );
+    },
+  });
+}
+
+function renderHookOnce<T>(
+  renderCallback: () => T,
+  routes?: string[],
+  options?: { initialUrl?: string }
+) {
+  return renderHook<T>(renderCallback, routes, options).result.current;
 }
 
 describe(useSegments, () => {
   it(`defaults abstract types`, () => {
-    const { result } = renderHook(() => useSegments(), {
-      wrapper: initialiseExpoRouter({}),
-    });
-    const segments = result.current;
+    const segments = renderHookOnce(() => useSegments());
     expectType<string>(segments[0]);
     expectType<string[]>(segments);
   });
   it(`allows abstract types`, () => {
-    const { result } = renderHook(() => useSegments<["alpha"]>(), {
-      wrapper: initialiseExpoRouter({}),
-    });
-    const segments = result.current;
+    const segments = renderHookOnce(() => useSegments<["alpha"]>());
     expectType<"alpha">(segments[0]);
   });
   it(`allows abstract union types`, () => {
-    const { result } = renderHook(
-      () => useSegments<["a"] | ["b"] | ["b", "c"]>(),
-      {
-        wrapper: initialiseExpoRouter({}),
-      }
+    const segments = renderHookOnce(() =>
+      useSegments<["a"] | ["b"] | ["b", "c"]>()
     );
-    const segments = result.current;
     expectType<"a" | "b">(segments[0]);
     if (segments[0] === "b") expectType<"c" | undefined>(segments[1]);
   });
 });
+
 describe(useGlobalSearchParams, () => {
-  it(`defaults abstract types`, () => {
-    const { result } = renderHook(() => useGlobalSearchParams(), {
-      wrapper: initialiseExpoRouter({}),
+  it(`return styles of deeply nested routes`, () => {
+    const { result } = renderHook(
+      () => useGlobalSearchParams(),
+      ["[fruit]/[shape]/[...veg?]"],
+      {
+        initialUrl: "/apple/square",
+      }
+    );
+
+    expect(result.current).toEqual({
+      fruit: "apple",
+      shape: "square",
     });
-    const params = result.current;
+
+    act(() => router.push("/banana/circle/carrot"));
+
+    expect(result.current).toEqual({
+      fruit: "banana",
+      shape: "circle",
+      veg: "carrot",
+    });
+  });
+
+  it(`defaults abstract types`, () => {
+    const params = renderHookOnce(() => useGlobalSearchParams());
     expectType<Record<string, string | string[] | undefined>>(params);
     expectType<string | string[] | undefined>(params.a);
   });
   it(`allows abstract types`, () => {
-    const { result } = renderHook(
-      () => useGlobalSearchParams<{ a: string }>(),
-      {
-        wrapper: initialiseExpoRouter({}),
-      }
-    );
-    const params = result.current;
+    const params = renderHookOnce(() => useGlobalSearchParams<{ a: string }>());
     expectType<{ a?: string }>(params);
     expectType<string | undefined>(params.a);
   });
 });
+
 describe(useLocalSearchParams, () => {
-  it(`defaults abstract types`, () => {
-    const { result } = renderHook(() => useLocalSearchParams(), {
-      wrapper: initialiseExpoRouter({}),
+  it(`return styles of deeply nested routes`, () => {
+    const { result } = renderHook(
+      () => useGlobalSearchParams(),
+      ["[fruit]/[shape]/[...veg?]"],
+      {
+        initialUrl: "/apple/square",
+      }
+    );
+
+    expect(result.current).toEqual({
+      fruit: "apple",
+      shape: "square",
     });
-    const params = result.current;
+
+    act(() => router.push("/banana/circle/carrot"));
+
+    expect(result.current).toEqual({
+      fruit: "banana",
+      shape: "circle",
+      veg: "carrot",
+    });
+  });
+
+  it(`defaults abstract types`, () => {
+    const params = renderHookOnce(() => useLocalSearchParams());
     expectType<Record<string, string | string[] | undefined>>(params);
     expectType<string | string[] | undefined>(params.a);
   });
   it(`allows abstract types`, () => {
-    const { result } = renderHook(() => useLocalSearchParams<{ a: string }>(), {
-      wrapper: initialiseExpoRouter({}),
-    });
-    const params = result.current;
+    const params = renderHookOnce(() => useLocalSearchParams<{ a: string }>());
     expectType<{ a?: string }>(params);
     expectType<string | undefined>(params.a);
+  });
+});
+
+describe(usePathname, () => {
+  it(`return pathname of deeply nested routes`, () => {
+    const { result } = renderHook(
+      () => usePathname(),
+      ["[fruit]/[shape]/[...veg?]"],
+      {
+        initialUrl: "/apple/square",
+      }
+    );
+
+    expect(result.current).toEqual("/apple/square");
+
+    act(() => router.push("/banana/circle/carrot"));
+    expect(result.current).toEqual("/banana/circle/carrot");
+
+    act(() => router.push("/banana/circle/carrot/beetroot"));
+    expect(result.current).toEqual("/banana/circle/carrot/beetroot");
+
+    act(() => router.push("/banana/circle/carrot/beetroot/beans"));
+    expect(result.current).toEqual("/banana/circle/carrot/beetroot/beans");
+
+    act(() => router.push("/banana/circle/carrot/beetroot?foo=bar"));
+    expect(result.current).toEqual("/banana/circle/carrot/beetroot");
   });
 });

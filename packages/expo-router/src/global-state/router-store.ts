@@ -76,6 +76,7 @@ export class RouterStore {
       this.linking = getLinkingConfig(this.routeNode!);
 
       if (initialLocation) {
+        this.linking.getInitialURL = () => initialLocation.toString();
         this.initialState = this.linking.getStateFromPath?.(
           initialLocation.pathname + initialLocation.search,
           this.linking.config

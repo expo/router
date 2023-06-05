@@ -7,9 +7,6 @@ expect.extend({
     return matchers.toEqual(screen.getPathname(), expected);
   },
   toHaveSearchParams(screen, expected) {
-    return matchers.toEqual(
-      Object.fromEntries(screen.getSearchParams().entries()),
-      expected
-    );
+    return matchers.toEqual(screen.getSearchParams(), expected);
   },
 });

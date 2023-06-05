@@ -1,14 +1,13 @@
 /// <reference types="../../types/jest" />
 import "./expect";
 
-import { BaseNavigationContainer } from "@react-navigation/core";
 import { render, RenderResult } from "@testing-library/react-native";
-import { findAll } from "@testing-library/react-native/build/helpers/findAll";
 import path from "path";
 import React from "react";
 
 import { ExpoRoot } from "../ExpoRoot";
 import { stateCache } from "../getLinkingConfig";
+import { store } from "../global-state/router-store";
 import { RequireContext } from "../types";
 import {
   FileStub,
@@ -27,7 +26,7 @@ type RenderRouterOptions = Parameters<typeof render>[1] & {
 
 type Result = ReturnType<typeof render> & {
   getPathname(): string;
-  getSearchParams(): URLSearchParams;
+  getSearchParams(): Record<string, string | string[]>;
 };
 
 function isOverrideContext(
@@ -80,7 +79,7 @@ export function renderRouter(
   let location: URL | undefined;
 
   if (typeof initialUrl === "string") {
-    location = new URL(initialUrl, "test://test");
+    location = new URL(initialUrl, "test://");
   } else if (initialUrl instanceof URL) {
     location = initialUrl;
   }
@@ -91,29 +90,10 @@ export function renderRouter(
 
   return Object.assign(result, {
     getPathname(this: RenderResult): string {
-      const containers = findAll(this.root, (node) => {
-        return node.type === BaseNavigationContainer;
-      });
-
-      return (
-        "/" +
-        containers
-          .flatMap((route) => {
-            return route.props.initialState.routes.map((r: any) => r.name);
-          })
-          .join("/")
-      );
+      return store.routeInfoSnapshot().pathname;
     },
-    getSearchParams(this: RenderResult): URLSearchParams {
-      const containers = findAll(this.root, (node) => {
-        return node.type === BaseNavigationContainer;
-      });
-
-      const params = containers.reduce<Record<string, string>>((acc, route) => {
-        return { ...acc, ...route.props.initialState.routes[0].params };
-      }, {});
-
-      return new URLSearchParams(params);
+    getSearchParams(this: RenderResult): Record<string, string | string[]> {
+      return store.routeInfoSnapshot().params;
     },
   });
 }

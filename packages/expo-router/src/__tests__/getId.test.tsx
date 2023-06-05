@@ -1,5 +1,11 @@
+import React from "react";
+import { Text } from "react-native";
+
 import { generateDynamic } from "../getRoutes";
+import { useLocalSearchParams } from "../hooks";
+import { act, renderRouter, screen } from "../testing-library";
 import { createGetIdForRoute } from "../useScreens";
+import { Link, router } from "../exports";
 
 function createMockRoute(routeName: string) {
   return {
@@ -42,7 +48,7 @@ describe(createGetIdForRoute, () => {
     // Unmatching param
     expect(getId({ params: { bar: "foo" } })).toBe("[user]");
     // No params
-    expect(getId({ params: null })).toBe("[user]");
+    expect(getId({ params: undefined })).toBe("[user]");
 
     // Should never happen, but just in case.
     expect(getId({ params: { user: "" } })).toBe("[user]");
@@ -58,9 +64,45 @@ describe(createGetIdForRoute, () => {
     // Unmatching param
     expect(getId({ params: { baz: "foo" } })).toBe("[user]/[bar]");
     // No params
-    expect(getId({ params: null })).toBe("[user]/[bar]");
+    expect(getId({ params: undefined })).toBe("[user]/[bar]");
 
     // Should never happen, but just in case.
     expect(getId({ params: { user: "" } })).toBe("[user]/[bar]");
+  });
+});
+
+describe.only(`${createGetIdForRoute.name} - integration test`, () => {
+  it("automatically generates a unique id per screen", async () => {
+    renderRouter(
+      {
+        "[fruit]": function Path() {
+          const { fruit } = useLocalSearchParams();
+          return (
+            <>
+              <Text testID="text">{fruit}</Text>
+              <Link href="/apple" />
+              <Link href="/orange" />
+              <Link href="/banana" />
+            </>
+          );
+        },
+      },
+      {
+        initialUrl: "/apple",
+      }
+    );
+
+    expect(screen).toHavePathname("/apple");
+
+    act(() => router.push("/banana"));
+    expect(screen).toHavePathname("/banana");
+    expect(screen).toHaveSearchParams({ fruit: "banana" });
+
+    act(() => router.push("/banana?shape=square"));
+    expect(screen).toHavePathname("/banana");
+    expect(screen).toHaveSearchParams({ fruit: "banana", shape: "square" });
+
+    act(() => router.back());
+    // What should Pathname be?
   });
 });
