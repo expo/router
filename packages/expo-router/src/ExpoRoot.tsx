@@ -3,7 +3,7 @@ import React from "react";
 import { Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import UpstreamNavigationContainer from "./fork/NavigationContainer";
+import { NavigationContainer } from "@react-navigation/native";
 import { useInitializeExpoRouter } from "./global-state/router-store";
 import { RequireContext } from "./types";
 import { SplashScreen } from "./views/Splash";
@@ -74,13 +74,13 @@ function ContextNavigator({
   const Component = store.rootComponent;
 
   return (
-    <UpstreamNavigationContainer
+    <NavigationContainer
       ref={store.navigationRef}
       initialState={store.initialState}
       linking={store.linking}
       onReady={store.onReady}
     >
       <Component />
-    </UpstreamNavigationContainer>
+    </NavigationContainer>
   );
 }
