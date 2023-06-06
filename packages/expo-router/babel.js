@@ -71,11 +71,7 @@ function getExpoRouterImportMode(projectRoot, platform) {
 }
 
 function directoryExistsSync(file) {
-  try {
-    return fs.statSync(file)?.isDirectory() ?? false;
-  } catch {
-    return false;
-  }
+  return fs.statSync(file, { throwIfNoEntry: false })?.isDirectory() ?? false;
 }
 
 function getRouterDirectory(projectRoot) {
