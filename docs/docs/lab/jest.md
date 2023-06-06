@@ -114,6 +114,14 @@ expect(screen).toHavePathname(string);
 
 Asserts that the currently rendered screen has the expected pathname.
 
+### `.toHaveSegments()`
+
+```tsx
+expect(screen).toHaveSegments(string[]);
+```
+
+Asserts that the currently rendered screen has the expected segments.
+
 ### `.toHaveSearchParams()`
 
 ```tsx

@@ -26,6 +26,7 @@ type RenderRouterOptions = Parameters<typeof render>[1] & {
 
 type Result = ReturnType<typeof render> & {
   getPathname(): string;
+  getSegments(): string[];
   getSearchParams(): Record<string, string | string[]>;
 };
 
@@ -91,6 +92,9 @@ export function renderRouter(
   return Object.assign(result, {
     getPathname(this: RenderResult): string {
       return store.routeInfoSnapshot().pathname;
+    },
+    getSegments(this: RenderResult): string[] {
+      return store.routeInfoSnapshot().segments;
     },
     getSearchParams(this: RenderResult): Record<string, string | string[]> {
       return store.routeInfoSnapshot().params;

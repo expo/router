@@ -36,7 +36,8 @@ describe("hooks only", () => {
       fireEvent.press(text);
     });
 
-    expect(await screen.findByText("test-name")).toBeDefined();
+    expect(await screen.findByText("test-name")).toBeOnTheScreen();
+    expect(screen).toHavePathname("/profile/test-name");
   });
 });
 
@@ -81,7 +82,7 @@ describe("imperative only", () => {
       router.push("/profile/test-name");
     });
 
-    expect(await screen.findByText("test-name")).toBeDefined();
+    expect(await screen.findByText("test-name")).toBeOnTheScreen();
   });
 });
 
@@ -112,13 +113,13 @@ describe("mixed navigation", () => {
       fireEvent.press(text);
     });
 
-    expect(await screen.findByText("test-name")).toBeDefined();
+    expect(await screen.findByText("test-name")).toBeOnTheScreen();
 
     act(() => {
       router.push("/profile/another-test-name");
     });
 
-    expect(await screen.findByText("another-test-name")).toBeDefined();
+    expect(await screen.findByText("another-test-name")).toBeOnTheScreen();
   });
 });
 
