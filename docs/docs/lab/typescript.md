@@ -1,10 +1,12 @@
 ---
-title: TypeScript
+title: Typed Routes
 ---
+
+> Expo Router supports standard TypeScript out of the box. [Learn how to setup TypeScript today](https://docs.expo.dev/guides/typescript/).
 
 > This guide requires `expo@49.0.0-alpha.3` or greater––everything listed here is still experimental.
 
-Expo Router provides an integrated TypeScript experience. To get started:
+Expo Router v2 provides automatic TypeScript support for linking between pages. To get started:
 
 - Install TypeScript either by `yarn add -D typescript` or `npm i -D typescript`
 - Run `npx tsc --init` or `yarn tsc --init` to initialise TypeScript
