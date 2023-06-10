@@ -42,7 +42,7 @@ components/
   UserPage.ios.js
 ```
 
-Suppose the designs require you to build completely different user screens for each platform. In that case, you can create a component for each platform in the `components/` directory, and Metro will import the correct version of the component. You can then re-export the the component as the screen in the app directory.
+Suppose the designs require you to build completely different user screens for each platform. In that case, you can create a component for each platform in the `components/` directory using platform extensions. When imported, Metro will ensure the correct version of the component is used based on the current platform. You can then re-export the the component as a screen in the app directory.
 
 ```tsx title="app/user/[id].js"
 import UserPage from "@components/UserPage";
