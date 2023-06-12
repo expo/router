@@ -51,7 +51,7 @@ export class RouterStore {
     initialLocation?: URL
   ) {
     // Clean up any previous state
-    this.isReady = Boolean(initialLocation);
+    this.isReady ||= Boolean(initialLocation);
     this.initialState = undefined;
     this.rootState = undefined;
     this.routeInfo = undefined;
