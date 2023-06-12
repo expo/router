@@ -145,8 +145,10 @@ export class RouterStore {
 
   /** Make sure these are arrow functions so `this` is correctly bound */
   onReady = () => {
+    if (!this.isReady) {
+      requestAnimationFrame(() => _internal_maybeHideAsync());
+    }
     this.isReady = true;
-    requestAnimationFrame(() => _internal_maybeHideAsync());
   };
   subscribeToRootState = (subscriber: () => void) => {
     this.rootStateSubscribers.add(subscriber);
