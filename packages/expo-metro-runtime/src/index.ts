@@ -1,3 +1,6 @@
 import "./location/install";
-import "./async-require";
+// IMPORT POSITION MATTERS FOR FAST REFRESH ON WEB
 import "./effects";
+
+// vvv EVERYTHING ELSE vvv
+import "./async-require";
