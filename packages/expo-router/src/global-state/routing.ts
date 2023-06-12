@@ -18,7 +18,7 @@ import {
 import type { RouterStore } from "./router-store";
 
 function assertIsReady(store: RouterStore) {
-  if (!store.isReady) {
+  if (!store.isReady || !store.navigationRef.current) {
     throw new Error("Attempted to use navigation outside of Expo Router");
   }
 }
