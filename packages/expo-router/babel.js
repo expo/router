@@ -195,6 +195,7 @@ module.exports = function (api) {
 
         // Expose the app route import mode.
         if (
+          platform &&
           t.isIdentifier(parent.node.property, {
             name: "EXPO_ROUTER_IMPORT_MODE_" + platform.toUpperCase(),
           }) &&
