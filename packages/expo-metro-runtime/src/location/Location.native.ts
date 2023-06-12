@@ -151,15 +151,20 @@ class Location {
       reload: {
         value: function reload() {
           if (process.env.NODE_ENV !== "production") {
+            // NOTE: This does change how native fast refresh works. The upstream metro-runtime will check
+            // if `location.reload` exists before falling back on an implementation that is nearly identical to
+            // this. The main difference is that on iOS there is a "reason" message sent, but at the time of writing
+            // this, that message is unused (ref: `RCTTriggerReloadCommandNotification`).
             const DevSettings = (
               require("react-native") as typeof import("react-native")
             ).DevSettings;
-            DevSettings.reload();
+            return DevSettings.reload();
+          } else {
+            throw new DOMException(
+              `Cannot call "location.reload()".`,
+              "NotSupportedError"
+            );
           }
-          throw new DOMException(
-            `Cannot call "location.reload()".`,
-            "NotSupportedError"
-          );
         },
         enumerable: true,
       },
