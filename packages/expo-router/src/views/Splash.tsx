@@ -49,7 +49,7 @@ function useGlobalSplash() {
 }
 
 SplashScreen.hideAsync = () => {
-  SplashModule.hideAsync();
+  forceHideAsync();
   globalStack.length = 0;
 };
 
@@ -85,6 +85,20 @@ export const _internal_maybeHideAsync = () => {
   }
   SplashScreen.hideAsync();
 };
+
+async function forceHideAsync() {
+  return SplashModule.hideAsync().catch((error: any) => {
+    // Hide this very unfortunate error.
+    if (
+      // Only throw the error is something unexpected happened.
+      _preventAutoHideAsyncInvoked &&
+      error.message.includes("No native splash screen registered for ")
+    ) {
+      return;
+    }
+    throw error;
+  });
+}
 
 SplashScreen.preventAutoHideAsync = () => {
   _userControlledAutoHideEnabled = true;
