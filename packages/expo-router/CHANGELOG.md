@@ -10,6 +10,25 @@
 
 ### 💡 Others
 
+## [Mon, 12 Jun 2023 16:33:50 -0500](https://github.com/expo/router/commit/de3387b677ec5a6089e4d7b980334616a8a4a296)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- Add support for the src directory to expo router ([#629](https://github.com/expo/router/issues/629))
+- Update async routes for metro@0.76.3 ([#622](https://github.com/expo/router/issues/622))
+- Add support for imperative API that works without hooks ([#600](https://github.com/expo/router/issues/600))
+- Implement better splash imperative API ([#620](https://github.com/expo/router/issues/620))
+- Add SafeAreaView to the default navigator ([#623](https://github.com/expo/router/issues/623))
+
+### 🐛 Bug fixes
+
+- Do not reset `isReady` during Fast Refresh ([#653](https://github.com/expo/router/issues/653))
+- Fix splash screen invocations ([#654](https://github.com/expo/router/issues/654))
+
+### 💡 Others
+
 ## [Thu, 1 Jun 2023 16:16:35 -0500](https://github.com/expo/router/commit/c75864b0bc2d05bde4c6f1cf409e2a7dd26a2248)
 
 ### 🛠 Breaking changes
