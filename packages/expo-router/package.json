@@ -24,7 +24,8 @@
     "plugin",
     "app.plugin.js",
     "!**/__tests__",
-    "_ctx.*"
+    "_ctx.*",
+    "_app.tsx"
   ],
   "repository": {
     "url": "https://github.com/expo/router.git",
