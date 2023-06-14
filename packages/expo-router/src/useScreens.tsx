@@ -118,6 +118,15 @@ function fromImport({ ErrorBoundary, ...component }: LoadedRoute) {
       }),
     };
   }
+  if (process.env.NODE_ENV !== "production") {
+    if (
+      typeof component.default === "object" &&
+      component.default &&
+      Object.keys(component.default).length === 0
+    ) {
+      return { default: EmptyRoute };
+    }
+  }
   return { default: component.default || EmptyRoute };
 }
 
