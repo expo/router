@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## [Tue, 13 Jun 2023 19:03:46 -0500](https://github.com/expo/router/commit/10bfe14151b2a89190bde4a371a4c6039d8f354d)
+
+### 🐛 Bug fixes
+
+- Fix react refresh for web with `output: single` ([#658](https://github.com/expo/router/issues/658))
+
 ## [Mon, 12 Jun 2023 17:06:50 -0500](https://github.com/expo/router/commit/460ad5e7f5de87e7abd8b20762bcdda0d38c8c2b)
 
 ## [Mon, 12 Jun 2023 16:33:50 -0500](https://github.com/expo/router/commit/de3387b677ec5a6089e4d7b980334616a8a4a296)
