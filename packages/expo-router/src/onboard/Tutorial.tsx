@@ -141,7 +141,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundImage:
       "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)",
-    backgroundPosition: "-3px -3px",
+    backgroundPositionX: -3,
+    backgroundPositionY: -3,
     backgroundSize: "40px 40px",
   },
   safeArea: {
