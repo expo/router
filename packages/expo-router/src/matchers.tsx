@@ -35,7 +35,7 @@ export function removeSupportedExtensions(name: string): string {
 }
 
 // Remove any amount of `./` and `../` from the start of the string
-function removeFileSystemDots(filePath: string): string {
+export function removeFileSystemDots(filePath: string): string {
   return filePath.replace(/^(?:\.\.?\/)+/g, "");
 }
 

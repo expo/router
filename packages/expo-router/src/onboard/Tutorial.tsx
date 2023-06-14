@@ -79,7 +79,7 @@ export function Tutorial() {
 }
 
 function getRootDir() {
-  const dir = process.env.EXPO_ROUTER_APP_ROOT!;
+  const dir = process.env.EXPO_ROUTER_ABS_APP_ROOT!;
   if (dir.match(/\/src\/app$/)) {
     return "src/app";
   } else if (dir.match(/\/app$/)) {
