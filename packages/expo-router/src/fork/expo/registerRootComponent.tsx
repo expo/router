@@ -24,6 +24,9 @@ type InitialProps = {
   [key: string]: any;
 };
 
+// Web root tag is preserved for re-use between refreshes.
+let rootTag: import("react-dom/client").Root | null = null;
+
 export default function registerRootComponent<P extends InitialProps>(
   component: React.ComponentType<P>
 ): void {
@@ -67,7 +70,7 @@ export default function registerRootComponent<P extends InitialProps>(
     if (process.env.EXPO_PUBLIC_USE_STATIC) {
       hydrateRoot(tag, React.createElement(qualifiedComponent));
     } else {
-      const rootTag = createRoot(tag);
+      rootTag ??= createRoot(tag);
       rootTag.render(React.createElement(qualifiedComponent));
     }
   }
