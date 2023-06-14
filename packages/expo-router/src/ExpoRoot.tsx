@@ -66,9 +66,14 @@ function ContextNavigator({
   const store = useInitializeExpoRouter(context, initialLocation);
 
   if (store.shouldShowTutorial()) {
-    const Tutorial = require("./onboard/Tutorial").Tutorial;
     SplashScreen.hideAsync();
-    return <Tutorial />;
+    if (process.env.NODE_ENV === "development") {
+      const Tutorial = require("./onboard/Tutorial").Tutorial;
+      return <Tutorial />;
+    } else {
+      // Ensure tutorial styles are stripped in production.
+      return null;
+    }
   }
 
   const Component = store.rootComponent;
