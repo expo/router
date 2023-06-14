@@ -1,4 +1,5 @@
 import { getDevServer } from "../getDevServer";
+import { removeFileSystemDots } from "../matchers";
 
 /** Middleware for creating an entry file in the project. */
 export function createEntryFileAsync() {
@@ -19,7 +20,7 @@ export function createEntryFileAsync() {
       absolutePath:
         process.env.EXPO_PROJECT_ROOT +
         "/" +
-        process.env.EXPO_ROUTER_APP_ROOT +
+        removeFileSystemDots(process.env.EXPO_ROUTER_APP_ROOT!) +
         "/" +
         "./index.js",
     }),
