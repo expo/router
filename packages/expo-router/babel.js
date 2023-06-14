@@ -94,6 +94,19 @@ function getExpoRouterAppRoot(projectRoot) {
   }
   const routerEntry = resolveFrom.silent(projectRoot, "expo-router/entry");
 
+  // It doesn't matter if the app folder exists.
+  const appFolder = getExpoRouterAbsoluteAppRoot(projectRoot);
+  const appRoot = nodePath.relative(nodePath.dirname(routerEntry), appFolder);
+  debug("routerEntry", routerEntry, appFolder, appRoot);
+
+  process.env.EXPO_ROUTER_APP_ROOT_2 = appRoot;
+  return appRoot;
+}
+
+function getExpoRouterAbsoluteAppRoot(projectRoot) {
+  if (process.env.EXPO_ROUTER_ABS_APP_ROOT) {
+    return process.env.EXPO_ROUTER_ABS_APP_ROOT;
+  }
   const { exp } = getConfigMemo(projectRoot);
   const customSrc =
     exp.extra?.router?.unstable_src || getRouterDirectory(projectRoot);
@@ -102,10 +115,10 @@ function getExpoRouterAppRoot(projectRoot) {
   const appFolder = isAbsolute
     ? customSrc
     : nodePath.join(projectRoot, customSrc);
-  const appRoot = nodePath.relative(nodePath.dirname(routerEntry), appFolder);
-  debug("routerEntry", routerEntry, appFolder, appRoot);
+  const appRoot = appFolder;
+  debug("absolute router entry", appFolder, appRoot);
 
-  process.env.EXPO_ROUTER_APP_ROOT_2 = appRoot;
+  process.env.EXPO_ROUTER_ABS_APP_ROOT = appFolder;
   return appRoot;
 }
 // TODO: Strip the function `generateStaticParams` when bundling for node.js environments.
@@ -161,13 +174,10 @@ module.exports = function (api) {
           !parent.parentPath.isAssignmentExpression()
         ) {
           parent.replaceWith(t.stringLiteral(projectRoot));
-          return;
-        }
-
-        // Enable static rendering
-        // TODO: Use a serializer or something to ensure this changes without
-        // needing to clear the cache.
-        if (
+        } else if (
+          // Enable static rendering
+          // TODO: Use a serializer or something to ensure this changes without
+          // needing to clear the cache.
           t.isIdentifier(parent.node.property, {
             name: "EXPO_PUBLIC_USE_STATIC",
           }) &&
@@ -177,12 +187,9 @@ module.exports = function (api) {
           parent.replaceWith(
             t.stringLiteral(process.env.EXPO_PUBLIC_USE_STATIC)
           );
-          return;
-        }
-
-        // Surfaces the `app.json` (config) as an environment variable which is then parsed by
-        // `expo-constants` https://docs.expo.dev/versions/latest/sdk/constants/
-        if (
+        } else if (
+          // Surfaces the `app.json` (config) as an environment variable which is then parsed by
+          // `expo-constants` https://docs.expo.dev/versions/latest/sdk/constants/
           t.isIdentifier(parent.node.property, {
             name: "APP_MANIFEST",
           }) &&
@@ -190,11 +197,31 @@ module.exports = function (api) {
         ) {
           const manifest = getExpoAppManifest(projectRoot);
           parent.replaceWith(t.stringLiteral(manifest));
-          return;
-        }
-
-        // Expose the app route import mode.
-        if (
+        } else if (
+          process.env.NODE_ENV !== "test" &&
+          t.isIdentifier(parent.node.property, {
+            name: "EXPO_ROUTER_ABS_APP_ROOT",
+          }) &&
+          !parent.parentPath.isAssignmentExpression()
+        ) {
+          parent.replaceWith(
+            t.stringLiteral(getExpoRouterAbsoluteAppRoot(projectRoot))
+          );
+        } else if (
+          // Skip loading the app root in tests.
+          // This is handled by the testing-library utils
+          process.env.NODE_ENV !== "test" &&
+          t.isIdentifier(parent.node.property, {
+            name: "EXPO_ROUTER_APP_ROOT",
+          }) &&
+          !parent.parentPath.isAssignmentExpression()
+        ) {
+          parent.replaceWith(
+            // This is defined in Expo CLI when using Metro. It points to the relative path for the project app directory.
+            t.stringLiteral(getExpoRouterAppRoot(projectRoot))
+          );
+        } else if (
+          // Expose the app route import mode.
           platform &&
           t.isIdentifier(parent.node.property, {
             name: "EXPO_ROUTER_IMPORT_MODE_" + platform.toUpperCase(),
@@ -204,31 +231,7 @@ module.exports = function (api) {
           parent.replaceWith(
             t.stringLiteral(getExpoRouterImportMode(projectRoot, platform))
           );
-          return;
         }
-
-        if (
-          !t.isIdentifier(parent.node.property, {
-            name: "EXPO_ROUTER_APP_ROOT",
-          })
-        ) {
-          return;
-        }
-
-        if (parent.parentPath.isAssignmentExpression()) {
-          return;
-        }
-
-        // Skip loading the app root in tests.
-        // This is handled by the testing-library utils
-        if (process.env.NODE_ENV === "test") {
-          return;
-        }
-
-        parent.replaceWith(
-          // This is defined in Expo CLI when using Metro. It points to the relative path for the project app directory.
-          t.stringLiteral(getExpoRouterAppRoot(projectRoot))
-        );
       },
     },
   };

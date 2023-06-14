@@ -1,5 +1,4 @@
 import { getDevServer } from "../getDevServer";
-import { removeFileSystemDots } from "../matchers";
 
 /** Middleware for creating an entry file in the project. */
 export function createEntryFileAsync() {
@@ -17,14 +16,13 @@ export function createEntryFileAsync() {
       // Legacy
       path: "./app/index.js",
       // New
-      absolutePath:
-        process.env.EXPO_PROJECT_ROOT +
-        "/" +
-        removeFileSystemDots(process.env.EXPO_ROUTER_APP_ROOT!) +
-        "/" +
-        "./index.js",
+      absolutePath: getAbsolutePath(),
     }),
   });
+}
+
+export function getAbsolutePath() {
+  return process.env.EXPO_ROUTER_ABS_APP_ROOT + "/index.js";
 }
 
 const TEMPLATE = `import { StyleSheet, Text, View } from "react-native";
