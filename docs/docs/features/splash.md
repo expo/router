@@ -3,7 +3,7 @@ title: Splash Screen
 sidebar_position: 5
 ---
 
-Expo Router automatically orchestrates the native splash screen to keep it visible until the first route is rendered, this applies to any route that the user deep links into. To enable this functionality, install `expo-splash-screen` in your project.
+Splash screens are required on native platforms. Expo Router automatically orchestrates the native splash screen to keep it visible until the first route is rendered, this applies to any route that the user deep links into. To enable this functionality, install `expo-splash-screen` in your project.
 
 The default behavior is to hide the splash screen when the first route is rendered, this is optimal for the majority of routes. For some routes, you may want to prolong the splash screen until additional data or asset loading has concluded. This can be achieved with the `SplashScreen` component. The splash screen will remain visible until all `SplashScreen` components in your app have been unmounted.
 
