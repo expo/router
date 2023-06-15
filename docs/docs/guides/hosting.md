@@ -4,6 +4,8 @@ title: Hosting
 
 The current behavior of web is to export as a single-page application or (SPA). This means you need to redirect incoming URL requests on the server to the root `index.html` file.
 
+Use `npx expo export --platform web` to export the static bundle into the `./dist` folder.
+
 ## Netlify
 
 Create a `./public/_redirects` (`./web/_redirects` with Expo Webpack) file and add the following:
@@ -14,19 +16,25 @@ Create a `./public/_redirects` (`./web/_redirects` with Expo Webpack) file and a
 
 ## Vercel
 
-Create a `./public/vercel.json` (contents of the root `public` folder are copied into the output `dist` folder) and add the following:
+1. Import your repository.
+2. Your build and development settings should look like this:
+- Framework preset: Other
+- Build command: `npx expo export --platform web`
+- Output directory: `dist`
+
+![image](https://github.com/expo/expo-cli/assets/55203625/d8646ff2-4c7c-4e5e-8ed7-5e91c7cab288)
+
+3. Create a `vercel.json` in your root folder and add the following:
 
 ```json
 {
-  "version": 2,
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/"
-    }
+  "rewrites": [
+    { "source": "/:path*", "destination": "/index.html"}
   ]
 }
 ```
+
+4. Push your changes and to trigger a deployment.
 
 ## Serve CLI
 
