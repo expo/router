@@ -24,7 +24,7 @@ Create a `./public/_redirects` (`./web/_redirects` with Expo Webpack) file and a
 
 ![image](https://github.com/expo/expo-cli/assets/55203625/d8646ff2-4c7c-4e5e-8ed7-5e91c7cab288)
 
-3. Create a `./public/vercel.json` (contents of the root `public` folder are copied into the output `dist` folder) and add the following:
+3. Create a `vercel.json` in your root folder and add the following:
 
 ```json
 {
