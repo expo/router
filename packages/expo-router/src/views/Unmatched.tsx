@@ -9,6 +9,19 @@ import { useNavigation } from "../useNavigation";
 const useLayoutEffect =
   typeof window !== "undefined" ? React.useLayoutEffect : function () {};
 
+function NoSSR({ children }: { children: React.ReactNode }) {
+  const [render, setRender] = React.useState(false);
+  React.useEffect(() => {
+    setRender(true);
+  }, []);
+
+  if (!render) {
+    return null;
+  }
+
+  return <>{children}</>;
+}
+
 /** Default screen for unmatched routes. */
 export function Unmatched() {
   const router = useRouter();
@@ -51,9 +64,11 @@ export function Unmatched() {
         </Text>
       </Text>
 
-      <Link href={pathname} replace style={styles.link}>
-        {url}
-      </Link>
+      <NoSSR>
+        <Link href={pathname} replace style={styles.link}>
+          {url}
+        </Link>
+      </NoSSR>
 
       <Link href="/_sitemap" replace style={[styles.link, { marginTop: 8 }]}>
         Sitemap
