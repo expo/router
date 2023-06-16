@@ -93,6 +93,68 @@ it(
 );
 
 it(
+  "can use hooks in the +html.js wrapper",
+  async () => {
+    const projectRoot = await ensureTesterReadyAsync("html-hooks");
+
+    await execa("npx", [bin, "export", "-p", "web"], {
+      cwd: projectRoot,
+      env: {
+        NODE_ENV: "production",
+        EXPO_USE_STATIC: "1",
+        E2E_ROUTER_SRC: "html-hooks",
+        E2E_ROUTER_ASYNC: "development",
+      },
+    });
+
+    const outputDir = path.join(projectRoot, "dist");
+    // List output files with sizes for snapshotting.
+    // This is to make sure that any changes to the output are intentional.
+    // Posix path formatting is used to make paths the same across OSes.
+    const files = klawSync(outputDir)
+      .map((entry) => {
+        if (entry.path.includes("node_modules") || !entry.stats.isFile()) {
+          return null;
+        }
+        return path.posix.relative(outputDir, entry.path);
+      })
+      .filter(Boolean);
+
+    const metadata = await JsonFile.readAsync(
+      path.resolve(outputDir, "metadata.json")
+    );
+
+    expect(metadata).toEqual({
+      bundler: "metro",
+      fileMetadata: {
+        web: {
+          assets: expect.anything(),
+          bundle: expect.stringMatching(/bundles\/web-.*\.js/),
+        },
+      },
+      version: 0,
+    });
+
+    // The wrapper should not be included as a route.
+    expect(files).not.toContain("+html.html");
+    expect(files).toContain("index.html");
+    expect(files).toContain("test.html");
+    expect(files).toContain("_sitemap.html");
+    expect(files).toContain("[...404].html");
+
+    expect(
+      await fs.readFile(path.join(outputDir, "index.html"), "utf8")
+    ).toContain('<meta name="custom-value" content="/"/>');
+
+    expect(
+      await fs.readFile(path.join(outputDir, "test.html"), "utf8")
+    ).toContain('<meta name="custom-value" content="/test"/>');
+  },
+  // Could take 45s depending on how fast npm installs
+  240 * 1000
+);
+
+it(
   "exports with nested static head",
   async () => {
     const projectRoot = await ensureTesterReadyAsync("static-head");

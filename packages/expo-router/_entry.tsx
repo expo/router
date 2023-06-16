@@ -6,13 +6,14 @@ import React from "react";
 
 import { ctx } from "./_ctx";
 import { ExpoRoot } from "./src";
+import { ExpoRootProps } from "./src/ExpoRoot";
 import { getNavigationConfig } from "./src/getLinkingConfig";
 import { getRoutes } from "./src/getRoutes";
 import { loadStaticParamsAsync } from "./src/loadStaticParamsAsync";
 
 // Must be exported or Fast Refresh won't update the context >:[
-export default function ExpoRouterRoot({ location }: { location: URL }) {
-  return <ExpoRoot context={ctx} location={location} />;
+export default function ExpoRouterRoot(props: Omit<ExpoRootProps, "context">) {
+  return <ExpoRoot context={ctx} {...props} />;
 }
 
 /** Get the linking manifest from a Node.js process. */
