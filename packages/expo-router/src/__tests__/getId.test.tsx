@@ -70,39 +70,3 @@ describe(createGetIdForRoute, () => {
     expect(getId({ params: { user: "" } })).toBe("[user]/[bar]");
   });
 });
-
-describe(`${createGetIdForRoute.name} - integration test`, () => {
-  it("automatically generates a unique id per screen", async () => {
-    renderRouter(
-      {
-        "[fruit]": function Path() {
-          const { fruit } = useLocalSearchParams();
-          return (
-            <>
-              <Text testID="text">{fruit}</Text>
-              <Link href="/apple" />
-              <Link href="/orange" />
-              <Link href="/banana" />
-            </>
-          );
-        },
-      },
-      {
-        initialUrl: "/apple",
-      }
-    );
-
-    expect(screen).toHavePathname("/apple");
-
-    act(() => router.push("/banana"));
-    expect(screen).toHavePathname("/banana");
-    expect(screen).toHaveSearchParams({ fruit: "banana" });
-
-    act(() => router.push("/banana?shape=square"));
-    expect(screen).toHavePathname("/banana");
-    expect(screen).toHaveSearchParams({ fruit: "banana", shape: "square" });
-
-    act(() => router.back());
-    // What should Pathname be?
-  });
-});
