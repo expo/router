@@ -6,10 +6,10 @@ expect.extend({
   toHavePathname(screen, expected) {
     return matchers.toEqual(screen.getPathname(), expected);
   },
+  toHaveSegments(screen, expected) {
+    return matchers.toEqual(screen.getSegments(), expected);
+  },
   toHaveSearchParams(screen, expected) {
-    return matchers.toEqual(
-      Object.fromEntries(screen.getSearchParams().entries()),
-      expected
-    );
+    return matchers.toEqual(screen.getSearchParams(), expected);
   },
 });

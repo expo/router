@@ -42,7 +42,7 @@ describe(createGetIdForRoute, () => {
     // Unmatching param
     expect(getId({ params: { bar: "foo" } })).toBe("[user]");
     // No params
-    expect(getId({ params: null })).toBe("[user]");
+    expect(getId({ params: undefined })).toBe("[user]");
 
     // Should never happen, but just in case.
     expect(getId({ params: { user: "" } })).toBe("[user]");
@@ -58,7 +58,7 @@ describe(createGetIdForRoute, () => {
     // Unmatching param
     expect(getId({ params: { baz: "foo" } })).toBe("[user]/[bar]");
     // No params
-    expect(getId({ params: null })).toBe("[user]/[bar]");
+    expect(getId({ params: undefined })).toBe("[user]/[bar]");
 
     // Should never happen, but just in case.
     expect(getId({ params: { user: "" } })).toBe("[user]/[bar]");

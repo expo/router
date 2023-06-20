@@ -13,7 +13,10 @@ it("404", async () => {
     index: Index,
   });
 
-  expect(await screen.findByText("Unmatched Route")).toBeDefined();
+  expect(await screen.findByText("Unmatched Route")).toBeOnTheScreen();
+  expect(screen).toHavePathname("/404");
+  expect(screen).toHaveSegments(["[...404]"]);
+  expect(screen).toHaveSearchParams({ "404": "404" });
 });
 
 it("can render a route", async () => {
@@ -21,7 +24,10 @@ it("can render a route", async () => {
     index: () => <Text>Hello</Text>,
   });
 
-  expect(await screen.findByText("Hello")).toBeDefined();
+  expect(await screen.findByText("Hello")).toBeOnTheScreen();
+  expect(screen).toHavePathname("/");
+  expect(screen).toHaveSegments([]);
+  expect(screen).toHaveSearchParams({});
 });
 
 it("can handle dynamic routes", async () => {
@@ -37,9 +43,10 @@ it("can handle dynamic routes", async () => {
     }
   );
 
-  expect(await screen.findByText("test-path")).toBeDefined();
+  expect(await screen.findByText("test-path")).toBeOnTheScreen();
 
-  expect(screen).toHavePathname("/[slug]");
+  expect(screen).toHavePathname("/test-path");
+  expect(screen).toHaveSegments(["[slug]"]);
   expect(screen).toHaveSearchParams({
     slug: "test-path",
   });
@@ -52,7 +59,7 @@ it("does not rerender routes", async () => {
     index: Index,
   });
 
-  expect(await screen.findByText("Screen")).toBeDefined();
+  expect(await screen.findByText("Screen")).toBeOnTheScreen();
   expect(Index).toHaveBeenCalledTimes(1);
 });
 
@@ -65,7 +72,7 @@ it("redirects", async () => {
     "(app)/other": Other,
   });
 
-  expect(await screen.findByText("Other")).toBeDefined();
+  expect(await screen.findByText("Other")).toBeOnTheScreen();
   expect(Index).toHaveBeenCalledTimes(1);
   expect(Other).toHaveBeenCalledTimes(1);
 });
@@ -81,7 +88,7 @@ it("layouts", async () => {
     "(app)/other": Other,
   });
 
-  expect(await screen.findByText("Other")).toBeDefined();
+  expect(await screen.findByText("Other")).toBeOnTheScreen();
   expect(Layout).toHaveBeenCalledTimes(2);
   expect(Index).toHaveBeenCalledTimes(1);
   expect(Other).toHaveBeenCalledTimes(1);
@@ -107,7 +114,7 @@ it("nested layouts", async () => {
     "(app)/(tabs)/home/nested": HomeNested,
   });
 
-  expect(await screen.findByText("HomeNested")).toBeDefined();
+  expect(await screen.findByText("HomeNested")).toBeOnTheScreen();
 
   expect(AppLayout).toHaveBeenCalledTimes(3);
   expect(TabsLayout).toHaveBeenCalledTimes(2);

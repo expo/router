@@ -83,7 +83,6 @@ function ContextNavigator({
       ref={store.navigationRef}
       initialState={store.initialState}
       linking={store.linking}
-      onReady={store.onReady}
     >
       <Component />
     </UpstreamNavigationContainer>

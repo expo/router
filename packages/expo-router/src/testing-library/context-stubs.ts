@@ -3,7 +3,9 @@ import path from "path";
 import requireContext from "./require-context-ponyfill";
 
 export type ReactComponent = () => React.ReactElement<any, any> | null;
-export type FileStub = { default: ReactComponent } | ReactComponent;
+export type FileStub =
+  | (Record<string, unknown> & { default: ReactComponent })
+  | ReactComponent;
 
 export { requireContext };
 
