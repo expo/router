@@ -11,6 +11,7 @@ import {
   useStoreRouteInfo,
 } from "./global-state/router-store";
 import { Router } from "./types";
+import { useDeprecated } from "./useDeprecated";
 
 type SearchParams = Record<string, string | string[]>;
 
@@ -28,7 +29,7 @@ export function useRootNavigation() {
 
 // Wraps useLinkTo to provide an API which is similar to the Link component.
 export function useLink() {
-  console.warn("`useLink()` is deprecated in favor of `useRouter()`");
+  useDeprecated("`useLink()` is deprecated in favor of `useRouter()`");
   return useRouter();
 }
 

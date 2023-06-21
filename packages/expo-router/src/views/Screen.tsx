@@ -1,5 +1,6 @@
 import React from "react";
 
+import { useDeprecated } from "../useDeprecated";
 import { useNavigation } from "../useNavigation";
 
 export type ScreenProps<
@@ -35,6 +36,11 @@ export function Screen<TOptions extends object = object>({
   useLayoutEffect(() => {
     navigation.setOptions(options ?? {});
   }, [navigation, options]);
+
+  useDeprecated(
+    "The `redirect` prop on <Screen /> is deprecated and will be removed. Please use `router.redirect` instead",
+    redirect
+  );
 
   if (process.env.NODE_ENV !== "production") {
     // eslint-disable-next-line react-hooks/rules-of-hooks
