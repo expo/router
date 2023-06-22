@@ -4,7 +4,11 @@ import HMRClient from "./HMRClient";
 
 // Sets up developer tools for React Native web.
 if (!Platform.isTesting) {
-  if (typeof window !== "undefined" && window.$$EXPO_RUNTIME) {
+  if (
+    typeof window !== "undefined" &&
+    // @ts-expect-error
+    window.$$EXPO_RUNTIME
+  ) {
     // We assume full control over the console and send JavaScript logs to Metro.
     [
       "trace",
@@ -17,7 +21,9 @@ if (!Platform.isTesting) {
       "groupEnd",
       "debug",
     ].forEach((level) => {
+      // @ts-expect-error
       const originalFunction = console[level];
+      // @ts-expect-error
       console[level] = function (...args: readonly any[]) {
         HMRClient.log(
           // @ts-expect-error

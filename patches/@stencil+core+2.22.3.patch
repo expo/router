@@ -1,0 +1,33 @@
+diff --git a/node_modules/@stencil/core/internal/client/index.js b/node_modules/@stencil/core/internal/client/index.js
+index 430f537..3c76795 100644
+--- a/node_modules/@stencil/core/internal/client/index.js
++++ b/node_modules/@stencil/core/internal/client/index.js
+@@ -3226,17 +3226,17 @@ const loadModule = (cmpMeta, hostRef, hmrVersionId) => {
+         return module[exportName];
+     }
+     /*!__STENCIL_STATIC_IMPORT_SWITCH__*/
+-    return import(
+-    /* @vite-ignore */
+-    /* webpackInclude: /\.entry\.js$/ */
+-    /* webpackExclude: /\.system\.entry\.js$/ */
+-    /* webpackMode: "lazy" */
+-    `./${bundleId}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`).then((importedModule) => {
+-        if (!BUILD.hotModuleReplacement) {
+-            cmpModules.set(bundleId, importedModule);
+-        }
+-        return importedModule[exportName];
+-    }, consoleError);
++    // return import(
++    // /* @vite-ignore */
++    // /* webpackInclude: /\.entry\.js$/ */
++    // /* webpackExclude: /\.system\.entry\.js$/ */
++    // /* webpackMode: "lazy" */
++    // `./${bundleId}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`).then((importedModule) => {
++    //     if (!BUILD.hotModuleReplacement) {
++    //         cmpModules.set(bundleId, importedModule);
++    //     }
++    //     return importedModule[exportName];
++    // }, consoleError);
+ };
+ const styles = /*@__PURE__*/ new Map();
+ const modeResolutionChain = [];

@@ -1,5 +1,5 @@
 diff --git a/node_modules/expo-image-picker/build/ExponentImagePicker.web.js b/node_modules/expo-image-picker/build/ExponentImagePicker.web.js
-index 5b51a3e..3c449d3 100644
+index 5b51a3e..90c7072 100644
 --- a/node_modules/expo-image-picker/build/ExponentImagePicker.web.js
 +++ b/node_modules/expo-image-picker/build/ExponentImagePicker.web.js
 @@ -5,53 +5,7 @@ const MediaTypeInput = {
@@ -57,7 +57,7 @@ index 5b51a3e..3c449d3 100644
  function permissionGrantedResponse() {
      return {
          status: PermissionStatus.GRANTED,
-@@ -125,3 +79,59 @@ function readFile(targetFile, options) {
+@@ -125,3 +79,61 @@ function readFile(targetFile, options) {
      });
  }
  //# sourceMappingURL=ExponentImagePicker.web.js.map
@@ -66,6 +66,7 @@ index 5b51a3e..3c449d3 100644
 +// Support web in native
 +if (typeof window !== 'undefined' && window.$$web_requireNativeModule) {
 +    mod = window.$$web_requireNativeModule("ExponentImagePicker");
++    console.log('got:', mod)
 +} else {
 +    mod = {
 +        get name() {
@@ -116,13 +117,21 @@ index 5b51a3e..3c449d3 100644
 +    };
 +}
 +
++// module.exports = mod;
 +export default mod;
 \ No newline at end of file
 diff --git a/node_modules/expo-image-picker/build/ImagePicker.js b/node_modules/expo-image-picker/build/ImagePicker.js
-index d50fe42..554fa8f 100644
+index d50fe42..346f7f5 100644
 --- a/node_modules/expo-image-picker/build/ImagePicker.js
 +++ b/node_modules/expo-image-picker/build/ImagePicker.js
-@@ -175,9 +175,10 @@ export async function launchCameraAsync(options = {}) {
+@@ -1,5 +1,6 @@
+ import { PermissionStatus, createPermissionHook, UnavailabilityError, CodedError, } from 'expo-modules-core';
+ import ExponentImagePicker from './ExponentImagePicker';
++console.log('ExponentImagePicker', ExponentImagePicker)
+ function validateOptions(options) {
+     const { aspect, quality, videoMaxDuration } = options;
+     if (aspect != null) {
+@@ -175,9 +176,10 @@ export async function launchCameraAsync(options = {}) {
   * the selected media assets which have a form of [`ImagePickerAsset`](#imagepickerasset).
   */
  export async function launchImageLibraryAsync(options) {
