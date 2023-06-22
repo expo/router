@@ -86,7 +86,7 @@ describe(nextRedirect, () => {
         {
           from: "/:slug",
           to: "/b/:slug",
-          missing: [
+          exclude: [
             {
               type: "query",
               key: "bar",
@@ -100,7 +100,7 @@ describe(nextRedirect, () => {
         {
           from: "/:slug",
           to: "/b/:slug",
-          missing: [
+          exclude: [
             {
               type: "query",
               key: "foo",

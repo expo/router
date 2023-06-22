@@ -27,6 +27,16 @@ module.exports = {
         asyncRoutes: "development",
         headOrigin: origin,
         origin,
+        redirects: [
+          {
+            from: "/about",
+            to: "/about-us",
+          },
+          {
+            from: "/source",
+            to: "https://github.com/",
+          },
+        ],
       },
     ],
   ],

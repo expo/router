@@ -2,19 +2,25 @@ import Constants from "expo-constants";
 import { match } from "path-to-regexp";
 import URL from "url-parse";
 
+/** Criteria for matching an attribute of a request. */
 export type RedirectMatchable = {
-  /** Only `query` is supported in client-side redirects. */
+  /** The request object to match against. Only `query` is supported in client-side redirects. */
   type: "host" | "header" | "cookie" | "query";
+  /** Key inside the request object for `type`.  */
   key: string;
+  /** If provided, the value for `key` in the incoming request object must match, i.e. `request[type][key] === value`.  */
   value?: string;
 };
 
 export type Redirect = {
-  /** glob pattern */
+  /** glob pattern to match against. Uses `path-to-regexp` to perform matching. */
   from: string;
+  /** String to redirect to given the criteria match the incoming request. */
   to: string;
+  /** Criteria for attributes that must be present in order to match the request. */
   has?: RedirectMatchable[];
-  missing?: RedirectMatchable[];
+  /** Criteria for attributes that must **not** be present in order to match the request. */
+  exclude?: RedirectMatchable[];
 };
 
 export function nextRedirect(
@@ -57,12 +63,12 @@ export function matchRedirect(pathname: string, redirects: Redirect[]) {
     })(url.pathname);
 
     if (matchResult) {
-      if (redirect.missing) {
-        const allMissing = redirect.missing.every((matchable) => {
+      if (redirect.exclude) {
+        const allExcludes = redirect.exclude.every((matchable) => {
           const result = matchHas(url, matchable);
           return result === null || result === false;
         });
-        if (!allMissing) {
+        if (!allExcludes) {
           continue;
         }
       }
@@ -77,7 +83,7 @@ export function matchRedirect(pathname: string, redirects: Redirect[]) {
       }
 
       const next = new URL(
-        redirect.to.replace(/\:([a-zA-Z0-9]+)/g, (_, key) => {
+        redirect.to.replace(/:([a-zA-Z0-9]+)/g, (_, key) => {
           return matchResult.params[key];
         })
       );

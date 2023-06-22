@@ -3,6 +3,60 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$ref": "#/definitions/Props",
     "definitions": {
+        "Redirect": {
+            "description": "Represents criteria for matching a request and the redirect destination.",
+            "properties": {
+                "from": {
+                    "description": "Glob pattern to match against. Uses `path-to-regexp` to perform matching.",
+                    "type": "string"
+                },
+                "to": {
+                    "description": "String to redirect to given the criteria match the incoming request.",
+                    "type": "string"
+                },
+                "has": {
+                    "description": "Criteria for attributes that must be present in order to match the request.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/RedirectMatchable"
+                    }
+                },
+                "exclude": {
+                    "description": "Criteria for attributes that must be present in order to match the request.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/RedirectMatchable"
+                    }
+                }
+            },
+            "required": ["from", "to"],
+            "additionalProperties": false
+        },
+        "RedirectMatchable": {
+            "description": "Criteria for matching an attribute of a request.",
+            "properties": {
+                "type": {
+                    "description": "The request object to match against. Only `query` is supported in client-side redirects.",
+                    "type": "string",
+                    "enum": [
+                        "host",
+                        "header",
+                        "cookie",
+                        "query"
+                    ]
+                },
+                "key": {
+                    "description": "Key inside the request object for `type`.",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "If provided, the value for `key` in the incoming request object must match, i.e. `request[type][key] === value`.",
+                    "type": "string"
+                }
+            },
+            "required": ["type", "key"],
+            "additionalProperties": false
+        },
         "AsyncRouteOption": {
             "description": "Should Async Routes be enabled, currently only `development` is supported.",
             "oneOf": [
@@ -65,6 +119,13 @@
                             "additionalProperties": true
                         }
                     ]
+                },
+                "redirects": {
+                    "description": "List of objects which match a path and redirect elsewhere",
+                    "type": "array",
+                    "items":{
+                        "$ref": "/definitions/Redirect"
+                    }
                 }
             },
             "required": ["origin"],
