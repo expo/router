@@ -9,9 +9,7 @@ import { install, setLocationHref } from "./Location";
 
 let hasWarned = false;
 
-const manifest = (Constants.manifest ??
-  Constants.manifest2 ??
-  Constants.expoConfig) as Record<string, any> | null;
+const manifest = Constants.expoConfig as Record<string, any> | null;
 
 // Add a development warning for fetch requests with relative paths
 // to ensure developers are aware of the need to configure a production
