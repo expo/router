@@ -3,7 +3,7 @@ title: Routing
 sidebar_position: 1
 ---
 
-The file-based routing convention enables developers to structure their app in a logic and intuitive way. Expo Router uses this convention to optimize the app by generating native deep links and web routes automatically.
+Expo Router uses a file-based routing convention to define pages in the app. Expo Router uses this convention to optimize the app by generating native deep links and web routes automatically.
 
 The convention is based on the concept of nesting routes inside each other to create shared UI elements like tab bars and headers across multiple children. This format should feel familiar to React developers.
 
@@ -78,9 +78,9 @@ export default function HomeLayout() {
 
 Mobile app users expect a refined platform-specific look and native feel for layouts. Expo Router provides a few drop-in native layouts that you can use to easily achieve familiar native behavior.
 
+- `Slot` - Render the current child without any styling. This can be used to create a custom layout.
 - `Stack` - Render a stack of screens like a deck of cards with a header on top. This is a native stack navigator that uses native animations and gestures. Extends the library [`@react-navigation/native-stack`](https://reactnavigation.org/docs/native-stack-navigator).
 - `Tabs` - Render screens with a tab bar below. [`@react-navigation/bottom-tabs`](https://reactnavigation.org/docs/bottom-tab-navigator/).
-- `Navigator` - Render screens in a generic, unstyled wrapper. This is useful for creating custom layouts.
 
 ```js title="app/home/_layout.js"
 import { Stack } from 'expo-router';
@@ -146,31 +146,42 @@ This is useful for adding layouts without adding additional segments to the URL.
 
 ### Shared Routes
 
+> Shared routes are an advanced concept that is unique to native app development.
+
 To match the same URL with different layouts, use _groups_ with overlapping child routes.
 
-This pattern is very common in native apps. For example, in Twitter, a profile can be viewed in every tab (home, search, profile). There should only be one URL needed to access this route however.
+This pattern is very common in native apps like Spotify, Facebook, or Instagram. For example, in Twitter, a profile can be viewed in every tab (home, search, profile) simultaneously, there should however only be one URL for this route.
+
+For **example-driven developers**: see this pseudo-twitter example: [Live demo](https://expo-twitter.netlify.app/) | [Source code](https://github.com/EvanBacon/expo-router-twitter/tree/main/app).
+
+Consider the following structure, the `app/*/[user].js` route can appear in multiple tabs simultaneously, while sharing the same public URL.
 
 ```bash title="File System"
 app/
   _layout.js # Tab bar
   (home)
     _layout.js # Header
-    [user].js # Matches `/baconbrix`
+    home.js # Matches `/home`
+    [user].js # Matches `/evanbacon`
   (search)
     _layout.js # Header with search bar
-    [user].js # Also matches `/baconbrix`
+    search.js # Matches `/search`
+    [user].js # Also matches `/evanbacon`
   (profile)
     _layout.js # Folding profile header
-    [user].js # Also matches `/baconbrix`
+    profile.js # Matches `/profile`
+    [user].js # Also matches `/evanbacon`
 ```
 
 > When reloading the page, the first match (alphabetically) will be rendered.
 
-Shared routes can be navigated to directly by including the group name in the route, e.g. `/(search)/baconbrix` would navigate to `/baconbrix` in the _search_ layout.
+Shared routes can be navigated to directly by including the group name in the route, e.g. `/(search)/evanbacon` would navigate to `/evanbacon` in the _search_ layout.
 
 <!-- TODO: optional group syntax `(())` -->
 
 ### Arrays
+
+> Array syntax is an advanced concept that is unique to native app development.
 
 Instead of defining the same route multiple times with different layouts, use the array syntax `(,)` to duplicate the children of a group.
 

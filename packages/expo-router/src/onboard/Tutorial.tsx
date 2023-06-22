@@ -68,13 +68,24 @@ export function Tutorial() {
             style={styles.subtitle}
           >
             Start by creating a file{"\n"}in the{" "}
-            <Text style={{ fontWeight: "bold" }}>app</Text> directory.
+            <Text style={{ fontWeight: "bold" }}>{getRootDir()}</Text>{" "}
+            directory.
           </Text>
           {canAutoTouchFile && <Button />}
         </View>
       </SafeAreaView>
     </View>
   );
+}
+
+function getRootDir() {
+  const dir = process.env.EXPO_ROUTER_ABS_APP_ROOT!;
+  if (dir.match(/\/src\/app$/)) {
+    return "src/app";
+  } else if (dir.match(/\/app$/)) {
+    return "app";
+  }
+  return dir.split("/").pop() ?? dir;
 }
 
 function Button() {
@@ -85,6 +96,10 @@ function Button() {
       }}
       style={{
         ...Platform.select({
+          web: {
+            // subtle white shadow
+            boxShadow: "rgba(255, 255, 255, 0.15) 0px 0px 20px 5px",
+          },
           native: {
             position: "absolute",
             bottom: 24,
@@ -111,7 +126,8 @@ function Button() {
             selectable={false}
             style={[styles.code, hovered && { color: "black" }]}
           >
-            <Text style={{ color: "#BCC3CD" }}>$</Text> touch app/index.js
+            <Text style={{ color: "#BCC3CD" }}>$</Text> touch {getRootDir()}
+            /index.js
           </Text>
         </View>
       )}
@@ -125,7 +141,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundImage:
       "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)",
-    backgroundPosition: "-3px -3px",
+    backgroundPositionX: -3,
+    backgroundPositionY: -3,
     backgroundSize: "40px 40px",
   },
   safeArea: {

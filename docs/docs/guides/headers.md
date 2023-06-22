@@ -82,11 +82,11 @@ You can use the imperative API `router.setParams()` function to configure the ro
 
 ```js title=app/details.tsx
 import { View, Text } from "react-native";
-import { Stack, useSearchParams, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 
 export default function Details() {
   const router = useRouter();
-  const params = useSearchParams();
+  const params = useLocalSearchParams();
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>

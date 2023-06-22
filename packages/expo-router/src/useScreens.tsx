@@ -1,14 +1,17 @@
 import React from "react";
 
-import { LocationProvider } from "./LocationProvider";
 import {
   DynamicConvention,
+  LoadedRoute,
   Route,
   RouteNode,
   sortRoutesWithInitial,
   useRouteNode,
 } from "./Route";
+import EXPO_ROUTER_IMPORT_MODE from "./import-mode";
 import { Screen } from "./primitives";
+import { EmptyRoute } from "./views/EmptyRoute";
+import { SuspenseFallback } from "./views/SuspenseFallback";
 import { Try } from "./views/Try";
 
 export type ScreenProps<
@@ -103,6 +106,38 @@ export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
   );
 }
 
+function fromImport({ ErrorBoundary, ...component }: LoadedRoute) {
+  if (ErrorBoundary) {
+    return {
+      default: React.forwardRef((props: any, ref: any) => {
+        const children = React.createElement(component.default, {
+          ...props,
+          ref,
+        });
+        return <Try catch={ErrorBoundary}>{children}</Try>;
+      }),
+    };
+  }
+  if (process.env.NODE_ENV !== "production") {
+    if (
+      typeof component.default === "object" &&
+      component.default &&
+      Object.keys(component.default).length === 0
+    ) {
+      return { default: EmptyRoute };
+    }
+  }
+  return { default: component.default || EmptyRoute };
+}
+
+function fromLoadedRoute(res: LoadedRoute) {
+  if (!(res instanceof Promise)) {
+    return fromImport(res);
+  }
+
+  return res.then(fromImport);
+}
+
 // TODO: Maybe there's a more React-y way to do this?
 // Without this store, the process enters a recursive loop.
 const qualifiedStore = new WeakMap<RouteNode, React.ComponentType<any>>();
@@ -113,7 +148,48 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     return qualifiedStore.get(value)!;
   }
 
-  const { default: Component, ErrorBoundary } = value.loadRoute();
+  let getLoadable: (props: any, ref: any) => JSX.Element;
+
+  // TODO: This ensures sync doesn't use React.lazy, but it's not ideal.
+  if (EXPO_ROUTER_IMPORT_MODE === "lazy") {
+    const AsyncComponent = React.lazy(async () => {
+      const res = value.loadRoute();
+      return fromLoadedRoute(res) as Promise<{
+        default: React.ComponentType<any>;
+      }>;
+    });
+    getLoadable = (props: any, ref: any) => (
+      <React.Suspense fallback={<SuspenseFallback route={value} />}>
+        <AsyncComponent
+          {...{
+            ...props,
+            ref,
+            // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
+            // the intention is to make it possible to deduce shared routes.
+            segment: value.route,
+          }}
+        />
+      </React.Suspense>
+    );
+  } else {
+    const SyncComponent = React.forwardRef((props, ref) => {
+      const res = value.loadRoute();
+      const Component = fromImport(res).default;
+      return <Component {...props} ref={ref} />;
+    });
+
+    getLoadable = (props: any, ref: any) => (
+      <SyncComponent
+        {...{
+          ...props,
+          ref,
+          // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
+          // the intention is to make it possible to deduce shared routes.
+          segment: value.route,
+        }}
+      />
+    );
+  }
 
   const QualifiedRoute = React.forwardRef(
     (
@@ -128,32 +204,14 @@ export function getQualifiedRouteComponent(value: RouteNode) {
       }: any,
       ref: any
     ) => {
-      const children = React.createElement(Component, {
-        ...props,
-        ref,
-        // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
-        // the intention is to make it possible to deduce shared routes.
-        segment: value.route,
-      });
+      const loadable = getLoadable(props, ref);
 
-      const errorBoundary = React.useMemo(() => {
-        if (ErrorBoundary) {
-          return <Try catch={ErrorBoundary}>{children}</Try>;
-        }
-        return children;
-      }, [ErrorBoundary, children]);
-
-      return (
-        <LocationProvider>
-          <Route node={value}>{errorBoundary}</Route>
-        </LocationProvider>
-      );
+      return <Route node={value}>{loadable}</Route>;
     }
   );
 
-  QualifiedRoute.displayName = `Route(${
-    Component.displayName || Component.name || value.route
-  })`;
+  QualifiedRoute.displayName = `Route(${value.route})`;
+
   qualifiedStore.set(value, QualifiedRoute);
   return QualifiedRoute;
 }
@@ -218,6 +276,8 @@ function routeToScreen(
         // Prevent generated screens from showing up in the tab bar.
         if (route.generated) {
           output.tabBarButton = () => null;
+          // TODO: React Navigation doesn't provide a way to prevent rendering the drawer item.
+          output.drawerItemStyle = { height: 0, display: "none" };
         }
 
         return output;

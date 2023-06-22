@@ -8,6 +8,8 @@
 
 import * as React from "react";
 
+import NativeLogBox from "../modules/NativeLogBox";
+import parseErrorStack from "../modules/parseErrorStack";
 import { LogBoxLog, StackType } from "./LogBoxLog";
 import type { LogLevel } from "./LogBoxLog";
 import { LogContext } from "./LogContext";
@@ -18,8 +20,6 @@ import type {
   ComponentStack,
   ExtendedExceptionData,
 } from "./parseLogBoxLog";
-import NativeLogBox from "../modules/NativeLogBox";
-import parseErrorStack from "../modules/parseErrorStack";
 
 export type LogBoxLogs = Set<LogBoxLog>;
 
@@ -68,7 +68,10 @@ type State = {
 const observers: Set<{ observer: Observer } & any> = new Set();
 const ignorePatterns: Set<IgnorePattern> = new Set();
 let logs: LogBoxLogs = new Set();
-let updateTimeout: null | ReturnType<typeof setImmediate> = null;
+let updateTimeout:
+  | null
+  | ReturnType<typeof setImmediate>
+  | ReturnType<typeof setTimeout> = null;
 let _isDisabled = false;
 let _selectedIndex = -1;
 
@@ -119,9 +122,16 @@ export function isMessageIgnored(message: string): boolean {
   return false;
 }
 
+function setImmediateShim(callback: () => void) {
+  if (!global.setImmediate) {
+    return setTimeout(callback, 0);
+  }
+  return global.setImmediate(callback);
+}
+
 function handleUpdate(): void {
   if (updateTimeout == null) {
-    updateTimeout = setImmediate(() => {
+    updateTimeout = setImmediateShim(() => {
       updateTimeout = null;
       const nextState = getNextState();
       observers.forEach(({ observer }) => observer(nextState));

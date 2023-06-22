@@ -9,6 +9,16 @@ Discuss them with us on [GitHub](https://github.com/expo/router/discussions).
 
 :::
 
+## Missing back button
+
+If you setup a modal or other screen which is expected to have a back button, then you'll need to add [`unstable_settings`](https://expo.github.io/router/docs/features/routing/#layout-settings) to the route's layout to ensure the initial route is configured. Initial routes are somewhat unique to mobile apps and therefore fit awkwardly in the system––improvements pending.
+
+```jsx title=app/_layout.tsx
+export const unstable_settings = {
+  initialRouteName: "index",
+};
+```
+
 ## Expo Router vs. Expo vs. React Native CLI
 
 Expo Router is akin to modern web frameworks like SvelteKit, Next.js or Remix, whereas default Expo/React Native projects are more closely related to default React projects built with Create React App.
@@ -41,5 +51,7 @@ Automation is not only easier but it's more reliable. Having to manually maintai
 Expo's routing API is designed to be universal for iOS, Android, and web but our priority is to solving native development. This means there may be aspects of a web-only framework that are more optimal for web, and we recommend using the tools that best suit your needs.
 
 ## How do I server-render my Expo Router website?
+
+> Basic static rendering (SSG) is supported in Expo Router v2. [Learn more here](/docs/lab/static-rendering).
 
 This functionality is not currently offered. Web support is secondary to our native offering and serves to help test and debug the native implementation. We recommend using SvelteKit, Next.js, or Remix for server-rendered websites that compliment your native app.

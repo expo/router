@@ -4,6 +4,14 @@ body:
   - type: markdown
     attributes:
       value: If you have a question or you think your issue might be caused by your application code, post in the [discussions](https://github.com/expo/router/discussions).
+  - type: dropdown
+    attributes:
+      label: Which package manager are you using? (Yarn is recommended)
+      multiple: false
+      options:
+        - yarn
+        - npm
+        - pnpm (known issues due to Metro)
   - type: textarea
     attributes:
       label: Summary

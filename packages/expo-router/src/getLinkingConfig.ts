@@ -1,100 +1,29 @@
-import { LinkingOptions, getActionFromState } from "@react-navigation/native";
+import { getActionFromState, LinkingOptions } from "@react-navigation/native";
 import { openURL } from "expo-linking";
+
 import { RouteNode } from "./Route";
+import { State } from "./fork/getPathFromState";
+import { getReactNavigationConfig, Screen } from "./getReactNavigationConfig";
 import {
   addEventListener,
   getInitialURL,
   getPathFromState,
   getStateFromPath,
 } from "./link/linking";
-import { matchDeepDynamicRouteName, matchDynamicName } from "./matchers";
-import {
-  getRuntimeRedirects,
-  matchRedirect,
-  nextRedirect,
-} from "./static/redirects";
-
-type Screen =
-  | string
-  | {
-      path: string;
-      screens: Record<string, Screen>;
-      initialRouteName?: string;
-    };
-
-// `[page]` -> `:page`
-// `page` -> `page`
-function convertDynamicRouteToReactNavigation(segment: string): string {
-  // NOTE(EvanBacon): To support shared routes we preserve group segments.
-  if (segment === "index") {
-    return "";
-  }
-
-  const rest = matchDeepDynamicRouteName(segment);
-  if (rest != null) {
-    return "*" + rest;
-  }
-  const dynamicName = matchDynamicName(segment);
-
-  if (dynamicName != null) {
-    return `:${dynamicName}`;
-  }
-
-  return segment;
-}
-
-function parseRouteSegments(segments: string): string {
-  return (
-    // NOTE(EvanBacon): When there are nested routes without layouts
-    // the node.route will be something like `app/home/index`
-    // this needs to be split to ensure each segment is parsed correctly.
-    segments
-      .split("/")
-      // Convert each segment to a React Navigation format.
-      .map(convertDynamicRouteToReactNavigation)
-      // Remove any empty paths from groups or index routes.
-      .filter(Boolean)
-      // Join to return as a path.
-      .join("/")
-  );
-}
-
-function convertRouteNodeToScreen(node: RouteNode): Screen {
-  const path = parseRouteSegments(node.route);
-  if (!node.children.length) {
-    return path;
-  }
-  const screens = getReactNavigationScreensConfig(node.children);
-  return {
-    path,
-    screens,
-    // NOTE(EvanBacon): This is bad because it forces all Layout Routes
-    // to be loaded into memory. We should move towards a system where
-    // the initial route name is either loaded asynchronously in the Layout Route
-    // or defined via a file system convention.
-    initialRouteName: node.initialRouteName,
-  };
-}
-
-export function getReactNavigationScreensConfig(
-  nodes: RouteNode[]
-): Record<string, Screen> {
-  return Object.fromEntries(
-    nodes.map((node) => [node.route, convertRouteNodeToScreen(node)] as const)
-  );
-}
+import { nextRedirect } from "./static/redirects";
 
 export function getNavigationConfig(routes: RouteNode): {
   initialRouteName?: string;
   screens: Record<string, Screen>;
 } {
-  return {
-    initialRouteName: routes.initialRouteName,
-    screens: getReactNavigationScreensConfig(routes.children),
-  };
+  return getReactNavigationConfig(routes, true);
 }
 
-export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
+export type ExpoLinkingOptions = LinkingOptions<object> & {
+  getPathFromState?: typeof getPathFromState;
+};
+
+export function getLinkingConfig(routes: RouteNode): ExpoLinkingOptions {
   return {
     prefixes: [],
     // @ts-expect-error
@@ -107,15 +36,25 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
     getInitialURL,
     subscribe: addEventListener,
     getStateFromPath: getStateFromPathMemoized,
-    getPathFromState,
-
+    getPathFromState(
+      state: State,
+      options: Parameters<typeof getPathFromState>[1]
+    ) {
+      return (
+        getPathFromState(state, {
+          screens: [],
+          ...this.config,
+          ...options,
+        }) ?? "/"
+      );
+    },
     // Add all functions to ensure the types never need to fallback.
     // This is a convenience for usage in the package.
     getActionFromState,
   };
 }
 
-const stateCache = new Map<string, any>();
+export const stateCache = new Map<string, any>();
 
 /** We can reduce work by memoizing the state by the pathname. This only works because the options (linking config) theoretically never change.  */
 function getStateFromPathMemoized(
@@ -129,7 +68,7 @@ function getStateFromPathMemoized(
   // TODO: Native-only, web should use server-side redirects.
   const nextPath = nextRedirect(path);
 
-  if (nextPath.match(/.*:\/\//)) {
+  if (nextPath.match(/^[\w\d+.-]+:\/\//)) {
     // If the path is a URL, don't try to match it as a path.
     openURL(nextPath);
     return null;

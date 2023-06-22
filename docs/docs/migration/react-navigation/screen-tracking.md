@@ -15,11 +15,11 @@ app/
 
 ```js title=app/_layout.js
 import { useEffect } from "react";
-import { usePathname, useSearchParams, Slot } from "expo-router";
+import { usePathname, useGlobalSearchParams, Slot } from "expo-router";
 
 export default function Layout() {
   const pathname = usePathname();
-  const params = useSearchParams();
+  const params = useGlobalSearchParams();
 
   // Track the location in your analytics provider here.
   useEffect(() => {

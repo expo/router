@@ -2,6 +2,7 @@ import Constants, { ExecutionEnvironment } from "expo-constants";
 import * as Linking from "expo-linking";
 import { Platform } from "react-native";
 
+import { adjustPathname } from "../fork/extractPathFromURL";
 import getPathFromState from "../fork/getPathFromState";
 import getStateFromPath from "../fork/getStateFromPath";
 
@@ -10,7 +11,11 @@ import getStateFromPath from "../fork/getStateFromPath";
 // This helps keep the native functionality working like the web functionality.
 // For example, if you had a root navigator where the first screen was `/settings` and the second was `/index`
 // then `/index` would be used on web and `/settings` would be used on native.
-export async function getInitialURL(): Promise<string> {
+export function getInitialURL(): Promise<string | null> | string {
+  if (process.env.NODE_ENV === "test") {
+    return Linking.getInitialURL() ?? getRootURL();
+  }
+
   if (Platform.OS === "web") {
     if (typeof window === "undefined") {
       return "";
@@ -33,7 +38,15 @@ export async function getInitialURL(): Promise<string> {
         const parsed = Linking.parse(url);
         // If the URL is defined (default in Expo Go dev apps) and the URL has no path:
         // `exp://192.168.87.39:19000/` then use the default `exp://192.168.87.39:19000/--/`
-        if (parsed.path === null || ["", "/"].includes(parsed.path)) {
+        if (
+          parsed.path === null ||
+          ["", "/"].includes(
+            adjustPathname({
+              hostname: parsed.hostname,
+              pathname: parsed.path,
+            })
+          )
+        ) {
           return getRootURL();
         }
       }
@@ -65,9 +78,15 @@ export function addEventListener(listener: (url: string) => void) {
     // This extra work is only done in the Expo Go app.
     callback = ({ url }: { url: string }) => {
       const parsed = Linking.parse(url);
+
       // If the URL is defined (default in Expo Go dev apps) and the URL has no path:
       // `exp://192.168.87.39:19000/` then use the default `exp://192.168.87.39:19000/--/`
-      if (parsed.path === null || ["", "/"].includes(parsed.path)) {
+      if (
+        parsed.path === null ||
+        ["", "/"].includes(
+          adjustPathname({ hostname: parsed.hostname, pathname: parsed.path })
+        )
+      ) {
         listener(getRootURL());
       } else {
         listener(url);
@@ -80,7 +99,7 @@ export function addEventListener(listener: (url: string) => void) {
 
   return () => {
     // https://github.com/facebook/react-native/commit/6d1aca806cee86ad76de771ed3a1cc62982ebcd7
-    subscription.remove?.();
+    subscription?.remove?.();
   };
 }
 

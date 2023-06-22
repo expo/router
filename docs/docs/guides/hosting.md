@@ -14,7 +14,7 @@ Create a `./public/_redirects` (`./web/_redirects` with Expo Webpack) file and a
 
 ## Vercel
 
-Create a `./vercel.json` and add the following:
+Create a `./public/vercel.json` (contents of the root `public` folder are copied into the output `dist` folder) and add the following:
 
 ```json
 {

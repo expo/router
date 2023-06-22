@@ -4,15 +4,28 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+
 import { ServerContainer, ServerContainerRef } from "@react-navigation/native";
-import App, { getManifest } from "expo-router/_root";
+import App, { getManifest } from "expo-router/_entry";
+import Head from "expo-router/head";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 import { AppRegistry } from "react-native-web";
 
-import Head from "../head/Head";
+import { getRootComponent } from "./getRootComponent";
 
 AppRegistry.registerComponent("App", () => App);
+
+function resetReactNavigationContexts() {
+  // https://github.com/expo/router/discussions/588
+  // https://github.com/react-navigation/react-navigation/blob/9fe34b445fcb86e5666f61e144007d7540f014fa/packages/elements/src/getNamedContext.tsx#LL3C1-L4C1
+
+  // React Navigation is storing providers in a global, this is fine for the first static render
+  // but subsequent static renders of Stack or Tabs will cause React to throw a warning. To prevent this warning, we'll reset the globals before rendering.
+  const contexts = "__react_navigation__elements_contexts";
+  // @ts-expect-error: global
+  global[contexts] = new Map<string, React.Context<any>>();
+}
 
 export function getStaticContent(location: URL): string {
   const headContext: { helmet?: any } = {};
@@ -26,25 +39,29 @@ export function getStaticContent(location: URL): string {
     getStyleElement,
   } = AppRegistry.getApplication("App");
 
-  const out = React.createElement(Root, {
-    // TODO: Use RNW view after they fix hydration for React 18
-    // https://github.com/necolas/react-native-web/blob/e8098fd029102d7801c32c1ede792bce01808c00/packages/react-native-web/src/exports/render/index.js#L10
-    // Otherwise this wraps the app with two extra divs
-    children:
-      // Inject the root tag using createElement to prevent any transforms like the ones in `@expo/html-elements`.
-      React.createElement(
-        "div",
-        {
-          id: "root",
-        },
-        <App />
-      ),
-  });
+  const Root = getRootComponent();
+
+  // This MUST be run before `ReactDOMServer.renderToString` to prevent
+  // "Warning: Detected multiple renderers concurrently rendering the same context provider. This is currently unsupported."
+  resetReactNavigationContexts();
 
   const html = ReactDOMServer.renderToString(
     <Head.Provider context={headContext}>
-      <ServerContainer ref={ref} location={location}>
-        {out}
+      <ServerContainer ref={ref}>
+        <App
+          location={location}
+          wrapper={({ children }) => {
+            return React.createElement(Root, {
+              children: React.createElement(
+                "div",
+                {
+                  id: "root",
+                },
+                children
+              ),
+            });
+          }}
+        />
       </ServerContainer>
     </Head.Provider>
   );
@@ -80,57 +97,6 @@ function mixHeadComponentsWithStaticResults(helmet: any, html: string) {
   html = html.replace("<body ", `<body ${helmet?.bodyAttributes.toString()} `);
 
   return html;
-}
-
-// Follows the setup for react-native-web:
-// https://necolas.github.io/react-native-web/docs/setup/#root-element
-// Plus additional React Native scroll and text parity styles for various
-// browsers.
-// Force root DOM element to fill the parent's height
-const style = `
-html, body, #root {
-  -webkit-overflow-scrolling: touch;
-}
-#root {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-html {
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-}
-body {
-  /* Allows you to scroll below the viewport; default value is visible */
-  overflow-y: auto;
-  overscroll-behavior-y: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -ms-overflow-style: scrollbar;
-}
-`;
-
-function StyleReset() {
-  return <style id="expo-reset" dangerouslySetInnerHTML={{ __html: style }} />;
-}
-
-// TODO(EvanBacon): Expose this to the developer
-export function Root({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" style={{ height: "100%" }}>
-      <head>
-        <meta charSet="utf-8" />
-        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-        <meta
-          name="viewport"
-          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1.00001,viewport-fit=cover"
-        />
-        <StyleReset />
-      </head>
-      <body style={{ height: "100%", overflow: "hidden" }}>{children}</body>
-    </html>
-  );
 }
 
 // Re-export for use in server

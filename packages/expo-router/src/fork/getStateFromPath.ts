@@ -1,8 +1,4 @@
-import {
-  PathConfigMap,
-  findFocusedRoute,
-  validatePathConfig,
-} from "@react-navigation/core";
+import { PathConfigMap } from "@react-navigation/core";
 import type {
   InitialState,
   NavigationState,
@@ -11,7 +7,10 @@ import type {
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
 
+import { RouteNode } from "../Route";
 import { matchGroupName, stripGroupSegmentsFromPath } from "../matchers";
+import { findFocusedRoute } from "./findFocusedRoute";
+import validatePathConfig from "./validatePathConfig";
 
 type Options<ParamList extends object> = {
   initialRouteName?: string;
@@ -30,6 +29,7 @@ type RouteConfig = {
   parse?: ParseConfig;
   hasChildren: boolean;
   userReadableName: string;
+  _route?: RouteNode;
 };
 
 type InitialRouteConfig = {
@@ -82,6 +82,14 @@ export default function getStateFromPath<ParamList extends object>(
   path: string,
   options?: Options<ParamList>
 ): ResultState | undefined {
+  const { initialRoutes, configs } = getMatchableRouteConfigs(options);
+
+  return getStateFromPathWithConfigs(path, configs, initialRoutes);
+}
+
+export function getMatchableRouteConfigs<ParamList extends object>(
+  options?: Options<ParamList>
+) {
   if (options) {
     validatePathConfig(options);
   }
@@ -126,7 +134,7 @@ export default function getStateFromPath<ParamList extends object>(
   // Assert any duplicates before we start parsing.
   assertConfigDuplicates(configs);
 
-  return getStateFromPathWithConfigs(path, configs, initialRoutes);
+  return { configs, initialRoutes };
 }
 
 function assertConfigDuplicates(configs: RouteConfig[]) {
@@ -308,7 +316,10 @@ function getStateFromEmptyPathWithConfigs(
     return undefined;
   }
 
-  const routes = match.routeNames.map((name) => ({ name }));
+  const routes = match.routeNames.map((name) => ({
+    name,
+    _route: match._route,
+  }));
 
   return createNestedStateObject(path, routes, configs, initialRoutes);
 }
@@ -326,14 +337,7 @@ function getStateFromPathWithConfigs(
 
   // We match the whole path against the regex instead of segments
   // This makes sure matches such as wildcard will catch any unmatched routes, even if nested
-  const routes = matchAgainstConfigs(
-    pathname,
-    configs.map((c) => ({
-      ...c,
-      // Add `$` to the regex to make sure it matches till end of the path and not just beginning
-      regex: c.regex ? new RegExp(c.regex.source + "$") : undefined,
-    }))
-  );
+  const routes = matchAgainstConfigs(pathname, configs);
 
   if (routes == null) {
     return undefined;
@@ -420,7 +424,10 @@ function matchAgainstConfigs(
       return { name };
     };
 
-    routes = config.routeNames.map((name) => routeFromName(name));
+    routes = config.routeNames.map((name) => ({
+      ...routeFromName(name),
+      _route: config._route,
+    }));
 
     // TODO(EvanBacon): Maybe we should warn / assert if multiple slugs use the same param name.
     const combinedParams = routes.reduce<Record<string, any>>(
@@ -475,6 +482,8 @@ const createNormalizedConfigs = (
   const config = (routeConfig as any)[screen];
 
   if (typeof config === "string") {
+    // TODO: This should never happen with the addition of `_route`
+
     // If a string is specified as the value of the key(e.g. Foo: '/path'), use it as the pattern
     const pattern = parentPattern ? joinPaths(parentPattern, config) : config;
 
@@ -482,6 +491,7 @@ const createNormalizedConfigs = (
   } else if (typeof config === "object") {
     let pattern: string | undefined;
 
+    const { _route } = config;
     // if an object is specified as the value (e.g. Foo: { ... }),
     // it can have `path` property and
     // it could have `screens` prop which has nested configs
@@ -504,7 +514,8 @@ const createNormalizedConfigs = (
           pattern!,
           config.path,
           config.screens ? !!Object.keys(config.screens)?.length : false,
-          config.parse
+          config.parse,
+          _route
         )
       );
     }
@@ -566,13 +577,14 @@ const createConfigItem = (
   pattern: string,
   path: string,
   hasChildren?: boolean,
-  parse?: ParseConfig
+  parse?: ParseConfig,
+  _route?: any
 ): RouteConfig => {
   // Normalize pattern to remove any leading, trailing slashes, duplicate slashes etc.
   pattern = pattern.split("/").filter(Boolean).join("/");
 
   const regex = pattern
-    ? new RegExp(`^(${pattern.split("/").map(formatRegexPattern).join("")})`)
+    ? new RegExp(`^(${pattern.split("/").map(formatRegexPattern).join("")})$`)
     : undefined;
 
   return {
@@ -585,6 +597,7 @@ const createConfigItem = (
     parse,
     userReadableName: [...routeNames.slice(0, -1), path || screen].join("/"),
     hasChildren: !!hasChildren,
+    _route,
   };
 };
 

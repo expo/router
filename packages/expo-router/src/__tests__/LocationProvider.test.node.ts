@@ -1,7 +1,4 @@
-import {
-  getNormalizedStatePath,
-  compareUrlSearchParams,
-} from "../LocationProvider";
+import { getNormalizedStatePath } from "../LocationProvider";
 
 describe(getNormalizedStatePath, () => {
   // Ensure all values are correctly decoded
@@ -26,30 +23,5 @@ describe(getNormalizedStatePath, () => {
         delta: ["evan", "foxtrot gamma", "hotel india"],
       },
     });
-  });
-});
-
-describe(compareUrlSearchParams, () => {
-  it("compares search params", () => {
-    expect(
-      compareUrlSearchParams(
-        { one: "two", three: ["four"] },
-        { one: "two", three: ["four"] }
-      )
-    ).toBe(true);
-
-    expect(
-      compareUrlSearchParams(
-        { one: "two", three: ["four"], five: "six", seven: "eight" },
-        { one: "two", three: ["four"], five: "six", seven: "eight" }
-      )
-    ).toBe(true);
-
-    expect(
-      compareUrlSearchParams(
-        { six: "seven", eight: ["nine"] },
-        { one: "two", three: ["four"] }
-      )
-    ).toBe(false);
   });
 });

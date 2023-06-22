@@ -19,7 +19,7 @@ npx create-expo-app@latest --example with-router
 
 ## Features
 
-<video src="/router/demo/routing.mp4" controls style={{ width: "100%" }} autoplay loop />
+<!-- <video src="/router/demo/routing.mp4" controls style={{ width: "100%" }} autoplay loop /> -->
 
 - **Native** Truly native navigation with the most cutting-edge developer experience.
 <!-- - **Zero-config** No need to configure anything, just start building your app. -->
@@ -31,9 +31,11 @@ npx create-expo-app@latest --example with-router
 
 ## Getting Started
 
+> Expo Router supports `expo@48.0.0` and greater.
+
 Ensure your computer is [setup for running an Expo app](https://docs.expo.dev/get-started/installation/).
 
-Create a new Expo project (`expo@46.0.13` and greater):
+Create a new Expo project:
 
 ```bash
 npx create-expo-app
@@ -42,7 +44,7 @@ npx create-expo-app
 Install `expo-router` and peer dependencies:
 
 ```bash
-npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar react-native-gesture-handler
 ```
 
 Then delete the entry point in your `package.json`, or replace it with `index.js` to be explicit:
@@ -59,7 +61,7 @@ Create a new file `index.js` in the root of your project. If it exists already, 
 import "expo-router/entry";
 ```
 
-Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guides/customizing-metro/#web-support-how) in your `app.json` (or `app.config.js`):
+Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guides/customizing-metro/#web-support) in your `app.json` (or `app.config.js`):
 
 ```json
 {
@@ -73,17 +75,17 @@ Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guide
 }
 ```
 
-<!-- TODO: Drop this when we upgrade React Native -->
+<!-- 76 is required for typed routes plugin -->
 
-Ensure you're using at least `metro@0.73.7` by setting a Yarn resolution or npm override (this step goes away in Expo SDK 47).
+Ensure you're using at least `metro@0.76.0` by setting a Yarn resolution or npm override.
 
 If you use **Yarn**:
 
 ```json title=package.json
 {
   "resolutions": {
-    "metro": "0.73.7",
-    "metro-resolver": "0.73.7"
+    "metro": "0.76.0",
+    "metro-resolver": "0.76.0"
   }
 }
 ```
@@ -93,8 +95,8 @@ If you use **npm**, this requires npm 8.3.0 or higher. You can install this with
 ```json title=package.json
 {
   "overrides": {
-    "metro": "0.73.7",
-    "metro-resolver": "0.73.7"
+    "metro": "0.76.0",
+    "metro-resolver": "0.76.0"
   }
 }
 ```
@@ -106,10 +108,7 @@ module.exports = function (api) {
   api.cache(true);
   return {
     presets: ["babel-preset-expo"],
-    plugins: [
-      // NOTE: `expo-router/babel` is a temporary extension to `babel-preset-expo`.
-      require.resolve("expo-router/babel"),
-    ],
+    plugins: [require.resolve("expo-router/babel")],
   };
 };
 ```
@@ -119,7 +118,7 @@ module.exports = function (api) {
 Start the server with:
 
 ```
-npx expo start --clear
+npx expo --clear
 ```
 
 Then open by pressing `i`, `a`, or `w` for web (only tested against Metro web).

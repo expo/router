@@ -1,7 +1,7 @@
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
-import { useLinkToPath } from "./useLinkToPath";
+import { useExpoRouter } from "../global-state/router-store";
 import { stripGroupSegmentsFromPath } from "../matchers";
 
 function eventShouldPreventDefault(
@@ -32,7 +32,7 @@ export default function useLinkToPathProps(props: {
   href: string;
   replace?: boolean;
 }) {
-  const linkTo = useLinkToPath();
+  const { linkTo } = useExpoRouter();
 
   const onPress = (
     e?: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent

@@ -4,11 +4,6 @@
 
 Repo for the new File-based router for React Native apps. Please open a discussion if you have any questions or feedback.
 
-- [Router](/packages/expo-router) - Current implementation.
-- [Documentation](https://expo.github.io/router) - Current documentation for the router (WIP / RFC).
-- [Example](/apps/demo) - Test app.
-- [RFC](https://github.com/expo/router/discussions/1) - Add your feedback here.
-
 ## Running
 
 The easiest way to try **Expo Router** is by creating a new project:
@@ -19,21 +14,16 @@ npx create-expo-app@latest -e with-router
 
 See the [setup guide for more](https://expo.github.io/router/docs/).
 
-## Contributing
-
-If you want to work against the latest branch for contributions, you can use `apps/sandbox`.
-
-> `apps/sandbox` is a basic playground for developing the Expo Router package, please don't open PRs specifically to improve the tester.
-
-- Run `yarn` in the root of the repo to install dependencies.
-- Run `yarn start` in the root to compile the `packages/`
-- Change directory to `apps/sandbox` and run `yarn start` to start the demo app.
-- Modify the contents of `apps/sandbox/app/` to use the router.
-
 ## Examples
 
+- [Layouts showcase](https://github.com/EvanBacon/expo-router-layouts-example) - Demo of bottom sheet, drawer, material tabs, top tabs, bottom tabs, js stack, and collapsing header layouts.
+- [Basic Twitter layout clone](https://github.com/EvanBacon/expo-router-twitter) - Similar layout to Twitter. Uses shared routes, and implements universal links.
 - [Test app](/apps/sandbox) - Test app, in this repository.
 - [Demo app](/apps/demo) - Demo app for the latest router version.
 - [Expo Router Guest List App](https://github.com/hola-soy-milk/upleveled-react-native-expo) - Simple guest list app with fetching from external API
 
 > Add yours today!
+
+## Contributing
+
+- [Contributing](/CONTRIBUTING.md) - Read before contributing.

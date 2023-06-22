@@ -26,20 +26,16 @@ export default function Page() {
 The Link component renders a `<Text>` component by default. You can customize the component by passing `asChild` which will forward all props to the first child of the Link component. The child component must support the `onPress` and `onClick` props, `href` and `accessibilityRole` will also be passed down.
 
 ```js
-import { Pressable, Text } from 'react-native';
-import { Link } from 'expo-router';
+import { Pressable, Text } from "react-native";
+import { Link } from "expo-router";
 
 function Home() {
   return (
     // highlight-next-line
-    <Link href="/other" asChild >
-      <Pressable>
-        {({ hovered, pressed }) => (
-          <Text>Home</Text>
-        )}
-      </Pressable>
+    <Link href="/other" asChild>
+      <Pressable>{({ hovered, pressed }) => <Text>Home</Text>}</Pressable>
     </Link>
-  )
+  );
 }
 ```
 
@@ -102,31 +98,6 @@ export default function Route() {
 }
 ```
 
-## `useSearchParams`
-
-Returns the URL search parameters for the globally selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`.
-
-> `/profile/baconbrix?extra=info`
-
-```js title=app/profile/[user].tsx
-import { Text } from "react-native";
-import { useSearchParams } from "expo-router";
-
-export default function Route() {
-  // highlight-next-line
-  const { user, extra } = useSearchParams();
-  return <Text>User: {user}</Text>;
-}
-```
-
-Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `/profile/123`, the results of `useSearchParams` would be as follows:
-
-```js
-{
-  id: "123";
-}
-```
-
 ## `useLocalSearchParams`
 
 Returns the URL search parameters for the contextually selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`. This is useful for stacks where the previous screen is still mounted.
@@ -138,18 +109,71 @@ app/
   [second]/shop.tsx
 ```
 
-When `/abc/home` pushes `/123/shop`, `useSearchParams` would return `{ first: undefined, second: '123' }` on `/app/[first]/home.tsx` because the global URL has changed. However, you may want the params to remain `{ first: 'abc' }` to reflect the context of the screen. In this case, you can use `useLocalSearchParams` to ensure the params `{ first: 'abc' }` are still returned in `/app/[first]/home.tsx`.
+When `/abc/home` pushes `/123/shop`, `useGlobalSearchParams` would return `{ first: undefined, second: '123' }` on `/app/[first]/home.tsx` because the global URL has changed. However, you may want the params to remain `{ first: 'abc' }` to reflect the context of the screen. In this case, you can use `useLocalSearchParams` to ensure the params `{ first: 'abc' }` are still returned in `/app/[first]/home.tsx`.
 
 > `/profile/baconbrix?extra=info`
 
 ```js title=app/profile/[user].tsx
 import { Text } from "react-native";
-import { useSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 
 export default function Route() {
   // highlight-next-line
   const { user, extra } = useLocalSearchParams();
   return <Text>User: {user}</Text>;
+}
+```
+
+This function can be typed using an abstract:
+
+```ts title=app/profile/[user].tsx
+import { useLocalSearchParams } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const { user, extra } = useLocalSearchParams<{
+    user: string;
+    extra?: string;
+  }>();
+}
+```
+
+## `useGlobalSearchParams`
+
+Returns the URL search parameters for the globally selected route. e.g. `/acme?foo=bar` -> `{ foo: "bar" }`.
+
+> `/profile/baconbrix?extra=info`
+
+```js title=app/profile/[user].tsx
+import { Text } from "react-native";
+import { useGlobalSearchParams } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const { user, extra } = useGlobalSearchParams();
+  return <Text>User: {user}</Text>;
+}
+```
+
+Given a route at `app/profile/[id].tsx` if the hook is called while the URL is `/profile/123`, the results of `useGlobalSearchParams` would be as follows:
+
+```js
+{
+  id: "123";
+}
+```
+
+This function can be typed using an abstract:
+
+```ts title=app/profile/[user].tsx
+import { useGlobalSearchParams } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const { user, extra } = useGlobalSearchParams<{
+    user: string;
+    extra?: string;
+  }>();
 }
 ```
 
@@ -167,6 +191,17 @@ export default function Route() {
   const segments = useSegments();
   // segments = ["profile", "[user]"]
   return <Text>Hello</Text>;
+}
+```
+
+This function can be typed using an abstract of string arrays:
+
+```ts title=app/profile/[user].tsx
+import { useSegments } from "expo-router";
+
+export default function Route() {
+  // highlight-next-line
+  const segments = useSegments<["profile"] | ["profile", "[user]"]>();
 }
 ```
 
@@ -195,6 +230,10 @@ export default function Route() {
   );
 }
 ```
+
+## `useSearchParams`
+
+This function has been renamed to `useGlobalSearchParams`. Often, you'll want to use `useLocalSearchParams` unless you're attempting to observe and report the global state.
 
 ## Redirect
 
