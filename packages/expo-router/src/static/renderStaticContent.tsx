@@ -16,6 +16,17 @@ import { getRootComponent } from "./getRootComponent";
 
 AppRegistry.registerComponent("App", () => App);
 
+function resetReactNavigationContexts() {
+  // https://github.com/expo/router/discussions/588
+  // https://github.com/react-navigation/react-navigation/blob/9fe34b445fcb86e5666f61e144007d7540f014fa/packages/elements/src/getNamedContext.tsx#LL3C1-L4C1
+
+  // React Navigation is storing providers in a global, this is fine for the first static render
+  // but subsequent static renders of Stack or Tabs will cause React to throw a warning. To prevent this warning, we'll reset the globals before rendering.
+  const contexts = "__react_navigation__elements_contexts";
+  // @ts-expect-error: global
+  global[contexts] = new Map<string, React.Context<any>>();
+}
+
 export function getStaticContent(location: URL): string {
   const headContext: { helmet?: any } = {};
 
@@ -29,6 +40,10 @@ export function getStaticContent(location: URL): string {
   } = AppRegistry.getApplication("App");
 
   const Root = getRootComponent();
+
+  // This MUST be run before `ReactDOMServer.renderToString` to prevent
+  // "Warning: Detected multiple renderers concurrently rendering the same context provider. This is currently unsupported."
+  resetReactNavigationContexts();
 
   const html = ReactDOMServer.renderToString(
     <Head.Provider context={headContext}>
