@@ -8,6 +8,12 @@
 
 ### 🐛 Bug fixes
 
+## [Thu, 22 Jun 2023 17:12:26 -0500](https://github.com/expo/router/commit/a83e1cd3bb15bccb83fc5c31bc4706260cba49b0)
+
+### 🐛 Bug fixes
+
+- Fix position for error overlays ([#674](https://github.com/expo/router/issues/674))
+
 ## [Thu, 15 Jun 2023 22:44:54 -0500](https://github.com/expo/router/commit/ac12133d0179dd1b2ec170b75ee04fae4456f2d6)
 
 ## [Tue, 13 Jun 2023 19:03:46 -0500](https://github.com/expo/router/commit/10bfe14151b2a89190bde4a371a4c6039d8f354d)

@@ -10,6 +10,21 @@
 
 ### 💡 Others
 
+## [Thu, 22 Jun 2023 17:12:26 -0500](https://github.com/expo/router/commit/a83e1cd3bb15bccb83fc5c31bc4706260cba49b0)
+
+### 🎉 New features
+
+- Allow +html file to use hooks ([#672](https://github.com/expo/router/issues/672))
+
+### 🐛 Bug fixes
+
+- Fix Unmatched rendering in static rendering ([#669](https://github.com/expo/router/issues/669))
+
+### 💡 Others
+
+- Manifest is deprecated in SDK 49, use expoConfig instead ([#679](https://github.com/expo/router/issues/679))
+- Additional tests ([#635](https://github.com/expo/router/issues/635))
+
 ## [Thu, 15 Jun 2023 22:44:54 -0500](https://github.com/expo/router/commit/ac12133d0179dd1b2ec170b75ee04fae4456f2d6)
 
 ### 🐛 Bug fixes
