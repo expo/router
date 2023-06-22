@@ -44,11 +44,9 @@ const memoSanitizeUrl = memoize(sanitizeUrl);
 
 function getUrlFromConstants(): string | null {
   // This will require a rebuild in bare-workflow to update.
-  const manifest =
-    Constants.expoConfig || Constants.manifest2 || Constants.manifest;
+  const manifest = Constants.expoConfig;
 
   const origin =
-    // @ts-expect-error
     manifest?.extra?.router?.headOrigin ?? manifest?.extra?.router?.origin;
 
   if (!origin) {
