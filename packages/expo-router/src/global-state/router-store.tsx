@@ -61,6 +61,7 @@ export class RouterStore {
     this.storeSubscribers.clear();
 
     this.routeNode = getRoutes(context);
+
     this.rootComponent = this.routeNode
       ? getQualifiedRouteComponent(this.routeNode)
       : Fragment;

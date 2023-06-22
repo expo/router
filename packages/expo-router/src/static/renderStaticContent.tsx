@@ -41,28 +41,28 @@ export function getStaticContent(location: URL): string {
 
   const Root = getRootComponent();
 
-  const out = React.createElement(Root, {
-    // TODO: Use RNW view after they fix hydration for React 18
-    // https://github.com/necolas/react-native-web/blob/e8098fd029102d7801c32c1ede792bce01808c00/packages/react-native-web/src/exports/render/index.js#L10
-    // Otherwise this wraps the app with two extra divs
-    children:
-      // Inject the root tag using createElement to prevent any transforms like the ones in `@expo/html-elements`.
-      React.createElement(
-        "div",
-        {
-          id: "root",
-        },
-        <App location={location} />
-      ),
-  });
-
   // This MUST be run before `ReactDOMServer.renderToString` to prevent
   // "Warning: Detected multiple renderers concurrently rendering the same context provider. This is currently unsupported."
   resetReactNavigationContexts();
 
   const html = ReactDOMServer.renderToString(
     <Head.Provider context={headContext}>
-      <ServerContainer ref={ref}>{out}</ServerContainer>
+      <ServerContainer ref={ref}>
+        <App
+          location={location}
+          wrapper={({ children }) => {
+            return React.createElement(Root, {
+              children: React.createElement(
+                "div",
+                {
+                  id: "root",
+                },
+                children
+              ),
+            });
+          }}
+        />
+      </ServerContainer>
     </Head.Provider>
   );
 
