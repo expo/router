@@ -24,6 +24,7 @@ const withRouter = (config, props) => {
         extra: {
             ...config.extra,
             router: {
+                origin: false,
                 ...config.extra?.router,
                 ...props,
             },
