@@ -1,6 +1,6 @@
 {
   "name": "expo-router",
-  "version": "2.0.0-rc.1",
+  "version": "2.0.0-rc.2",
   "main": "src/index.tsx",
   "types": "build/index.d.ts",
   "files": [
@@ -104,12 +104,12 @@
   },
   "dependencies": {
     "@bacons/react-views": "^1.1.3",
-    "@expo/metro-runtime": "2.1.7",
+    "@expo/metro-runtime": "2.1.8",
     "@radix-ui/react-slot": "1.0.1",
     "@react-navigation/bottom-tabs": "~6.5.7",
     "@react-navigation/native": "~6.1.6",
     "@react-navigation/native-stack": "~6.9.12",
-    "expo-head": "0.0.9",
+    "expo-head": "0.0.10",
     "expo-splash-screen": "*",
     "query-string": "7.1.3",
     "react-helmet-async": "^1.3.0",
