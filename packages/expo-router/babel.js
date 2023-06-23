@@ -59,7 +59,7 @@ function getExpoRouterImportMode(projectRoot, platform) {
   }
 
   // NOTE: This is a temporary workaround for static rendering on web.
-  if (platform === "web" && process.env.EXPO_USE_STATIC) {
+  if (platform === "web" && (exp.web || {}).output === "static") {
     mode = "sync";
   }
 
