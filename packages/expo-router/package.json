@@ -1,6 +1,6 @@
 {
   "name": "expo-router",
-  "version": "2.0.0-rc.3",
+  "version": "2.0.0-rc.4",
   "main": "src/index.tsx",
   "types": "build/index.d.ts",
   "files": [
@@ -61,11 +61,11 @@
   },
   "peerDependencies": {
     "@react-navigation/drawer": "^6.5.8",
-    "expo": "^48.0.0",
+    "expo": "^49.0.0-alpha.6",
     "expo-constants": "*",
     "expo-linking": "*",
     "expo-status-bar": "*",
-    "metro": "~0.76.0",
+    "metro": "~0.76.7",
     "react-native-gesture-handler": "*",
     "react-native-reanimated": "*",
     "react-native-safe-area-context": "*",
