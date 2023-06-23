@@ -16,7 +16,8 @@ const withExpoHeadIos = (config) => {
         return config;
     });
 };
-const withRouter = (config, props) => {
+const withRouter = (config, _props) => {
+    const props = _props || {};
     (0, schema_utils_1.validate)(schema, props);
     withExpoHeadIos(config);
     return {

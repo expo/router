@@ -13,5 +13,5 @@ declare const withRouter: ConfigPlugin<{
         web?: string;
         default?: string;
     };
-}>;
+} | void>;
 export default withRouter;
