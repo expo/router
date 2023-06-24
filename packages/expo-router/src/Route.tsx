@@ -7,7 +7,7 @@ export type DynamicConvention = { name: string; deep: boolean };
 
 export type LoadedRoute = {
   ErrorBoundary?: React.ComponentType<ErrorBoundaryProps>;
-  default: React.ComponentType<any>;
+  default?: React.ComponentType<any>;
   unstable_settings?: Record<string, any>;
   getNavOptions?: (args: any) => any;
   generateStaticParams?: (props: {
@@ -17,7 +17,7 @@ export type LoadedRoute = {
 
 export type RouteNode = {
   /** Load a route into memory. Returns the exports from a route. */
-  loadRoute: () => LoadedRoute;
+  loadRoute: () => Partial<LoadedRoute>;
   /** Loaded initial route name. */
   initialRouteName?: string;
   /** nested routes */
