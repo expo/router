@@ -110,7 +110,7 @@ function fromImport({ ErrorBoundary, ...component }: LoadedRoute) {
   if (ErrorBoundary) {
     return {
       default: React.forwardRef((props: any, ref: any) => {
-        const children = React.createElement(component.default, {
+        const children = React.createElement(component.default || EmptyRoute, {
           ...props,
           ref,
         });
