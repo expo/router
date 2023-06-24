@@ -5,8 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import getDevServer from "../getDevServer";
-
 export function buildUrlForBundle(bundlePath: string): string {
   if (process.env.NODE_ENV === "production") {
     if (typeof location !== "undefined") {
@@ -15,8 +13,12 @@ export function buildUrlForBundle(bundlePath: string): string {
     throw new Error(
       'Unable to determine the production URL where additional JavaScript chunks are hosted because the global "location" variable is not defined.'
     );
-  }
-  const { url: serverUrl } = getDevServer();
+  } else {
+    const getDevServer =
+      require("../getDevServer") as typeof import("../getDevServer").default;
 
-  return serverUrl.replace(/\/+$/, "") + "/" + bundlePath.replace(/^\/+/, "");
+    const { url: serverUrl } = getDevServer();
+
+    return serverUrl.replace(/\/+$/, "") + "/" + bundlePath.replace(/^\/+/, "");
+  }
 }
