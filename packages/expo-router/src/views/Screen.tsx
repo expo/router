@@ -37,10 +37,13 @@ export function Screen<TOptions extends object = object>({
     navigation.setOptions(options ?? {});
   }, [navigation, options]);
 
-  useDeprecated(
-    "The `redirect` prop on <Screen /> is deprecated and will be removed. Please use `router.redirect` instead",
-    redirect
-  );
+  if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useDeprecated(
+      "The `redirect` prop on <Screen /> is deprecated and will be removed. Please use `router.redirect` instead",
+      redirect
+    );
+  }
 
   if (process.env.NODE_ENV !== "production") {
     // eslint-disable-next-line react-hooks/rules-of-hooks
