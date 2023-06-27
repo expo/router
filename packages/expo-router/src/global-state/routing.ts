@@ -15,6 +15,7 @@ import {
   getQualifiedStateForTopOfTargetState,
   isMovingToSiblingRoute,
 } from "../link/stateOperations";
+import { hasUrlProtocolPrefix } from "../utils/url";
 import type { RouterStore } from "./router-store";
 
 function assertIsReady(store: RouterStore) {
@@ -45,7 +46,7 @@ export function setParams(
 }
 
 export function linkTo(this: RouterStore, href: string, event?: string) {
-  if (isRemoteHref(href)) {
+  if (hasUrlProtocolPrefix(href)) {
     Linking.openURL(href);
     return;
   }
@@ -158,10 +159,6 @@ export function linkTo(this: RouterStore, href: string, event?: string) {
   } else {
     navigationRef.reset(state);
   }
-}
-
-function isRemoteHref(href: string): boolean {
-  return /:\/\//.test(href);
 }
 
 /** @returns `true` if the action is moving to the first screen of all the navigators in the action. */
