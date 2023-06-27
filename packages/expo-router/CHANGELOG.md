@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## [Tue, 27 Jun 2023 16:44:04 -0700](https://github.com/expo/router/commit/8dbfc405ba2b85da98d34936fce829ec22b63d9f)
+
+### 🐛 Bug fixes
+
+- fix initial router info regression ([#689](https://github.com/expo/router/issues/689))
+
 ## [Tue, 27 Jun 2023 11:20:24 -0700](https://github.com/expo/router/commit/94c285ff3b3862a50bfb70d4fda688cedb91f244)
 
 ### 🐛 Bug fixes
