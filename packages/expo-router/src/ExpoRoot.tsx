@@ -104,6 +104,9 @@ function ContextNavigator({
       ref={store.navigationRef}
       initialState={store.initialState}
       linking={store.linking}
+      documentTitle={{
+        enabled: false,
+      }}
     >
       <WrapperComponent>
         <Component />
