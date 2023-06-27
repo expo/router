@@ -10,6 +10,13 @@
 
 ### 💡 Others
 
+## [Tue, 27 Jun 2023 11:20:24 -0700](https://github.com/expo/router/commit/94c285ff3b3862a50bfb70d4fda688cedb91f244)
+
+### 🐛 Bug fixes
+
+- add hasUrlProtocolPrefix ([#691](https://github.com/expo/router/issues/691))
+- expect more optionals ([#685](https://github.com/expo/router/issues/685))
+
 ## [Thu, 22 Jun 2023 20:16:45 -0500](https://github.com/expo/router/commit/88637e027771608f8f163c7a8240ce84ef23f3ad)
 
 ### 🐛 Bug fixes
