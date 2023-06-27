@@ -7,7 +7,7 @@ import { useSyncExternalStore, useMemo, ComponentType, Fragment } from "react";
 
 import { UrlObject, getRouteInfoFromState } from "../LocationProvider";
 import { RouteNode } from "../Route";
-import { getPathDataFromState } from "../fork/getPathFromState";
+import { deepEqual, getPathDataFromState } from "../fork/getPathFromState";
 import { ResultState } from "../fork/getStateFromPath";
 import { ExpoLinkingOptions, getLinkingConfig } from "../getLinkingConfig";
 import { getRoutes } from "../getRoutes";
@@ -30,6 +30,7 @@ export class RouterStore {
 
   initialState: ResultState | undefined;
   rootState: ResultState | undefined;
+  nextState: ResultState | undefined;
   routeInfo?: UrlObject | undefined;
 
   navigationRef!: NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>;
@@ -54,6 +55,7 @@ export class RouterStore {
     this.isReady ||= Boolean(initialLocation);
     this.initialState = undefined;
     this.rootState = undefined;
+    this.nextState = undefined;
     this.routeInfo = undefined;
     this.linking = undefined;
     this.navigationRefSubscription?.();
@@ -99,6 +101,17 @@ export class RouterStore {
       };
     }
 
+    /**
+     * Counter intuitively - this fires AFTER both React Navigations state change and the subsequent paint.
+     * This poses a couple of issues for Expo Router,
+     *   - Ensuring hooks (e.g. useSearchParams()) have data in the initial render
+     *   - Reacting to state changes after a navigation event
+     *
+     * This is why the initial render renders a Fragment and we wait until `onReady()` is called
+     * Additionally, some hooks compare the state from both the store and the navigationRef. If the store it stale,
+     * that hooks will manually update the store.
+     *
+     */
     this.navigationRefSubscription = navigationRef.addListener(
       "state",
       (data) => {
@@ -108,11 +121,18 @@ export class RouterStore {
           this.onReady();
         }
 
-        // This can sometimes be undefined when an error is thrown in the Root Layout Route.
-        if (state && state !== this.rootState) {
-          this.rootState = state;
-          this.routeInfo = this.getRouteInfo(state);
+        let shouldUpdateSubscribers = this.nextState === state;
+        this.nextState = undefined;
 
+        // This can sometimes be undefined when an error is thrown in the Root Layout Route.
+        // Additionally that state may already equal the rootState if it was updated within a hook
+        if (state && state !== this.rootState) {
+          store.updateState(state, undefined);
+          shouldUpdateSubscribers = true;
+        }
+
+        // If the state has changed, or was changed inside a hook we need to update the subscribers
+        if (shouldUpdateSubscribers) {
           for (const subscriber of this.rootStateSubscribers) {
             subscriber();
           }
@@ -122,6 +142,17 @@ export class RouterStore {
 
     for (const subscriber of this.storeSubscribers) {
       subscriber();
+    }
+  }
+
+  updateState(state: ResultState, nextState = state) {
+    store.rootState = state;
+    store.nextState = nextState;
+
+    const nextRouteInfo = store.getRouteInfo(state);
+
+    if (!deepEqual(this.routeInfo, nextRouteInfo)) {
+      store.routeInfo = nextRouteInfo;
     }
   }
 
@@ -181,7 +212,19 @@ export function useExpoRouter() {
   );
 }
 
+function syncStoreRootState() {
+  if (store.navigationRef.isReady()) {
+    const currentState =
+      store.navigationRef.getRootState() as unknown as ResultState;
+
+    if (store.rootState !== currentState) {
+      store.updateState(currentState);
+    }
+  }
+}
+
 export function useStoreRootState() {
+  syncStoreRootState();
   return useSyncExternalStore(
     store.subscribeToRootState,
     store.rootStateSnapshot,
@@ -190,6 +233,7 @@ export function useStoreRootState() {
 }
 
 export function useStoreRouteInfo() {
+  syncStoreRootState();
   return useSyncExternalStore(
     store.subscribeToRootState,
     store.routeInfoSnapshot,
