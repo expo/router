@@ -30,6 +30,7 @@ export class RouterStore {
 
   initialState: ResultState | undefined;
   rootState: ResultState | undefined;
+  nextState: ResultState | undefined;
   routeInfo?: UrlObject | undefined;
 
   navigationRef!: NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>;
@@ -54,6 +55,7 @@ export class RouterStore {
     this.isReady ||= Boolean(initialLocation);
     this.initialState = undefined;
     this.rootState = undefined;
+    this.nextState = undefined;
     this.routeInfo = undefined;
     this.linking = undefined;
     this.navigationRefSubscription?.();
@@ -99,6 +101,17 @@ export class RouterStore {
       };
     }
 
+    /**
+     * Counter intuitively - this fires AFTER both React Navigations state change and the subsequent paint.
+     * This poses a couple of issues for Expo Router,
+     *   - Ensuring hooks (e.g. useSearchParams()) have data in the initial render
+     *   - Reacting to state changes after a navigation event
+     *
+     * This is why the initial render renders a Fragment and we wait until `onReady()` is called
+     * Additionally, some hooks compare the state from both the store and the navigationRef. If the store it stale,
+     * that hooks will manually update the store.
+     *
+     */
     this.navigationRefSubscription = navigationRef.addListener(
       "state",
       (data) => {
@@ -108,11 +121,19 @@ export class RouterStore {
           this.onReady();
         }
 
+        let shouldUpdateSubscribers = this.nextState === state;
+
         // This can sometimes be undefined when an error is thrown in the Root Layout Route.
+        // Additionally that state may already equal the rootState if it was updated within a hook
         if (state && state !== this.rootState) {
           this.rootState = state;
           this.routeInfo = this.getRouteInfo(state);
+          this.nextState = undefined;
+          shouldUpdateSubscribers = true;
+        }
 
+        // If the state has changed, or was changed inside a hook we need to update the subscribers
+        if (shouldUpdateSubscribers) {
           for (const subscriber of this.rootStateSubscribers) {
             subscriber();
           }
@@ -182,6 +203,17 @@ export function useExpoRouter() {
 }
 
 export function useStoreRootState() {
+  if (store.navigationRef.isReady()) {
+    const currentState =
+      store.navigationRef.getRootState() as unknown as ResultState;
+
+    if (store.rootState !== currentState) {
+      store.rootState = currentState;
+      store.routeInfo = store.getRouteInfo(currentState);
+      store.nextState = currentState;
+    }
+  }
+
   return useSyncExternalStore(
     store.subscribeToRootState,
     store.rootStateSnapshot,
@@ -190,6 +222,7 @@ export function useStoreRootState() {
 }
 
 export function useStoreRouteInfo() {
+  useStoreRootState();
   return useSyncExternalStore(
     store.subscribeToRootState,
     store.routeInfoSnapshot,
