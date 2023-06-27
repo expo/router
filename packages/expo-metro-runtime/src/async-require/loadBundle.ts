@@ -32,8 +32,8 @@ export function loadBundleAsync(bundlePath: string): Promise<void> {
     return fetchThenEvalAsync(requestUrl)
       .then(() => {
         if (process.env.NODE_ENV !== "production") {
-          const HMRClient =
-            require("../HMRClient") as typeof import("../HMRClient").default;
+          const HMRClient = require("../HMRClient")
+            .default as typeof import("../HMRClient").default;
           HMRClient.registerBundle(requestUrl);
         }
       })
