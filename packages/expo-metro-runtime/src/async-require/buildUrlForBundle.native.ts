@@ -8,7 +8,7 @@
 export function buildUrlForBundle(bundlePath: string): string {
   if (process.env.NODE_ENV === "production") {
     if (typeof location !== "undefined") {
-      return location.origin.replace(/\/+$/, "") + "/" + bundlePath;
+      return joinComponents(location.origin, bundlePath);
     }
     throw new Error(
       'Unable to determine the production URL where additional JavaScript chunks are hosted because the global "location" variable is not defined.'
@@ -19,6 +19,10 @@ export function buildUrlForBundle(bundlePath: string): string {
 
     const { url: serverUrl } = getDevServer();
 
-    return serverUrl.replace(/\/+$/, "") + "/" + bundlePath.replace(/^\/+/, "");
+    return joinComponents(serverUrl, bundlePath);
   }
+}
+
+function joinComponents(prefix: string, suffix: string): string {
+  return prefix.replace(/\/+$/, "") + "/" + suffix.replace(/^\/+/, "");
 }

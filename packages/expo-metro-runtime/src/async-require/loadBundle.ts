@@ -14,7 +14,7 @@ let pendingRequests = 0;
  *
  * @param bundlePath Given a statement like `import('./Bacon')` `bundlePath` would be `Bacon.bundle?params=from-metro`.
  */
-export function loadBundleAsync(bundlePath: string): Promise<void> {
+export async function loadBundleAsync(bundlePath: string): Promise<void> {
   const requestUrl = buildUrlForBundle(bundlePath);
 
   if (process.env.NODE_ENV === "production") {
