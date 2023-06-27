@@ -9,7 +9,8 @@ import {
   usePathname,
   useSegments,
 } from "../hooks";
-import { act } from "../testing-library";
+import Stack from "../layouts/Stack";
+import { act, renderRouter } from "../testing-library";
 import { inMemoryContext } from "../testing-library/context-stubs";
 
 /*
@@ -99,6 +100,129 @@ describe(useGlobalSearchParams, () => {
     expectType<{ a?: string }>(params);
     expectType<string | undefined>(params.a);
   });
+
+  it(`only renders once per navigation`, () => {
+    const allHookValues: unknown[] = [];
+
+    renderRouter(
+      {
+        "[fruit]/[shape]/[...veg?]": function Test() {
+          allHookValues.push({
+            url: usePathname(),
+            globalParams: useGlobalSearchParams(),
+            params: useLocalSearchParams(),
+          });
+          return null;
+        },
+      },
+      {
+        initialUrl: "/apple/square",
+      }
+    );
+
+    act(() => router.push("/banana/circle/carrot"));
+
+    expect(allHookValues).toEqual([
+      // The initial render
+      {
+        url: "/apple/square",
+        globalParams: {
+          fruit: "apple",
+          shape: "square",
+        },
+        params: {
+          fruit: "apple",
+          shape: "square",
+        },
+      },
+      // The new screen
+      {
+        url: "/banana/circle/carrot",
+        globalParams: {
+          fruit: "banana",
+          shape: "circle",
+          veg: "carrot",
+        },
+        params: {
+          fruit: "banana",
+          shape: "circle",
+          veg: ["carrot"],
+        },
+      },
+    ]);
+  });
+
+  it(`causes stacks in a screen to rerender on change `, () => {
+    const allHookValues: unknown[] = [];
+
+    // When using a navigation that keeps the screens in memory (e.g. Stack)
+    // , any <Screen /> that uses useGlobalSearchParams Should update
+    // when the searchparams change, even if not visible
+    //
+    // This is different to the "only renders once per navigation" which only renders
+    // the current screen
+
+    renderRouter(
+      {
+        _layout: () => <Stack />,
+        "[fruit]/[shape]/[...veg?]": function Test() {
+          allHookValues.push({
+            url: usePathname(),
+            globalParams: useGlobalSearchParams(),
+            params: useLocalSearchParams(),
+          });
+          return null;
+        },
+      },
+      {
+        initialUrl: "/apple/square",
+      }
+    );
+
+    act(() => router.push("/banana/circle/carrot"));
+
+    expect(allHookValues).toEqual([
+      // The initial render
+      {
+        url: "/apple/square",
+        globalParams: {
+          fruit: "apple",
+          shape: "square",
+        },
+        params: {
+          fruit: "apple",
+          shape: "square",
+        },
+      },
+      // The new screen
+      {
+        url: "/banana/circle/carrot",
+        globalParams: {
+          fruit: "banana",
+          shape: "circle",
+          veg: "carrot",
+        },
+        params: {
+          fruit: "banana",
+          shape: "circle",
+          veg: ["carrot"],
+        },
+      },
+      // The is the first page rerendering due to being in a <Stack />
+      {
+        url: "/banana/circle/carrot",
+        globalParams: {
+          fruit: "banana",
+          shape: "circle",
+          veg: "carrot",
+        },
+        params: {
+          fruit: "apple",
+          shape: "square",
+        },
+      },
+    ]);
+  });
 });
 
 describe(useLocalSearchParams, () => {
@@ -162,3 +286,5 @@ describe(usePathname, () => {
     expect(result.current).toEqual("/banana/circle/carrot/beetroot");
   });
 });
+
+describe("hooks rendering", () => {});

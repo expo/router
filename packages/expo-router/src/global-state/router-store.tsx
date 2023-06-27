@@ -7,7 +7,7 @@ import { useSyncExternalStore, useMemo, ComponentType, Fragment } from "react";
 
 import { UrlObject, getRouteInfoFromState } from "../LocationProvider";
 import { RouteNode } from "../Route";
-import { getPathDataFromState } from "../fork/getPathFromState";
+import { deepEqual, getPathDataFromState } from "../fork/getPathFromState";
 import { ResultState } from "../fork/getStateFromPath";
 import { ExpoLinkingOptions, getLinkingConfig } from "../getLinkingConfig";
 import { getRoutes } from "../getRoutes";
@@ -122,13 +122,12 @@ export class RouterStore {
         }
 
         let shouldUpdateSubscribers = this.nextState === state;
+        this.nextState = undefined;
 
         // This can sometimes be undefined when an error is thrown in the Root Layout Route.
         // Additionally that state may already equal the rootState if it was updated within a hook
         if (state && state !== this.rootState) {
-          this.rootState = state;
-          this.routeInfo = this.getRouteInfo(state);
-          this.nextState = undefined;
+          store.updateState(state, undefined);
           shouldUpdateSubscribers = true;
         }
 
@@ -143,6 +142,17 @@ export class RouterStore {
 
     for (const subscriber of this.storeSubscribers) {
       subscriber();
+    }
+  }
+
+  updateState(state: ResultState, nextState = state) {
+    store.rootState = state;
+    store.nextState = nextState;
+
+    const nextRouteInfo = store.getRouteInfo(state);
+
+    if (!deepEqual(this.routeInfo, nextRouteInfo)) {
+      store.routeInfo = nextRouteInfo;
     }
   }
 
@@ -202,18 +212,19 @@ export function useExpoRouter() {
   );
 }
 
-export function useStoreRootState() {
+function syncStoreRootState() {
   if (store.navigationRef.isReady()) {
     const currentState =
       store.navigationRef.getRootState() as unknown as ResultState;
 
     if (store.rootState !== currentState) {
-      store.rootState = currentState;
-      store.routeInfo = store.getRouteInfo(currentState);
-      store.nextState = currentState;
+      store.updateState(currentState);
     }
   }
+}
 
+export function useStoreRootState() {
+  syncStoreRootState();
   return useSyncExternalStore(
     store.subscribeToRootState,
     store.rootStateSnapshot,
@@ -222,7 +233,7 @@ export function useStoreRootState() {
 }
 
 export function useStoreRouteInfo() {
-  useStoreRootState();
+  syncStoreRootState();
   return useSyncExternalStore(
     store.subscribeToRootState,
     store.routeInfoSnapshot,
