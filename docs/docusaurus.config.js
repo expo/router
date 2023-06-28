@@ -47,25 +47,6 @@ const config = {
     ],
   ],
 
-  plugins: [
-    [
-      "@docusaurus/plugin-client-redirects",
-      {
-        redirects: [
-          {
-            to: "https://docs.expo.dev/router/reference/static-rendering/",
-            from: "/docs/lab/static-rendering/",
-          },
-          {
-            to: "https://docs.expo.dev/versions/v49.0.0/config/metro/#css",
-            from: "/docs/lab/styles/",
-          },
-        ],
-      },
-    ],
-  ],
-  //https://docs.expo.dev/router/reference/static-rendering/
-
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
