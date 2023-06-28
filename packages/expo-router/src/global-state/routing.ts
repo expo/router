@@ -105,9 +105,15 @@ export function linkTo(this: RouterStore, href: string, event?: string) {
     const nextRoute = findTopRouteForTarget(state);
 
     if (knownOwnerState.type === "tab") {
-      navigationRef.dispatch(
-        TabActions.jumpTo(nextRoute.name, nextRoute.params)
-      );
+      if (event === "REPLACE") {
+        navigationRef.dispatch(
+          TabActions.jumpTo(nextRoute.name, nextRoute.params)
+        );
+      } else {
+        navigationRef.dispatch(
+          CommonActions.navigate(nextRoute.name, nextRoute.params)
+        );
+      }
       return;
     } else {
       if (event === "REPLACE") {

@@ -7,6 +7,8 @@ import {
   useLocalSearchParams,
   Redirect,
 } from "../exports";
+import { Stack } from "../layouts/Stack";
+import { Tabs } from "../layouts/Tabs";
 import { act, fireEvent, renderRouter, screen } from "../testing-library";
 
 describe("hooks only", () => {
@@ -159,4 +161,32 @@ it("preserves history when replacing screens within the same navigator", () => {
 
   act(() => router.back());
   expect(screen).toHavePathname("/");
+});
+
+it("replaces from top level modal to initial route in a tab navigator", () => {
+  /* Modified repro of [#221](https://github.com/expo/router/issues/221). */
+
+  renderRouter({
+    _layout: {
+      unstable_settings: {
+        // Ensure that reloading on `/modal` keeps a back button present.
+        initialRouteName: "(tabs)",
+      },
+      default: () => <Stack />,
+    },
+    "[...missing]": () => <Text>missing</Text>,
+    "(tabs)/_layout": () => <Tabs />,
+    "(tabs)/index": () => <Text>two</Text>,
+  });
+
+  expect(screen).toHavePathname("/");
+  expect(screen).toHaveSegments(["(tabs)"]);
+
+  act(() => router.push("/missing-screen"));
+  expect(screen).toHavePathname("/missing-screen");
+  expect(screen).toHaveSegments(["[...missing]"]);
+  act(() => router.push("/"));
+  // /protected should have a redirect that replaces the pathname
+  expect(screen).toHavePathname("/");
+  expect(screen).toHaveSegments(["(tabs)"]);
 });
