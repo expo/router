@@ -8,6 +8,12 @@
 
 ### 🐛 Bug fixes
 
+## [Wed, 28 Jun 2023 15:53:41 -0700](https://github.com/expo/router/commit/11bb4476807dd98eebd2c9052abdc50ddac34f6a)
+
+### 🛠 Breaking changes
+
+- delete custom CSS transformer in favor of expo/metro-runtime ([#698](https://github.com/expo/router/issues/698))
+
 ## [Tue, 27 Jun 2023 11:20:24 -0700](https://github.com/expo/router/commit/94c285ff3b3862a50bfb70d4fda688cedb91f244)
 
 ### 🐛 Bug fixes

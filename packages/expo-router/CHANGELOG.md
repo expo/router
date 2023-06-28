@@ -10,6 +10,13 @@
 
 ### 💡 Others
 
+## [Wed, 28 Jun 2023 15:53:41 -0700](https://github.com/expo/router/commit/11bb4476807dd98eebd2c9052abdc50ddac34f6a)
+
+### 🐛 Bug fixes
+
+- disable setting the document.title with React Navigation ([#693](https://github.com/expo/router/issues/693))
+- fix moving from modal to tab ([#696](https://github.com/expo/router/issues/696))
+
 ## [Tue, 27 Jun 2023 16:44:04 -0700](https://github.com/expo/router/commit/8dbfc405ba2b85da98d34936fce829ec22b63d9f)
 
 ### 🐛 Bug fixes
