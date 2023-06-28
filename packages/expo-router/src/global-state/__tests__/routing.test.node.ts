@@ -1,4 +1,4 @@
-import { isAbsoluteInitialRoute } from "../../global-state/routing";
+import { isAbsoluteInitialRoute } from "../routing";
 
 describe(isAbsoluteInitialRoute, () => {
   it(`returns true when a nested action is absolutely initial`, () => {

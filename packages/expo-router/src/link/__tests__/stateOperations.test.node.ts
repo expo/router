@@ -156,7 +156,6 @@ describe(getQualifiedStateForTopOfTargetState, () => {
       getQualifiedStateForTopOfTargetState(
         {
           type: "stack",
-          key: "stack-FS_ZJZ0VEQWAtuFrQv1wV",
           index: 0,
           routeNames: ["(app)", "_sitemap", "[...404]"],
           routes: [
@@ -164,7 +163,6 @@ describe(getQualifiedStateForTopOfTargetState, () => {
               name: "(app)",
               state: {
                 type: "stack",
-                key: "stack-L59x2fFlmmVjUY9-zrPLk",
                 index: 1,
                 routeNames: ["index", "two", "send", "permissions"],
                 routes: [
@@ -202,7 +200,6 @@ describe(getQualifiedStateForTopOfTargetState, () => {
       )
     ).toEqual({
       index: 1,
-      key: "stack-L59x2fFlmmVjUY9-zrPLk",
       routeNames: ["index", "two", "send", "permissions"],
       routes: [{ name: "index" }, { name: "two", path: "/two" }],
       type: "stack",
@@ -275,6 +272,75 @@ describe(getQualifiedStateForTopOfTargetState, () => {
 });
 
 describe(isMovingToSiblingRoute, () => {
+  it(`returns true when moving from a high-level modal (/modal) to the first tab (/(tabs)/index)`, () => {
+    // Discovered in Expo SDK 49 beta from the tabs template.
+    // Going to `/_sitemap` -> `/foobar` (missing) -> `/` (pop back home).
+    // didn't work because it assumed `/modal` and `/(tabs)/index` were sibling routes.
+    expect(
+      isMovingToSiblingRoute(
+        {
+          stale: false,
+          type: "stack",
+          key: "stack-a5P8_EsAnIzvh34s0mPr6",
+          index: 1,
+          routeNames: ["(tabs)", "_sitemap", "[...missing]"],
+          routes: [
+            {
+              name: "(tabs)",
+              key: "(tabs)-nQhC-Q4Ldn0JOaFgDVqsY",
+              state: {
+                stale: false,
+                type: "tab",
+                key: "tab-EpWWwS_dplNQEmSOBgnjg",
+                index: 0,
+                routeNames: ["index", "two"],
+                history: [
+                  {
+                    type: "route",
+                    key: "index-3a4SpcHaMEUdxuaVnGGZ0",
+                  },
+                ],
+                routes: [
+                  {
+                    name: "index",
+                    key: "index-3a4SpcHaMEUdxuaVnGGZ0",
+                  },
+                  {
+                    name: "two",
+                    key: "two-rQPjCgQDfXpHU2Ft-6t3A",
+                  },
+                ],
+              },
+            },
+            {
+              name: "[...missing]",
+              params: {
+                missing: ["[...missing]", "1687982087761"],
+              },
+              path: "/[...missing]/1687982087761",
+              key: "[...missing]-7uOsFmuZMfC6Q8bgOm7Ig",
+            },
+          ],
+        },
+        {
+          routes: [
+            {
+              name: "(tabs)",
+              state: {
+                routes: [
+                  {
+                    name: "index",
+                    path: "/",
+                  },
+                ],
+              },
+            },
+          ],
+        }
+      )
+    ).toBe(true);
+  });
+
   it(`returns false`, () => {
     expect(
       isMovingToSiblingRoute(

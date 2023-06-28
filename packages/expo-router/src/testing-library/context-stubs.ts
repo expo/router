@@ -4,7 +4,10 @@ import requireContext from "./require-context-ponyfill";
 
 export type ReactComponent = () => React.ReactElement<any, any> | null;
 export type FileStub =
-  | (Record<string, unknown> & { default: ReactComponent })
+  | (Record<string, unknown> & {
+      default: ReactComponent;
+      unstable_settings?: Record<string, any>;
+    })
   | ReactComponent;
 
 export { requireContext };
