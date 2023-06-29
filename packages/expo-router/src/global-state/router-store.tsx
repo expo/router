@@ -38,6 +38,7 @@ export class RouterStore {
 
   rootStateSubscribers = new Set<() => void>();
   storeSubscribers = new Set<() => void>();
+  private readySubscribers = new Set<() => void>();
 
   linkTo = linkTo.bind(this);
   getSortedRoutes = getSortedRoutes.bind(this);
@@ -182,7 +183,25 @@ export class RouterStore {
       requestAnimationFrame(() => _internal_maybeHideAsync());
     }
     this.isReady = true;
+
+    for (const subscriber of this.readySubscribers) {
+      subscriber();
+    }
   };
+
+  /** Called once when the navigation is ready. Specifically added for `useFocusEvent` + redirection. */
+  onceReady = (callback: () => void) => {
+    if (this.navigationRef.isReady()) {
+      callback();
+    } else {
+      const remove = () => {
+        callback();
+        this.readySubscribers.delete(remove);
+      };
+      this.readySubscribers.add(remove);
+    }
+  };
+
   subscribeToRootState = (subscriber: () => void) => {
     this.rootStateSubscribers.add(subscriber);
     return () => this.rootStateSubscribers.delete(subscriber);

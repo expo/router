@@ -1,8 +1,9 @@
 // A fork of `useFocusEffect` that waits for the navigation state to load before
 // running the effect. This is especially useful for native redirects.
+import { useNavigation } from "@react-navigation/native";
 import * as React from "react";
 
-import { useOptionalNavigation } from "./link/useLoadedNavigation";
+import { useExpoRouter } from "./global-state/router-store";
 
 type EffectCallback = () => undefined | void | (() => void);
 
@@ -17,8 +18,8 @@ export function useFocusEffect(
   effect: EffectCallback,
   do_not_pass_a_second_prop?: never
 ) {
-  const navigation = useOptionalNavigation();
-
+  const { navigationRef, onceReady } = useExpoRouter();
+  const navigation = useNavigation();
   if (do_not_pass_a_second_prop !== undefined) {
     const message =
       "You passed a second argument to 'useFocusEffect', but it only accepts one argument. " +
@@ -79,8 +80,8 @@ export function useFocusEffect(
       }
     };
 
-    // We need to run the effect on intial render/dep changes if the screen is focused
-    if (navigation.isFocused()) {
+    // We need to run the effect on initial render/dep changes if the screen is focused
+    if (navigation.isFocused() && navigationRef.isReady()) {
       cleanup = callback();
       isFocused = true;
     }
@@ -96,8 +97,17 @@ export function useFocusEffect(
         cleanup();
       }
 
-      cleanup = callback();
-      isFocused = true;
+      if (!navigationRef.isReady()) {
+        onceReady(() => {
+          if (!isFocused && navigation.isFocused()) {
+            cleanup = callback();
+            isFocused = true;
+          }
+        });
+      } else {
+        cleanup = callback();
+        isFocused = true;
+      }
     });
 
     const unsubscribeBlur = navigation.addListener("blur", () => {
