@@ -20,7 +20,9 @@ import type { RouterStore } from "./router-store";
 
 function assertIsReady(store: RouterStore) {
   if (!store.isReady || !store.navigationRef.current) {
-    throw new Error("Attempted to use navigation outside of Expo Router");
+    throw new Error(
+      "Attempted to navigate before mounting the Root Layout component. Ensure the Root Layout component is rendering a Slot, or other navigator on the first render."
+    );
   }
 }
 
