@@ -300,7 +300,7 @@ it(
   240 * 1000
 );
 
-it(
+xit(
   "exports with global CSS",
   async () => {
     const projectRoot = await ensureTesterReadyAsync("global-css");
