@@ -5,7 +5,7 @@ import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
-import { useRouter } from "../hooks";
+import { router } from "../imperative-api";
 import { useFocusEffect } from "../useFocusEffect";
 import { Href, resolveHref } from "./href";
 import useLinkToPathProps from "./useLinkToPathProps";
@@ -28,13 +28,15 @@ export interface LinkProps extends Omit<TextProps, "href" | "hoverStyle"> {
 
 /** Redirects to the href as soon as the component is mounted. */
 export function Redirect({ href }: { href: Href }) {
-  const router = useRouter();
   useFocusEffect(() => {
-    try {
-      router.replace(href);
-    } catch (error) {
-      console.error(error);
-    }
+    // TODO: Remove this
+    setTimeout(() => {
+      try {
+        router.replace(href);
+      } catch (error) {
+        console.error(error);
+      }
+    });
   });
   return null;
 }
