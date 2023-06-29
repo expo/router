@@ -86,6 +86,25 @@ describe("imperative only", () => {
 
     expect(await screen.findByText("test-name")).toBeOnTheScreen();
   });
+  it("can handle navigation between routes with hashes", async () => {
+    renderRouter({
+      index: function MyIndexRoute() {
+        return <Text testID="index">Press me</Text>;
+      },
+      "/profile/[name]": function MyRoute() {
+        const { name } = useGlobalSearchParams();
+        return <Text>{name}</Text>;
+      },
+    });
+
+    await screen.findByTestId("index");
+
+    act(() => {
+      router.push("/profile/test-name?foo=bar#baz");
+    });
+
+    expect(await screen.findByText("test-name")).toBeOnTheScreen();
+  });
 });
 
 describe("mixed navigation", () => {
