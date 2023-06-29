@@ -100,7 +100,6 @@ describe(RouterStore, () => {
       rootState: {
         routes: [
           {
-            _route: undefined,
             name: "index",
             path: "/",
           },
@@ -109,7 +108,6 @@ describe(RouterStore, () => {
       initialState: {
         routes: [
           {
-            _route: undefined,
             name: "index",
             path: "/",
           },
