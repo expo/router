@@ -38,8 +38,8 @@ export function useRouter(): Router {
     back: store.goBack,
     replace: store.replace,
     setParams: store.setParams,
+    canGoBack: store.canGoBack,
     // TODO(EvanBacon): add `reload`
-    // TODO(EvanBacon): add `canGoBack` but maybe more like a `hasContext`
   };
 }
 

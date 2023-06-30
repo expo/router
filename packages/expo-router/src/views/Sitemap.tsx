@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RouteNode } from "../Route";
 import { useExpoRouter } from "../global-state/router-store";
+import { router } from "../imperative-api";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName } from "../matchers";
 
@@ -147,9 +148,9 @@ function FileItem({
           accessibilityLabel={route.contextKey}
           href={href}
           onPress={() => {
-            if (Platform.OS !== "web") {
+            if (Platform.OS !== "web" && router.canGoBack()) {
               // Ensure the modal pops
-              navigation.goBack();
+              router.back();
             }
           }}
           style={{ flex: 1, display: "flex" }}

@@ -39,6 +39,11 @@ export function goBack(this: RouterStore) {
   this.navigationRef?.current?.goBack();
 }
 
+export function canGoBack(this: RouterStore): boolean {
+  assertIsReady(this);
+  return this.navigationRef?.current?.canGoBack();
+}
+
 export function setParams(
   this: RouterStore,
   params: Record<string, string | number> = {}

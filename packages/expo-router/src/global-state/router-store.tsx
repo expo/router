@@ -14,7 +14,7 @@ import { getRoutes } from "../getRoutes";
 import { RequireContext } from "../types";
 import { getQualifiedRouteComponent } from "../useScreens";
 import { _internal_maybeHideAsync } from "../views/Splash";
-import { goBack, linkTo, push, replace, setParams } from "./routing";
+import { canGoBack, goBack, linkTo, push, replace, setParams } from "./routing";
 import { getSortedRoutes } from "./sort-routes";
 
 /**
@@ -42,6 +42,7 @@ export class RouterStore {
   linkTo = linkTo.bind(this);
   getSortedRoutes = getSortedRoutes.bind(this);
   goBack = goBack.bind(this);
+  canGoBack = canGoBack.bind(this);
   push = push.bind(this);
   replace = replace.bind(this);
   setParams = setParams.bind(this);

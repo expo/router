@@ -52,8 +52,8 @@ export function Unmatched() {
         Page could not be found.{" "}
         <Text
           onPress={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
+            if (router.canGoBack()) {
+              router.back();
             } else {
               router.replace("/");
             }
