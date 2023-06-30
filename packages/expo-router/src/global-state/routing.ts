@@ -41,7 +41,7 @@ export function goBack(this: RouterStore) {
 
 export function canGoBack(this: RouterStore): boolean {
   assertIsReady(this);
-  return this.navigationRef?.current?.canGoBack();
+  return this.navigationRef?.current?.canGoBack() ?? false;
 }
 
 export function setParams(
