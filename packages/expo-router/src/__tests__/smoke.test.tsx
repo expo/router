@@ -109,17 +109,20 @@ it("nested layouts", async () => {
     "(app)/_layout": AppLayout,
     "(app)/index": Index,
     "(app)/(tabs)/_layout": TabsLayout,
-    "(app)/(tabs)/home/_layout": StackLayout,
+    "(app)/(tabs)/home/_layout": {
+      unstable_settings: { initialRouteName: "index" },
+      default: StackLayout,
+    },
     "(app)/(tabs)/home/index": Home,
     "(app)/(tabs)/home/nested": HomeNested,
   });
 
   expect(await screen.findByText("HomeNested")).toBeOnTheScreen();
 
-  expect(AppLayout).toHaveBeenCalledTimes(3);
-  expect(TabsLayout).toHaveBeenCalledTimes(2);
-  expect(StackLayout).toHaveBeenCalledTimes(2);
+  expect(AppLayout).toHaveBeenCalledTimes(4);
+  expect(TabsLayout).toHaveBeenCalledTimes(3);
+  expect(StackLayout).toHaveBeenCalledTimes(3);
   expect(Index).toHaveBeenCalledTimes(1);
-  expect(Home).toHaveBeenCalledTimes(1);
+  expect(Home).toHaveBeenCalledTimes(2);
   expect(HomeNested).toHaveBeenCalledTimes(1);
 });
