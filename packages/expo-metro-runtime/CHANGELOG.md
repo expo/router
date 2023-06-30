@@ -8,6 +8,12 @@
 
 ### 🐛 Bug fixes
 
+## [Thu, 29 Jun 2023 22:27:08 -0700](https://github.com/expo/router/commit/44ca98dfe9dea5d533badf368ce3374e50873196)
+
+### 🐛 Bug fixes
+
+- Fix iOS HMRClient import ([#706](https://github.com/expo/router/issues/706))
+
 ## [Wed, 28 Jun 2023 15:53:41 -0700](https://github.com/expo/router/commit/11bb4476807dd98eebd2c9052abdc50ddac34f6a)
 
 ### 🛠 Breaking changes
