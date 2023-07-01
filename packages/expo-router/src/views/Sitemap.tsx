@@ -99,8 +99,6 @@ function FileItem({
 }) {
   const disabled = route.children.length > 0;
 
-  const navigation = useNavigation();
-
   const segments = React.useMemo(
     () => [...parents, ...route.route.split("/")],
     [parents, route.route]
