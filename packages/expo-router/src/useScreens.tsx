@@ -29,6 +29,12 @@ export type ScreenProps<
 
   // TODO: types
   listeners?: any;
+
+  getId?: ({
+    params,
+  }: {
+    params?: Record<string, any> | undefined;
+  }) => string | undefined;
 };
 
 function getSortedChildren(
@@ -44,7 +50,7 @@ function getSortedChildren(
   const entries = [...children];
 
   const ordered = order
-    .map(({ name, redirect, initialParams, listeners, options }) => {
+    .map(({ name, redirect, initialParams, listeners, options, getId }) => {
       if (!entries.length) {
         console.warn(
           `[Layout children]: Too many screens defined. Route "${name}" is extraneous.`
@@ -73,7 +79,10 @@ function getSortedChildren(
           return null;
         }
 
-        return { route: match, props: { initialParams, listeners, options } };
+        return {
+          route: match,
+          props: { initialParams, listeners, options, getId },
+        };
       }
     })
     .filter(Boolean) as {
