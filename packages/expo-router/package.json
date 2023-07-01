@@ -110,7 +110,7 @@
     "@react-navigation/native": "~6.1.6",
     "@react-navigation/native-stack": "~6.9.12",
     "expo-head": "0.0.11",
-    "expo-splash-screen": "*",
+    "expo-splash-screen": "~0.20.2",
     "query-string": "7.1.3",
     "react-helmet-async": "^1.3.0",
     "schema-utils": "^4.0.1",
