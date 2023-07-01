@@ -1,5 +1,4 @@
 import { Image, Pressable, StyleSheet, Text, View } from "@bacons/react-views";
-import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import React from "react";
 import {
