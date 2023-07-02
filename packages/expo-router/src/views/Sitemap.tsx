@@ -1,5 +1,4 @@
 import { Image, Pressable, StyleSheet, Text, View } from "@bacons/react-views";
-import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import React from "react";
 import {
@@ -12,6 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RouteNode } from "../Route";
 import { useExpoRouter } from "../global-state/router-store";
+import { router } from "../imperative-api";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName } from "../matchers";
 
@@ -98,8 +98,6 @@ function FileItem({
 }) {
   const disabled = route.children.length > 0;
 
-  const navigation = useNavigation();
-
   const segments = React.useMemo(
     () => [...parents, ...route.route.split("/")],
     [parents, route.route]
@@ -147,9 +145,9 @@ function FileItem({
           accessibilityLabel={route.contextKey}
           href={href}
           onPress={() => {
-            if (Platform.OS !== "web") {
+            if (Platform.OS !== "web" && router.canGoBack()) {
               // Ensure the modal pops
-              navigation.goBack();
+              router.back();
             }
           }}
           style={{ flex: 1, display: "flex" }}
