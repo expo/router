@@ -1,6 +1,7 @@
-import { Platform } from "react-native";
-
 import HMRClient from "./HMRClient";
+
+// eslint-disable-next-line import/order
+import { Platform } from "react-native";
 
 // Sets up developer tools for React Native web.
 if (!Platform.isTesting) {
