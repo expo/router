@@ -5,6 +5,12 @@ sidebar_position: 1
 slug: /
 ---
 
+:::note Migration
+
+This doc has [moved to the Expo Docs](https://docs.expo.dev/routing/introduction/).
+
+:::
+
 Expo Router brings the best routing concepts from the web to native iOS and Android apps. Every file in the **app** directory automatically becomes a route in your mobile navigation, making it easier than ever to build, maintain, and scale your project. It's built on top of our powerful [React Navigation suite](https://reactnavigation.org/) enabling truly native navigation. The entire deep linking system is automatically generated live, so users can share links to any route in your app.
 
 ## Quick Start
@@ -30,6 +36,12 @@ npx create-expo-app@latest --example with-router
 - **Cross-Platform** Expo Router is a large step towards universal React apps. The same codebase can be used to build iOS, Android, and web apps.
 
 ## Getting Started
+
+:::note Migration
+
+This guide has [moved to the Expo Docs](https://docs.expo.dev/routing/installation/).
+
+:::
 
 > Expo Router supports `expo@48.0.0` and greater.
 
