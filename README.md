@@ -12,7 +12,7 @@ The easiest way to try **Expo Router** is by creating a new project:
 npx create-expo-app@latest -e with-router
 ```
 
-See the [setup guide for more](https://expo.github.io/router/docs/).
+See the [setup guide for more](https://docs.expo.dev/routing/installation/).
 
 ## Examples
 
@@ -21,8 +21,6 @@ See the [setup guide for more](https://expo.github.io/router/docs/).
 - [Test app](/apps/sandbox) - Test app, in this repository.
 - [Demo app](/apps/demo) - Demo app for the latest router version.
 - [Expo Router Guest List App](https://github.com/hola-soy-milk/upleveled-react-native-expo) - Simple guest list app with fetching from external API
-
-> Add yours today!
 
 ## Contributing
 
