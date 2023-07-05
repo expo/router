@@ -3,6 +3,12 @@ title: FAQ
 sidebar_position: 5
 ---
 
+:::note Migration
+
+This doc has [moved to the Expo Docs](https://docs.expo.dev/router/reference/faq/).
+
+:::
+
 :::note Have more questions?
 
 Discuss them with us on [GitHub](https://github.com/expo/router/discussions).
