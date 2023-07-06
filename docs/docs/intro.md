@@ -87,9 +87,9 @@ Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guide
 }
 ```
 
-<!-- 76 is required for typed routes plugin -->
+## Additional setup for v1
 
-Ensure you're using at least `metro@0.76.0` by setting a Yarn resolution or npm override.
+If you're using Expo Router v1, you need to resolve to `metro@0.76.0`. Expo Router v2+ should delete `resolutions` and `overrides` on `metro` packages.
 
 If you use **Yarn**:
 
@@ -120,7 +120,7 @@ module.exports = function (api) {
   api.cache(true);
   return {
     presets: ["babel-preset-expo"],
-    plugins: [require.resolve("expo-router/babel")],
+    plugins: ["expo-router/babel"],
   };
 };
 ```
