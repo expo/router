@@ -1,6 +1,6 @@
 # Expo Router
 
-> Stable Version 1 is out now!
+> [Stable version 2 is out now](https://blog.expo.dev/introducing-expo-router-v2-3850fd5c3ca1)!
 
 Repo for the new File-based router for React Native apps. Please open a discussion if you have any questions or feedback.
 
