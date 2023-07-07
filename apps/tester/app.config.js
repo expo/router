@@ -9,7 +9,11 @@ module.exports = {
     image: "./splash.png",
     backgroundColor: "#1c2026",
   },
+  experiments: {
+    tsconfigPaths: process.env.EXPO_USE_PATH_ALIASES,
+  },
   web: {
+    output: process.env.EXPO_USE_STATIC ? "static" : "single",
     bundler: "metro",
   },
   plugins: [
