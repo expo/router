@@ -7,7 +7,9 @@ const projectRoot = __dirname;
 // This can be replaced with `find-yarn-workspace-root`
 const workspaceRoot = path.resolve(projectRoot, "../..");
 
-const config = getDefaultConfig(__dirname);
+const config = getDefaultConfig(__dirname, {
+  isCSSEnabled: true,
+});
 
 config.watcher = {
   // +73.3
