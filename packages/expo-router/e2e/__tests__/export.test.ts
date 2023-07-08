@@ -83,8 +83,8 @@ it(
     expect(page).toContain('<div id="root">');
 
     const sanitized = page.replace(
-      /<script src="\/bundles\/.*" defer>/g,
-      '<script src="/bundles/[mock].js" defer>'
+      /<script src="\/_expo\/static\/js\/web\/.*" defer>/g,
+      '<script src="/_expo/static/js/web/[mock].js" defer>'
     );
     expect(sanitized).toMatchSnapshot();
   },
@@ -205,8 +205,8 @@ it(
     expect(page).toContain('<div id="root">');
 
     const sanitized = page.replace(
-      /<script src="\/bundles\/.*" defer>/g,
-      '<script src="/bundles/[mock].js" defer>'
+      /<script src="\/_expo\/static\/js\/web\/.*" defer>/g,
+      '<script src="/_expo/static/js/web/[mock].js" defer>'
     );
     expect(sanitized).toMatchSnapshot();
   },
