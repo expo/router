@@ -33,14 +33,17 @@ export function useLink() {
 }
 
 export function useRouter(): Router {
-  return {
-    push: store.push,
-    back: store.goBack,
-    replace: store.replace,
-    setParams: store.setParams,
-    canGoBack: store.canGoBack,
-    // TODO(EvanBacon): add `reload`
-  };
+  return React.useMemo(
+    () => ({
+      push: store.push,
+      back: store.goBack,
+      replace: store.replace,
+      setParams: store.setParams,
+      canGoBack: store.canGoBack,
+      // TODO(EvanBacon): add `reload`
+    }),
+    []
+  );
 }
 
 /**
