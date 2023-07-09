@@ -63,9 +63,7 @@ function FooterButton({
           ]}
         >
           <View style={buttonStyles.content}>
-            <Text selectable={false} style={buttonStyles.label}>
-              {text}
-            </Text>
+            <Text style={buttonStyles.label}>{text}</Text>
           </View>
         </View>
       )}
@@ -86,6 +84,7 @@ const buttonStyles = StyleSheet.create({
     justifyContent: "center",
   },
   label: {
+    userSelect: "none",
     color: LogBoxStyle.getTextColor(1),
     fontSize: 14,
     includeFontPadding: false,

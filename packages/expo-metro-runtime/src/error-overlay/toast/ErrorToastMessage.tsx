@@ -7,7 +7,7 @@ import * as LogBoxStyle from "../UI/LogBoxStyle";
 
 export function ErrorToastMessage({ message }: { message?: MessageType }) {
   return (
-    <Text numberOfLines={1} selectable={false} style={styles.text}>
+    <Text numberOfLines={1} style={styles.text}>
       {message && (
         <LogBoxMessage
           plaintext
@@ -21,6 +21,7 @@ export function ErrorToastMessage({ message }: { message?: MessageType }) {
 
 const styles = StyleSheet.create({
   text: {
+    userSelect: "none",
     paddingLeft: 8,
     color: LogBoxStyle.getTextColor(1),
     flex: 1,

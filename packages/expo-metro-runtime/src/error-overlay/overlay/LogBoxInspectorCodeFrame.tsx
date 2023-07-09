@@ -64,7 +64,7 @@ export function LogBoxInspectorCodeFrame({
             openFileInEditor(codeFrame.fileName, codeFrame.location?.row ?? 0);
           }}
         >
-          <Text selectable={false} style={styles.fileText}>
+          <Text style={styles.fileText}>
             {getFileName()}
             {getLocation()}
           </Text>
@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     fontFamily: CODE_FONT,
   },
   fileText: {
+    userSelect: "none",
     color: LogBoxStyle.getTextColor(0.5),
     textAlign: "center",
     flex: 1,

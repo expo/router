@@ -122,10 +122,7 @@ function Button() {
             },
           ]}
         >
-          <Text
-            selectable={false}
-            style={[styles.code, hovered && { color: "black" }]}
-          >
+          <Text style={[styles.code, hovered && { color: "black" }]}>
             <Text style={{ color: "#BCC3CD" }}>$</Text> touch {getRootDir()}
             /index.js
           </Text>
@@ -179,6 +176,7 @@ const styles = StyleSheet.create({
     color: "black",
   },
   code: {
+    userSelect: "none",
     fontSize: 18,
     transitionDuration: "200ms",
     fontWeight: "bold",
