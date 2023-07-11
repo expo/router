@@ -37,18 +37,10 @@ export function Unmatched() {
 
   return (
     <View style={styles.container}>
-      <Text
-        accessibilityRole="header"
-        accessibilityLevel={1}
-        style={styles.title}
-      >
+      <Text role="heading" accessibilityLevel={1} style={styles.title}>
         Unmatched Route
       </Text>
-      <Text
-        accessibilityRole="header"
-        accessibilityLevel={2}
-        style={styles.subtitle}
-      >
+      <Text role="heading" accessibilityLevel={2} style={styles.subtitle}>
         Page could not be found.{" "}
         <Text
           onPress={() => {

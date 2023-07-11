@@ -95,10 +95,7 @@ const buttonStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   root: {
     backgroundColor: LogBoxStyle.getBackgroundColor(1),
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowRadius: 2,
-    shadowOpacity: 0.5,
+    boxShadow: `0 -2px 0 2px #000`,
     flexDirection: "row",
   },
   button: {

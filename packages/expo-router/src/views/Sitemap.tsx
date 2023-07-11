@@ -27,7 +27,6 @@ export function getNavOptions(): NativeStackNavigationOptions {
     headerTitleStyle: {
       color: "white",
     },
-
     headerTintColor: "white",
     headerLargeTitleStyle: {
       color: "white",
