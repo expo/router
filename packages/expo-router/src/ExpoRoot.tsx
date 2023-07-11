@@ -90,7 +90,11 @@ function ContextNavigator({
     SplashScreen.hideAsync();
     if (process.env.NODE_ENV === "development") {
       const Tutorial = require("./onboard/Tutorial").Tutorial;
-      return <Tutorial />;
+      return (
+        <WrapperComponent>
+          <Tutorial />
+        </WrapperComponent>
+      );
     } else {
       // Ensure tutorial styles are stripped in production.
       return null;

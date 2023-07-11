@@ -12,7 +12,7 @@ function Header() {
       {({ hovered }) => (
         <Text
           role="heading"
-          accessibilityLevel={1}
+          aria-level={1}
           style={[styles.title, Platform.OS !== "web" && { textAlign: "left" }]}
         >
           Welcome to{" "}
@@ -62,7 +62,7 @@ export function Tutorial() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
           <Header />
-          <Text role="heading" accessibilityLevel={2} style={styles.subtitle}>
+          <Text role="heading" aria-level={2} style={styles.subtitle}>
             Start by creating a file{"\n"}in the{" "}
             <Text style={{ fontWeight: "bold" }}>{getRootDir()}</Text>{" "}
             directory.
