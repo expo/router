@@ -10,8 +10,7 @@ import {
   GestureResponderEvent,
   Insets,
   Platform,
-  StyleSheet,
-  TouchableWithoutFeedback,
+  Pressable,
   View,
   ViewStyle,
 } from "react-native";
@@ -42,7 +41,7 @@ export function LogBoxButton(props: Props) {
 
   const content = (
     <View
-      style={StyleSheet.compose(
+      style={[
         {
           backgroundColor: pressed
             ? backgroundColor.pressed
@@ -53,8 +52,8 @@ export function LogBoxButton(props: Props) {
             },
           }),
         },
-        props.style
-      )}
+        props.style,
+      ]}
     >
       {props.children}
     </View>
@@ -63,13 +62,13 @@ export function LogBoxButton(props: Props) {
   return props.onPress == null ? (
     content
   ) : (
-    <TouchableWithoutFeedback
+    <Pressable
       hitSlop={props.hitSlop}
       onPress={props.onPress}
       onPressIn={() => setPressed(true)}
       onPressOut={() => setPressed(false)}
     >
       {content}
-    </TouchableWithoutFeedback>
+    </Pressable>
   );
 }

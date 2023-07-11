@@ -11,8 +11,8 @@ function Header() {
     <Pressable>
       {({ hovered }) => (
         <Text
-          accessibilityRole="header"
-          accessibilityLevel={1}
+          role="heading"
+          aria-level={1}
           style={[styles.title, Platform.OS !== "web" && { textAlign: "left" }]}
         >
           Welcome to{" "}
@@ -62,11 +62,7 @@ export function Tutorial() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
           <Header />
-          <Text
-            accessibilityRole="header"
-            accessibilityLevel={2}
-            style={styles.subtitle}
-          >
+          <Text role="heading" aria-level={2} style={styles.subtitle}>
             Start by creating a file{"\n"}in the{" "}
             <Text style={{ fontWeight: "bold" }}>{getRootDir()}</Text>{" "}
             directory.
@@ -122,10 +118,7 @@ function Button() {
             },
           ]}
         >
-          <Text
-            selectable={false}
-            style={[styles.code, hovered && { color: "black" }]}
-          >
+          <Text style={[styles.code, hovered && { color: "black" }]}>
             <Text style={{ color: "#BCC3CD" }}>$</Text> touch {getRootDir()}
             /index.js
           </Text>
@@ -179,6 +172,7 @@ const styles = StyleSheet.create({
     color: "black",
   },
   code: {
+    userSelect: "none",
     fontSize: 18,
     transitionDuration: "200ms",
     fontWeight: "bold",
