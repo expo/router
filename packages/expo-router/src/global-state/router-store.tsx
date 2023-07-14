@@ -118,7 +118,11 @@ export class RouterStore {
       (data) => {
         const state = data.data.state as ResultState;
 
-        if (navigationRef.isReady()) {
+        if (
+          navigationRef.isReady() ||
+          // NOTE(EvanBacon): `navigationRef.isReady` is sometimes not true when state is called initially.
+          !this.isReady
+        ) {
           this.onReady();
         }
 
