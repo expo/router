@@ -27,6 +27,7 @@ export class RouterStore {
   rootComponent!: ComponentType;
   linking: ExpoLinkingOptions | undefined;
   isReady: boolean = false;
+  private hasAttemptedToHideSplash: boolean = false;
 
   initialState: ResultState | undefined;
   rootState: ResultState | undefined;
@@ -118,12 +119,16 @@ export class RouterStore {
       (data) => {
         const state = data.data.state as ResultState;
 
-        if (
-          navigationRef.isReady() ||
-          // NOTE(EvanBacon): `navigationRef.isReady` is sometimes not true when state is called initially.
-          !this.isReady
-        ) {
-          this.onReady();
+        if (!this.isReady) {
+          if (!this.hasAttemptedToHideSplash) {
+            this.hasAttemptedToHideSplash = true;
+            // NOTE(EvanBacon): `navigationRef.isReady` is sometimes not true when state is called initially.
+            requestAnimationFrame(() => _internal_maybeHideAsync());
+          }
+
+          if (navigationRef.isReady()) {
+            this.onReady();
+          }
         }
 
         let shouldUpdateSubscribers = this.nextState === state;
@@ -183,9 +188,9 @@ export class RouterStore {
 
   /** Make sure these are arrow functions so `this` is correctly bound */
   onReady = () => {
-    if (!this.isReady) {
-      requestAnimationFrame(() => _internal_maybeHideAsync());
-    }
+    // if (!this.isReady) {
+    //   requestAnimationFrame(() => _internal_maybeHideAsync());
+    // }
     this.isReady = true;
   };
   subscribeToRootState = (subscriber: () => void) => {
