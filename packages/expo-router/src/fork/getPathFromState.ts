@@ -465,7 +465,16 @@ function getPathWithConventionsCollapsed({
           return `[...${name}]`;
         }
         if (params[name]) {
-          return params[name].join("/");
+          if (Array.isArray(params[name])) {
+            return params[name].join("/");
+          } else {
+            // reserved query parameter is used in valid...
+            // throw new Error(
+            //   `The query parameter "${name}" cannot be used with the rest parameter by the same name.`
+            // );
+
+            return params[name];
+          }
         }
         if (i === 0) {
           // This can occur when a wildcard matches all routes and the given path was `/`.

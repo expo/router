@@ -4,7 +4,7 @@ declare global {
     interface Matchers<R> {
       toHavePathname(pathname: string): R;
       toHaveSegments(segments: string[]): R;
-      toHaveSearchParams(params: Record<string, string>): R;
+      toHaveSearchParams(params: Record<string, string | string[]>): R;
     }
   }
 }

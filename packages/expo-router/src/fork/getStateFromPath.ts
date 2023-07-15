@@ -741,6 +741,7 @@ const createNestedStateObject = (
     route.path,
     findParseConfigForRoute(route.name, routeConfigs)
   );
+  console.log("f", params);
 
   if (params) {
     const resolvedParams = { ...route.params, ...params };

@@ -239,3 +239,32 @@ it("pushes auto-encoded params and fully qualified URLs", () => {
     three: "one,two,three",
   });
 });
+
+it("pushes rest params without layout", () => {
+  /** https://github.com/expo/router/issues/345 */
+  renderRouter({
+    index: () => <Text />,
+    _layout: () => <Stack />,
+    "[...unmatched]": () => <Text />,
+    "P/[...rest]": () => <Text />,
+  });
+
+  expect(screen).toHavePathname("/");
+
+  act(() =>
+    router.push({
+      pathname: "/P/1/2/3",
+      params: {
+        rest: "override",
+      },
+    })
+  );
+
+  expect(screen).toHaveSearchParams({
+    rest: ["override"],
+    // one: "hello?",
+    // two: "https://localhost:8081/?foo=bar&one=more",
+    // three: "one,two,three",
+  });
+  expect(screen).toHavePathname("/abc");
+});
