@@ -239,3 +239,29 @@ it("pushes auto-encoded params and fully qualified URLs", () => {
     three: "one,two,three",
   });
 });
+
+it("does not loop infinitely when pushing a screen with empty options to an invalid initial route name", () => {
+  /** https://github.com/expo/router/issues/452 */
+
+  renderRouter({
+    _layout: () => <Stack />,
+    index: () => <Text />,
+    "main/_layout": {
+      unstable_settings: {
+        // NOTE(EvanBacon): This has to be an invalid route.
+        initialRouteName: "index",
+      },
+      default: () => <Stack />,
+    },
+    "main/welcome": () => (
+      <>
+        <Stack.Screen options={{}} />
+        <Text />
+      </>
+    ),
+  });
+
+  expect(screen).toHavePathname("/");
+  act(() => router.push("/main/welcome"));
+  expect(screen).toHavePathname("/main/welcome");
+});
