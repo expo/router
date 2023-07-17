@@ -19,10 +19,8 @@ export const resolveHref = (href: Href): string => {
   const { pathname, params } = createQualifiedPathname(path, {
     ...href.params,
   });
-  return (
-    pathname +
-    (Object.keys(params).length ? `?${createQueryParams(params)}` : "")
-  );
+  const paramsString = createQueryParams(params);
+  return pathname + (paramsString ? `?${paramsString}` : "");
 };
 
 function createQualifiedPathname(
@@ -54,7 +52,11 @@ function encodeParam(param: any): string {
 }
 
 function createQueryParams(params: Record<string, any>): string {
-  return Object.entries(params)
-    .map(([key, value]) => `${key}=${encodeURIComponent(value.toString())}`)
-    .join("&");
+  return (
+    Object.entries(params)
+      // Allow nullish params
+      .filter(([, value]) => value != null)
+      .map(([key, value]) => `${key}=${encodeURIComponent(value.toString())}`)
+      .join("&")
+  );
 }

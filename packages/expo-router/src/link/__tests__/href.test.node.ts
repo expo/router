@@ -31,6 +31,17 @@ describe(resolveHref, () => {
       })
     ).toBe("/alpha/cool/beta");
   });
+  it(`allows nullish query parameters`, () => {
+    expect(resolveHref({ pathname: "/alpha", params: { beta: null } })).toBe(
+      "/alpha"
+    );
+    expect(
+      resolveHref({
+        pathname: "/alpha",
+        params: { beta: undefined, three: "1" },
+      })
+    ).toBe("/alpha?three=1");
+  });
   it(`adds query parameters`, () => {
     expect(resolveHref({ pathname: "/alpha", params: { beta: "value" } })).toBe(
       "/alpha?beta=value"
