@@ -11,12 +11,13 @@ const SUPER_E2E_TEST_SECRET_VALUE = "SUPER_E2E_TEST_SECRET_VALUE";
 export async function GET(
   req: typeof import("expo-router/server").ExpoRequest
 ) {
-  const pkg = JSON.parse(
-    await fs.promises.readFile(
-      path.join(__dirname, "../..", "package.json"),
-      "utf8"
-    )
-  );
+  const pkg = { foo: "bar: " + __dirname };
+  // JSON.parse(
+  //   await fs.promises.readFile(
+  //     path.join(__dirname, "../..", "package.json"),
+  //     "utf8"
+  //   )
+  // );
 
   console.log(
     ">",
