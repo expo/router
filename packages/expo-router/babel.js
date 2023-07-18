@@ -1,6 +1,8 @@
 const { getConfig } = require("expo/config");
+const fs = require("fs");
 const nodePath = require("path");
 const resolveFrom = require("resolve-from");
+
 const { getExpoConstantsManifest } = require("./node/getExpoConstantsManifest");
 
 const debug = require("debug")("expo:router:babel");
@@ -27,34 +29,60 @@ function getConfigMemo(projectRoot) {
 }
 
 function getExpoRouterImportMode(projectRoot, platform) {
-  if (process.env.EXPO_ROUTER_IMPORT_MODE) {
-    return process.env.EXPO_ROUTER_IMPORT_MODE;
+  const envVar = "EXPO_ROUTER_IMPORT_MODE_" + platform.toUpperCase();
+  if (process.env[envVar]) {
+    return process.env[envVar];
   }
   const env = process.env.NODE_ENV || process.env.BABEL_ENV;
 
   const { exp } = getConfigMemo(projectRoot);
-  let mode = [env, true].includes(exp.extra?.router?.asyncRoutes)
-    ? "lazy"
-    : "sync";
+
+  let asyncRoutesSetting;
+
+  if (exp.extra?.router?.asyncRoutes) {
+    const asyncRoutes = exp.extra?.router?.asyncRoutes;
+    if (typeof asyncRoutes === "string") {
+      asyncRoutesSetting = asyncRoutes;
+    } else if (typeof asyncRoutes === "object") {
+      asyncRoutesSetting = asyncRoutes[platform] ?? asyncRoutes.default;
+    }
+  }
+
+  let mode = [env, true].includes(asyncRoutesSetting) ? "lazy" : "sync";
 
   // TODO: Production bundle splitting
 
   if (env === "production" && mode === "lazy") {
     throw new Error(
-      "Async routes are not supported in production yet. Set `extra.router.asyncRoutes` to `development`, `false`, or `undefined`."
+      "Async routes are not supported in production yet. Set the `expo-router` Config Plugin prop `asyncRoutes` to `development`, `false`, or `undefined`."
     );
   }
 
   // NOTE: This is a temporary workaround for static rendering on web.
-  if (platform === "web" && process.env.EXPO_USE_STATIC) {
+  if (platform === "web" && (exp.web || {}).output === "static") {
     mode = "sync";
   }
 
   // Development
   debug("Router import mode", mode);
 
-  process.env.EXPO_ROUTER_IMPORT_MODE = mode;
+  process.env[envVar] = mode;
   return mode;
+}
+
+function directoryExistsSync(file) {
+  return fs.statSync(file, { throwIfNoEntry: false })?.isDirectory() ?? false;
+}
+
+function getRouterDirectory(projectRoot) {
+  // more specific directories first
+  if (directoryExistsSync(nodePath.join(projectRoot, "src/app"))) {
+    // Log.log(chalk.gray('Using src/app as the root directory for Expo Router.'));
+    return "./src/app";
+  }
+
+  // Log.debug('Using app as the root directory for Expo Router.');
+  return "./app";
 }
 
 function getExpoRouterAppRoot(projectRoot) {
@@ -66,37 +94,44 @@ function getExpoRouterAppRoot(projectRoot) {
   }
   const routerEntry = resolveFrom.silent(projectRoot, "expo-router/entry");
 
-  const { exp } = getConfigMemo(projectRoot);
-  const customSrc = exp.extra?.router?.unstable_src || "./app";
-  const isAbsolute = customSrc.startsWith("/");
   // It doesn't matter if the app folder exists.
-  const appFolder = isAbsolute
-    ? customSrc
-    : nodePath.join(projectRoot, customSrc);
+  const appFolder = getExpoRouterAbsoluteAppRoot(projectRoot);
   const appRoot = nodePath.relative(nodePath.dirname(routerEntry), appFolder);
   debug("routerEntry", routerEntry, appFolder, appRoot);
 
   process.env.EXPO_ROUTER_APP_ROOT_2 = appRoot;
   return appRoot;
 }
+
+function getExpoRouterAbsoluteAppRoot(projectRoot) {
+  if (process.env.EXPO_ROUTER_ABS_APP_ROOT) {
+    return process.env.EXPO_ROUTER_ABS_APP_ROOT;
+  }
+  const { exp } = getConfigMemo(projectRoot);
+  const customSrc =
+    exp.extra?.router?.unstable_src || getRouterDirectory(projectRoot);
+  const isAbsolute = customSrc.startsWith("/");
+  // It doesn't matter if the app folder exists.
+  const appFolder = isAbsolute
+    ? customSrc
+    : nodePath.join(projectRoot, customSrc);
+  const appRoot = appFolder;
+  debug("absolute router entry", appFolder, appRoot);
+
+  process.env.EXPO_ROUTER_ABS_APP_ROOT = appFolder;
+  return appRoot;
+}
 // TODO: Strip the function `generateStaticParams` when bundling for node.js environments.
 
 module.exports = function (api) {
   const { types: t } = api;
+  const getRelPath = (state) =>
+    "./" + nodePath.relative(state.file.opts.root, state.filename);
 
   const platform = api.caller((caller) => caller?.platform);
   return {
     name: "expo-router",
     visitor: {
-      // Given `{ __filename }` expand to `{ __filename: __filename }` then convert the value.
-      ObjectProperty(path, state) {
-        if (path.node.key.name === "__filename") {
-          path.node.value = t.stringLiteral(state.filename);
-        }
-        if (path.node.key.name === "__dirname") {
-          path.node.value = t.stringLiteral(nodePath.dirname(state.filename));
-        }
-      },
       // Add support for Node.js __filename
       Identifier(path, state) {
         // Prevent converting object keys
@@ -104,21 +139,18 @@ module.exports = function (api) {
           return;
         }
 
-        // Add support for Node.js `__filename`.
-        // This static value comes from Webpack somewhere.
-
         if (path.node.name === "__filename") {
           path.replaceWith(
             t.stringLiteral(
               // `/index.js` is the value used by Webpack.
-              nodePath.resolve(state.filename)
+              getRelPath(state)
             )
           );
         }
         // Add support for Node.js `__dirname`.
         // This static value comes from Webpack somewhere.
         if (path.node.name === "__dirname") {
-          path.replaceWith(t.stringLiteral(nodePath.dirname(state.filename)));
+          path.replaceWith(t.stringLiteral("/"));
         }
       },
 
@@ -147,13 +179,10 @@ module.exports = function (api) {
           !parent.parentPath.isAssignmentExpression()
         ) {
           parent.replaceWith(t.stringLiteral(projectRoot));
-          return;
-        }
-
-        // Enable static rendering
-        // TODO: Use a serializer or something to ensure this changes without
-        // needing to clear the cache.
-        if (
+        } else if (
+          // Enable static rendering
+          // TODO: Use a serializer or something to ensure this changes without
+          // needing to clear the cache.
           t.isIdentifier(parent.node.property, {
             name: "EXPO_PUBLIC_USE_STATIC",
           }) &&
@@ -163,12 +192,9 @@ module.exports = function (api) {
           parent.replaceWith(
             t.stringLiteral(process.env.EXPO_PUBLIC_USE_STATIC)
           );
-          return;
-        }
-
-        // Surfaces the `app.json` (config) as an environment variable which is then parsed by
-        // `expo-constants` https://docs.expo.dev/versions/latest/sdk/constants/
-        if (
+        } else if (
+          // Surfaces the `app.json` (config) as an environment variable which is then parsed by
+          // `expo-constants` https://docs.expo.dev/versions/latest/sdk/constants/
           t.isIdentifier(parent.node.property, {
             name: "APP_MANIFEST",
           }) &&
@@ -176,38 +202,41 @@ module.exports = function (api) {
         ) {
           const manifest = getExpoAppManifest(projectRoot);
           parent.replaceWith(t.stringLiteral(manifest));
-          return;
-        }
-
-        // Expose the app route import mode.
-        if (
+        } else if (
+          process.env.NODE_ENV !== "test" &&
           t.isIdentifier(parent.node.property, {
-            name: "EXPO_ROUTER_IMPORT_MODE",
+            name: "EXPO_ROUTER_ABS_APP_ROOT",
+          }) &&
+          !parent.parentPath.isAssignmentExpression()
+        ) {
+          parent.replaceWith(
+            t.stringLiteral(getExpoRouterAbsoluteAppRoot(projectRoot))
+          );
+        } else if (
+          // Skip loading the app root in tests.
+          // This is handled by the testing-library utils
+          process.env.NODE_ENV !== "test" &&
+          t.isIdentifier(parent.node.property, {
+            name: "EXPO_ROUTER_APP_ROOT",
+          }) &&
+          !parent.parentPath.isAssignmentExpression()
+        ) {
+          parent.replaceWith(
+            // This is defined in Expo CLI when using Metro. It points to the relative path for the project app directory.
+            t.stringLiteral(getExpoRouterAppRoot(projectRoot))
+          );
+        } else if (
+          // Expose the app route import mode.
+          platform &&
+          t.isIdentifier(parent.node.property, {
+            name: "EXPO_ROUTER_IMPORT_MODE_" + platform.toUpperCase(),
           }) &&
           !parent.parentPath.isAssignmentExpression()
         ) {
           parent.replaceWith(
             t.stringLiteral(getExpoRouterImportMode(projectRoot, platform))
           );
-          return;
         }
-
-        if (
-          !t.isIdentifier(parent.node.property, {
-            name: "EXPO_ROUTER_APP_ROOT",
-          })
-        ) {
-          return;
-        }
-
-        if (parent.parentPath.isAssignmentExpression()) {
-          return;
-        }
-
-        parent.replaceWith(
-          // This is defined in Expo CLI when using Metro. It points to the relative path for the project app directory.
-          t.stringLiteral(getExpoRouterAppRoot(projectRoot))
-        );
       },
     },
   };
