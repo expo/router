@@ -80,7 +80,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.2)",
     flexDirection: "row",
-    position: "absolute",
+    position: Platform.select({
+      web: "fixed",
+      default: "absolute",
+    }),
     bottom: 8,
     left: 8,
     paddingVertical: 8,

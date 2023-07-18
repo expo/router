@@ -9,15 +9,22 @@ module.exports = {
     image: "./splash.png",
     backgroundColor: "#1c2026",
   },
+  experiments: {
+    tsconfigPaths: process.env.EXPO_USE_PATH_ALIASES,
+  },
   web: {
+    output: process.env.EXPO_USE_STATIC ? "static" : "single",
     bundler: "metro",
   },
-  extra: {
-    router: {
-      asyncRoutes: process.env.E2E_ROUTER_ASYNC,
-      // THIS DOES NOT WORK -- DO NOT USE
-      unstable_src: process.env.E2E_ROUTER_SRC,
-      origin: "https://smart-symbiote.netlify.app/",
-    },
-  },
+  plugins: [
+    [
+      "expo-router",
+      {
+        asyncRoutes: process.env.E2E_ROUTER_ASYNC,
+        // THIS DOES NOT WORK -- DO NOT USE
+        unstable_src: process.env.E2E_ROUTER_SRC,
+        origin: "https://smart-symbiote.netlify.app/",
+      },
+    ],
+  ],
 };

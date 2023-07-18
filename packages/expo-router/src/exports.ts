@@ -1,13 +1,20 @@
 // Expo Router API
 import { Navigator, Slot } from "./views/Navigator";
 
-export { useRouter } from "./link/useRouter";
 export {
+  useRouter,
+  useUnstableGlobalHref,
   usePathname,
+  useGlobalSearchParams,
   useLocalSearchParams,
   useSearchParams,
   useSegments,
-} from "./LocationProvider";
+  useRootNavigation,
+  useRootNavigationState,
+} from "./hooks";
+
+export { router } from "./imperative-api";
+
 export { Link, Redirect } from "./link/Link";
 
 export { withLayoutContext } from "./layouts/withLayoutContext";
@@ -24,5 +31,4 @@ export { SplashScreen } from "./views/Splash";
 
 // React Navigation
 export { useNavigation } from "./useNavigation";
-export { useRootNavigation, useRootNavigationState } from "./useRootNavigation";
 export { useFocusEffect } from "./useFocusEffect";

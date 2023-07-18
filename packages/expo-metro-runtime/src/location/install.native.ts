@@ -1,14 +1,15 @@
+// This MUST be first to ensure that `fetch` is defined in the React Native environment.
+import "react-native/Libraries/Core/InitializeCore";
+
 import Constants from "expo-constants";
 import URL from "url-parse";
 
-import { install, setLocationHref } from "./Location";
 import getDevServer from "../getDevServer";
+import { install, setLocationHref } from "./Location";
 
 let hasWarned = false;
 
-const manifest = (Constants.manifest ??
-  Constants.manifest2 ??
-  Constants.expoConfig) as Record<string, any> | null;
+const manifest = Constants.expoConfig as Record<string, any> | null;
 
 // Add a development warning for fetch requests with relative paths
 // to ensure developers are aware of the need to configure a production
@@ -20,7 +21,7 @@ function warnProductionOriginNotConfigured(requestUrl: string) {
   hasWarned = true;
   if (!manifest?.extra?.router?.origin) {
     console.warn(
-      `The relative fetch request "${requestUrl}" will not work in production until the Expo config (app.json) \`expo.extra.router.origin\` field is set to the base URL of your web server. [Learn more](https://expo.github.io/router/docs/lab/runtime-location)`
+      `The relative fetch request "${requestUrl}" will not work in production until the Expo Router Config Plugin (app.json) is configured with the \`origin\` prop set to the base URL of your web server, e.g. \`{ plugins: [["expo-router", { origin: "..." }]] }\`. [Learn more](https://expo.github.io/router/docs/lab/runtime-location)`
     );
   }
 }

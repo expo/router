@@ -1,18 +1,18 @@
 {
   "name": "@expo/metro-runtime",
-  "version": "2.0.5",
+  "version": "2.2.3",
   "description": "Tools for making experimental Metro bundler features work",
   "main": "build",
   "homepage": "https://github.com/expo/router/tree/main/packages/expo-metro-runtime",
   "files": [
     "build",
+    "symbolicate",
     "async-require.js",
     "async-require.d.ts",
     "error-overlay.js",
     "error-overlay.d.ts",
-    "transformer.js",
-    "transformer.d.ts",
-    "assets"
+    "assets",
+    "!**/__tests__"
   ],
   "scripts": {
     "build": "expo-module build",

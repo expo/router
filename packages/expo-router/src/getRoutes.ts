@@ -1,4 +1,5 @@
 import type { DynamicConvention, RouteNode } from "./Route";
+import EXPO_ROUTER_IMPORT_MODE from "./import-mode";
 import {
   getNameFromFilePath,
   matchDeepDynamicRouteName,
@@ -6,6 +7,7 @@ import {
   matchGroupName,
   removeSupportedExtensions,
   stripGroupSegmentsFromPath,
+  stripInvisibleSegmentsFromPath,
 } from "./matchers";
 import type { RequireContext } from "./types";
 
@@ -148,7 +150,7 @@ function applyDefaultInitialRouteName(node: RouteNode): RouteNode {
     : undefined;
   const loaded = node.loadRoute();
 
-  if (loaded.unstable_settings) {
+  if (loaded?.unstable_settings) {
     // Allow unstable_settings={ initialRouteName: '...' } to override the default initial route name.
     initialRouteName =
       loaded.unstable_settings.initialRouteName ?? initialRouteName;
@@ -275,7 +277,7 @@ function contextModuleToFileNodes(
       if (process.env.NODE_ENV === "development") {
         // If the user has set the `EXPO_ROUTER_IMPORT_MODE` to `sync` then we should
         // filter the missing routes.
-        if (process.env.EXPO_ROUTER_IMPORT_MODE === "sync") {
+        if (EXPO_ROUTER_IMPORT_MODE === "sync") {
           const isApi = key.match(/\+api\.[jt]sx?$/);
           if (!isApi && !contextModule(key)?.default) {
             return null;
@@ -359,6 +361,8 @@ export function getRoutes(
   options?: Options
 ): RouteNode | null {
   const route = getExactRoutes(contextModule, options);
+
+  // If there is no route, return an empty route.
   if (!route) {
     return null;
   }
@@ -479,7 +483,9 @@ export function getUserDefinedDeepDynamicRoute(
 ): RouteNode | null {
   // Auto add not found route if it doesn't exist
   for (const route of routes.children ?? []) {
-    const isDeepDynamic = matchDeepDynamicRouteName(route.route);
+    if (route.generated) continue;
+    const opaqueRoute = stripInvisibleSegmentsFromPath(route.route);
+    const isDeepDynamic = matchDeepDynamicRouteName(opaqueRoute);
     if (isDeepDynamic) {
       return route;
     }

@@ -7,20 +7,11 @@ const projectRoot = __dirname;
 // This can be replaced with `find-yarn-workspace-root`
 const workspaceRoot = path.resolve(projectRoot, "../..");
 
-const config = getDefaultConfig(__dirname);
-
-config.transformer = {
-  ...config.transformer,
-  babelTransformerPath: require.resolve("@expo/metro-runtime/transformer"),
-  asyncRequireModulePath: require.resolve("@expo/metro-runtime/async-require"),
-};
+const config = getDefaultConfig(__dirname, {
+  isCSSEnabled: true,
+});
 
 config.resolver.sourceExts.push("css");
-
-config.server = {
-  ...config.server,
-  experimentalImportBundleSupport: true,
-};
 
 config.watcher = {
   // +73.3

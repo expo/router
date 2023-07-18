@@ -6,11 +6,12 @@ import type {
 } from "@react-navigation/routers";
 import escape from "escape-string-regexp";
 import * as queryString from "query-string";
+import URL from "url-parse";
 
-import { findFocusedRoute } from "./findFocusedRoute";
-import validatePathConfig from "./validatePathConfig";
 import { RouteNode } from "../Route";
 import { matchGroupName, stripGroupSegmentsFromPath } from "../matchers";
+import { findFocusedRoute } from "./findFocusedRoute";
+import validatePathConfig from "./validatePathConfig";
 
 type Options<ParamList extends object> = {
   initialRouteName?: string;
@@ -47,14 +48,18 @@ type ParsedRoute = {
   params?: Record<string, any> | undefined;
 };
 
-function getPathname(path: string) {
-  const remaining = path
-    .replace(/\/+/g, "/") // Replace multiple slash (//) with single ones
-    .replace(/^\//, "") // Remove extra leading slash
-    .replace(/\?.*$/, ""); // Remove query params which we will handle later
+export function getUrlWithReactNavigationConcessions(path: string) {
+  const parsed = new URL(path, "https://acme.com");
+  const pathname = parsed.pathname;
 
   // Make sure there is a trailing slash
-  return remaining.endsWith("/") ? remaining : `${remaining}/`;
+  return {
+    // The slashes are at the end, not the beginning
+    nonstandardPathname:
+      pathname.replace(/^\/+/g, "").replace(/\/+$/g, "") + "/",
+    // React Navigation doesn't support hashes, so here
+    inputPathnameWithoutHash: path.replace(/#.*$/, ""),
+  };
 }
 
 /**
@@ -316,10 +321,15 @@ function getStateFromEmptyPathWithConfigs(
     return undefined;
   }
 
-  const routes = match.routeNames.map((name) => ({
-    name,
-    _route: match._route,
-  }));
+  const routes = match.routeNames.map((name) => {
+    if (!match._route) {
+      return { name };
+    }
+    return {
+      name,
+      _route: match._route,
+    };
+  });
 
   return createNestedStateObject(path, routes, configs, initialRoutes);
 }
@@ -329,21 +339,33 @@ function getStateFromPathWithConfigs(
   configs: RouteConfig[],
   initialRoutes: InitialRouteConfig[]
 ): ResultState | undefined {
-  const pathname = getPathname(path);
+  const formattedPaths = getUrlWithReactNavigationConcessions(path);
 
-  if (pathname === "/") {
-    return getStateFromEmptyPathWithConfigs(path, configs, initialRoutes);
+  if (formattedPaths.nonstandardPathname === "/") {
+    return getStateFromEmptyPathWithConfigs(
+      formattedPaths.inputPathnameWithoutHash,
+      configs,
+      initialRoutes
+    );
   }
 
   // We match the whole path against the regex instead of segments
   // This makes sure matches such as wildcard will catch any unmatched routes, even if nested
-  const routes = matchAgainstConfigs(pathname, configs);
+  const routes = matchAgainstConfigs(
+    formattedPaths.nonstandardPathname,
+    configs
+  );
 
   if (routes == null) {
     return undefined;
   }
   // This will always be empty if full path matched
-  return createNestedStateObject(path, routes, configs, initialRoutes);
+  return createNestedStateObject(
+    formattedPaths.inputPathnameWithoutHash,
+    routes,
+    configs,
+    initialRoutes
+  );
 }
 
 const joinPaths = (...paths: string[]): string =>
@@ -424,10 +446,15 @@ function matchAgainstConfigs(
       return { name };
     };
 
-    routes = config.routeNames.map((name) => ({
-      ...routeFromName(name),
-      _route: config._route,
-    }));
+    routes = config.routeNames.map((name) => {
+      if (!config._route) {
+        return { ...routeFromName(name) };
+      }
+      return {
+        ...routeFromName(name),
+        _route: config._route,
+      };
+    });
 
     // TODO(EvanBacon): Maybe we should warn / assert if multiple slugs use the same param name.
     const combinedParams = routes.reduce<Record<string, any>>(

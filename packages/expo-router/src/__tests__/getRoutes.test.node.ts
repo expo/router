@@ -162,6 +162,33 @@ describe(getRecursiveTree, () => {
 });
 
 describe(getUserDefinedDeepDynamicRoute, () => {
+  it(`should match top-level deep dynamic with nested index`, () => {
+    [
+      "./[...else].tsx",
+      "./(group)/[...else].tsx",
+      "./(group)/[...else]/(group).tsx",
+      "./(group)/[...else]/(group)/index.tsx",
+      "./[...else]/index.tsx",
+      "./[...else]/(group)/index.tsx",
+      "./(group1)/[...else]/(group2)/index.tsx",
+      "./(group1)/[...else]/(group2)/(group3)/index.tsx",
+    ].forEach((name) => {
+      expect(
+        getUserDefinedDeepDynamicRoute(
+          getRoutes(
+            createMockContextModule({
+              [name]: { default() {} },
+            })
+          )!
+        )
+      ).toEqual(
+        expect.objectContaining({
+          contextKey: name,
+        })
+      );
+    });
+  });
+
   it(`should return a basic deep dynamic route`, () => {
     const routes = asRouteNode({
       children: [
@@ -481,6 +508,6 @@ describe(getRoutes, () => {
     });
   });
   it(`should convert an empty context module to routes`, () => {
-    expect(getRoutes(createMockContextModule({}))).toEqual(null);
+    expect(getRoutes(createMockContextModule({}))).toBeNull();
   });
 });

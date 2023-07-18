@@ -7,17 +7,9 @@ const projectRoot = __dirname;
 // This can be replaced with `find-yarn-workspace-root`
 const workspaceRoot = path.resolve(projectRoot, "../..");
 
-const config = getDefaultConfig(__dirname);
-
-config.transformer = {
-  ...config.transformer,
-  asyncRequireModulePath: require.resolve("@expo/metro-runtime/async-require"),
-};
-
-config.server = {
-  ...config.server,
-  experimentalImportBundleSupport: true,
-};
+const config = getDefaultConfig(__dirname, {
+  isCSSEnabled: true,
+});
 
 config.watcher = {
   // +73.3

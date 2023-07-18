@@ -87,6 +87,10 @@ const backgroundForLevel = (level: LogLevel) =>
       default: "transparent",
       pressed: LogBoxStyle.getFatalDarkColor(),
     },
+    static: {
+      default: "transparent",
+      pressed: LogBoxStyle.getFatalDarkColor(),
+    },
   }[level]);
 
 function LogBoxInspectorHeaderButton(props: {
@@ -102,7 +106,11 @@ function LogBoxInspectorHeaderButton(props: {
       style={headerStyles.button}
     >
       {props.disabled ? null : (
-        <Image source={props.image} style={headerStyles.buttonImage} />
+        <Image
+          source={props.image}
+          tintColor={LogBoxStyle.getTextColor()}
+          style={headerStyles.buttonImage}
+        />
       )}
     </LogBoxButton>
   );
@@ -111,26 +119,23 @@ function LogBoxInspectorHeaderButton(props: {
 const headerStyles = StyleSheet.create({
   button: {
     alignItems: "center",
-    aspectRatio: 1,
     justifyContent: "center",
-    marginTop: 5,
+    aspectRatio: 1,
     marginRight: 6,
     marginLeft: 6,
-    marginBottom: Platform.select({
-      web: 0,
-      default: -8,
-    }),
     borderRadius: 3,
   },
   buttonImage: {
     height: 14,
     width: 8,
-    tintColor: LogBoxStyle.getTextColor(),
   },
 });
 
 const styles = StyleSheet.create({
   syntax: {
+    backgroundColor: LogBoxStyle.getFatalColor(),
+  },
+  static: {
     backgroundColor: LogBoxStyle.getFatalColor(),
   },
   fatal: {
@@ -144,6 +149,9 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
+    alignItems: "center",
+
+    paddingHorizontal: 8,
     height: Platform.select({
       default: 48,
       ios: 44,

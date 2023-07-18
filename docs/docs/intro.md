@@ -5,6 +5,12 @@ sidebar_position: 1
 slug: /
 ---
 
+:::note Migration
+
+This doc has [moved to the Expo Docs](https://docs.expo.dev/routing/introduction/).
+
+:::
+
 Expo Router brings the best routing concepts from the web to native iOS and Android apps. Every file in the **app** directory automatically becomes a route in your mobile navigation, making it easier than ever to build, maintain, and scale your project. It's built on top of our powerful [React Navigation suite](https://reactnavigation.org/) enabling truly native navigation. The entire deep linking system is automatically generated live, so users can share links to any route in your app.
 
 ## Quick Start
@@ -19,7 +25,7 @@ npx create-expo-app@latest --example with-router
 
 ## Features
 
-<video src="/router/demo/routing.mp4" controls style={{ width: "100%" }} autoplay loop />
+<!-- <video src="/router/demo/routing.mp4" controls style={{ width: "100%" }} autoplay loop /> -->
 
 - **Native** Truly native navigation with the most cutting-edge developer experience.
 <!-- - **Zero-config** No need to configure anything, just start building your app. -->
@@ -31,7 +37,13 @@ npx create-expo-app@latest --example with-router
 
 ## Getting Started
 
-> Expo Router supports `expo@46.0.13` and greater.
+:::note Migration
+
+This guide has [moved to the Expo Docs](https://docs.expo.dev/routing/installation/).
+
+:::
+
+> Expo Router supports `expo@48.0.0` and greater.
 
 Ensure your computer is [setup for running an Expo app](https://docs.expo.dev/get-started/installation/).
 
@@ -44,7 +56,7 @@ npx create-expo-app
 Install `expo-router` and peer dependencies:
 
 ```bash
-npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar react-native-gesture-handler
 ```
 
 Then delete the entry point in your `package.json`, or replace it with `index.js` to be explicit:
@@ -61,7 +73,7 @@ Create a new file `index.js` in the root of your project. If it exists already, 
 import "expo-router/entry";
 ```
 
-Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guides/customizing-metro/#web-support-how) in your `app.json` (or `app.config.js`):
+Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guides/customizing-metro/#web-support) in your `app.json` (or `app.config.js`):
 
 ```json
 {
@@ -75,9 +87,9 @@ Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guide
 }
 ```
 
-<!-- 76 is required for typed routes plugin -->
+## Additional setup for v1
 
-Ensure you're using at least `metro@0.76.0` by setting a Yarn resolution or npm override.
+If you're using Expo Router v1, you need to resolve to `metro@0.76.0`. Expo Router v2+ should delete `resolutions` and `overrides` on `metro` packages.
 
 If you use **Yarn**:
 
@@ -108,7 +120,7 @@ module.exports = function (api) {
   api.cache(true);
   return {
     presets: ["babel-preset-expo"],
-    plugins: [require.resolve("expo-router/babel")],
+    plugins: ["expo-router/babel"],
   };
 };
 ```

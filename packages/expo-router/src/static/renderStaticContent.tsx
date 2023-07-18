@@ -5,21 +5,27 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { ServerContainerRef } from "@react-navigation/native";
-// We use the value from `main` in the `package.json` since this
-// should only be accessed from processes that are running in Node.js and
-// conform to using `mainFields: ['main']` in their bundler config.
-// @ts-expect-error
-import ServerContainer from "@react-navigation/native/lib/commonjs/ServerContainer";
+import { ServerContainer, ServerContainerRef } from "@react-navigation/native";
 import App, { getManifest } from "expo-router/_entry";
+import Head from "expo-router/head";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 import { AppRegistry } from "react-native-web";
 
 import { getRootComponent } from "./getRootComponent";
-import Head from "../head/Head";
 
 AppRegistry.registerComponent("App", () => App);
+
+function resetReactNavigationContexts() {
+  // https://github.com/expo/router/discussions/588
+  // https://github.com/react-navigation/react-navigation/blob/9fe34b445fcb86e5666f61e144007d7540f014fa/packages/elements/src/getNamedContext.tsx#LL3C1-L4C1
+
+  // React Navigation is storing providers in a global, this is fine for the first static render
+  // but subsequent static renders of Stack or Tabs will cause React to throw a warning. To prevent this warning, we'll reset the globals before rendering.
+  const contexts = "__react_navigation__elements_contexts";
+  // @ts-expect-error: global
+  global[contexts] = new Map<string, React.Context<any>>();
+}
 
 export function getStaticContent(location: URL): string {
   const headContext: { helmet?: any } = {};
@@ -35,25 +41,27 @@ export function getStaticContent(location: URL): string {
 
   const Root = getRootComponent();
 
-  const out = React.createElement(Root, {
-    // TODO: Use RNW view after they fix hydration for React 18
-    // https://github.com/necolas/react-native-web/blob/e8098fd029102d7801c32c1ede792bce01808c00/packages/react-native-web/src/exports/render/index.js#L10
-    // Otherwise this wraps the app with two extra divs
-    children:
-      // Inject the root tag using createElement to prevent any transforms like the ones in `@expo/html-elements`.
-      React.createElement(
-        "div",
-        {
-          id: "root",
-        },
-        <App />
-      ),
-  });
+  // This MUST be run before `ReactDOMServer.renderToString` to prevent
+  // "Warning: Detected multiple renderers concurrently rendering the same context provider. This is currently unsupported."
+  resetReactNavigationContexts();
 
   const html = ReactDOMServer.renderToString(
     <Head.Provider context={headContext}>
-      <ServerContainer ref={ref} location={location}>
-        {out}
+      <ServerContainer ref={ref}>
+        <App
+          location={location}
+          wrapper={({ children }) => {
+            return React.createElement(Root, {
+              children: React.createElement(
+                "div",
+                {
+                  id: "root",
+                },
+                children
+              ),
+            });
+          }}
+        />
       </ServerContainer>
     </Head.Provider>
   );

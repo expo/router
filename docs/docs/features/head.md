@@ -1,20 +1,36 @@
 ---
 title: Head
-# TODO
-sidebar_class_name: hidden
 ---
 
 > This guide refers to upcoming Expo Router features, all of which are experimental.
 
 The Expo `<Head />` component provides a simple and flexible way to manage the meta tags and other important elements of the page head in a universal Expo application. The Expo Head component is designed to be used in both web and mobile applications built with Expo Router. By using this component, developers can easily enhance the search engine optimization (SEO) of their applications.
 
-<!-- TODO -->
-
-> Native support is still in development.
+Native support can be found in the [handoff guide](/docs/lab/handoff).
 
 ## Usage
 
-The `<Head />` component can be imported in any route in the `app` directory, simply import using `expo-router/head`:
+Be sure to use the `expo-router` Config Plugin if you're planning to use on iOS:
+
+```json title=app.json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-router",
+        {
+          // Set this to the URL where your iOS universal links can be accessed.
+          // For example, if I build an app "Bacon Blog" and host at `evanbacon.dev`
+          // then `origin` should be `https://evanbacon.dev`.
+          "origin": "<PRODUCTION_URL>"
+        }
+      ]
+    ]
+  }
+}
+```
+
+The `<Head />` component can be imported in any route in the `app` directory, import using `expo-router/head`:
 
 ```tsx title=app/index.js
 import { Text } from "react-native";
@@ -59,9 +75,9 @@ The `<Head />` component accepts any web meta tags as children. The `<Head />` c
 
 ## Rendering
 
-> `EXPO_USE_STATIC` is [available on main](https://github.com/expo/expo/pull/21572) and not currently published.
+> Static rendering is experimentally available starting in SDK 49
 
-The `<Head />` component can be used for static rendering with `EXPO_USE_STATIC=1 yarn expo` (cite needed). The `<Head />` component can also be used to update during runtime or in single-page applications, this is useful for updating the page title and favicon to reflect dynamic interactions.
+The `<Head />` component can be used for static rendering, be setting `web.output: 'static'` in `app.json`. The `<Head />` component can also be used to update during runtime or in single-page applications, this is useful for updating the page title and favicon to reflect dynamic interactions.
 
 ## Beta Notice
 

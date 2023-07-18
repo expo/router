@@ -1,6 +1,5 @@
 import React from "react";
 
-import { LocationProvider } from "./LocationProvider";
 import {
   DynamicConvention,
   LoadedRoute,
@@ -9,6 +8,7 @@ import {
   sortRoutesWithInitial,
   useRouteNode,
 } from "./Route";
+import EXPO_ROUTER_IMPORT_MODE from "./import-mode";
 import { Screen } from "./primitives";
 import { EmptyRoute } from "./views/EmptyRoute";
 import { SuspenseFallback } from "./views/SuspenseFallback";
@@ -29,6 +29,12 @@ export type ScreenProps<
 
   // TODO: types
   listeners?: any;
+
+  getId?: ({
+    params,
+  }: {
+    params?: Record<string, any> | undefined;
+  }) => string | undefined;
 };
 
 function getSortedChildren(
@@ -44,7 +50,7 @@ function getSortedChildren(
   const entries = [...children];
 
   const ordered = order
-    .map(({ name, redirect, initialParams, listeners, options }) => {
+    .map(({ name, redirect, initialParams, listeners, options, getId }) => {
       if (!entries.length) {
         console.warn(
           `[Layout children]: Too many screens defined. Route "${name}" is extraneous.`
@@ -73,7 +79,10 @@ function getSortedChildren(
           return null;
         }
 
-        return { route: match, props: { initialParams, listeners, options } };
+        return {
+          route: match,
+          props: { initialParams, listeners, options, getId },
+        };
       }
     })
     .filter(Boolean) as {
@@ -110,13 +119,22 @@ function fromImport({ ErrorBoundary, ...component }: LoadedRoute) {
   if (ErrorBoundary) {
     return {
       default: React.forwardRef((props: any, ref: any) => {
-        const children = React.createElement(component.default, {
+        const children = React.createElement(component.default || EmptyRoute, {
           ...props,
           ref,
         });
         return <Try catch={ErrorBoundary}>{children}</Try>;
       }),
     };
+  }
+  if (process.env.NODE_ENV !== "production") {
+    if (
+      typeof component.default === "object" &&
+      component.default &&
+      Object.keys(component.default).length === 0
+    ) {
+      return { default: EmptyRoute };
+    }
   }
   return { default: component.default || EmptyRoute };
 }
@@ -142,25 +160,7 @@ export function getQualifiedRouteComponent(value: RouteNode) {
   let getLoadable: (props: any, ref: any) => JSX.Element;
 
   // TODO: This ensures sync doesn't use React.lazy, but it's not ideal.
-  if (process.env.EXPO_ROUTER_IMPORT_MODE === "sync") {
-    const SyncComponent = React.forwardRef((props, ref) => {
-      const res = value.loadRoute();
-      const Component = fromImport(res).default;
-      return <Component {...props} ref={ref} />;
-    });
-
-    getLoadable = (props: any, ref: any) => (
-      <SyncComponent
-        {...{
-          ...props,
-          ref,
-          // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
-          // the intention is to make it possible to deduce shared routes.
-          segment: value.route,
-        }}
-      />
-    );
-  } else {
+  if (EXPO_ROUTER_IMPORT_MODE === "lazy") {
     const AsyncComponent = React.lazy(async () => {
       const res = value.loadRoute();
       return fromLoadedRoute(res) as Promise<{
@@ -180,6 +180,24 @@ export function getQualifiedRouteComponent(value: RouteNode) {
         />
       </React.Suspense>
     );
+  } else {
+    const SyncComponent = React.forwardRef((props, ref) => {
+      const res = value.loadRoute();
+      const Component = fromImport(res).default;
+      return <Component {...props} ref={ref} />;
+    });
+
+    getLoadable = (props: any, ref: any) => (
+      <SyncComponent
+        {...{
+          ...props,
+          ref,
+          // Expose the template segment path, e.g. `(home)`, `[foo]`, `index`
+          // the intention is to make it possible to deduce shared routes.
+          segment: value.route,
+        }}
+      />
+    );
   }
 
   const QualifiedRoute = React.forwardRef(
@@ -197,11 +215,7 @@ export function getQualifiedRouteComponent(value: RouteNode) {
     ) => {
       const loadable = getLoadable(props, ref);
 
-      return (
-        <LocationProvider>
-          <Route node={value}>{loadable}</Route>
-        </LocationProvider>
-      );
+      return <Route node={value}>{loadable}</Route>;
     }
   );
 

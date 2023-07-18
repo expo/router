@@ -1,5 +1,74 @@
 import { configFromFs } from "../../utils/mockState";
-import getStateFromPath from "../getStateFromPath";
+import getStateFromPath, {
+  getUrlWithReactNavigationConcessions,
+} from "../getStateFromPath";
+
+describe(getUrlWithReactNavigationConcessions, () => {
+  ["/", "foo/", "foo/bar/", "foo/bar/baz/"].forEach((path) => {
+    it(`returns the pathname for ${path}`, () => {
+      expect(
+        getUrlWithReactNavigationConcessions(path).nonstandardPathname
+      ).toBe(path);
+    });
+  });
+
+  [
+    ["", "/"],
+    ["https://acme.com/hello/world?foo=bar#123", "hello/world/"],
+    ["https://acme.com/hello/world/?foo=bar#123", "hello/world/"],
+  ].forEach(([url, expected]) => {
+    it(`returns the pathname for ${url}`, () => {
+      expect(
+        getUrlWithReactNavigationConcessions(url).nonstandardPathname
+      ).toBe(expected);
+    });
+  });
+  [
+    ["", ""],
+    [
+      "https://acme.com/hello/world/?foo=bar#123",
+      "https://acme.com/hello/world/?foo=bar",
+    ],
+    ["/foobar#123", "/foobar"],
+  ].forEach(([url, expected]) => {
+    it(`returns the pathname without hash for ${url}`, () => {
+      expect(
+        getUrlWithReactNavigationConcessions(url).inputPathnameWithoutHash
+      ).toBe(expected);
+    });
+  });
+});
+
+it(`strips hashes`, () => {
+  expect(
+    getStateFromPath("/hello#123", {
+      screens: {
+        hello: "hello",
+      },
+    } as any)
+  ).toEqual({
+    routes: [
+      {
+        name: "hello",
+        path: "/hello",
+      },
+    ],
+  });
+
+  expect(getStateFromPath("/hello#123", configFromFs(["[hello].js"]))).toEqual({
+    routes: [
+      {
+        name: "[hello]",
+        params: {
+          hello: "hello",
+        },
+        path: "/hello",
+      },
+    ],
+  });
+
+  // TODO: Test rest params
+});
 
 it(`supports spaces`, () => {
   expect(

@@ -19,7 +19,7 @@ type Props = {
 export function LogBoxInspectorFooter(props: Props) {
   const log = useSelectedLog();
 
-  if (log.level === "syntax") {
+  if (["static", "syntax"].includes(log.level)) {
     return (
       <View style={styles.root}>
         <View style={styles.button}>
@@ -63,9 +63,7 @@ function FooterButton({
           ]}
         >
           <View style={buttonStyles.content}>
-            <Text selectable={false} style={buttonStyles.label}>
-              {text}
-            </Text>
+            <Text style={buttonStyles.label}>{text}</Text>
           </View>
         </View>
       )}
@@ -86,6 +84,7 @@ const buttonStyles = StyleSheet.create({
     justifyContent: "center",
   },
   label: {
+    userSelect: "none",
     color: LogBoxStyle.getTextColor(1),
     fontSize: 14,
     includeFontPadding: false,
@@ -96,10 +95,7 @@ const buttonStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   root: {
     backgroundColor: LogBoxStyle.getBackgroundColor(1),
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowRadius: 2,
-    shadowOpacity: 0.5,
+    boxShadow: `0 -2px 0 2px #000`,
     flexDirection: "row",
   },
   button: {

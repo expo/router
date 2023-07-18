@@ -21,13 +21,13 @@ export default function Layout() {
 ```
 
 ```js title=app/index.js
-import { useSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 
 import { useEffect } from "react";
 import { View, Text } from "react-native";
 
 export default function Home() {
-  const { post } = useSearchParams();
+  const { post } = useLocalSearchParams();
 
   useEffect(() => {
     if (post) {
@@ -55,12 +55,12 @@ export default function Home() {
 
 ```js title=app/details.js
 import { View, Text } from "react-native";
-import { useNavigation, useRouter, useSearchParams } from "expo-router";
+import { useNavigation, useRouter, useLocalSearchParams } from "expo-router";
 
 export default function Details() {
   const navigation = useNavigation();
   const router = useRouter();
-  const params = useSearchParams();
+  const params = useLocalSearchParams();
   const { id = 42, other } = params;
 
   return (

@@ -19,10 +19,8 @@ export const resolveHref = (href: Href): string => {
   const { pathname, params } = createQualifiedPathname(path, {
     ...href.params,
   });
-  return (
-    pathname +
-    (Object.keys(params).length ? `?${createQueryParams(params)}` : "")
-  );
+  const paramsString = createQueryParams(params);
+  return pathname + (paramsString ? `?${paramsString}` : "");
 };
 
 function createQualifiedPathname(
@@ -33,15 +31,9 @@ function createQualifiedPathname(
     const dynamicKey = `[${key}]`;
     const deepDynamicKey = `[...${key}]`;
     if (pathname.includes(dynamicKey)) {
-      pathname = pathname.replace(
-        dynamicKey,
-        Array.isArray(value) ? value.join("/") : value
-      );
+      pathname = pathname.replace(dynamicKey, encodeParam(value));
     } else if (pathname.includes(deepDynamicKey)) {
-      pathname = pathname.replace(
-        deepDynamicKey,
-        Array.isArray(value) ? value.join("/") : value
-      );
+      pathname = pathname.replace(deepDynamicKey, encodeParam(value));
     } else {
       continue;
     }
@@ -51,8 +43,20 @@ function createQualifiedPathname(
   return { pathname, params };
 }
 
+function encodeParam(param: any): string {
+  if (Array.isArray(param)) {
+    return param.map((p) => encodeParam(p)).join("/");
+  }
+
+  return encodeURIComponent(param.toString());
+}
+
 function createQueryParams(params: Record<string, any>): string {
-  return Object.entries(params)
-    .map((props) => props.join("="))
-    .join("&");
+  return (
+    Object.entries(params)
+      // Allow nullish params
+      .filter(([, value]) => value != null)
+      .map(([key, value]) => `${key}=${encodeURIComponent(value.toString())}`)
+      .join("&")
+  );
 }

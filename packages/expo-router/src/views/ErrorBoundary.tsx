@@ -1,16 +1,57 @@
 import { Pressable, StyleSheet, Text, View } from "@bacons/react-views";
+import { LogContext } from "@expo/metro-runtime/build/error-overlay/Data/LogContext";
+import { LogBoxInspectorStackFrames } from "@expo/metro-runtime/build/error-overlay/overlay/LogBoxInspectorStackFrames";
+import { LogBoxLog, parseErrorStack } from "@expo/metro-runtime/symbolicate";
+import { BottomTabBarHeightContext } from "@react-navigation/bottom-tabs";
 import React from "react";
-import { Platform, ScrollView, TouchableOpacity } from "react-native";
+import { Platform, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ErrorBoundaryProps } from "./Try";
 import { Link } from "../link/Link";
+import { ErrorBoundaryProps } from "./Try";
+
+function useMetroSymbolication(error: Error) {
+  const [logBoxLog, setLogBoxLog] = React.useState<LogBoxLog | null>(null);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    const stack = parseErrorStack(error.stack);
+
+    const log = new LogBoxLog({
+      level: "error",
+      message: {
+        content: error.message,
+        substitutions: [],
+      },
+      isComponentError: false,
+      stack,
+      category: error.message,
+      componentStack: [],
+    });
+
+    log.symbolicate("stack", (symbolicatedLog) => {
+      if (isMounted) {
+        setLogBoxLog(log);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [error]);
+
+  return logBoxLog;
+}
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  const logBoxLog = useMetroSymbolication(error);
+  const inTabBar = React.useContext(BottomTabBarHeightContext);
+  const Wrapper = inTabBar ? View : SafeAreaView;
+
   return (
-    <View style={[styles.container]}>
-      <SafeAreaView
-        style={{ flex: 1, maxWidth: 720, marginHorizontal: "auto" }}
+    <View style={styles.container}>
+      <Wrapper
+        style={{ flex: 1, gap: 8, maxWidth: 720, marginHorizontal: "auto" }}
       >
         <View
           style={{
@@ -21,70 +62,59 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
             alignItems: "center",
           }}
         >
-          <Text
-            accessibilityRole="header"
-            accessibilityLevel={1}
-            style={styles.title}
-          >
+          <Text role="heading" aria-level={1} style={styles.title}>
             Something went wrong
           </Text>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Pressable>
-              {({ hovered }) => (
-                <TouchableOpacity onPress={retry}>
-                  <View
-                    style={[
-                      {
-                        transitionDuration: "100ms",
-                        paddingVertical: 12,
-                        paddingHorizontal: 24,
-                        borderColor: "white",
-                        borderWidth: 2,
-                        marginLeft: 8,
-                      },
-                      hovered && { backgroundColor: "white" },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.buttonText,
-                        {
-                          transitionDuration: "100ms",
-                          color: hovered ? "black" : "white",
-                        },
-                      ]}
-                    >
-                      Retry
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-            </Pressable>
-          </View>
         </View>
 
-        <StackTrace error={error} />
+        <StackTrace logData={logBoxLog} />
         {process.env.NODE_ENV === "development" && (
           <Link href="/_sitemap" style={styles.link}>
             Sitemap
           </Link>
         )}
-      </SafeAreaView>
+        <Pressable onPress={retry}>
+          {({ hovered, pressed }) => (
+            <View
+              style={[
+                styles.buttonInner,
+                (hovered || pressed) && { backgroundColor: "white" },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  {
+                    transitionDuration: "100ms",
+                    color: hovered || pressed ? "black" : "white",
+                  },
+                ]}
+              >
+                Retry
+              </Text>
+            </View>
+          )}
+        </Pressable>
+      </Wrapper>
     </View>
   );
 }
 
-function StackTrace({ error }: { error: Error }) {
+function StackTrace({ logData }: { logData: LogBoxLog | null }) {
+  if (!logData?.symbolicated?.stack?.stack) {
+    return null;
+  }
   return (
-    <ScrollView
-      style={{
-        marginVertical: 8,
-        borderColor: "rgba(255,255,255,0.5)",
-        borderWidth: 1,
-        padding: 12,
-      }}
-    >
-      <Text style={[styles.code, { color: "white" }]}>{error.stack}</Text>
+    <ScrollView style={{ flex: 1 }}>
+      <LogContext.Provider
+        value={{
+          isDisabled: false,
+          logs: [logData],
+          selectedLogIndex: 0,
+        }}
+      >
+        <LogBoxInspectorStackFrames onRetry={function () {}} type="stack" />
+      </LogContext.Provider>
     </ScrollView>
   );
 }
@@ -99,15 +129,23 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "white",
-    fontSize: 36,
-
-    // textAlign: "center",
+    fontSize: Platform.select({ web: 32, default: 24 }),
     fontWeight: "bold",
   },
   buttonText: {
     fontSize: 18,
     fontWeight: "bold",
     color: "black",
+  },
+  buttonInner: {
+    transitionDuration: "100ms",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderColor: "white",
+    borderWidth: 2,
+    marginLeft: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
   code: {
     fontFamily: Platform.select({

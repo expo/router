@@ -10,11 +10,17 @@
     "web": {
       "bundler": "metro"
     },
-    "extra": {
-      "router": {
-        "asyncRoutes": false,
-        "origin": "https://smart-symbiote.netlify.app/"
-      }
-    }
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "asyncRoutes": {
+            "default": "development",
+            "android": false
+          },
+          "origin": "https://smart-symbiote.netlify.app"
+        }
+      ]
+    ]
   }
 }

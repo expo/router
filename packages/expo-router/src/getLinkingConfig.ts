@@ -1,6 +1,7 @@
 import { getActionFromState, LinkingOptions } from "@react-navigation/native";
 
 import { RouteNode } from "./Route";
+import { State } from "./fork/getPathFromState";
 import { getReactNavigationConfig, Screen } from "./getReactNavigationConfig";
 import {
   addEventListener,
@@ -16,7 +17,11 @@ export function getNavigationConfig(routes: RouteNode): {
   return getReactNavigationConfig(routes, true);
 }
 
-export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
+export type ExpoLinkingOptions = LinkingOptions<object> & {
+  getPathFromState?: typeof getPathFromState;
+};
+
+export function getLinkingConfig(routes: RouteNode): ExpoLinkingOptions {
   return {
     prefixes: [],
     // @ts-expect-error
@@ -29,15 +34,25 @@ export function getLinkingConfig(routes: RouteNode): LinkingOptions<object> {
     getInitialURL,
     subscribe: addEventListener,
     getStateFromPath: getStateFromPathMemoized,
-    getPathFromState,
-
+    getPathFromState(
+      state: State,
+      options: Parameters<typeof getPathFromState>[1]
+    ) {
+      return (
+        getPathFromState(state, {
+          screens: [],
+          ...this.config,
+          ...options,
+        }) ?? "/"
+      );
+    },
     // Add all functions to ensure the types never need to fallback.
     // This is a convenience for usage in the package.
     getActionFromState,
   };
 }
 
-const stateCache = new Map<string, any>();
+export const stateCache = new Map<string, any>();
 
 /** We can reduce work by memoizing the state by the pathname. This only works because the options (linking config) theoretically never change.  */
 function getStateFromPathMemoized(

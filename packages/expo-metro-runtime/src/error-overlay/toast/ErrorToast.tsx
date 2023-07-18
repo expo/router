@@ -8,10 +8,10 @@
 import { Image, Pressable, StyleSheet, Text, View } from "@bacons/react-views";
 import React, { useEffect } from "react";
 
-import { ErrorToastMessage } from "./ErrorToastMessage";
 import * as LogBoxData from "../Data/LogBoxData";
 import { LogBoxLog } from "../Data/LogBoxLog";
 import * as LogBoxStyle from "../UI/LogBoxStyle";
+import { ErrorToastMessage } from "./ErrorToastMessage";
 
 type Props = {
   log: LogBoxLog;
@@ -126,9 +126,7 @@ const countStyles = StyleSheet.create({
     lineHeight: 18,
     textAlign: "center",
     fontWeight: "600",
-    textShadowColor: LogBoxStyle.getBackgroundColor(0.8),
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 3,
+    textShadow: `0px 0px 3px ${LogBoxStyle.getBackgroundColor(0.8)}`,
   },
 });
 

@@ -6,9 +6,9 @@ import {
 import React from "react";
 import { Platform } from "react-native";
 
-import { withLayoutContext } from "./withLayoutContext";
 import { Link } from "../link/Link";
 import { Href } from "../link/href";
+import { withLayoutContext } from "./withLayoutContext";
 
 // This is the only way to access the navigator.
 const BottomTabNavigator = createBottomTabNavigator().Navigator;
@@ -31,7 +31,6 @@ export const Tabs = withLayoutContext<
         ...screen,
         options: {
           ...options,
-          // Force the button to go to the user's profile
           tabBarButton: (props) => {
             if (href == null) {
               return null;

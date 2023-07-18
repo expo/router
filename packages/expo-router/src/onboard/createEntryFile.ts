@@ -13,9 +13,16 @@ export function createEntryFileAsync() {
     method: "POST",
     body: JSON.stringify({
       contents: TEMPLATE,
+      // Legacy
       path: "./app/index.js",
+      // New
+      absolutePath: getAbsolutePath(),
     }),
   });
+}
+
+export function getAbsolutePath() {
+  return process.env.EXPO_ROUTER_ABS_APP_ROOT + "/index.js";
 }
 
 const TEMPLATE = `import { StyleSheet, Text, View } from "react-native";

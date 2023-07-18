@@ -1,5 +1,4 @@
 import { Image, Pressable, StyleSheet, Text, View } from "@bacons/react-views";
-import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 import React from "react";
 import {
@@ -10,22 +9,13 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { RouteNode, sortRoutes } from "../Route";
+import { RouteNode } from "../Route";
+import { useExpoRouter } from "../global-state/router-store";
+import { router } from "../imperative-api";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName } from "../matchers";
-import { useRootRouteNodeContext } from "../useRootRouteNodeContext";
 
 const INDENT = 24;
-
-function useSortedRoutes() {
-  const ctx = useRootRouteNodeContext();
-
-  const routes = React.useMemo(
-    () => [ctx].filter((route) => !route.internal).sort(sortRoutes),
-    [ctx]
-  );
-  return routes;
-}
 
 export function getNavOptions(): NativeStackNavigationOptions {
   return {
@@ -37,7 +27,6 @@ export function getNavOptions(): NativeStackNavigationOptions {
     headerTitleStyle: {
       color: "white",
     },
-
     headerTintColor: "white",
     headerLargeTitleStyle: {
       color: "white",
@@ -82,7 +71,7 @@ export function Sitemap() {
 }
 
 function FileSystemView() {
-  const routes = useSortedRoutes();
+  const routes = useExpoRouter().getSortedRoutes();
 
   return (
     <>
@@ -107,8 +96,6 @@ function FileItem({
   isInitial?: boolean;
 }) {
   const disabled = route.children.length > 0;
-
-  const navigation = useNavigation();
 
   const segments = React.useMemo(
     () => [...parents, ...route.route.split("/")],
@@ -157,9 +144,9 @@ function FileItem({
           accessibilityLabel={route.contextKey}
           href={href}
           onPress={() => {
-            if (Platform.OS !== "web") {
+            if (Platform.OS !== "web" && router.canGoBack()) {
               // Ensure the modal pops
-              navigation.goBack();
+              router.back();
             }
           }}
           style={{ flex: 1, display: "flex" }}

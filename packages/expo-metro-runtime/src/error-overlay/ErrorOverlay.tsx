@@ -5,8 +5,9 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
+import { StyleSheet } from "@bacons/react-views";
 import React, { useCallback, useEffect, useState } from "react";
-import { Keyboard, ScrollView, StyleSheet, View } from "react-native";
+import { Keyboard, ScrollView, View } from "react-native";
 
 import * as LogBoxData from "./Data/LogBoxData";
 import { LogBoxLog, StackType } from "./Data/LogBoxLog";
@@ -23,6 +24,7 @@ const HEADER_TITLE_MAP = {
   error: "Console Error",
   fatal: "Uncaught Error",
   syntax: "Syntax Error",
+  static: "Static Rendering Error (Node.js)",
   component: "Render Error",
 };
 
@@ -40,6 +42,7 @@ export function LogBoxInspectorContainer() {
     />
   );
 }
+
 export function LogBoxInspector({
   log,
   selectedLogIndex,
@@ -106,7 +109,7 @@ export function LogBoxInspector({
   );
 
   return (
-    <View style={[StyleSheet.absoluteFill, { flex: 1 }]}>
+    <View style={styles.container}>
       <ErrorOverlayHeader
         onSelectIndex={onChangeSelectedIndex}
         level={log.level}
@@ -117,8 +120,22 @@ export function LogBoxInspector({
   );
 }
 
-function ErrorOverlayBody({ onRetry }: { onRetry: (type: StackType) => void }) {
+export function ErrorOverlayBody({
+  onRetry,
+}: {
+  onRetry: (type: StackType) => void;
+}) {
   const log = useSelectedLog();
+  return <ErrorOverlayBodyContents log={log} onRetry={onRetry} />;
+}
+
+export function ErrorOverlayBodyContents({
+  log,
+  onRetry,
+}: {
+  log: LogBoxLog;
+  onRetry: (type: StackType) => void;
+}) {
   const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
@@ -139,37 +156,27 @@ function ErrorOverlayBody({ onRetry }: { onRetry: (type: StackType) => void }) {
     />
   );
 
-  const content = (
-    <>
-      <LogBoxInspectorCodeFrame codeFrame={log.codeFrame} />
-      <LogBoxInspectorStackFrames
-        type="stack"
-        // eslint-disable-next-line react/jsx-no-bind
-        onRetry={onRetry.bind(onRetry, "stack")}
-      />
-      {!!log?.componentStack?.length && (
-        <LogBoxInspectorStackFrames
-          type="component"
-          // eslint-disable-next-line react/jsx-no-bind
-          onRetry={onRetry.bind(onRetry, "component")}
-        />
-      )}
-    </>
-  );
-
-  if (collapsed) {
-    return (
-      <>
-        {header}
-        <ScrollView style={styles.scrollBody}>{content}</ScrollView>
-      </>
-    );
-  }
   return (
-    <ScrollView style={styles.scrollBody}>
-      {header}
-      {content}
-    </ScrollView>
+    <>
+      {collapsed && header}
+      <ScrollView style={styles.scrollBody}>
+        {!collapsed && header}
+
+        <LogBoxInspectorCodeFrame codeFrame={log.codeFrame} />
+        <LogBoxInspectorStackFrames
+          type="stack"
+          // eslint-disable-next-line react/jsx-no-bind
+          onRetry={onRetry.bind(onRetry, "stack")}
+        />
+        {!!log?.componentStack?.length && (
+          <LogBoxInspectorStackFrames
+            type="component"
+            // eslint-disable-next-line react/jsx-no-bind
+            onRetry={onRetry.bind(onRetry, "component")}
+          />
+        )}
+      </ScrollView>
+    </>
   );
 }
 
@@ -177,6 +184,15 @@ const styles = StyleSheet.create({
   scrollBody: {
     backgroundColor: LogBoxStyle.getBackgroundColor(1),
     flex: 1,
+  },
+  container: {
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    zIndex: 999,
+    flex: 1,
+    position: "fixed",
   },
 });
 

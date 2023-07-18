@@ -61,11 +61,7 @@ export function LogBoxInspectorMessageHeader(props: Props) {
 const styles = StyleSheet.create({
   body: {
     backgroundColor: LogBoxStyle.getBackgroundColor(1),
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 2,
-    shadowOpacity: 0.5,
-    // flex: 0,
+    boxShadow: `0 2px 0 2px #00000080`,
   },
   bodyText: {
     color: LogBoxStyle.getTextColor(1),
@@ -100,6 +96,9 @@ const styles = StyleSheet.create({
     color: LogBoxStyle.getFatalColor(1),
   },
   syntax: {
+    color: LogBoxStyle.getFatalColor(1),
+  },
+  static: {
     color: LogBoxStyle.getFatalColor(1),
   },
   messageText: {

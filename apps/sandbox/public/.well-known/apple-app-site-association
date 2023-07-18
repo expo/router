@@ -1,0 +1,27 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": [
+          "QQ57RJ5UTD.app.expo.router.sandbox"
+        ],
+        "components": [
+          {
+            "/": "*",
+            "comment": "Matches all routes"
+          }
+        ]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": [
+      "QQ57RJ5UTD.app.expo.router.sandbox"
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "QQ57RJ5UTD.app.expo.router.sandbox"
+    ]
+  }
+}

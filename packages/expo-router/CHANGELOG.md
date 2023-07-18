@@ -10,6 +10,194 @@
 
 ### 💡 Others
 
+## [Wed, 5 Jul 2023 10:41:30 -0700](https://github.com/expo/router/commit/5610b2c68a5b58f250e2789e49a9fc76dbac0097)
+
+## [Wed, 5 Jul 2023 10:24:47 -0700](https://github.com/expo/router/commit/103a4637d2980d7642c1ac4bdf40586e1941b537)
+
+### 🎉 New features
+
+- expose canGoBack function on router ([#712](https://github.com/expo/router/issues/712))
+- add custom getId ([#713](https://github.com/expo/router/issues/713))
+
+### 💡 Others
+
+- remove duplicate `sortRoutes` declaration ([#705](https://github.com/expo/router/issues/705))
+- set sdk 49 compatible splash screen version explicitly ([#711](https://github.com/expo/router/issues/711))
+
+## [Thu, 29 Jun 2023 22:27:08 -0700](https://github.com/expo/router/commit/44ca98dfe9dea5d533badf368ce3374e50873196)
+
+### 🐛 Bug fixes
+
+- Improve mounting error message ([#703](https://github.com/expo/router/issues/703))
+- Strip hashes before navigating ([#702](https://github.com/expo/router/issues/702))
+
+## [Wed, 28 Jun 2023 15:53:41 -0700](https://github.com/expo/router/commit/11bb4476807dd98eebd2c9052abdc50ddac34f6a)
+
+### 🐛 Bug fixes
+
+- disable setting the document.title with React Navigation ([#693](https://github.com/expo/router/issues/693))
+- fix moving from modal to tab ([#696](https://github.com/expo/router/issues/696))
+
+## [Tue, 27 Jun 2023 16:44:04 -0700](https://github.com/expo/router/commit/8dbfc405ba2b85da98d34936fce829ec22b63d9f)
+
+### 🐛 Bug fixes
+
+- fix initial router info regression ([#689](https://github.com/expo/router/issues/689))
+
+## [Tue, 27 Jun 2023 11:20:24 -0700](https://github.com/expo/router/commit/94c285ff3b3862a50bfb70d4fda688cedb91f244)
+
+### 🐛 Bug fixes
+
+- add hasUrlProtocolPrefix ([#691](https://github.com/expo/router/issues/691))
+- expect more optionals ([#685](https://github.com/expo/router/issues/685))
+
+## [Thu, 22 Jun 2023 20:16:45 -0500](https://github.com/expo/router/commit/88637e027771608f8f163c7a8240ce84ef23f3ad)
+
+### 🐛 Bug fixes
+
+- Fix async routes in static web.
+- Fix `react-native-gesture-handler` optional import.
+- Make `origin` optional in config plugin.
+
+## [Thu, 22 Jun 2023 17:12:26 -0500](https://github.com/expo/router/commit/a83e1cd3bb15bccb83fc5c31bc4706260cba49b0)
+
+### 🎉 New features
+
+- Allow +html file to use hooks ([#672](https://github.com/expo/router/issues/672))
+
+### 🐛 Bug fixes
+
+- Fix Unmatched rendering in static rendering ([#669](https://github.com/expo/router/issues/669))
+
+### 💡 Others
+
+- Manifest is deprecated in SDK 49, use expoConfig instead ([#679](https://github.com/expo/router/issues/679))
+- Additional tests ([#635](https://github.com/expo/router/issues/635))
+
+## [Thu, 15 Jun 2023 22:44:54 -0500](https://github.com/expo/router/commit/ac12133d0179dd1b2ec170b75ee04fae4456f2d6)
+
+### 🐛 Bug fixes
+
+- Fix tutorial style ([#662](https://github.com/expo/router/issues/662))
+- Fix create entry when run outside of monorepos ([#660](https://github.com/expo/router/issues/660))
+
+## [Tue, 13 Jun 2023 19:03:46 -0500](https://github.com/expo/router/commit/10bfe14151b2a89190bde4a371a4c6039d8f354d)
+
+### 🐛 Bug fixes
+
+- Fix react refresh for web with `output: single` ([#658](https://github.com/expo/router/issues/658))
+
+## [Mon, 12 Jun 2023 17:06:50 -0500](https://github.com/expo/router/commit/460ad5e7f5de87e7abd8b20762bcdda0d38c8c2b)
+
+## [Mon, 12 Jun 2023 16:33:50 -0500](https://github.com/expo/router/commit/de3387b677ec5a6089e4d7b980334616a8a4a296)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- Add support for the src directory to expo router ([#629](https://github.com/expo/router/issues/629))
+- Update async routes for metro@0.76.3 ([#622](https://github.com/expo/router/issues/622))
+- Add support for imperative API that works without hooks ([#600](https://github.com/expo/router/issues/600))
+- Implement better splash imperative API ([#620](https://github.com/expo/router/issues/620))
+- Add SafeAreaView to the default navigator ([#623](https://github.com/expo/router/issues/623))
+
+### 🐛 Bug fixes
+
+- Do not reset `isReady` during Fast Refresh ([#653](https://github.com/expo/router/issues/653))
+- Fix splash screen invocations ([#654](https://github.com/expo/router/issues/654))
+
+### 💡 Others
+
+## [Thu, 1 Jun 2023 16:16:35 -0500](https://github.com/expo/router/commit/c75864b0bc2d05bde4c6f1cf409e2a7dd26a2248)
+
+### 🛠 Breaking changes
+
+- Remove `useHref` ([#602](https://github.com/expo/router/issues/602))
+
+### 🎉 New features
+
+- Symbolicate ErrorBoundary stack ([#617](https://github.com/expo/router/issues/617))
+- Encode query parameter values when resolving href ([#608](https://github.com/expo/router/issues/608))
+
+### 🐛 Bug fixes
+
+- Fix fast refresh on web. ([#606](https://github.com/expo/router/issues/606))
+- Fix showing tutorial page when no app directory is found. ([#605](https://github.com/expo/router/issues/605))
+- Prevent root rerender. ([#612](https://github.com/expo/router/issues/612))
+
+### 💡 Others
+
+- Move the context stubs into a new file ([#599](https://github.com/expo/router/issues/599))
+
+## [Fri, 19 May 2023 11:10:36 -0500](https://github.com/expo/router/commit/590b4c8c0ce18ae701ae0509181679ebcbc3a5de)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- rename `useSearchParams` to `useGlobalSearchParams` and deprecate the `useSearchParams` function. ([#578](https://github.com/expo/router/issues/578))
+- automatically urlencode path params ([#553](https://github.com/expo/router/issues/553))
+
+### 🐛 Bug fixes
+
+- fix ssg warning ([#589](https://github.com/expo/router/issues/589))
+- fix: isMovingToSiblingRoute incorrectly detecting parent as sibling ([#532](https://github.com/expo/router/issues/532))
+- inifinite rerenders due to default prop value ([#531](https://github.com/expo/router/issues/531))
+- remove navigation store ([#527](https://github.com/expo/router/issues/527))
+
+### 💡 Others
+
+## [Thu, 27 Apr 2023 19:28:53 -0500](https://github.com/expo/router/commit/100817c4e91eac21cd2416827144bd8da963f8af)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- Add Expo Config Plugin for configuring API.
+
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## [Wed, 26 Apr 2023 19:13:52 -0500](https://github.com/expo/router/commit/7ab776facb0fb26427a7891e4a5c98ac431105a4)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- feat: testing utils for jest ([#447](https://github.com/expo/router/issues/447))
+
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## [Thu, 13 Apr 2023 21:13:59 -0500](https://github.com/expo/router/commit/8d8ece6dc5f73d824c0e3a7b44fb71b57ad24536)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- refactor: consolidate providers into a central store ([#466](https://github.com/expo/router/issues/466))
+- feat: expo-env.d.ts ([#477](https://github.com/expo/router/issues/477))
+
+### 🐛 Bug fixes
+
+- fix: Convert react-native-web types to an ambient module ([#481](https://github.com/expo/router/issues/481))
+
+### 💡 Others
+
+## [Sun, 9 Apr 2023 16:42:18 -0500](https://github.com/expo/router/commit/ec6f6ecf15063bccf062307b0fcd350933956479)
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
+- fix nested deep dynamic route colliding with generated 404 ([#473](https://github.com/expo/router/issues/473))
+
+### 💡 Others
+
 ## [Wed, 5 Apr 2023 12:31:34 -0500](https://github.com/expo/router/commit/ad5d734485e00468d39955d16b4af0e2ac1a6fbf)
 
 ### 🛠 Breaking changes
