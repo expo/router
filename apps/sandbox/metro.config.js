@@ -11,6 +11,8 @@ const config = getDefaultConfig(__dirname, {
   isCSSEnabled: true,
 });
 
+config.resolver.unstable_enablePackageExports = true;
+
 config.resolver.sourceExts.push("css");
 
 config.watcher = {
