@@ -32,8 +32,8 @@ npx create-expo-app@latest --example with-router
 - **Deep linking** Every screen in your app is automatically deep linkable. Making any part of your app shareable.
 - **Offline-first** Apps are cached and run offline-first, with automatic updates when you publish a new version. Handles all incoming native URLs without a network connection or server.
 - **Scale** Apps are built with a modular architecture that scales to any size. Refactoring and upgrading are a breeze due to the declarative nature of the API.
-- **Iteration** Universal Fast Refresh across iOS, Android, and web along with artifact memoziation in the bundler keep you moving fast at scale.
-- **Cross-Platform** Expo Router is a large step towards universal React apps. The same codebase can be used to build iOS, Android, and web apps.
+- **Iteration** Universal Fast Refresh across iOS, Android, and web along with artifact memoization in the bundler keep you moving fast at scale.
+- **Cross-Platform** Expo Router is a large step toward universal React apps. The same codebase can be used to build iOS, Android, and web apps.
 
 ## Getting Started
 
