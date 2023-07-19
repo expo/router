@@ -14,7 +14,7 @@ export function ScrollViewStyleReset() {
     <style
       id="expo-reset"
       dangerouslySetInnerHTML={{
-        __html: `#root,body,html{height:100%}body{overflow:hidden}#root{display:flex}`,
+        __html: `#root,body{display:flex}#root,body,html{width:100%;-webkit-overflow-scrolling:touch;margin:0;padding:0;min-height:100%}#root{flex-shrink:0;flex-basis:auto;flex-grow:1;flex:1}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;height:calc(100% + env(safe-area-inset-top))}body{overflow-y:auto;overscroll-behavior-y:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-ms-overflow-style:scrollbar}`,
       }}
     />
   );
