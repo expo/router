@@ -30,6 +30,7 @@ export type ExpoRoutesManifestV1<TRegex = string> = {
 export async function createRoutesManifest(): Promise<any> {
   let routeTree = getRoutes(ctx, {
     preserveApiRoutes: true,
+    ignoreRequireErrors: true,
   });
 
   if (!routeTree) {

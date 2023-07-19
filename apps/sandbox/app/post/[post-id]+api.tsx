@@ -1,9 +1,4 @@
-// import { ExpoRequest, ExpoResponse } from "expo-router/server";
-// import fs from "fs";
-// import path from "path";
 import satori from "satori";
-// import { getFont } from "../../etc/getFont";
-// const svg2img = require("svg2img");
 
 const ExpoResponse =
   global.ExpoResponse as typeof import("expo-router/server").ExpoResponse;
@@ -14,15 +9,6 @@ const SUPER_E2E_TEST_SECRET_VALUE = "SUPER_E2E_TEST_SECRET_VALUE";
 export async function GET(
   req: typeof import("expo-router/server").ExpoRequest
 ) {
-  const pkg = { foo: "bar: " + __dirname };
-  // JSON.parse(
-  //   await fs.promises.readFile(
-  //     path.join(__dirname, "../..", "package.json"),
-  //     "utf8"
-  //   )
-  // );
-
-  console.log("req", req.expoUrl.pathname, req.url);
   // Used for most languages
   const inter = await getFont({
     family: "Inter",
@@ -122,30 +108,12 @@ export async function GET(
     req.expoUrl.searchParams.get("post-id")
   );
 
-  // const data = await new Promise((res) =>
-  //   svg2img(svg, function (error, buffer) {
-  //     res(buffer);
-  //   })
-  // );
-
-  // const resvg = new Resvg(svg, {});
-  // const pngData = resvg.render();
-  // const pngBuffer = pngData.asPng();
-
-  // return new ExpoResponse(data, {
-  //   headers: {
-  //     "Content-Type": "image/png",
-  //     "cache-control": "public, max-age=31536000, immutable",
-  //   },
-  // });
   return new ExpoResponse(svg, {
     headers: {
       "cache-control": "public, max-age=31536000, immutable",
       "Content-Type": "image/svg+xml",
     },
   });
-
-  return ExpoResponse.json({ hey: "world", pkg, SUPER_E2E_TEST_SECRET_VALUE });
 }
 
 /** https://github.com/juliusmarminge/jumr.dev/blob/main/app/og-image/get-fonts.ts */

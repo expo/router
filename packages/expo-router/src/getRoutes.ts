@@ -27,6 +27,7 @@ type TreeNode = {
 type Options = {
   ignore?: RegExp[];
   preserveApiRoutes?: boolean;
+  ignoreRequireErrors?: boolean;
 };
 
 /** Convert a flat map of file nodes into a nested tree of files. */
@@ -268,6 +269,7 @@ function treeNodeToRouteNode(tree: TreeNode): RouteNode[] | null {
 
 function contextModuleToFileNodes(
   contextModule: RequireContext,
+  options: Options = {},
   files: string[] = contextModule.keys()
 ): FileNode[] {
   const nodes = files.map((key) => {
@@ -286,7 +288,15 @@ function contextModuleToFileNodes(
       }
       const node: FileNode = {
         loadRoute() {
-          return contextModule(key);
+          if (options.ignoreRequireErrors) {
+            try {
+              return contextModule(key);
+            } catch {
+              return {};
+            }
+          } else {
+            return contextModule(key);
+          }
         },
         normalizedName: getNameFromFilePath(key),
         contextKey: key,
@@ -419,7 +429,7 @@ function contextModuleToTree(contextModule: RequireContext, options?: Options) {
     ignore: getIgnoreList(options),
   });
   assertDuplicateRoutes(allowed);
-  const files = contextModuleToFileNodes(contextModule, allowed);
+  const files = contextModuleToFileNodes(contextModule, options, allowed);
   return getRecursiveTree(files);
 }
 
