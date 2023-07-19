@@ -3,6 +3,8 @@ import { nanoid } from "nanoid/non-secure";
 import * as React from "react";
 import { Platform } from "react-native";
 
+import { useDeprecated } from "../useDeprecated";
+
 const globalStack: string[] = [];
 
 /**
@@ -25,11 +27,9 @@ const globalStack: string[] = [];
  */
 export function SplashScreen() {
   useGlobalSplash();
-  React.useEffect(() => {
-    console.warn(
-      "The <SplashScreen /> component is deprecated. Use `SplashScreen.preventAutoHideAsync()` and `SplashScreen.hideAsync` from `expo-router` instead."
-    );
-  }, []);
+  useDeprecated(
+    "The <SplashScreen /> component is deprecated. Use `SplashScreen.preventAutoHideAsync()` and `SplashScreen.hideAsync` from `expo-router` instead."
+  );
   return null;
 }
 
