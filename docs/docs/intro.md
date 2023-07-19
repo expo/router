@@ -5,6 +5,12 @@ sidebar_position: 1
 slug: /
 ---
 
+:::note Migration
+
+This doc has [moved to the Expo Docs](https://docs.expo.dev/routing/introduction/).
+
+:::
+
 Expo Router brings the best routing concepts from the web to native iOS and Android apps. Every file in the **app** directory automatically becomes a route in your mobile navigation, making it easier than ever to build, maintain, and scale your project. It's built on top of our powerful [React Navigation suite](https://reactnavigation.org/) enabling truly native navigation. The entire deep linking system is automatically generated live, so users can share links to any route in your app.
 
 ## Quick Start
@@ -26,10 +32,16 @@ npx create-expo-app@latest --example with-router
 - **Deep linking** Every screen in your app is automatically deep linkable. Making any part of your app shareable.
 - **Offline-first** Apps are cached and run offline-first, with automatic updates when you publish a new version. Handles all incoming native URLs without a network connection or server.
 - **Scale** Apps are built with a modular architecture that scales to any size. Refactoring and upgrading are a breeze due to the declarative nature of the API.
-- **Iteration** Universal Fast Refresh across iOS, Android, and web along with artifact memoziation in the bundler keep you moving fast at scale.
-- **Cross-Platform** Expo Router is a large step towards universal React apps. The same codebase can be used to build iOS, Android, and web apps.
+- **Iteration** Universal Fast Refresh across iOS, Android, and web along with artifact memoization in the bundler keep you moving fast at scale.
+- **Cross-Platform** Expo Router is a large step toward universal React apps. The same codebase can be used to build iOS, Android, and web apps.
 
 ## Getting Started
+
+:::note Migration
+
+This guide has [moved to the Expo Docs](https://docs.expo.dev/routing/installation/).
+
+:::
 
 > Expo Router supports `expo@48.0.0` and greater.
 
@@ -75,9 +87,9 @@ Add a deep linking `scheme` and enable [`metro` web](https://docs.expo.dev/guide
 }
 ```
 
-<!-- 76 is required for typed routes plugin -->
+## Additional setup for v1
 
-Ensure you're using at least `metro@0.76.0` by setting a Yarn resolution or npm override.
+If you're using Expo Router v1, you need to resolve to `metro@0.76.0`. Expo Router v2+ should delete `resolutions` and `overrides` on `metro` packages.
 
 If you use **Yarn**:
 
@@ -108,7 +120,7 @@ module.exports = function (api) {
   api.cache(true);
   return {
     presets: ["babel-preset-expo"],
-    plugins: [require.resolve("expo-router/babel")],
+    plugins: ["expo-router/babel"],
   };
 };
 ```

@@ -23,6 +23,8 @@ export type Router = {
   replace: (href: Href) => void;
   /** Go back in the history. */
   back: () => void;
+  /** If there's history that supports invoking the `back` function. */
+  canGoBack: () => boolean;
   /** Update the current route query params. */
   setParams: (params?: Record<string, string>) => void;
 };

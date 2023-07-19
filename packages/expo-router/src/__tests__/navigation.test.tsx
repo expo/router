@@ -211,3 +211,57 @@ it("replaces from top level modal to initial route in a tab navigator", () => {
   expect(screen).toHavePathname("/");
   expect(screen).toHaveSegments(["(tabs)"]);
 });
+
+it("pushes auto-encoded params and fully qualified URLs", () => {
+  /** https://github.com/expo/router/issues/345 */
+  renderRouter({
+    index: () => <Text />,
+    "[id]": () => <Text />,
+  });
+
+  expect(screen).toHavePathname("/");
+
+  act(() =>
+    router.push({
+      pathname: "/abc",
+      params: {
+        one: "hello?",
+        two: "https://localhost:8081/?foo=bar&one=more",
+        three: ["one", "two", "three"],
+      },
+    })
+  );
+  expect(screen).toHavePathname("/abc");
+  expect(screen).toHaveSearchParams({
+    id: "abc",
+    one: "hello?",
+    two: "https://localhost:8081/?foo=bar&one=more",
+    three: "one,two,three",
+  });
+});
+
+it("does not loop infinitely when pushing a screen with empty options to an invalid initial route name", () => {
+  /** https://github.com/expo/router/issues/452 */
+
+  renderRouter({
+    _layout: () => <Stack />,
+    index: () => <Text />,
+    "main/_layout": {
+      unstable_settings: {
+        // NOTE(EvanBacon): This has to be an invalid route.
+        initialRouteName: "index",
+      },
+      default: () => <Stack />,
+    },
+    "main/welcome": () => (
+      <>
+        <Stack.Screen options={{}} />
+        <Text />
+      </>
+    ),
+  });
+
+  expect(screen).toHavePathname("/");
+  act(() => router.push("/main/welcome"));
+  expect(screen).toHavePathname("/main/welcome");
+});

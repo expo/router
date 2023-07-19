@@ -10,6 +10,20 @@
 
 ### 💡 Others
 
+## [Wed, 5 Jul 2023 10:41:30 -0700](https://github.com/expo/router/commit/5610b2c68a5b58f250e2789e49a9fc76dbac0097)
+
+## [Wed, 5 Jul 2023 10:24:47 -0700](https://github.com/expo/router/commit/103a4637d2980d7642c1ac4bdf40586e1941b537)
+
+### 🎉 New features
+
+- expose canGoBack function on router ([#712](https://github.com/expo/router/issues/712))
+- add custom getId ([#713](https://github.com/expo/router/issues/713))
+
+### 💡 Others
+
+- remove duplicate `sortRoutes` declaration ([#705](https://github.com/expo/router/issues/705))
+- set sdk 49 compatible splash screen version explicitly ([#711](https://github.com/expo/router/issues/711))
+
 ## [Thu, 29 Jun 2023 22:27:08 -0700](https://github.com/expo/router/commit/44ca98dfe9dea5d533badf368ce3374e50873196)
 
 ### 🐛 Bug fixes

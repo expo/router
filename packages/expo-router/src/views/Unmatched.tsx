@@ -37,23 +37,15 @@ export function Unmatched() {
 
   return (
     <View style={styles.container}>
-      <Text
-        accessibilityRole="header"
-        accessibilityLevel={1}
-        style={styles.title}
-      >
+      <Text role="heading" aria-level={1} style={styles.title}>
         Unmatched Route
       </Text>
-      <Text
-        accessibilityRole="header"
-        accessibilityLevel={2}
-        style={styles.subtitle}
-      >
+      <Text role="heading" aria-level={2} style={styles.subtitle}>
         Page could not be found.{" "}
         <Text
           onPress={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
+            if (router.canGoBack()) {
+              router.back();
             } else {
               router.replace("/");
             }

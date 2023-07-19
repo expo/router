@@ -126,9 +126,7 @@ const countStyles = StyleSheet.create({
     lineHeight: 18,
     textAlign: "center",
     fontWeight: "600",
-    textShadowColor: LogBoxStyle.getBackgroundColor(0.8),
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 3,
+    textShadow: `0px 0px 3px ${LogBoxStyle.getBackgroundColor(0.8)}`,
   },
 });
 

@@ -1,5 +1,6 @@
 import React from "react";
 
+import { useDeprecated } from "../useDeprecated";
 import { useNavigation } from "../useNavigation";
 
 export type ScreenProps<
@@ -33,8 +34,23 @@ export function Screen<TOptions extends object = object>({
   const navigation = useNavigation(name);
 
   useLayoutEffect(() => {
-    navigation.setOptions(options ?? {});
+    if (
+      options &&
+      // React Navigation will infinitely loop in some cases if an empty object is passed to setOptions.
+      // https://github.com/expo/router/issues/452
+      Object.keys(options).length
+    ) {
+      navigation.setOptions(options);
+    }
   }, [navigation, options]);
+
+  if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useDeprecated(
+      "The `redirect` prop on <Screen /> is deprecated and will be removed. Please use `router.redirect` instead",
+      redirect
+    );
+  }
 
   if (process.env.NODE_ENV !== "production") {
     // eslint-disable-next-line react-hooks/rules-of-hooks

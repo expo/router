@@ -1,6 +1,6 @@
 # Expo Router
 
-> Stable Version 1 is out now!
+> [Stable version 2 is out now](https://blog.expo.dev/introducing-expo-router-v2-3850fd5c3ca1)!
 
 Repo for the new File-based router for React Native apps. Please open a discussion if you have any questions or feedback.
 
@@ -12,7 +12,7 @@ The easiest way to try **Expo Router** is by creating a new project:
 npx create-expo-app@latest -e with-router
 ```
 
-See the [setup guide for more](https://expo.github.io/router/docs/).
+See the [setup guide for more](https://docs.expo.dev/routing/installation/).
 
 ## Examples
 
@@ -21,8 +21,6 @@ See the [setup guide for more](https://expo.github.io/router/docs/).
 - [Test app](/apps/sandbox) - Test app, in this repository.
 - [Demo app](/apps/demo) - Demo app for the latest router version.
 - [Expo Router Guest List App](https://github.com/hola-soy-milk/upleveled-react-native-expo) - Simple guest list app with fetching from external API
-
-> Add yours today!
 
 ## Contributing
 

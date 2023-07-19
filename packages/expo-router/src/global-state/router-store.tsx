@@ -14,7 +14,7 @@ import { getRoutes } from "../getRoutes";
 import { RequireContext } from "../types";
 import { getQualifiedRouteComponent } from "../useScreens";
 import { _internal_maybeHideAsync } from "../views/Splash";
-import { goBack, linkTo, push, replace, setParams } from "./routing";
+import { canGoBack, goBack, linkTo, push, replace, setParams } from "./routing";
 import { getSortedRoutes } from "./sort-routes";
 
 /**
@@ -27,6 +27,7 @@ export class RouterStore {
   rootComponent!: ComponentType;
   linking: ExpoLinkingOptions | undefined;
   isReady: boolean = false;
+  private hasAttemptedToHideSplash: boolean = false;
 
   initialState: ResultState | undefined;
   rootState: ResultState | undefined;
@@ -42,6 +43,7 @@ export class RouterStore {
   linkTo = linkTo.bind(this);
   getSortedRoutes = getSortedRoutes.bind(this);
   goBack = goBack.bind(this);
+  canGoBack = canGoBack.bind(this);
   push = push.bind(this);
   replace = replace.bind(this);
   setParams = setParams.bind(this);
@@ -117,8 +119,16 @@ export class RouterStore {
       (data) => {
         const state = data.data.state as ResultState;
 
-        if (navigationRef.isReady()) {
-          this.onReady();
+        if (!this.isReady) {
+          if (!this.hasAttemptedToHideSplash) {
+            this.hasAttemptedToHideSplash = true;
+            // NOTE(EvanBacon): `navigationRef.isReady` is sometimes not true when state is called initially.
+            requestAnimationFrame(() => _internal_maybeHideAsync());
+          }
+
+          if (navigationRef.isReady()) {
+            this.onReady();
+          }
         }
 
         let shouldUpdateSubscribers = this.nextState === state;
@@ -178,9 +188,6 @@ export class RouterStore {
 
   /** Make sure these are arrow functions so `this` is correctly bound */
   onReady = () => {
-    if (!this.isReady) {
-      requestAnimationFrame(() => _internal_maybeHideAsync());
-    }
     this.isReady = true;
   };
   subscribeToRootState = (subscriber: () => void) => {

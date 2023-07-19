@@ -98,9 +98,9 @@ export function LogBoxInspectorSourceMapStatus(props: Props) {
     >
       <Animated.Image
         source={image}
+        tintColor={color ?? LogBoxStyle.getTextColor(0.4)}
         style={[
           styles.image,
-          { tintColor: color },
           state.rotate == null || props.status !== "PENDING"
             ? null
             : { transform: [{ rotate: state.rotate }] },
@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
     height: 14,
     width: 16,
     marginEnd: 4,
-    tintColor: LogBoxStyle.getTextColor(0.4),
   },
   text: {
     fontSize: 12,

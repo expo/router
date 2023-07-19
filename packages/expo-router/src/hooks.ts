@@ -11,6 +11,7 @@ import {
   useStoreRouteInfo,
 } from "./global-state/router-store";
 import { Router } from "./types";
+import { useDeprecated } from "./useDeprecated";
 
 type SearchParams = Record<string, string | string[]>;
 
@@ -28,19 +29,22 @@ export function useRootNavigation() {
 
 // Wraps useLinkTo to provide an API which is similar to the Link component.
 export function useLink() {
-  console.warn("`useLink()` is deprecated in favor of `useRouter()`");
+  useDeprecated("`useLink()` is deprecated in favor of `useRouter()`");
   return useRouter();
 }
 
 export function useRouter(): Router {
-  return {
-    push: store.push,
-    back: store.goBack,
-    replace: store.replace,
-    setParams: store.setParams,
-    // TODO(EvanBacon): add `reload`
-    // TODO(EvanBacon): add `canGoBack` but maybe more like a `hasContext`
-  };
+  return React.useMemo(
+    () => ({
+      push: store.push,
+      back: store.goBack,
+      replace: store.replace,
+      setParams: store.setParams,
+      canGoBack: store.canGoBack,
+      // TODO(EvanBacon): add `reload`
+    }),
+    []
+  );
 }
 
 /**

@@ -62,11 +62,7 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
             alignItems: "center",
           }}
         >
-          <Text
-            accessibilityRole="header"
-            accessibilityLevel={1}
-            style={styles.title}
-          >
+          <Text role="heading" aria-level={1} style={styles.title}>
             Something went wrong
           </Text>
         </View>

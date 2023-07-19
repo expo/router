@@ -127,8 +127,6 @@ declare module "react-native" {
     /** @platform web */
     tabIndex?: number;
     /** @platform web */
-    accessibilityLevel?: number;
-    /** @platform web */
     lang?: string;
   }
 
