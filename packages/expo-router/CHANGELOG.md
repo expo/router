@@ -10,6 +10,24 @@
 
 ### 💡 Others
 
+## [Fri, 21 Jul 2023 16:23:54 -0500](https://github.com/expo/router/commit/747b479918584692b978a8d4f6ed0ce86d83ea7d)
+
+### 🎉 New features
+
+- View controller based status bar appearance ([#773](https://github.com/expo/router/issues/773))
+- Allow nullish params ([#782](https://github.com/expo/router/issues/782))
+- Add full expo style reset to SSG ([#751](https://github.com/expo/router/issues/751))
+
+### 🐛 Bug fixes
+
+- Fix infinite loop when using invalid initialRouteName ([#780](https://github.com/expo/router/issues/780))
+- Fix initial route modal being presented instantly ([#781](https://github.com/expo/router/issues/781))
+- Memoize useRouter ([#753](https://github.com/expo/router/issues/753))
+
+### 💡 Others
+
+- Deprecate <Screen /> redirect prop ([#677](https://github.com/expo/router/issues/677))
+
 ## [Wed, 5 Jul 2023 10:41:30 -0700](https://github.com/expo/router/commit/5610b2c68a5b58f250e2789e49a9fc76dbac0097)
 
 ## [Wed, 5 Jul 2023 10:24:47 -0700](https://github.com/expo/router/commit/103a4637d2980d7642c1ac4bdf40586e1941b537)
