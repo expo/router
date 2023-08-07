@@ -67,7 +67,7 @@ export default function Details() {
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text
         onPress={() => {
-          router.push({ pathname: "/", params: { post: "random", id, other } });
+          router.push({ pathname: "/", params: { post: "random" } });
         }}
       >
         Go Home
