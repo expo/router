@@ -6,7 +6,6 @@ import {
 import { TabActions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 
-import type { RouterStore } from "./router-store";
 import { Href, resolveHref } from "../link/href";
 import { resolve } from "../link/path";
 import {
@@ -17,6 +16,7 @@ import {
   isMovingToSiblingRoute,
 } from "../link/stateOperations";
 import { hasUrlProtocolPrefix } from "../utils/url";
+import type { RouterStore } from "./router-store";
 
 function assertIsReady(store: RouterStore) {
   if (!store.navigationRef.isReady()) {
