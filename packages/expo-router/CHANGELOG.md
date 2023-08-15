@@ -10,6 +10,14 @@
 
 ### 💡 Others
 
+## [Tue, 15 Aug 2023 15:28:07 -0400](https://github.com/expo/router/commit/255ae7c676a6c59eab397b34e8730ea26de6d536)
+
+### 🐛 Bug fixes
+
+- Remove navigation context requirement for `canGoBack()` ([#839](https://github.com/expo/router/issues/839))
+- Remove `store.onReady` checks ([#794](https://github.com/expo/router/issues/794))
+- Fix navigation to sibling with same name.
+
 ## [Fri, 21 Jul 2023 16:23:54 -0500](https://github.com/expo/router/commit/747b479918584692b978a8d4f6ed0ce86d83ea7d)
 
 ### 🎉 New features
