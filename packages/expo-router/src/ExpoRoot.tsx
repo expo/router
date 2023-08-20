@@ -45,11 +45,6 @@ const INITIAL_METRICS = {
   insets: { top: 0, left: 0, right: 0, bottom: 0 },
 };
 
-const hasViewControllerBasedStatusBarAppearance =
-  Platform.OS === "ios" &&
-  !!Constants.expoConfig?.ios?.infoPlist
-    ?.UIViewControllerBasedStatusBarAppearance;
-
 export function ExpoRoot({
   wrapper: ParentWrapper = Fragment,
   ...props
@@ -68,11 +63,6 @@ export function ExpoRoot({
             initialMetrics={INITIAL_METRICS}
           >
             {children}
-
-            {/* Users can override this by adding another StatusBar element anywhere higher in the component tree. */}
-            {!hasViewControllerBasedStatusBarAppearance && (
-              <StatusBar style="auto" />
-            )}
           </SafeAreaProvider>
         </GestureHandlerRootView>
       </ParentWrapper>
