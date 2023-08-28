@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## [Mon, 28 Aug 2023 18:10:50 -0500](https://github.com/expo/router/commit/378394031bf0f7d7cd7d92648020f29730339fec)
+
+### 🐛 Bug fixes
+
+- Prevent double renders when pushing layouts ([#862](https://github.com/expo/router/issues/862))
+
 ## [Tue, 15 Aug 2023 15:28:07 -0400](https://github.com/expo/router/commit/255ae7c676a6c59eab397b34e8730ea26de6d536)
 
 ### 🐛 Bug fixes
