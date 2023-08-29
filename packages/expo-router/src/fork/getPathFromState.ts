@@ -153,7 +153,7 @@ export function getPathDataFromState<ParamList extends object>(
   }
 
   return getPathFromResolvedState(
-    state,
+    JSON.parse(JSON.stringify(state)),
     // Create a normalized configs object which will be easier to use
     createNormalizedConfigs(options.screens),
     { preserveGroups, preserveDynamicRoutes }
