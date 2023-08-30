@@ -1,5 +1,5 @@
-import React from "react";
 import { EventMapBase, NavigationState } from "@react-navigation/native";
+import React from "react";
 
 import { useContextKey } from "../Route";
 import { PickPartial } from "../types";
