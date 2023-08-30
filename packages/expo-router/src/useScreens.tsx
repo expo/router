@@ -1,4 +1,3 @@
-import React from "react";
 import type {
   EventMapBase,
   NavigationState,
@@ -6,6 +5,7 @@ import type {
   RouteProp,
   ScreenListeners,
 } from "@react-navigation/native";
+import React from "react";
 
 import {
   DynamicConvention,
