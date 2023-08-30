@@ -1,9 +1,9 @@
+import { ParamListBase, StackNavigationState } from "@react-navigation/native";
 import {
   createNativeStackNavigator,
   NativeStackNavigationEventMap,
   NativeStackNavigationOptions,
 } from "@react-navigation/native-stack";
-import { ParamListBase, StackNavigationState } from "@react-navigation/native";
 
 import { withLayoutContext } from "./withLayoutContext";
 
