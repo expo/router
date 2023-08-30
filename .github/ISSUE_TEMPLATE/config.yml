@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Expo Router has moved
-    url: https://github.com/expo/expo/tree/main/packages/expo-router
-    about: The source code for Expo Router has moved upstream to expo/expo. Learn more about the [`expo-router` source migration](https://github.com/expo/router/discussions/820)
   - name: Open an Expo Router issue
     url: https://github.com/expo/expo/issues/new?template=bug_report_router.yml
     about: Open issues for Expo Router in the expo/expo repo.
