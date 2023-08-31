@@ -10,6 +10,13 @@
 
 ### 💡 Others
 
+## [Thu, 31 Aug 2023 10:58:46 -0500](https://github.com/expo/router/commit/2e1e7a722044a1984aaa1a18bb688e7d29391787)
+
+### 🐛 Bug fixes
+
+- fix pushing back to nested modals ([#24166](https://github.com/expo/expo/pull/24166))
+- Add listener types ([#861](https://github.com/expo/router/issues/861))
+
 ## [Mon, 28 Aug 2023 18:10:50 -0500](https://github.com/expo/router/commit/378394031bf0f7d7cd7d92648020f29730339fec)
 
 ### 🐛 Bug fixes
