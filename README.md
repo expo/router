@@ -19,7 +19,6 @@ See the [setup guide for more](https://docs.expo.dev/routing/installation/).
 - [Layouts showcase](https://github.com/EvanBacon/expo-router-layouts-example) - Demo of bottom sheet, drawer, material tabs, top tabs, bottom tabs, js stack, and collapsing header layouts.
 - [Basic Twitter layout clone](https://github.com/EvanBacon/expo-router-twitter) - Similar layout to Twitter. Uses shared routes, and implements universal links.
 - [Test app](/apps/sandbox) - Test app, in this repository.
-- [Demo app](/apps/demo) - Demo app for the latest router version.
 - [Expo Router Guest List App](https://github.com/hola-soy-milk/upleveled-react-native-expo) - Simple guest list app with fetching from external API
 
 ## Contributing
