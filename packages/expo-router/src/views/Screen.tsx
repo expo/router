@@ -44,7 +44,7 @@ export function Screen<TOptions extends object = object>({
     }
   }, [navigation, options]);
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === "development" && redirect != null) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useDeprecated(
       "The `redirect` prop on <Screen /> is deprecated and will be removed. Please use `router.redirect` instead",
