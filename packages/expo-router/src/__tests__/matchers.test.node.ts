@@ -31,6 +31,11 @@ describe(matchGroupName, () => {
     expect(matchGroupName("leading/((foobar))")).toEqual("(foobar)");
     expect(matchGroupName("leading/(...foobar)")).toEqual("...foobar");
     expect(matchGroupName("leading/(foo,bar)")).toEqual("foo,bar");
+    expect(matchGroupName("leading/foobar/trailing")).toEqual(undefined);
+    expect(matchGroupName("leading/(foobar)/trailing")).toEqual("foobar");
+    expect(matchGroupName("leading/((foobar))/trailing")).toEqual("(foobar)");
+    expect(matchGroupName("leading/(...foobar)/trailing")).toEqual("...foobar");
+    expect(matchGroupName("leading/(foo,bar)/trailing)")).toEqual("foo,bar");
   });
 });
 describe(matchDynamicName, () => {
