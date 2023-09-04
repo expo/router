@@ -22,6 +22,7 @@
     "tabs.ts",
     "types",
     "plugin",
+    "testing-library.ts",
     "app.plugin.js",
     "!**/__tests__",
     "_ctx.*",
