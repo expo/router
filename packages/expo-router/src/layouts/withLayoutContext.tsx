@@ -86,6 +86,7 @@ export function withLayoutContext<
     (
       {
         children: userDefinedChildren,
+        hideTabsByDefault = false,
         ...props
       }: PickPartial<React.ComponentProps<T>, "children">,
       ref
@@ -98,7 +99,7 @@ export function withLayoutContext<
 
       const processed = processor ? processor(screens ?? []) : screens;
 
-      const sorted = useSortedScreens(processed ?? []);
+      const sorted = useSortedScreens(processed ?? [], { hideTabsByDefault });
 
       // Prevent throwing an error when there are no screens.
       if (!sorted.length) {

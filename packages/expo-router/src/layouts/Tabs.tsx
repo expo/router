@@ -16,7 +16,7 @@ import { withLayoutContext } from "./withLayoutContext";
 const BottomTabNavigator = createBottomTabNavigator().Navigator;
 
 export const Tabs = withLayoutContext<
-  BottomTabNavigationOptions & { href?: Href | null },
+  BottomTabNavigationOptions & { href?: Href | null; hideTabsByDefault?: Boolean },
   typeof BottomTabNavigator,
   TabNavigationState<ParamListBase>,
   BottomTabNavigationEventMap

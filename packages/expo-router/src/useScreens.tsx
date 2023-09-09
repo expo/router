@@ -116,11 +116,17 @@ function getSortedChildren(
 /**
  * @returns React Navigation screens sorted by the `route` property.
  */
-export function useSortedScreens(order: ScreenProps[]): React.ReactNode[] {
+export function useSortedScreens(order: ScreenProps[], {hideTabsByDefault = false} = {}): React.ReactNode[] {
   const node = useRouteNode();
 
   const sorted = node?.children?.length
-    ? getSortedChildren(node.children, order, node.initialRouteName)
+    ? getSortedChildren(
+      hideTabsByDefault
+        ? node?.children.filter(child => order.some(({name}) => child.route === name))
+        : node?.children,
+      order,
+      node.initialRouteName
+    )
     : [];
   return React.useMemo(
     () => sorted.map((value) => routeToScreen(value.route, value.props)),
