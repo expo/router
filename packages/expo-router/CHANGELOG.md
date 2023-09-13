@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## [Wed, 13 Sep 2023 16:26:03 -0700](https://github.com/expo/router/commit/a85e35f9a27fb6be34f963412eb5423d50770133)
+
+### 🐛 Bug fixes
+
+- feat: add testing-library.ts to npm file ([#876](https://github.com/expo/router/issues/876))
+
 ## [Thu, 31 Aug 2023 10:58:46 -0500](https://github.com/expo/router/commit/2e1e7a722044a1984aaa1a18bb688e7d29391787)
 
 ### 🐛 Bug fixes
