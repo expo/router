@@ -10,7 +10,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RouteNode } from "../Route";
-import { useExpoRouter } from "../global-state/router-store";
+import { useExpoRouter } from "../global-state/hooks";
 import { router } from "../imperative-api";
 import { Link } from "../link/Link";
 import { matchDeepDynamicRouteName } from "../matchers";

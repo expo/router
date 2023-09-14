@@ -1,7 +1,7 @@
 import * as React from "react";
 import { GestureResponderEvent, Platform } from "react-native";
 
-import { useExpoRouter } from "../global-state/router-store";
+import { useExpoRouter } from "../global-state/hooks";
 import { stripGroupSegmentsFromPath } from "../matchers";
 
 function eventShouldPreventDefault(

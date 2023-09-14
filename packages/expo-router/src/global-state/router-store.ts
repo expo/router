@@ -1,9 +1,8 @@
 import {
   NavigationContainerRefWithCurrent,
   getPathFromState,
-  useNavigationContainerRef,
 } from "@react-navigation/native";
-import { useSyncExternalStore, useMemo, ComponentType, Fragment } from "react";
+import { ComponentType, Fragment } from "react";
 
 import { UrlObject, getRouteInfoFromState } from "../LocationProvider";
 import { RouteNode } from "../Route";
@@ -199,53 +198,3 @@ export class RouterStore {
 }
 
 export const store = new RouterStore();
-
-export function useExpoRouter() {
-  return useSyncExternalStore(
-    store.subscribeToStore,
-    store.snapshot,
-    store.snapshot
-  );
-}
-
-function syncStoreRootState() {
-  if (store.navigationRef.isReady()) {
-    const currentState =
-      store.navigationRef.getRootState() as unknown as ResultState;
-
-    if (store.rootState !== currentState) {
-      store.updateState(currentState);
-    }
-  }
-}
-
-export function useStoreRootState() {
-  syncStoreRootState();
-  return useSyncExternalStore(
-    store.subscribeToRootState,
-    store.rootStateSnapshot,
-    store.rootStateSnapshot
-  );
-}
-
-export function useStoreRouteInfo() {
-  syncStoreRootState();
-  return useSyncExternalStore(
-    store.subscribeToRootState,
-    store.routeInfoSnapshot,
-    store.routeInfoSnapshot
-  );
-}
-
-export function useInitializeExpoRouter(
-  context: RequireContext,
-  initialLocation: URL | undefined
-) {
-  const navigationRef = useNavigationContainerRef();
-  useMemo(
-    () => store.initialize(context, navigationRef, initialLocation),
-    [context, initialLocation]
-  );
-  useExpoRouter();
-  return store;
-}

@@ -5,7 +5,7 @@ import { Platform } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import UpstreamNavigationContainer from "./fork/NavigationContainer";
-import { useInitializeExpoRouter } from "./global-state/router-store";
+import { useInitializeExpoRouter } from "./global-state/hooks";
 import { RequireContext } from "./types";
 import { SplashScreen } from "./views/Splash";
 

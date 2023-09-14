@@ -5,11 +5,8 @@ import {
 } from "@react-navigation/native";
 import React from "react";
 
-import {
-  store,
-  useStoreRootState,
-  useStoreRouteInfo,
-} from "./global-state/router-store";
+import { useStoreRootState, useStoreRouteInfo } from "./global-state/hooks";
+import { store } from "./global-state/router-store";
 import { Router } from "./types";
 import { useDeprecated } from "./useDeprecated";
 
