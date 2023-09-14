@@ -1,5 +1,5 @@
 import { useNavigationContainerRef } from "@react-navigation/native";
-import { useSyncExternalStore, useMemo } from "react";
+import { useSyncExternalStore, useEffect } from "react";
 
 import { ResultState } from "../fork/getStateFromPath";
 import { RequireContext } from "../types";
@@ -48,7 +48,7 @@ export function useInitializeExpoRouter(
 ) {
   const navigationRef = useNavigationContainerRef();
 
-  useMemo(
+  useEffect(
     () => store.initialize(context, navigationRef, initialLocation),
     [context, initialLocation]
   );
