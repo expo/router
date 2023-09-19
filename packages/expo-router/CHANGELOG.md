@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## [Tue, 19 Sep 2023 15:29:26 -0700](https://github.com/expo/router/commit/46c24a79494f60ba5b5b8550c00e2c78477b937a)
+
+### 🐛 Bug fixes
+
+- fix `router.replace()` navigation across nested navigators ([#884](https://github.com/expo/router/issues/884))
+
 ## [Wed, 13 Sep 2023 16:26:03 -0700](https://github.com/expo/router/commit/a85e35f9a27fb6be34f963412eb5423d50770133)
 
 ### 🐛 Bug fixes
