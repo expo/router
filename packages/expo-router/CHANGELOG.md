@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## [Wed, 20 Sep 2023 14:39:03 -0700](https://github.com/expo/router/commit/4798c5f7351387a04ac8451092e23ef4d45b0d6b)
+
+### 🐛 Bug fixes
+
+- Prevent circular navigation references. ([#885](https://github.com/expo/router/issues/885))
+
 ## [Tue, 19 Sep 2023 15:29:26 -0700](https://github.com/expo/router/commit/46c24a79494f60ba5b5b8550c00e2c78477b937a)
 
 ### 🐛 Bug fixes
