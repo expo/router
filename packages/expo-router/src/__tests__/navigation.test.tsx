@@ -6,6 +6,7 @@ import {
   router,
   useLocalSearchParams,
   Redirect,
+  Slot,
 } from "../exports";
 import { Stack } from "../layouts/Stack";
 import { Tabs } from "../layouts/Tabs";
@@ -264,4 +265,36 @@ it("does not loop infinitely when pushing a screen with empty options to an inva
   expect(screen).toHavePathname("/");
   act(() => router.push("/main/welcome"));
   expect(screen).toHavePathname("/main/welcome");
+});
+
+it("can push & replace with nested Slots", async () => {
+  renderRouter({
+    _layout: () => <Slot />,
+    index: () => <Text testID="index" />,
+    "one/_layout": () => <Slot />,
+    "one/index": () => <Text testID="one" />,
+  });
+
+  expect(screen).toHavePathname("/");
+  expect(screen.getByTestId("index")).toBeOnTheScreen();
+
+  // Push
+
+  act(() => router.push("/one"));
+  expect(screen).toHavePathname("/one");
+  expect(screen.getByTestId("one")).toBeOnTheScreen();
+
+  act(() => router.push("/"));
+  expect(screen).toHavePathname("/");
+  expect(screen.getByTestId("index")).toBeOnTheScreen();
+
+  // Replace
+
+  act(() => router.replace("/one"));
+  expect(screen).toHavePathname("/one");
+  expect(screen.getByTestId("one")).toBeOnTheScreen();
+
+  act(() => router.replace("/"));
+  expect(screen).toHavePathname("/");
+  expect(screen.getByTestId("index")).toBeOnTheScreen();
 });
