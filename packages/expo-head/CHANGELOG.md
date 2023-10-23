@@ -10,6 +10,19 @@
 
 ### 💡 Others
 
+## [Sat, 7 Oct 2023 13:27:03 -0500](https://github.com/expo/router/commit/b6c8a573130e1102a75bd610018079e5980b2306)
+
+
+## [Wed, 20 Sep 2023 14:39:03 -0700](https://github.com/expo/router/commit/4798c5f7351387a04ac8451092e23ef4d45b0d6b)
+
+## [Tue, 19 Sep 2023 15:29:26 -0700](https://github.com/expo/router/commit/46c24a79494f60ba5b5b8550c00e2c78477b937a)
+
+## [Wed, 13 Sep 2023 16:26:03 -0700](https://github.com/expo/router/commit/a85e35f9a27fb6be34f963412eb5423d50770133)
+
+### 🐛 Bug fixes
+
+- Remove expo-constants peer dependency
+
 ## [Thu, 22 Jun 2023 20:16:45 -0500](https://github.com/expo/router/commit/88637e027771608f8f163c7a8240ce84ef23f3ad)
 
 ## [Thu, 22 Jun 2023 17:12:26 -0500](https://github.com/expo/router/commit/a83e1cd3bb15bccb83fc5c31bc4706260cba49b0)

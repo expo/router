@@ -14,7 +14,7 @@
     "expo": "^49.0.0",
     "expo-auth-session": "~5.0.2",
     "expo-random": "~13.2.0",
-    "expo-router": "2.0.4",
+    "expo-router": "*",
     "expo-secure-store": "~12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",

@@ -17,7 +17,7 @@ export function useWarnOnce(
   key = message
 ) {
   // useLayoutEffect typically doesn't run in node environments.
-  // Combined with skipWarn, this should prevent unwanted warnings
+  // Combined with skipWarn, this should prevent unwanted warnings during SSR rendering
   useLayoutEffect(() => {
     if (guard && canWarn && !warned.has(key)) {
       warned.add(key);
@@ -27,8 +27,11 @@ export function useWarnOnce(
 }
 
 export function useDeprecated(
+  /** The deprecated message to display */
   message: string,
+  /** The guard to cause the warning to being displayed */
   guard: unknown = true,
+  /** The key to use for the warning. Used to detect if the warning has already been shown. */
   key = message
 ) {
   return useWarnOnce(key, guard, `Expo Router: ${message}`);
