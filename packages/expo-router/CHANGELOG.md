@@ -10,13 +10,18 @@
 
 ### 💡 Others
 
+## [Wed, 25 Oct 2023 11:19:52 -0700](https://github.com/expo/router/commit/54e151c0986ea7214ec5001963760a7058ef1300)
+
+### 🐛 Bug fixes
+
+- fix: correctly clone hoisted groups ([#874](https://github.com/expo/router/issues/874))
+
 ## [Sat, 7 Oct 2023 13:27:03 -0500](https://github.com/expo/router/commit/b6c8a573130e1102a75bd610018079e5980b2306)
 
 ### 🐛 Bug fixes
 
 - fix `console.warn`` firing incorrectly for deprecated features. ([#859](https://github.com/expo/router/issues/859))
 - backport navigation fixes from v3. ([#888](https://github.com/expo/router/issues/888))
-
 
 ## [Wed, 20 Sep 2023 14:39:03 -0700](https://github.com/expo/router/commit/4798c5f7351387a04ac8451092e23ef4d45b0d6b)
 
