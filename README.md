@@ -1,5 +1,14 @@
 # Expo Router
 
+The Expo Router repo **has moved** upstream to [**expo/expo**](https://github.com/expo/expo/). 
+- [View the source code](https://github.com/expo/expo/tree/main/packages/expo-router).
+- [Read the docs](https://docs.expo.dev/routing/introduction/).
+- [Report an issue](https://github.com/expo/expo/issues/new?assignees=&labels=needs+validation%2CRouter&projects=&template=bug_report_router.yml).
+
+This repo will remain in maintenance-mode until Expo Router v3 is released.
+
+---
+
 > [Stable version 2 is out now](https://blog.expo.dev/introducing-expo-router-v2-3850fd5c3ca1)!
 
 Repo for the new File-based router for React Native apps. Please open a discussion if you have any questions or feedback.
