@@ -10,6 +10,13 @@
 
 ### 💡 Others
 
+## [Mon, 6 Nov 2023 21:44:05 -0600](https://github.com/expo/router/commit/ac6a27600a49d71d2a11c900f590da95f5deffc5)
+
+### 🐛 Bug fixes
+
+- fix relative hrefs inside groups ([#900](https://github.com/expo/router/issues/900))
+- fix jest testing-library mocks ([#899](https://github.com/expo/router/issues/899))
+
 ## [Wed, 25 Oct 2023 11:19:52 -0700](https://github.com/expo/router/commit/54e151c0986ea7214ec5001963760a7058ef1300)
 
 ### 🐛 Bug fixes
