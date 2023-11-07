@@ -15,7 +15,7 @@ import {
   requireContext,
   requireContextWithOverrides,
 } from "./context-stubs";
-import { initialUrlRef } from "./mocks";
+import { setInitialUrl } from "./mocks";
 
 // re-export everything
 export * from "@testing-library/react-native";
@@ -60,7 +60,8 @@ export function renderRouter(
   let ctx: RequireContext;
 
   // Reset the initial URL
-  initialUrlRef.value = initialUrl as any;
+
+  setInitialUrl(initialUrl);
 
   // Force the render to be synchronous
   process.env.EXPO_ROUTER_IMPORT_MODE_WEB = "sync";
