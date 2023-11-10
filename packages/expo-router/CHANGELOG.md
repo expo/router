@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## [Fri, 10 Nov 2023 10:56:03 -0600](https://github.com/expo/router/commit/c792dd65d15a257f32979f5c54da9f734fde273d)
+
+### 🐛 Bug fixes
+
+- fix(router): relative links with index routes ([#903](https://github.com/expo/router/issues/903))
+
 ## [Mon, 6 Nov 2023 21:44:05 -0600](https://github.com/expo/router/commit/ac6a27600a49d71d2a11c900f590da95f5deffc5)
 
 ### 🐛 Bug fixes
