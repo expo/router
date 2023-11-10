@@ -98,6 +98,7 @@ export class RouterStore {
         pathname: "",
         params: {},
         segments: [],
+        isIndex: false,
       };
     }
 
