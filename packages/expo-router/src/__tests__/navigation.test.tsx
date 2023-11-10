@@ -435,3 +435,24 @@ describe("shared routes with tabs", () => {
     });
   });
 });
+
+it("can push relative links from index routes", async () => {
+  renderRouter({
+    _layout: () => <Slot />,
+    "(app)/index": () => <Text testID="one" />,
+    "(app)/test/_layout": () => <Stack />,
+    "(app)/test/index": () => <Text testID="two" />,
+    "(app)/test/bar": () => <Text testID="three" />,
+  });
+
+  expect(screen).toHavePathname("/");
+  expect(screen.getByTestId("one")).toBeOnTheScreen();
+
+  act(() => router.push("./test"));
+  expect(screen).toHavePathname("/test");
+  expect(screen.getByTestId("two")).toBeOnTheScreen();
+
+  act(() => router.push("./bar"));
+  expect(screen.getByTestId("three")).toBeOnTheScreen();
+  expect(screen).toHavePathname("/test/bar");
+});
