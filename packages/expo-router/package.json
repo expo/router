@@ -3,6 +3,7 @@
   "version": "2.0.12",
   "main": "src/index.tsx",
   "types": "build/index.d.ts",
+  "license": "MIT",
   "files": [
     "_error.js",
     "_entry.tsx",
