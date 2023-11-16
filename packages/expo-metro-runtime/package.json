@@ -37,7 +37,7 @@
     "react-native"
   ],
   "author": "Evan Bacon",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "dependencies": {
     "@bacons/react-views": "^1.1.3",
     "qs": "^6.10.3"
