@@ -10,6 +10,8 @@
 
 ### 💡 Others
 
+## [Fri, 17 Nov 2023 16:17:27 -0600](https://github.com/expo/router/commit/7ac1e71058386848aa2ab214e4c7114aa6bd028a)
+
 ## [Fri, 10 Nov 2023 10:56:03 -0600](https://github.com/expo/router/commit/c792dd65d15a257f32979f5c54da9f734fde273d)
 
 ## [Mon, 6 Nov 2023 21:44:05 -0600](https://github.com/expo/router/commit/ac6a27600a49d71d2a11c900f590da95f5deffc5)

@@ -10,6 +10,16 @@
 
 ### 💡 Others
 
+## [Fri, 17 Nov 2023 16:17:27 -0600](https://github.com/expo/router/commit/7ac1e71058386848aa2ab214e4c7114aa6bd028a)
+
+### 🐛 Bug fixes
+
+- backport fix for `generateStaticParams` ([#907](https://github.com/expo/router/issues/907))
+
+### 💡 Others
+
+- add MIT license ([#904](https://github.com/expo/router/issues/904))
+
 ## [Fri, 10 Nov 2023 10:56:03 -0600](https://github.com/expo/router/commit/c792dd65d15a257f32979f5c54da9f734fde273d)
 
 ### 🐛 Bug fixes
