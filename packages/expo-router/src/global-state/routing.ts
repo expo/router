@@ -7,7 +7,7 @@ import * as Linking from "expo-linking";
 import { ResultState } from "../fork/getStateFromPath";
 import { Href, resolveHref } from "../link/href";
 import { resolve } from "../link/path";
-import { hasUrlProtocolPrefix } from "../utils/url";
+import { shouldLinkExternally } from "../utils/url";
 import type { RouterStore } from "./router-store";
 
 function assertIsReady(store: RouterStore) {
@@ -52,7 +52,7 @@ export function setParams(
 }
 
 export function linkTo(this: RouterStore, href: string, event?: string) {
-  if (hasUrlProtocolPrefix(href)) {
+  if (shouldLinkExternally(href)) {
     Linking.openURL(href);
     return;
   }
