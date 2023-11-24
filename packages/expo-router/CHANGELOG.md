@@ -10,6 +10,12 @@
 
 ### 💡 Others
 
+## [Fri, 24 Nov 2023 00:59:20 -0600](https://github.com/expo/router/commit/b0065940f57ff58c5aef33e1ec6072f3c9941513)
+
+### 🎉 New features
+
+- support `mailto:` links ([#911](https://github.com/expo/router/issues/911))
+
 ## [Fri, 17 Nov 2023 16:17:27 -0600](https://github.com/expo/router/commit/7ac1e71058386848aa2ab214e4c7114aa6bd028a)
 
 ### 🐛 Bug fixes
