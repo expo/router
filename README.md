@@ -1,8 +1,8 @@
 # Expo Router
 
-The Expo Router repo **has moved** upstream to [**expo/expo**](https://github.com/expo/expo/). 
+The Expo Router repo **has moved** upstream to [**expo/expo**](https://github.com/expo/expo/).
 - [View the source code](https://github.com/expo/expo/tree/main/packages/expo-router).
-- [Read the docs](https://docs.expo.dev/routing/introduction/).
+- [Read the docs](https://docs.expo.dev/router/introduction/).
 - [Report an issue](https://github.com/expo/expo/issues/new?assignees=&labels=needs+validation%2CRouter&projects=&template=bug_report_router.yml).
 
 This repo will remain in maintenance-mode until Expo Router v3 is released.
@@ -21,7 +21,7 @@ The easiest way to try **Expo Router** is by creating a new project:
 npx create-expo-app@latest -e with-router
 ```
 
-See the [setup guide for more](https://docs.expo.dev/routing/installation/).
+See the [setup guide for more](https://docs.expo.dev/router/installation/).
 
 ## Examples
 

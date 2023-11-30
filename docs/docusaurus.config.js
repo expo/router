@@ -76,7 +76,7 @@ const config = {
       announcementBar: {
         id: "v2-notice",
         content:
-          'Expo Router v2 and Expo SDK 49 are stable. The docs are moving to <a href="https://docs.expo.dev/routing/introduction/">docs.expo.dev</a>.',
+          'Expo Router v2 and Expo SDK 49 are stable. The docs are moving to <a href="https://docs.expo.dev/router/introduction/">docs.expo.dev</a>.',
         backgroundColor: "#fafbfc",
         textColor: "#091E42",
         isCloseable: true,
