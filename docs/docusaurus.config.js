@@ -76,7 +76,7 @@ const config = {
       announcementBar: {
         id: "v2-notice",
         content:
-          'Expo Router v3 and Expo SDK 50 are in beta. The docs are moving to <a href="https://docs.expo.dev/routing/introduction/">docs.expo.dev</a>.',
+          'Expo Router v3 and Expo SDK 50 are in beta. The docs have moved to <a href="https://docs.expo.dev/routing/introduction/">docs.expo.dev</a>.',
         backgroundColor: "#fafbfc",
         textColor: "#091E42",
         isCloseable: true,
