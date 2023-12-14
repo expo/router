@@ -80,7 +80,7 @@ Use the [`usePathname()`](/docs/features/linking#usepathname), [`useSegments()`]
 In React Navigation, [`onReady`](https://reactnavigation.org/docs/navigation-container/#onready) is most often used to determine when the splash screen should hide or when to track screens using analytics. Expo Router has special handling for both these use cases. Assume the navigation is always ready in for navigation events in Expo Router.
 
 - See the [Screen Tracking guide](/docs/migration/react-navigation/screen-tracking) for info on migrating analytics from React Navigation.
-- See the [Splash Screen feature](/docs/features/splash) for info on handling the splash screen.
+- See the [Splash Screen feature](https://docs.expo.dev/routing/appearance/#splash-screen) for info on handling the splash screen.
 
 ### `onUnhandledAction`
 
@@ -92,11 +92,11 @@ The [`linking`](https://reactnavigation.org/docs/navigation-container/#linking) 
 
 ### `fallback`
 
-The [`fallback`](https://reactnavigation.org/docs/navigation-container/#fallback) prop is automatically handled by Expo Router. Learn more in the [Splash Screen guide](/docs/features/splash.md).
+The [`fallback`](https://reactnavigation.org/docs/navigation-container/#fallback) prop is automatically handled by Expo Router. Learn more in the [Splash Screen guide](https://docs.expo.dev/routing/appearance/#splash-screen).
 
 ### `theme`
 
-Use the `<ThemeProvider />` component instead. Learn more in the [Themes guide](/docs/migration/react-navigation/themes).
+Use the `<ThemeProvider />` component instead. Learn more in the [Themes guide](https://docs.expo.dev/routing/appearance).
 
 ### `children`
 
