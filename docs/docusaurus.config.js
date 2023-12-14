@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "Expo Router",
   tagline: "File-based Routing for React Native apps",
-  url: "https://expo.github.io",
+  url: "https://docs.expo.dev/router/introduction/",
   baseUrl: "/router/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -76,7 +76,7 @@ const config = {
       announcementBar: {
         id: "v2-notice",
         content:
-          'Expo Router v2 and Expo SDK 49 are stable. The docs are moving to <a href="https://docs.expo.dev/routing/introduction/">docs.expo.dev</a>.',
+          'Expo Router v3 and Expo SDK 50 are in beta. The docs are moving to <a href="https://docs.expo.dev/routing/introduction/">docs.expo.dev</a>.',
         backgroundColor: "#fafbfc",
         textColor: "#091E42",
         isCloseable: true,
@@ -88,17 +88,17 @@ const config = {
           alt: "Expo logo",
           srcDark: "img/logo.dark.svg",
           src: "img/logo.light.svg",
-          href: "/docs",
+          href: "https://docs.expo.dev/router/introduction/",
         },
 
         items: [
           {
-            to: "/docs/features/routing",
+            to: "https://docs.expo.dev/router/introduction/",
             label: "Features",
             position: "left",
           },
           {
-            href: "https://github.com/expo/router",
+            href: "https://github.com/expo/expo/tree/main/packages/expo-router",
             label: "GitHub",
             position: "right",
           },
@@ -112,15 +112,15 @@ const config = {
             items: [
               {
                 label: "Start",
-                to: "/docs",
+                to: "https://docs.expo.dev/router/introduction/",
               },
               {
                 label: "Features",
-                to: "/docs/features/routing",
+                to: "https://docs.expo.dev/router/introduction/",
               },
               {
                 label: "Guides",
-                to: "/docs/category/guides",
+                to: "https://docs.expo.dev/router/introduction/",
               },
             ],
           },
@@ -132,8 +132,8 @@ const config = {
                 href: "https://chat.expo.dev/",
               },
               {
-                label: "Twitter",
-                href: "https://twitter.com/expo",
+                label: "X (Twitter)",
+                href: "https://x.com/expo",
               },
             ],
           },
