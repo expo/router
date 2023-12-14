@@ -1,6 +1,6 @@
-import { Redirect } from "@docusaurus/router";
 import React from "react";
+import Redirect from "../../components/redirect";
 
-export default function RemovedPage() {
+export default function Home() {
   return <Redirect to="https://docs.expo.dev/router/introduction/" />;
 }
