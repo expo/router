@@ -7,7 +7,7 @@ slug: /
 
 :::note Migration
 
-This doc has [moved to the Expo Docs](https://docs.expo.dev/routing/introduction/).
+This doc has [moved to the Expo Docs](https://docs.expo.dev/router/introduction/).
 
 :::
 
