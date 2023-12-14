@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[7498],{119:(e,t,u)=>{u.r(t),u.d(t,{default:()=>c});var r=u(7294),s=u(6775);function c(){return r.createElement(s.l_,{to:"/router/docs/features/routing#layouts"})}}}]);
