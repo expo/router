@@ -1,6 +1,8 @@
 # Expo Router
 
-The Expo Router repo **has moved** upstream to [**expo/expo**](https://github.com/expo/expo/).
+> [!warning]
+> The Expo Router repo **has moved** upstream to [**expo/expo**](https://github.com/expo/expo/).
+
 - [View the source code](https://github.com/expo/expo/tree/main/packages/expo-router).
 - [Read the docs](https://docs.expo.dev/router/introduction/).
 - [Report an issue](https://github.com/expo/expo/issues/new?assignees=&labels=needs+validation%2CRouter&projects=&template=bug_report_router.yml).
