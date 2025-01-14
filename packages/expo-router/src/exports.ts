@@ -25,6 +25,7 @@ export { ExpoRoot } from "./ExpoRoot";
 export { Unmatched } from "./views/Unmatched";
 export { ErrorBoundaryProps } from "./views/Try";
 export { ErrorBoundary } from "./views/ErrorBoundary";
+export { Sitemap } from "./views/Sitemap";
 
 // Platform
 export { SplashScreen } from "./views/Splash";
